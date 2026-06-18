@@ -1563,7 +1563,7 @@ function AttributeGame({ onComplete, onResult, onBack }) {
         <div className="attr-points-display" id="attrPointsDisplay">{currentPoints}</div>
       </div>
 
-      <div className="attr-question-text">คุณสมบัติของสิ่งนี้คืออะไร?</div>
+      <div className="attr-question-text">{cfg.question}</div>
 
       <div className="attr-clues-list" id="attrCluesList">
         {Array.from({ length: displayCluesCount }).map((_, i) => {

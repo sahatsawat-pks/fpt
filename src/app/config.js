@@ -10,185 +10,187 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร"
+        "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+        "ชื่อเพลงที่คุณกำลังจะได้ยินต่อไปนี้ ใครเป็นนักร้อง"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/01.png",
             "audio": null,
-            "answer": "Sentinels"
+            "answer": "KAITO"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/02.png",
             "audio": null,
-            "answer": "Paper Rex"
+            "answer": "Megurine Luka"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/03.png",
             "audio": null,
-            "answer": "FNATIC"
+            "answer": "GUMI"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/04.png",
             "audio": null,
-            "answer": "T1"
+            "answer": "Kagamine Rin"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/05.png",
             "audio": null,
-            "answer": "FULL SENSE"
+            "answer": "Kagamine Len"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/06.png",
             "audio": null,
-            "answer": "ZETA DIVISION"
+            "answer": "MEIKA Hime"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/07.png",
             "audio": null,
-            "answer": "X10"
+            "answer": "Yuzuki Yukari"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/08.png",
             "audio": null,
-            "answer": "Attack All Around"
+            "answer": "Camui Gackpo"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/09.png",
             "audio": null,
-            "answer": "CRIT"
+            "answer": "MAYU"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/10.png",
             "audio": null,
-            "answer": "XERXIA"
+            "answer": "Fukase"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/11.png",
             "audio": null,
-            "answer": "Sharper Esports"
+            "answer": "Nekomura Iroha"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/12.png",
             "audio": null,
-            "answer": "Rex Regum Qeon"
+            "answer": "Amehare Hau"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/13.png",
             "audio": null,
-            "answer": "Team Vitality"
+            "answer": "SeeU"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/14.png",
             "audio": null,
-            "answer": "DRX"
+            "answer": "Sweet ANN"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
             "image": "public/img/15.png",
             "audio": null,
-            "answer": "Leviatán Esports"
+            "answer": "IA"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/16.png",
+            "question": "World is Mine",
+            "image": null,
             "audio": null,
-            "answer": "Ex Oblivione"
+            "answer": "Hatsune Miku"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/17.png",
+            "question": "ECHO",
+            "image": null,
             "audio": null,
-            "answer": "FunPlus Phoenix"
+            "answer": "GUMI"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/18.png",
+            "question": "The Lost One's Weeping",
+            "image": null,
             "audio": null,
-            "answer": "LOUD"
+            "answer": "Kagamine Rin"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/19.png",
+            "question": "Just Be Friends",
+            "image": null,
             "audio": null,
-            "answer": "Trace Esports"
+            "answer": "Megurine Luka"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/20.png",
+            "question": "Servant of Evil",
+            "image": null,
             "audio": null,
-            "answer": "VARREL"
+            "answer": "Kagamine Len"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/21.png",
+            "question": "Chururira Chururira Daddadda!",
+            "image": null,
             "audio": null,
-            "answer": "Revenant XSpark"
+            "answer": "Yuzuki Yukari"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/22.png",
+            "question": "Matoryoshka",
+            "image": null,
             "audio": null,
-            "answer": "TALON"
+            "answer": "Hatsune Miku / GUMI"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/23.png",
+            "question": "Hide and Seek",
+            "image": null,
             "audio": null,
-            "answer": "Northeption"
+            "answer": "SeeU"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/24.png",
+            "question": "Blessed Messiah and the Tower of AI",
+            "image": null,
             "audio": null,
-            "answer": "DetonatioN FocusMe"
+            "answer": "Hatsune Miku, Kagamine Len, Kagamine Rin, Megurine Luka, Camui Gackpo, GUMI, IA, MAYU, MEIKO, KAITO"
         },
         {
-            "question": "นี่คือตราประจำทีม E-Sports ที่มีชื่อว่าอะไร",
-            "image": "public/img/25.png",
+            "question": "Senbonzakura",
+            "image": null,
             "audio": null,
-            "answer": "Made in Thailand"
+            "answer": "Hatsune Miku"
         }
     ],
     "qa": {
-        "question": "ในการแข่งขัน VALORANT Masters Bangkok 2025 ทีมที่ชนะเลิศในการแข่งขั้นครั้งนี้ 3 แมทซ์แรก พบกับทีมที่มีชื่อว่าอะไรบ้าง",
-        "answer": "Team Vitality / Trace Esports / DRX",
+        "question": "เพลงในซีรีส์ \"The Daughter of Evil\" มีเพลงรวมกันทั้งหมดกี่เพลง และ มีการพูดถึงอาณาจักรหรือประเทศ รวมกันทั้งหมดกี่ประเทศ",
+        "answer": "13 เพลง / 6 ประเทศ",
         "choices": [
-            "Sentinels / Trace Esports / EDward Gaming",
-            "Sentinels / Team Vitality / Trace Esports",
-            "Team Vitality / Trace Esports / DRX",
-            "Team Vitality / Trace Esports / G2 Esports",
-            "T1 / Sentinels / Team Liquid"
+            "3 เพลง / 2 ประเทศ",
+            "7 เพลง / 4 ประเทศ",
+            "9 เพลง / 4 ประเทศ",
+            "11 เพลง / 5 ประเทศ",
+            "13 เพลง / 6 ประเทศ"
         ]
     },
     "jigsaw": {
         "image": "public/img/jigsaw.png",
-        "answer": "กล้า Cigarettes",
-        "question": "หลังจิ๊กซอว์นี้ นี่คือภาพของนักแข่ง Valorant ที่มีชื่อว่าอะไร"
+        "answer": "The Disappearance of Hatsune Miku",
+        "question": "หลังจิ๊กซอว์นี้ มาจาก MV เพลงที่มีชื่อว่าอะไร"
     },
     "attribute": {
+        "question": "นี่คือคุณสมบัติของตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
         "clues": [
-            "1 ในทีมเข้าแข่งขัน VALORANT Masters London 2026",
-            "ชื่อทีมมี 2 พยางค์",
-            "ลงแข่งครั้งแรกปี 2020",
-            "ทีมส่งตรงจากประเทศไทย",
-            "เคยมีทีมหญิง"
+            "เพศหญิง",
+            "ผมเหลือง ตาฟ้า",
+            "1 ในกลุ่ม Virtual Singer จาก Project Sekai",
+            "ปรากฎครั้งแรกใน Vocaloid2 Engine",
+            "มีฝาแฝด"
         ],
-        "answer": "FULL SENSE"
+        "answer": "Kagamine Rin"
     }
 };
 
