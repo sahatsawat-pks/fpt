@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Matter from "matter-js";
-import { playAudio, stopAudio } from "../soundUtils";
 
 const BALL_COLORS = [
   { name: "ทอง", top: "linear-gradient(135deg, #ffd700 0%, #b8860b 100%)", bottom: "rgba(184, 134, 11, 0.4)", glow: "#ffd700", text: "#fff" },
@@ -43,18 +42,13 @@ export default function BallDrawPage() {
 
   // Suspense Egg Crack Reveal State
   const [showEggModal, setShowEggModal] = useState(false);
-  const [eggState, setEggState] = useState("closed"); // 'closed' | 'egg_opened' | 'slip_opened'
+  const [eggState, setEggState] = useState("closed"); // 'closed' | 'revealed'
   const [autoCrackEgg, setAutoCrackEgg] = useState(true);
 
   // Auto Simulation State
   const [isAutoSimulating, setIsAutoSimulating] = useState(false);
   const [autoSpeed, setAutoSpeed] = useState(2000); // ms per step
   const autoSimTimerRef = useRef(null);
-
-  // Sound Ref
-  const soundRef = useRef(null);
-  const revealSoundRef = useRef(null);
-  const [soundMuted, setSoundMuted] = useState(false);
 
   // Matter.js Physics Engine Refs
   const engineRef = useRef(null);
@@ -157,8 +151,6 @@ export default function BallDrawPage() {
 
     return () => {
       if (autoSimTimerRef.current) clearTimeout(autoSimTimerRef.current);
-      stopAudio(soundRef);
-      stopAudio(revealSoundRef);
     };
   }, [isAuthenticated]);
 
@@ -320,38 +312,10 @@ export default function BallDrawPage() {
     initializeBalls(lines);
   };
 
-  // Sound Helpers
-  const playSuspenseSound = () => {
-    if (soundMuted) return;
-    stopAudio(soundRef);
-    soundRef.current = playAudio("/sound/Fan Of The Year (จับลูกบอลยุคเก่า).mp3");
-  };
-
-  const playShuffleSound = () => {
-    if (soundMuted) return;
-    stopAudio(soundRef);
-    soundRef.current = playAudio("/sound/Shuffle (Score) (2012-14).wav");
-  };
-
-  const playDropSound = () => {
-    if (soundMuted) return;
-    playAudio("/sound/ทึ้ม.mp3");
-  };
-
-  const playCrackSound = () => {
-    if (soundMuted) return;
-    stopAudio(revealSoundRef);
-    revealSoundRef.current = playAudio("/sound/Text In (2012-14).wav");
-    setTimeout(() => {
-      if (!soundMuted) playAudio("/sound/เฉลยจบ.mp3");
-    }, 180);
-  };
-
   // Realistic Jar Shaking with dynamic turbulent physical pulses
   const handleShuffle = () => {
     if (isShuffling) return;
     setIsShuffling(true);
-    playShuffleSound();
 
     let shakeTicks = 0;
     const shakeInterval = setInterval(() => {
@@ -406,8 +370,7 @@ export default function BallDrawPage() {
     const randomIndex = Math.floor(Math.random() * unpicked.length);
     const chosenEntry = unpicked[randomIndex];
 
-    // 1. Play drop sound and animate ball into the bottom chute
-    playDropSound();
+    // 1. Animate ball into the bottom chute
     setDroppingBallId(ball.id);
     droppingIdRef.current = ball.id;
 
@@ -449,16 +412,12 @@ export default function BallDrawPage() {
       setShowEggModal(true);
       setDroppingBallId(null);
       droppingIdRef.current = null;
-      playSuspenseSound();
 
-      // In auto-simulation: automatically open egg shell, then unroll slip
+      // In auto-simulation: automatically open egg to reveal contestant
       if (isAutoSimulating) {
         setTimeout(() => {
-          handleOpenEggShell();
-          setTimeout(() => {
-            handleUnrollSlip();
-          }, 700);
-        }, 600);
+          handleOpenEgg();
+        }, 500);
       }
     }, 420);
   };
@@ -474,18 +433,10 @@ export default function BallDrawPage() {
     processDrawBall(remaining[randomIndex]);
   };
 
-  // Step 1: Open horizontal egg shells (ฝาไข่แยกซ้าย-ขวา)
-  const handleOpenEggShell = () => {
+  // Open egg and reveal contestant name immediately
+  const handleOpenEgg = () => {
     if (eggState !== "closed") return;
-    setEggState("egg_opened");
-    playDropSound();
-  };
-
-  // Step 2: Unroll the mystery paper slip (คลี่กระดาษสลากแนวนอน)
-  const handleUnrollSlip = () => {
-    if (eggState === "slip_opened") return;
-    setEggState("slip_opened");
-    playCrackSound();
+    setEggState("revealed");
   };
 
   // Auto Simulation Loop
@@ -501,9 +452,9 @@ export default function BallDrawPage() {
       return;
     }
 
-    // Step interval: if modal is open and slip is unrolled, close modal and draw next
+    // Step interval: if modal is open and revealed, close modal and draw next
     autoSimTimerRef.current = setTimeout(() => {
-      if (showEggModal && eggState === "slip_opened") {
+      if (showEggModal && eggState === "revealed") {
         setShowEggModal(false);
         setEggState("closed");
         setCurrentDrawn(null);
@@ -544,7 +495,6 @@ export default function BallDrawPage() {
   const handleCloseEggModal = (drawNext = false) => {
     setShowEggModal(false);
     setEggState("closed");
-    stopAudio(soundRef);
     if (drawNext) {
       setTimeout(() => {
         handleDrawRandomBall();
@@ -575,7 +525,7 @@ export default function BallDrawPage() {
         justifyContent: "center",
         color: "#00e5ff",
         fontSize: "18px",
-        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif"
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)"
       }}>
         กำลังโหลด...
       </div>
@@ -591,7 +541,7 @@ export default function BallDrawPage() {
         alignItems: "center",
         justifyContent: "center",
         padding: "20px",
-        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
         color: "#ffffff"
       }}>
         <div style={{
@@ -684,7 +634,7 @@ export default function BallDrawPage() {
       minHeight: "100vh",
       background: "radial-gradient(ellipse at top center, #0f2744 0%, #061124 50%, #02060e 100%)",
       color: "#ffffff",
-      fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif",
+      fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
       position: "relative"
     }}>
       {/* Dynamic CSS Styles for Realistic Shaking, Floating, and Egg Cracking Animations */}
@@ -872,28 +822,6 @@ export default function BallDrawPage() {
               </div>
 
               <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
-                {/* Sound Toggle Button */}
-                <button
-                  type="button"
-                  onClick={() => setSoundMuted(!soundMuted)}
-                  style={{
-                    padding: "10px 14px",
-                    borderRadius: "10px",
-                    background: soundMuted ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
-                    border: soundMuted ? "1px solid rgba(239, 68, 68, 0.4)" : "1px solid rgba(34, 197, 94, 0.4)",
-                    color: soundMuted ? "#ff7875" : "#86efac",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                  title={soundMuted ? "เปิดเสียงเอฟเฟกต์" : "ปิดเสียงเอฟเฟกต์"}
-                >
-                  {soundMuted ? "🔇 ปิดเสียง" : "🔊 เปิดเสียง"}
-                </button>
-
                 {/* Shake / Shuffle Jar Button */}
                 <button
                   type="button"
@@ -1573,7 +1501,7 @@ export default function BallDrawPage() {
               <div>
                 {/* 3D Horizontal Festival Capsule Egg (Clickable) */}
                 <div
-                  onClick={handleOpenEggShell}
+                  onClick={handleOpenEgg}
                   style={{
                     position: "relative",
                     width: "290px",
@@ -1585,7 +1513,7 @@ export default function BallDrawPage() {
                     justifyContent: "center",
                     animation: "eggFloatSuspense 2.4s ease-in-out infinite, eggPulsingGlow 1.8s infinite"
                   }}
-                  title="คลิกเพื่อเปิดไข่แนวนอน!"
+                  title="คลิกเพื่อเปิดไข่!"
                 >
                   {/* Left Half Shell (ฝาซ้าย) */}
                   <div style={{
@@ -1660,15 +1588,15 @@ export default function BallDrawPage() {
                   marginBottom: "8px",
                   textShadow: "0 2px 10px rgba(255, 215, 0, 0.5)"
                 }}>
-                  ✨ กดหรือแตะที่ไข่เพื่อเปิดฝาออก (แนวนอน)! ✨
+                  ✨ กดหรือแตะที่ไข่เพื่อเปิดดูชื่อผู้เข้าแข่งขัน ✨
                 </h3>
                 <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", marginBottom: "24px" }}>
-                  ไข่สุ่มงานวัด เปิดฝาแยกซ้าย-ขวาเพื่อลุ้นกระดาษสลากด้านใน
+                  แตะที่ไข่เพื่อเปิดดูชื่อผู้เข้าแข่งขันคนที่จับได้ทันที
                 </p>
 
                 <button
                   type="button"
-                  onClick={handleOpenEggShell}
+                  onClick={handleOpenEgg}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -1685,157 +1613,15 @@ export default function BallDrawPage() {
                     animation: "fingerTapPrompt 1.2s infinite ease-in-out"
                   }}
                 >
-                  <span style={{ fontSize: "20px" }}>👆</span> แตะเพื่อเปิดฝาไข่เดี๋ยวนี้!
+                  <span style={{ fontSize: "20px" }}>👆</span> แตะเพื่อเปิดไข่เดี๋ยวนี้!
                 </button>
               </div>
             )}
 
             {/* ====================================================
-                STAGE B: EGG OPENED - ROLLED PAPER SLIP WAITING INSIDE
+                STAGE B: REVEALED CONTESTANT RESULT
                ==================================================== */}
-            {eggState === "egg_opened" && (
-              <div style={{ position: "relative" }}>
-                {/* Horizontal Opened Shells with Rolled Paper in Between */}
-                <div style={{
-                  position: "relative",
-                  width: "360px",
-                  height: "170px",
-                  margin: "0 auto 20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}>
-                  {/* Left Shell Slid Left */}
-                  <div style={{
-                    position: "absolute",
-                    left: "20px",
-                    width: "125px",
-                    height: "145px",
-                    borderRadius: "75px 0 0 75px",
-                    background: currentDrawn.color,
-                    border: "3px solid #ffffff",
-                    boxShadow: "inset 10px 0 20px rgba(255,255,255,0.6)",
-                    animation: "horizontalEggLeftSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards"
-                  }}></div>
-
-                  {/* Rolled Paper Slip (ม้วนกระดาษสลาก รอเปิด) */}
-                  <div
-                    onClick={handleUnrollSlip}
-                    style={{
-                      position: "relative",
-                      zIndex: 15,
-                      width: "86px",
-                      height: "120px",
-                      borderRadius: "10px",
-                      background: "linear-gradient(90deg, #cfbf92 0%, #fffdf4 35%, #fef3c7 65%, #c2b184 100%)",
-                      border: "2px solid #ffd700",
-                      boxShadow: "0 10px 30px rgba(0,0,0,0.8), 0 0 25px rgba(255, 215, 0, 0.8)",
-                      cursor: "pointer",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      animation: "rolledPaperPulse 1.4s infinite ease-in-out"
-                    }}
-                    title="แตะเพื่อคลี่กระดาษสลาก!"
-                  >
-                    {/* Red Ribbon Band Wrapped Around the Roll */}
-                    <div style={{
-                      width: "100%",
-                      height: "26px",
-                      background: "linear-gradient(180deg, #991b1b 0%, #dc2626 50%, #7f1d1d 100%)",
-                      borderTop: "1px solid #ffd700",
-                      borderBottom: "1px solid #ffd700",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.5)"
-                    }}>
-                      <div style={{
-                        width: "18px",
-                        height: "18px",
-                        borderRadius: "50%",
-                        background: "radial-gradient(circle, #ffd700 0%, #b45309 100%)",
-                        border: "1px solid #ffffff",
-                        fontSize: "10px",
-                        fontWeight: "900",
-                        color: "#030812",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}>
-                        ★
-                      </div>
-                    </div>
-
-                    <span style={{
-                      position: "absolute",
-                      bottom: "10px",
-                      fontSize: "10px",
-                      fontWeight: "800",
-                      color: "#78350f",
-                      letterSpacing: "0.5px"
-                    }}>
-                      สลาก
-                    </span>
-                  </div>
-
-                  {/* Right Shell Slid Right */}
-                  <div style={{
-                    position: "absolute",
-                    right: "20px",
-                    width: "125px",
-                    height: "145px",
-                    borderRadius: "0 75px 75px 0",
-                    background: currentDrawn.bottomColor,
-                    border: "3px solid #ffffff",
-                    boxShadow: "inset -10px 0 20px rgba(0,0,0,0.7)",
-                    animation: "horizontalEggRightSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards"
-                  }}></div>
-                </div>
-
-                {/* Prompt Message */}
-                <h3 style={{
-                  fontSize: "22px",
-                  fontWeight: "800",
-                  color: "#ffd700",
-                  marginBottom: "8px",
-                  textShadow: "0 2px 10px rgba(255, 215, 0, 0.5)"
-                }}>
-                  📜 พบสลากกระดาษม้วนอยู่ด้านใน!
-                </h3>
-                <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.75)", marginBottom: "22px" }}>
-                  แตะที่ม้วนกระดาษเพื่อคลี่เปิดดูชื่อผู้เข้าแข่งขัน
-                </p>
-
-                <button
-                  type="button"
-                  onClick={handleUnrollSlip}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    padding: "14px 38px",
-                    borderRadius: "30px",
-                    background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                    color: "#030812",
-                    fontSize: "17px",
-                    fontWeight: "900",
-                    border: "none",
-                    cursor: "pointer",
-                    boxShadow: "0 0 30px rgba(0, 229, 255, 0.7)",
-                    animation: "fingerTapPrompt 1.2s infinite ease-in-out"
-                  }}
-                >
-                  <span style={{ fontSize: "20px" }}>📜</span> คลี่กระดาษสลากเดี๋ยวนี้!
-                </button>
-              </div>
-            )}
-
-            {/* ====================================================
-                STAGE C: PAPER SLIP UNROLLED HORIZONTALLY (คลี่ออกสมบูรณ์)
-               ==================================================== */}
-            {eggState === "slip_opened" && (
+            {eggState === "revealed" && (
               <div style={{ position: "relative" }}>
                 {/* Dynamic Celebration Confetti Particle Burst */}
                 <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1000, overflow: "hidden" }}>

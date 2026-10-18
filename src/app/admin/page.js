@@ -642,7 +642,7 @@ export default function AdminPage() {
         justifyContent: "center",
         background: "radial-gradient(ellipse at center, #0a192f 0%, #030812 100%)",
         color: "#fff",
-        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
         padding: "20px"
       }}>
         <div style={{
@@ -748,7 +748,7 @@ export default function AdminPage() {
       minHeight: "100vh",
       background: "radial-gradient(ellipse at top center, #0f2744 0%, #07101f 60%, #02050a 100%)",
       color: "#ffffff",
-      fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif"
+      fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)"
     }}>
       {/* Top Navbar */}
       <header style={{

@@ -495,7 +495,7 @@ export default function MainPage() {
         justifyContent: "center",
         color: "#00e5ff",
         fontSize: "18px",
-        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif"
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)"
       }}>
         กำลังโหลด...
       </div>
@@ -511,7 +511,7 @@ export default function MainPage() {
         alignItems: "center",
         justifyContent: "center",
         padding: "20px",
-        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
         color: "#ffffff"
       }}>
         <div style={{
@@ -612,7 +612,7 @@ export default function MainPage() {
       minHeight: "100vh",
       background: "#030814",
       color: "#ffffff",
-      fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif"
+      fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)"
     }}>
       {/* ========================================================
           1. TOP NAVIGATION BAR (Themed after official Fan Pan Tae)
@@ -2317,7 +2317,7 @@ export default function MainPage() {
           <img src="/img/logo.png" alt="FANPANTAE 2026" style={{ width: "100%", height: "auto", opacity: 0.6 }} />
         </div>
         <p style={{ margin: "0 0 8px 0" }}>
-          แฟนพันธุ์แท้แห่งปี 2026
+          แฟนพันธุ์แท้แห่งปี 2026 (Fanmade)
         </p>
         <p style={{ fontSize: "12px", margin: 0, color: "rgba(255,255,255,0.3)" }}>
           ระบบจำลองการแข่งขันและคำนวณคะแนนอัตโนมัติ สำหรับทีมงานและผู้ชม

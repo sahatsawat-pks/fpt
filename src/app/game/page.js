@@ -1457,7 +1457,7 @@ export default function Home() {
         justifyContent: "center",
         background: "radial-gradient(ellipse at center, #0f2744 0%, #081020 70%, #03060c 100%)",
         color: "#fff",
-        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
         padding: "20px"
       }}>
         <div style={{
