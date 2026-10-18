@@ -48,6 +48,11 @@ export default function AdminPage() {
   });
   const [scoringNotice, setScoringNotice] = useState("");
 
+  // Custom Contestant Dropdown State
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownSearch, setDropdownSearch] = useState("");
+  const dropdownRef = useRef(null);
+
   // Contestant Edit / Modal State
   const [showContestantModal, setShowContestantModal] = useState(false);
   const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
@@ -150,6 +155,17 @@ export default function AdminPage() {
       setLoadingPoll(false);
     }
   };
+
+  // Close custom dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const getContestantPollRank = (c) => {
     if (!pollItems || pollItems.length === 0) return 999;
@@ -934,35 +950,297 @@ export default function AdminPage() {
                 <span>1️⃣</span> เลือกผู้เข้าแข่งขันที่กำลังแข่งขัน (เรียงตามอันดับโพลล์)
               </h2>
 
-              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-                <select
-                  value={selectedContestantId}
-                  onChange={(e) => setSelectedContestantId(e.target.value)}
-                  style={{
-                    flex: "1",
-                    minWidth: "280px",
-                    padding: "12px 16px",
-                    borderRadius: "10px",
-                    background: "rgba(0, 15, 30, 0.9)",
-                    border: "1px solid rgba(0, 229, 255, 0.4)",
-                    color: "#ffffff",
-                    fontSize: "16px",
-                    outline: "none"
-                  }}
-                >
-                  <option value="">-- กรุณาเลือกผู้เข้าแข่งขัน (เรียงตามอันดับโพลล์) --</option>
-                  {[...contestants]
-                    .sort((a, b) => getContestantPollRank(a) - getContestantPollRank(b))
-                    .map((c) => {
-                      const pRank = getContestantPollRank(c);
-                      const pollPrefix = pRank !== 999 ? `[อันดับโพลล์ #${pRank}] ` : "";
+              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "stretch" }}>
+                {/* Custom Rich Contestant Dropdown */}
+                <div ref={dropdownRef} style={{ position: "relative", flex: "1", minWidth: "320px" }}>
+                  {/* Dropdown Trigger Box */}
+                  <div
+                    onClick={() => {
+                      setIsDropdownOpen(!isDropdownOpen);
+                      setDropdownSearch("");
+                    }}
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: "10px",
+                      background: "rgba(0, 15, 30, 0.9)",
+                      border: isDropdownOpen ? "1.5px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.4)",
+                      boxShadow: isDropdownOpen ? "0 0 16px rgba(0, 229, 255, 0.3)" : "none",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "12px",
+                      minHeight: "56px",
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    {(() => {
+                      const selected = contestants.find((c) => String(c.id) === String(selectedContestantId));
+                      if (!selected) {
+                        return (
+                          <span style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "15px" }}>
+                            -- กรุณาเลือกผู้เข้าแข่งขัน (เรียงตามอันดับโพลล์) --
+                          </span>
+                        );
+                      }
+                      const pRank = getContestantPollRank(selected);
+                      const isTop5 = pRank <= 5;
                       return (
-                        <option key={c.id} value={c.id}>
-                          {pollPrefix}{c.name} {c.nickname ? `(${c.nickname})` : ""} — {c.topic} (คะแนนรวม: {c.totalScore ?? 0})
-                        </option>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px", overflow: "hidden", flex: 1 }}>
+                          {/* Poll Rank Badge */}
+                          {pRank !== 999 && (
+                            <span style={{
+                              display: "inline-block",
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              fontWeight: "900",
+                              fontSize: "12px",
+                              background: isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.15)",
+                              color: isTop5 ? "#ffd700" : "#67e8f9",
+                              border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
+                              flexShrink: 0
+                            }}>
+                              โพลล์ #{pRank}
+                            </span>
+                          )}
+
+                          {/* Contestant Photo */}
+                          <div style={{
+                            width: "38px",
+                            height: "38px",
+                            borderRadius: "50%",
+                            overflow: "hidden",
+                            background: "rgba(0, 229, 255, 0.1)",
+                            border: isTop5 ? "2px solid #ffd700" : "2px solid #00e5ff",
+                            flexShrink: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                          }}>
+                            {selected.image ? (
+                              <img src={selected.image} alt={selected.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            ) : (
+                              <span style={{ fontSize: "18px" }}>👤</span>
+                            )}
+                          </div>
+
+                          {/* Contestant Name & Topic */}
+                          <div style={{ display: "flex", flexDirection: "column", textAlign: "left", overflow: "hidden" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                              <span style={{ fontWeight: "800", fontSize: "15px", color: "#ffffff" }}>
+                                {selected.name}
+                              </span>
+                              {selected.nickname && (
+                                <span style={{ color: "#ffd700", fontWeight: "700", fontSize: "13px" }}>
+                                  ({selected.nickname})
+                                </span>
+                              )}
+                            </div>
+                            <span style={{
+                              fontSize: "12px",
+                              color: "rgba(255, 255, 255, 0.65)",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis"
+                            }}>
+                              หัวข้อ: {selected.topic}
+                            </span>
+                          </div>
+
+                          {/* Total Score */}
+                          <span style={{
+                            marginLeft: "auto",
+                            padding: "3px 10px",
+                            borderRadius: "8px",
+                            background: "rgba(255, 215, 0, 0.15)",
+                            color: "#ffd700",
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            flexShrink: 0
+                          }}>
+                            {selected.totalScore ?? 0} คะแนน
+                          </span>
+                        </div>
                       );
-                    })}
-                </select>
+                    })()}
+
+                    <span style={{
+                      fontSize: "12px",
+                      color: "#00e5ff",
+                      transform: isDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s ease",
+                      flexShrink: 0
+                    }}>
+                      ▼
+                    </span>
+                  </div>
+
+                  {/* Dropdown Options List */}
+                  {isDropdownOpen && (
+                    <div style={{
+                      position: "absolute",
+                      top: "calc(100% + 6px)",
+                      left: 0,
+                      right: 0,
+                      zIndex: 1000,
+                      background: "linear-gradient(160deg, #07162b 0%, #030a14 100%)",
+                      border: "1.5px solid #00e5ff",
+                      borderRadius: "12px",
+                      boxShadow: "0 14px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 229, 255, 0.3)",
+                      maxHeight: "380px",
+                      overflowY: "auto",
+                      backdropFilter: "blur(12px)"
+                    }}>
+                      {/* Search inside dropdown */}
+                      <div style={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 10,
+                        background: "#07162b",
+                        padding: "10px 12px",
+                        borderBottom: "1px solid rgba(0, 229, 255, 0.25)"
+                      }}>
+                        <input
+                          type="text"
+                          value={dropdownSearch}
+                          onChange={(e) => setDropdownSearch(e.target.value)}
+                          placeholder="🔍 ค้นหาชื่อเล่น, ชื่อจริง หรือ หัวข้อ..."
+                          autoFocus
+                          style={{
+                            width: "100%",
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            background: "#030a14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#ffffff",
+                            fontSize: "13px",
+                            outline: "none"
+                          }}
+                        />
+                      </div>
+
+                      {/* Items */}
+                      {(() => {
+                        const sorted = [...contestants].sort((a, b) => getContestantPollRank(a) - getContestantPollRank(b));
+                        const q = dropdownSearch.trim().toLowerCase();
+                        const filtered = sorted.filter((c) => {
+                          if (!q) return true;
+                          return (
+                            c.name?.toLowerCase().includes(q) ||
+                            c.nickname?.toLowerCase().includes(q) ||
+                            c.topic?.toLowerCase().includes(q)
+                          );
+                        });
+
+                        if (filtered.length === 0) {
+                          return (
+                            <div style={{ padding: "20px", textAlign: "center", color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>
+                              ไม่พบผู้เข้าแข่งขันที่ตรงกับการค้นหา
+                            </div>
+                          );
+                        }
+
+                        return filtered.map((c) => {
+                          const isSelected = String(c.id) === String(selectedContestantId);
+                          const pRank = getContestantPollRank(c);
+                          const isTop5 = pRank <= 5;
+                          return (
+                            <div
+                              key={c.id}
+                              onClick={() => {
+                                setSelectedContestantId(c.id);
+                                setIsDropdownOpen(false);
+                              }}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                                padding: "10px 14px",
+                                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                background: isSelected ? "rgba(0, 229, 255, 0.18)" : "transparent",
+                                cursor: "pointer",
+                                transition: "background 0.15s ease"
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) e.currentTarget.style.background = "rgba(0, 229, 255, 0.1)";
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) e.currentTarget.style.background = "transparent";
+                              }}
+                            >
+                              {/* Poll Rank Badge */}
+                              <span style={{
+                                display: "inline-block",
+                                minWidth: "40px",
+                                textAlign: "center",
+                                padding: "3px 6px",
+                                borderRadius: "6px",
+                                fontWeight: "900",
+                                fontSize: "11px",
+                                background: isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)",
+                                color: isTop5 ? "#ffd700" : "#67e8f9",
+                                border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)",
+                                flexShrink: 0
+                              }}>
+                                {pRank !== 999 ? `#${pRank}` : "-"}
+                              </span>
+
+                              {/* Photo Avatar */}
+                              <div style={{
+                                width: "36px",
+                                height: "36px",
+                                borderRadius: "50%",
+                                overflow: "hidden",
+                                background: "rgba(0, 229, 255, 0.1)",
+                                border: isTop5 ? "2px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
+                                flexShrink: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}>
+                                {c.image ? (
+                                  <img src={c.image} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                ) : (
+                                  <span style={{ fontSize: "16px" }}>👤</span>
+                                )}
+                              </div>
+
+                              {/* Details */}
+                              <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <span style={{ fontWeight: "700", fontSize: "14px", color: isSelected ? "#00e5ff" : "#ffffff" }}>
+                                    {c.name}
+                                  </span>
+                                  {c.nickname && (
+                                    <span style={{ color: "#ffd700", fontSize: "12px", fontWeight: "600" }}>
+                                      ({c.nickname})
+                                    </span>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {c.topic}
+                                </div>
+                              </div>
+
+                              {/* Score & Check */}
+                              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#ffd700" }}>
+                                  {c.totalScore ?? 0} คะแนน
+                                </div>
+                                {isSelected && (
+                                  <span style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "800" }}>
+                                    ✓ กำลังเลือก
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  )}
+                </div>
 
                 <button
                   type="button"
@@ -976,7 +1254,11 @@ export default function AdminPage() {
                     fontWeight: "800",
                     border: "none",
                     cursor: "pointer",
-                    boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)"
+                    boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)",
+                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                 >
                   ✅ ยืนยันเลือกคนนี้
