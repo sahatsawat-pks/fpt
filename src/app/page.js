@@ -258,6 +258,7 @@ const POLL_CONTESTANTS = [
 export default function MainPage() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [totalContestants, setTotalContestants] = useState(23);
+  const [pollList, setPollList] = useState(POLL_CONTESTANTS);
   const [loading, setLoading] = useState(true);
 
   // Tab State: 'standings' | 'poll'
@@ -279,15 +280,20 @@ export default function MainPage() {
   // Load leaderboard & settings
   const fetchData = async () => {
     try {
-      const [scoresRes, settingsRes] = await Promise.all([
+      const [scoresRes, settingsRes, pollRes] = await Promise.all([
         fetch("/api/scores"),
         fetch("/api/settings"),
+        fetch("/api/poll"),
       ]);
       const scoresData = await scoresRes.json();
       const settingsData = await settingsRes.json();
+      const pollData = await pollRes.json();
 
       if (scoresData.success && Array.isArray(scoresData.data)) {
         setLeaderboard(scoresData.data);
+      }
+      if (pollData.success && Array.isArray(pollData.data) && pollData.data.length > 0) {
+        setPollList(pollData.data);
       }
       if (settingsData.success) {
         if (settingsData.totalContestants) {
@@ -396,7 +402,7 @@ export default function MainPage() {
     return true;
   });
 
-  const filteredPoll = POLL_CONTESTANTS.filter((item) => {
+  const filteredPoll = pollList.filter((item) => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return true;
     return (
@@ -1701,7 +1707,6 @@ export default function MainPage() {
                   boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7), inset 0 1px 3px rgba(255, 255, 255, 0.6)"
                 }}>
                   <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{ fontSize: "20px" }}>📊</span>
                     <h2 style={{
                       fontStyle: "italic",
                       fontWeight: "900",
@@ -1728,7 +1733,7 @@ export default function MainPage() {
                 }}>
                   {/* Rank Header */}
                   <div style={{
-                    width: "56px",
+                    width: "88px",
                     height: "32px",
                     borderRadius: "8px",
                     transform: "skewX(-16deg)",
@@ -1740,7 +1745,7 @@ export default function MainPage() {
                     justifyContent: "center"
                   }}>
                     <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                      อันดับ
+                      อันดับโพลล์
                     </span>
                   </div>
 
@@ -1804,24 +1809,6 @@ export default function MainPage() {
                       คิดเป็น %
                     </span>
                   </div>
-
-                  {/* Popularity Badge Header */}
-                  <div style={{
-                    width: "120px",
-                    height: "32px",
-                    borderRadius: "8px",
-                    transform: "skewX(-16deg)",
-                    background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
-                    border: "2px solid #e0e0e0",
-                    boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>
-                      อันดับโพลล์
-                    </span>
-                  </div>
                 </div>
 
                 {/* Poll Data Rows */}
@@ -1876,7 +1863,7 @@ export default function MainPage() {
                       >
                         {/* 1. Slanted Rank Box (Yellow highlight for Top 5 matching image) */}
                         <div style={{
-                          width: "56px",
+                          width: "88px",
                           height: "48px",
                           borderRadius: "8px",
                           transform: "skewX(-16deg)",
@@ -2025,42 +2012,6 @@ export default function MainPage() {
                             textShadow: isTop5 ? "0 0 10px rgba(255, 215, 0, 0.7)" : "0 0 8px rgba(0, 229, 255, 0.5)"
                           }}>
                             {item.percent}
-                          </span>
-                        </div>
-
-                        {/* 5. Slanted Popularity Badge */}
-                        <div style={{
-                          width: "120px",
-                          height: "48px",
-                          borderRadius: "8px",
-                          transform: "skewX(-16deg)",
-                          background: isRank1
-                            ? "linear-gradient(180deg, #2c2007 0%, #130d02 100%)"
-                            : isRank2
-                            ? "linear-gradient(180deg, #242a32 0%, #0f1216 100%)"
-                            : isRank3
-                            ? "linear-gradient(180deg, #261608 0%, #120a03 100%)"
-                            : isTop5
-                            ? "linear-gradient(180deg, #241d08 0%, #120e03 100%)"
-                            : "linear-gradient(180deg, #101c2b 0%, #070e17 100%)",
-                          border: `2.5px solid ${borderColor}`,
-                          boxShadow: glowShadow,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0
-                        }}>
-                          <span style={{
-                            transform: "skewX(16deg)",
-                            fontStyle: "italic",
-                            fontWeight: "900",
-                            fontSize: "13px",
-                            color: isRank1 ? "#ffd700" : isRank2 ? "#ffffff" : isRank3 ? "#f59e0b" : isTop5 ? "#ffd700" : "rgba(255,255,255,0.7)",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px"
-                          }}>
-                            {isRank1 ? "🥇 อันดับ 1" : isRank2 ? "🥈 อันดับ 2" : isRank3 ? "🥉 อันดับ 3" : isTop5 ? "⭐ Top 5" : `POLL #${item.pollRank}`}
                           </span>
                         </div>
                       </div>

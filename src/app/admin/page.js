@@ -77,11 +77,29 @@ export default function AdminPage() {
     }
   }, []);
 
-  // 2. Fetch Settings and Contestants when authenticated
+  // Poll Rankings State
+  const [pollItems, setPollItems] = useState([]);
+  const [loadingPoll, setLoadingPoll] = useState(false);
+  const [savingPoll, setSavingPoll] = useState(false);
+  const [pollNotice, setPollNotice] = useState("");
+
+  // 1. Check Auth on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("fpt_admin_auth");
+      if (stored === "true") {
+        setIsAuthenticated(true);
+      }
+      setAuthChecking(false);
+    }
+  }, []);
+
+  // 2. Fetch Settings, Contestants and Poll when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       loadSettings();
       loadContestants();
+      loadPoll();
     }
   }, [isAuthenticated]);
 
@@ -115,6 +133,128 @@ export default function AdminPage() {
       console.error("Failed to load contestants:", err);
     } finally {
       setLoadingContestants(false);
+    }
+  };
+
+  const loadPoll = async () => {
+    setLoadingPoll(true);
+    try {
+      const res = await fetch("/api/poll");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setPollItems(data.data);
+      }
+    } catch (err) {
+      console.error("Failed to load poll:", err);
+    } finally {
+      setLoadingPoll(false);
+    }
+  };
+
+  const getContestantPollRank = (c) => {
+    if (!pollItems || pollItems.length === 0) return 999;
+    const match = pollItems.find((p) =>
+      (p.name && c.name && (p.name.trim() === c.name.trim() || c.name.includes(p.name) || p.name.includes(c.name))) ||
+      (p.nickname && c.nickname && p.nickname.trim() === c.nickname.trim()) ||
+      (p.topic && c.topic && (p.topic.trim() === c.topic.trim() || c.topic.includes(p.topic) || p.topic.includes(c.topic)))
+    );
+    return match ? match.pollRank : 999;
+  };
+
+  const handlePollFieldChange = (index, field, value) => {
+    setPollItems((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleMovePoll = (index, delta) => {
+    const targetIndex = index + delta;
+    if (targetIndex < 0 || targetIndex >= pollItems.length) return;
+    setPollItems((prev) => {
+      const updated = [...prev];
+      const temp = updated[index];
+      updated[index] = updated[targetIndex];
+      updated[targetIndex] = temp;
+      return updated.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
+    });
+  };
+
+  const handleAddPollItem = () => {
+    const newRank = pollItems.length + 1;
+    setPollItems((prev) => [
+      ...prev,
+      {
+        pollRank: newRank,
+        name: "ผู้เข้าแข่งขันใหม่",
+        nickname: "",
+        topic: "-",
+        percent: "0.00%",
+      },
+    ]);
+  };
+
+  const handleDeletePollItem = (index) => {
+    const item = pollItems[index];
+    if (!window.confirm(`ต้องการลบ "${item.nickname || item.name}" ออกจากตารางโพลล์ใช่หรือไม่?`)) {
+      return;
+    }
+    setPollItems((prev) => {
+      const filtered = prev.filter((_, idx) => idx !== index);
+      return filtered.map((it, idx) => ({ ...it, pollRank: idx + 1 }));
+    });
+  };
+
+  const handleSaveAllPoll = async () => {
+    setSavingPoll(true);
+    setPollNotice("");
+    try {
+      const res = await fetch("/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save_all", items: pollItems }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPollNotice("✅ บันทึกตารางอันดับโพลล์เรียบร้อยแล้ว!");
+        showToast("บันทึกตารางอันดับโพลล์เรียบร้อยแล้ว");
+        if (Array.isArray(data.data)) {
+          setPollItems(data.data);
+        }
+      } else {
+        setPollNotice("❌ บันทึกไม่สำเร็จ: " + (data.error || ""));
+      }
+    } catch (err) {
+      setPollNotice("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+    } finally {
+      setSavingPoll(false);
+    }
+  };
+
+  const handleResetPoll = async () => {
+    if (!window.confirm("ต้องการรีเซ็ตตารางอันดับโพลล์กลับเป็นค่าเริ่มต้น 22 คนใช่หรือไม่?")) {
+      return;
+    }
+    setSavingPoll(true);
+    try {
+      const res = await fetch("/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reset" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPollNotice("✅ รีเซ็ตตารางอันดับโพลล์เป็นค่าเริ่มต้นเรียบร้อยแล้ว!");
+        showToast("รีเซ็ตผลโพลล์เป็นค่าเริ่มต้นแล้ว");
+        if (Array.isArray(data.data)) {
+          setPollItems(data.data);
+        }
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการรีเซ็ตผลโพลล์");
+    } finally {
+      setSavingPoll(false);
     }
   };
 
@@ -744,6 +884,22 @@ export default function AdminPage() {
             👥 รายชื่อผู้เข้าแข่งขัน & ผูกรูป ({contestants.length})
           </button>
           <button
+            onClick={() => setActiveTab("poll")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "poll" ? "rgba(255, 215, 0, 0.15)" : "transparent",
+              color: activeTab === "poll" ? "#ffd700" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "poll" ? "2px solid #ffd700" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0"
+            }}
+          >
+            📊 จัดการอันดับโพลล์ ({pollItems.length})
+          </button>
+          <button
             onClick={() => setActiveTab("settings")}
             style={{
               padding: "12px 20px",
@@ -775,7 +931,7 @@ export default function AdminPage() {
               marginBottom: "24px"
             }}>
               <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#80d0ff", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>1️⃣</span> เลือกผู้เข้าแข่งขันที่กำลังแข่งขัน
+                <span>1️⃣</span> เลือกผู้เข้าแข่งขันที่กำลังแข่งขัน (เรียงตามอันดับโพลล์)
               </h2>
 
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
@@ -794,12 +950,18 @@ export default function AdminPage() {
                     outline: "none"
                   }}
                 >
-                  <option value="">-- กรุณาเลือกผู้เข้าแข่งขัน --</option>
-                  {contestants.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} {c.nickname ? `(${c.nickname})` : ""} — {c.topic} (คะแนนรวม: {c.totalScore ?? 0})
-                    </option>
-                  ))}
+                  <option value="">-- กรุณาเลือกผู้เข้าแข่งขัน (เรียงตามอันดับโพลล์) --</option>
+                  {[...contestants]
+                    .sort((a, b) => getContestantPollRank(a) - getContestantPollRank(b))
+                    .map((c) => {
+                      const pRank = getContestantPollRank(c);
+                      const pollPrefix = pRank !== 999 ? `[อันดับโพลล์ #${pRank}] ` : "";
+                      return (
+                        <option key={c.id} value={c.id}>
+                          {pollPrefix}{c.name} {c.nickname ? `(${c.nickname})` : ""} — {c.topic} (คะแนนรวม: {c.totalScore ?? 0})
+                        </option>
+                      );
+                    })}
                 </select>
 
                 <button
@@ -1494,13 +1656,16 @@ export default function AdminPage() {
             return true;
           });
 
+          // เรียงตามอันดับโพลล์ (Poll Rankings)
+          filteredContestants.sort((a, b) => getContestantPollRank(a) - getContestantPollRank(b));
+
           return (
             <div>
               {/* Header & Add Button */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "18px" }}>
                 <div>
                   <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#80d0ff", margin: "0 0 4px 0" }}>
-                    👥 รายชื่อผู้เข้าแข่งขันทั้งหมด ({contestants.length} คน)
+                    👥 รายชื่อผู้เข้าแข่งขันทั้งหมด ({contestants.length} คน — เรียงตามอันดับโพลล์)
                   </h2>
                   <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
                     ผูกรูปโปรไฟล์ อัปเดตข้อมูล และตรวจสอบคะแนนรวมของผู้เข้าแข่งขัน
@@ -1617,6 +1782,7 @@ export default function AdminPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "14px" }}>
                   <thead>
                     <tr style={{ background: "rgba(0, 229, 255, 0.12)", borderBottom: "1px solid rgba(0, 229, 255, 0.3)" }}>
+                      <th style={{ padding: "12px 14px", width: "95px", textAlign: "center", color: "#ffd700" }}>อันดับโพลล์</th>
                       <th style={{ padding: "12px 14px", width: "60px", textAlign: "center" }}>รูป</th>
                       <th style={{ padding: "12px 14px" }}>ชื่อจริง-นามสกุล</th>
                       <th style={{ padding: "12px 14px" }}>ชื่อเล่น</th>
@@ -1632,6 +1798,27 @@ export default function AdminPage() {
                   <tbody>
                     {filteredContestants.map((c) => (
                       <tr key={c.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", transition: "background 0.15s ease" }}>
+                        <td style={{ padding: "10px", textAlign: "center" }}>
+                          {(() => {
+                            const pRank = getContestantPollRank(c);
+                            if (pRank === 999) return <span style={{ color: "rgba(255,255,255,0.3)" }}>-</span>;
+                            const isTop5 = pRank <= 5;
+                            return (
+                              <span style={{
+                                display: "inline-block",
+                                padding: "3px 8px",
+                                borderRadius: "6px",
+                                fontWeight: "800",
+                                fontSize: "12px",
+                                background: isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)",
+                                color: isTop5 ? "#ffd700" : "#67e8f9",
+                                border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)"
+                              }}>
+                                #{pRank}
+                              </span>
+                            );
+                          })()}
+                        </td>
                         <td style={{ padding: "10px", textAlign: "center" }}>
                           <div
                             onClick={() => openEditModal(c)}
@@ -1707,7 +1894,7 @@ export default function AdminPage() {
                     ))}
                     {filteredContestants.length === 0 && (
                       <tr>
-                        <td colSpan={10} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.4)" }}>
+                        <td colSpan={11} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.4)" }}>
                           {contestants.length === 0
                             ? "ยังไม่มีรายชื่อผู้เข้าแข่งขันในระบบ"
                             : "ไม่พบรายชื่อผู้เข้าแข่งขันที่ตรงตามเงื่อนไขการค้นหา/ฟิลเตอร์"}
@@ -1722,7 +1909,354 @@ export default function AdminPage() {
         })()}
 
         {/* ========================================================
-            TAB 3: SETTINGS & PASSWORDS
+            TAB 3: POLL RANKINGS MANAGEMENT
+           ======================================================== */}
+        {activeTab === "poll" && (
+          <div>
+            {/* Header & Action Bar */}
+            <div style={{
+              background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+              border: "1px solid rgba(255, 215, 0, 0.3)",
+              borderRadius: "16px",
+              padding: "24px",
+              marginBottom: "20px"
+            }}>
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                gap: "16px",
+                marginBottom: "16px"
+              }}>
+                <div>
+                  <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#ffd700", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>📊</span> จัดการตารางอันดับโพลล์ (Poll Rankings)
+                  </h2>
+                  <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: 0, lineHeight: "1.6" }}>
+                    ตารางนี้จะแสดงบนหน้าแรก (/) และใช้เป็นลำดับการเรียงผู้เข้าแข่งขันในหน้านี้ (คะแนนสด และรายชื่อผู้เข้าแข่งขัน)<br />
+                    คุณสามารถกดปุ่ม <strong style={{ color: "#00e5ff" }}>⬆️ / ⬇️</strong> เพื่อสลับอันดับ หรือแก้ไขข้อมูลในช่องได้โดยตรง แล้วกดปุ่ม <strong>"บันทึกผลโพลล์ทั้งหมด"</strong>
+                  </p>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    onClick={handleAddPollItem}
+                    style={{
+                      padding: "10px 16px",
+                      borderRadius: "8px",
+                      background: "rgba(0, 229, 255, 0.15)",
+                      border: "1px solid rgba(0, 229, 255, 0.5)",
+                      color: "#00e5ff",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}
+                  >
+                    ➕ เพิ่มคนในโพลล์
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResetPoll}
+                    disabled={savingPoll}
+                    style={{
+                      padding: "10px 16px",
+                      borderRadius: "8px",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      color: "rgba(255, 255, 255, 0.8)",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                      cursor: savingPoll ? "not-allowed" : "pointer"
+                    }}
+                  >
+                    🔄 รีเซ็ตค่าเริ่มต้น (22 คน)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveAllPoll}
+                    disabled={savingPoll}
+                    style={{
+                      padding: "10px 22px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(90deg, #ffd700 0%, #ffb703 100%)",
+                      border: "none",
+                      color: "#030812",
+                      fontSize: "14px",
+                      fontWeight: "800",
+                      cursor: savingPoll ? "not-allowed" : "pointer",
+                      boxShadow: "0 0 16px rgba(255, 215, 0, 0.35)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}
+                  >
+                    {savingPoll ? "⏳ กำลังบันทึก..." : "💾 บันทึกผลโพลล์ทั้งหมด"}
+                  </button>
+                </div>
+              </div>
+
+              {pollNotice && (
+                <div style={{
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                  background: pollNotice.startsWith("✅") ? "rgba(34, 197, 94, 0.15)" : "rgba(255, 77, 79, 0.15)",
+                  color: pollNotice.startsWith("✅") ? "#86efac" : "#ff7875",
+                  fontWeight: "700",
+                  fontSize: "14px"
+                }}>
+                  {pollNotice}
+                </div>
+              )}
+            </div>
+
+            {/* Poll Table Editor */}
+            <div style={{
+              background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+              border: "1px solid rgba(0, 229, 255, 0.25)",
+              borderRadius: "16px",
+              padding: "20px",
+              overflowX: "auto"
+            }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "750px", fontSize: "14px" }}>
+                <thead>
+                  <tr style={{ background: "rgba(0, 229, 255, 0.08)", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
+                    <th style={{ padding: "12px 14px", textAlign: "center", width: "95px", color: "#ffd700", fontWeight: "800" }}>อันดับโพลล์</th>
+                    <th style={{ padding: "12px 14px", textAlign: "left", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
+                    <th style={{ padding: "12px 14px", textAlign: "left", width: "130px", color: "#80d0ff" }}>ชื่อเล่น</th>
+                    <th style={{ padding: "12px 14px", textAlign: "left", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
+                    <th style={{ padding: "12px 14px", textAlign: "center", width: "130px", color: "#80d0ff" }}>คิดเป็น %</th>
+                    <th style={{ padding: "12px 14px", textAlign: "center", width: "110px", color: "#80d0ff" }}>เลื่อนลำดับ</th>
+                    <th style={{ padding: "12px 14px", textAlign: "center", width: "80px", color: "#80d0ff" }}>ลบ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pollItems.map((item, index) => {
+                    const isTop5 = item.pollRank <= 5;
+                    return (
+                      <tr
+                        key={item.pollRank + "-" + index}
+                        style={{
+                          borderBottom: "1px solid rgba(255,255,255,0.06)",
+                          background: index % 2 === 0 ? "rgba(0,0,0,0.15)" : "transparent"
+                        }}
+                      >
+                        {/* Poll Rank Badge */}
+                        <td style={{ padding: "10px", textAlign: "center" }}>
+                          <span style={{
+                            display: "inline-block",
+                            padding: "4px 10px",
+                            borderRadius: "8px",
+                            fontWeight: "800",
+                            fontSize: "13px",
+                            background: isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)",
+                            color: isTop5 ? "#ffd700" : "#67e8f9",
+                            border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)",
+                            boxShadow: isTop5 ? "0 0 8px rgba(255, 215, 0, 0.25)" : "none"
+                          }}>
+                            {isTop5 ? `⭐ #${item.pollRank}` : `#${item.pollRank}`}
+                          </span>
+                        </td>
+
+                        {/* Name Input */}
+                        <td style={{ padding: "8px 10px" }}>
+                          <input
+                            type="text"
+                            value={item.name || ""}
+                            onChange={(e) => handlePollFieldChange(index, "name", e.target.value)}
+                            placeholder="ชื่อ-นามสกุล..."
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0, 229, 255, 0.3)",
+                              color: "#ffffff",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </td>
+
+                        {/* Nickname Input */}
+                        <td style={{ padding: "8px 10px" }}>
+                          <input
+                            type="text"
+                            value={item.nickname || ""}
+                            onChange={(e) => handlePollFieldChange(index, "nickname", e.target.value)}
+                            placeholder="ชื่อเล่น..."
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0, 229, 255, 0.3)",
+                              color: "#ffd700",
+                              fontSize: "13px",
+                              fontWeight: "600"
+                            }}
+                          />
+                        </td>
+
+                        {/* Topic Input */}
+                        <td style={{ padding: "8px 10px" }}>
+                          <input
+                            type="text"
+                            value={item.topic || ""}
+                            onChange={(e) => handlePollFieldChange(index, "topic", e.target.value)}
+                            placeholder="หัวข้อแฟนพันธุ์แท้..."
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0, 229, 255, 0.3)",
+                              color: "rgba(255,255,255,0.9)",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </td>
+
+                        {/* Percent Input */}
+                        <td style={{ padding: "8px 10px" }}>
+                          <input
+                            type="text"
+                            value={item.percent || ""}
+                            onChange={(e) => handlePollFieldChange(index, "percent", e.target.value)}
+                            placeholder="เช่น 12.50%"
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(0, 229, 255, 0.3)",
+                              color: "#67e8f9",
+                              fontSize: "13px",
+                              textAlign: "center",
+                              fontFamily: "monospace",
+                              fontWeight: "700"
+                            }}
+                          />
+                        </td>
+
+                        {/* Reorder Buttons */}
+                        <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                          <div style={{ display: "inline-flex", gap: "4px" }}>
+                            <button
+                              type="button"
+                              onClick={() => handleMovePoll(index, -1)}
+                              disabled={index === 0}
+                              title="เลื่อนขึ้น"
+                              style={{
+                                width: "30px",
+                                height: "30px",
+                                borderRadius: "6px",
+                                background: index === 0 ? "rgba(255,255,255,0.04)" : "rgba(0, 229, 255, 0.15)",
+                                border: index === 0 ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0, 229, 255, 0.4)",
+                                color: index === 0 ? "rgba(255,255,255,0.2)" : "#00e5ff",
+                                cursor: index === 0 ? "not-allowed" : "pointer",
+                                fontSize: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleMovePoll(index, 1)}
+                              disabled={index === pollItems.length - 1}
+                              title="เลื่อนลง"
+                              style={{
+                                width: "30px",
+                                height: "30px",
+                                borderRadius: "6px",
+                                background: index === pollItems.length - 1 ? "rgba(255,255,255,0.04)" : "rgba(0, 229, 255, 0.15)",
+                                border: index === pollItems.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0, 229, 255, 0.4)",
+                                color: index === pollItems.length - 1 ? "rgba(255,255,255,0.2)" : "#00e5ff",
+                                cursor: index === pollItems.length - 1 ? "not-allowed" : "pointer",
+                                fontSize: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}
+                            >
+                              ▼
+                            </button>
+                          </div>
+                        </td>
+
+                        {/* Delete Button */}
+                        <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePollItem(index)}
+                            title="ลบออกจากโพลล์"
+                            style={{
+                              width: "30px",
+                              height: "30px",
+                              borderRadius: "6px",
+                              background: "rgba(255, 77, 79, 0.15)",
+                              border: "1px solid rgba(255, 77, 79, 0.4)",
+                              color: "#ff7875",
+                              cursor: "pointer",
+                              fontSize: "12px",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center"
+                            }}
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {pollItems.length === 0 && (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.4)" }}>
+                        ยังไม่มีข้อมูลในตารางอันดับโพลล์ กดปุ่ม "➕ เพิ่มคนในโพลล์" หรือ "🔄 รีเซ็ตค่าเริ่มต้น" เพื่อเริ่มต้น
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+
+              {/* Bottom Quick Save */}
+              <div style={{ marginTop: "20px", display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button
+                  type="button"
+                  onClick={handleSaveAllPoll}
+                  disabled={savingPoll}
+                  style={{
+                    padding: "12px 24px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(90deg, #ffd700 0%, #ffb703 100%)",
+                    border: "none",
+                    color: "#030812",
+                    fontSize: "15px",
+                    fontWeight: "800",
+                    cursor: savingPoll ? "not-allowed" : "pointer",
+                    boxShadow: "0 0 16px rgba(255, 215, 0, 0.35)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
+                  {savingPoll ? "⏳ กำลังบันทึก..." : "💾 บันทึกผลโพลล์ทั้งหมด"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 4: SETTINGS & PASSWORDS
            ======================================================== */}
         {activeTab === "settings" && (
           <div style={{
