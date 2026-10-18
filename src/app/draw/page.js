@@ -708,6 +708,20 @@ export default function BallDrawPage() {
           0% { transform: translateY(0) rotate(0deg); opacity: 1; }
           100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
         }
+
+        .draw-grid-container {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 390px;
+          gap: 24px;
+          align-items: start;
+          width: 100%;
+        }
+
+        @media (max-width: 992px) {
+          .draw-grid-container {
+            grid-template-columns: minmax(0, 1fr);
+          }
+        }
       `}</style>
 
       {/* Top Navbar */}
@@ -784,10 +798,10 @@ export default function BallDrawPage() {
 
       {/* Main Container */}
       <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "28px 20px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", gap: "28px", alignItems: "start" }}>
+        <div className="draw-grid-container">
 
           {/* LEFT: The Realistic Glass Jar & Controls */}
-          <div>
+          <div style={{ minWidth: 0, width: "100%" }}>
             {/* Control Bar */}
             <div style={{
               background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(8, 16, 32, 0.95) 100%)",
@@ -962,6 +976,7 @@ export default function BallDrawPage() {
             <div style={{
               position: "relative",
               width: "100%",
+              minWidth: 0,
               height: "530px",
               background: "radial-gradient(circle at center, rgba(0, 180, 216, 0.09) 0%, rgba(2, 6, 14, 0.98) 75%)",
               border: "1px solid rgba(0, 229, 255, 0.25)",
@@ -988,10 +1003,12 @@ export default function BallDrawPage() {
               <div style={{
                 position: "relative",
                 width: "480px",
+                maxWidth: "100%",
                 height: "460px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
+                flexShrink: 0,
                 animation: isShuffling ? "realisticJarShake 0.15s infinite" : "none"
               }}>
                 {/* 1. Jar Rim / Top Opening with Metallic Gold/Chrome Band */}
@@ -1229,7 +1246,10 @@ export default function BallDrawPage() {
                 background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.9) 100%)",
                 border: "1px solid rgba(0, 229, 255, 0.25)",
                 borderRadius: "14px",
-                padding: "12px 16px"
+                padding: "12px 16px",
+                minWidth: 0,
+                width: "100%",
+                boxSizing: "border-box"
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                   <span style={{ fontSize: "12px", fontWeight: "800", color: "#00e5ff", display: "flex", alignItems: "center", gap: "6px" }}>
@@ -1243,7 +1263,10 @@ export default function BallDrawPage() {
                   display: "flex",
                   gap: "10px",
                   overflowX: "auto",
-                  paddingBottom: "6px"
+                  paddingBottom: "6px",
+                  minWidth: 0,
+                  width: "100%",
+                  WebkitOverflowScrolling: "touch"
                 }}>
                   {drawnList.slice().reverse().map((d) => {
                     const photo = getContestantPhoto(d);
@@ -1289,7 +1312,7 @@ export default function BallDrawPage() {
           </div>
 
           {/* RIGHT: Real-time Draw Order & Entries Input */}
-          <div>
+          <div style={{ minWidth: 0, width: "100%" }}>
             {/* Draw Order Results */}
             <div style={{
               background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(8, 16, 32, 0.95) 100%)",
