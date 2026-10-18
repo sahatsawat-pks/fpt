@@ -18,6 +18,8 @@ export default function AdminPage() {
   const [homePassword, setHomePassword] = useState("");
   const [protectDraw, setProtectDraw] = useState(false);
   const [drawPassword, setDrawPassword] = useState("");
+  const [protectHistory, setProtectHistory] = useState(false);
+  const [historyPassword, setHistoryPassword] = useState("");
   const [settingsNotice, setSettingsNotice] = useState("");
 
   // Tab State: 'scoring', 'contestants', 'settings'
@@ -88,25 +90,200 @@ export default function AdminPage() {
   const [savingPoll, setSavingPoll] = useState(false);
   const [pollNotice, setPollNotice] = useState("");
 
-  // 1. Check Auth on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem("fpt_admin_auth");
-      if (stored === "true") {
-        setIsAuthenticated(true);
-      }
-      setAuthChecking(false);
-    }
-  }, []);
+  // History & Hall of Fame Admin States
+  const [adminHistoryData, setAdminHistoryData] = useState(null);
+  const [loadingHistoryAdmin, setLoadingHistoryAdmin] = useState(false);
+  const [savingHistoryAdmin, setSavingHistoryAdmin] = useState(false);
+  const [historyAdminNotice, setHistoryAdminNotice] = useState("");
+  const [selectedAdminYear, setSelectedAdminYear] = useState("2024");
+  const [editChampData, setEditChampData] = useState({
+    year: "2024",
+    name: "",
+    nickname: "",
+    topic: "",
+    badge: "",
+    description: "",
+    image: "",
+  });
+  const [editingContestantIdx, setEditingContestantIdx] = useState(null);
+  const [contestantFormData, setContestantFormData] = useState({
+    name: "",
+    nickname: "",
+    topic: "",
+    rank: "",
+    order: "",
+    pollRank: "",
+    scores: { "3sec": 0, qa: 0, jigsaw: 0, attribute: 0 },
+    totalScore: 0,
+    image: "",
+  });
 
-  // 2. Fetch Settings, Contestants and Poll when authenticated
+  // 2. Fetch Settings, Contestants, Poll, and History when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       loadSettings();
       loadContestants();
       loadPoll();
+      loadAdminHistory();
     }
   }, [isAuthenticated]);
+
+  const loadAdminHistory = async () => {
+    setLoadingHistoryAdmin(true);
+    try {
+      const res = await fetch("/api/history");
+      const json = await res.json();
+      if (json.success && json.data) {
+        setAdminHistoryData(json.data);
+        const champ = (json.data.champions || []).find((c) => String(c.year) === selectedAdminYear);
+        if (champ) {
+          setEditChampData({ ...champ, year: String(champ.year) });
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load history in admin:", err);
+    } finally {
+      setLoadingHistoryAdmin(false);
+    }
+  };
+
+  useEffect(() => {
+    if (adminHistoryData && adminHistoryData.champions) {
+      const champ = adminHistoryData.champions.find((c) => String(c.year) === selectedAdminYear);
+      if (champ) {
+        setEditChampData({
+          year: String(champ.year),
+          name: champ.name || "",
+          nickname: champ.nickname || "",
+          topic: champ.topic || "",
+          badge: champ.badge || "",
+          description: champ.description || "",
+          image: champ.image || "",
+        });
+      } else {
+        setEditChampData({
+          year: selectedAdminYear,
+          name: "",
+          nickname: "",
+          topic: "",
+          badge: "",
+          description: "",
+          image: "",
+        });
+      }
+      setEditingContestantIdx(null);
+    }
+  }, [selectedAdminYear, adminHistoryData]);
+
+  const handleToggleYearVisibility = async (year) => {
+    if (!adminHistoryData) return;
+    const curr = adminHistoryData.enabledYears || { "2021": true, "2022": true, "2023": true, "2024": true };
+    const updated = {
+      ...curr,
+      [year]: !curr[year],
+    };
+    setSavingHistoryAdmin(true);
+    try {
+      const res = await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_years", enabledYears: updated }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setAdminHistoryData(json.data);
+        const statusMsg = updated[year] ? "เปิดใช้งานบนหน้าเว็บ" : "ปิดการแสดงผลแล้ว";
+        setHistoryAdminNotice(`✅ อัปเดตปี ${year}: ${statusMsg}`);
+        showToast(`ปี ${year}: ${statusMsg}`);
+        setTimeout(() => setHistoryAdminNotice(""), 3500);
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการบันทึก");
+    } finally {
+      setSavingHistoryAdmin(false);
+    }
+  };
+
+  const handleSaveChampionInfo = async (e) => {
+    if (e) e.preventDefault();
+    setSavingHistoryAdmin(true);
+    try {
+      const res = await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_champion",
+          champion: {
+            ...editChampData,
+            year: Number(editChampData.year),
+          },
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setAdminHistoryData(json.data);
+        setHistoryAdminNotice(`✅ บันทึกข้อมูลทำเนียบแชมป์ปี ${editChampData.year} สำเร็จ!`);
+        showToast(`บันทึกข้อมูลแชมป์ปี ${editChampData.year} แล้ว`);
+        setTimeout(() => setHistoryAdminNotice(""), 3500);
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลแชมป์");
+    } finally {
+      setSavingHistoryAdmin(false);
+    }
+  };
+
+  const handleSelectContestantForEdit = (idx, player) => {
+    setEditingContestantIdx(idx);
+    setContestantFormData({
+      name: player.name || "",
+      nickname: player.nickname || "",
+      topic: player.topic || "",
+      rank: player.rank !== undefined ? String(player.rank) : "",
+      order: player.order !== undefined ? String(player.order) : "",
+      pollRank: player.pollRank !== undefined ? String(player.pollRank) : "",
+      scores: {
+        "3sec": player.scores?.["3sec"] !== undefined ? player.scores["3sec"] : 0,
+        qa: player.scores?.qa !== undefined ? player.scores.qa : 0,
+        jigsaw: player.scores?.jigsaw !== undefined ? player.scores.jigsaw : 0,
+        attribute: player.scores?.attribute !== undefined ? player.scores.attribute : 0,
+      },
+      totalScore: player.totalScore !== undefined ? player.totalScore : 0,
+      image: player.image || "",
+    });
+  };
+
+  const handleSaveHistoryContestant = async (e) => {
+    if (e) e.preventDefault();
+    if (editingContestantIdx === null) {
+      alert("กรุณาเลือกผู้เข้าแข่งขันที่ต้องการแก้ไข");
+      return;
+    }
+    setSavingHistoryAdmin(true);
+    try {
+      const res = await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_contestant",
+          year: selectedAdminYear,
+          contestantIndex: editingContestantIdx,
+          contestant: contestantFormData,
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setAdminHistoryData(json.data);
+        setHistoryAdminNotice(`✅ บันทึกคะแนนของ ${contestantFormData.nickname || contestantFormData.name} สำเร็จ!`);
+        showToast(`บันทึกข้อมูลเรียบร้อย`);
+        setTimeout(() => setHistoryAdminNotice(""), 3500);
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการบันทึก");
+    } finally {
+      setSavingHistoryAdmin(false);
+    }
+  };
 
   const loadSettings = async () => {
     try {
@@ -120,6 +297,8 @@ export default function AdminPage() {
         setHomePassword(data.homePassword || "");
         setProtectDraw(Boolean(data.protectDraw));
         setDrawPassword(data.drawPassword || "");
+        setProtectHistory(Boolean(data.protectHistory));
+        setHistoryPassword(data.historyPassword || "");
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -331,6 +510,8 @@ export default function AdminPage() {
           homePassword,
           protectDraw,
           drawPassword,
+          protectHistory,
+          historyPassword,
         }),
       });
       const data = await res.json();
@@ -809,6 +990,21 @@ export default function AdminPage() {
             🏠 หน้าหลัก
           </Link>
           <Link
+            href="/history"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255, 215, 0, 0.15)",
+              color: "#ffd700",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(255, 215, 0, 0.4)",
+              fontWeight: "700"
+            }}
+          >
+            🏆 ทำเนียบแชมป์
+          </Link>
+          <Link
             href="/game"
             style={{
               padding: "6px 14px",
@@ -930,6 +1126,23 @@ export default function AdminPage() {
             }}
           >
             🔐 ตั้งค่ารหัสผ่าน & ระบบ
+          </button>
+          <button
+            onClick={() => setActiveTab("history")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "history" ? "rgba(255, 215, 0, 0.15)" : "transparent",
+              color: activeTab === "history" ? "#ffd700" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "history" ? "2px solid #ffd700" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0",
+              transition: "all 0.2s ease"
+            }}
+          >
+            🏆 จัดการทำเนียบแชมป์ & สถิติเก่า
           </button>
         </div>
 
@@ -2715,6 +2928,47 @@ export default function AdminPage() {
                 )}
               </div>
 
+              {/* History & Champions (/history, /champions) Password Protection */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: "1px solid rgba(255, 215, 0, 0.3)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "22px"
+              }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: "#ffd700" }}>
+                  <input
+                    type="checkbox"
+                    checked={protectHistory}
+                    onChange={(e) => setProtectHistory(e.target.checked)}
+                    style={{ width: "18px", height: "18px", accentColor: "#ffd700", cursor: "pointer" }}
+                  />
+                  🏆 เปิดระบบรหัสผ่านสำหรับหน้าทำเนียบแชมป์ & สถิติเก่า (/history, /champions)
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 10px 28px" }}>
+                  เมื่อเปิดใช้งาน ผู้เข้าชมหน้าทำเนียบแชมป์จะต้องกรอกรหัสผ่านก่อนเข้าดูข้อมูล
+                </p>
+                {protectHistory && (
+                  <div style={{ marginLeft: "28px" }}>
+                    <input
+                      type="text"
+                      value={historyPassword}
+                      onChange={(e) => setHistoryPassword(e.target.value)}
+                      placeholder="กำหนดรหัสผ่านสำหรับหน้าทำเนียบแชมป์..."
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(255, 215, 0, 0.5)",
+                        color: "#ffd700",
+                        fontSize: "14px"
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
               {settingsNotice && (
                 <div style={{
                   padding: "10px 14px",
@@ -2778,6 +3032,966 @@ export default function AdminPage() {
               >
                 ⚠️ เปิดเมนูรีเซ็ตการแข่งขัน
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 5: HISTORY & HALL OF FAME MANAGEMENT
+           ======================================================== */}
+        {activeTab === "history" && (
+          <div>
+            {/* Header / Intro banner */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(0, 229, 255, 0.08) 100%)",
+              border: "1px solid rgba(255, 215, 0, 0.35)",
+              borderRadius: "16px",
+              padding: "22px 26px",
+              marginBottom: "24px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "16px"
+            }}>
+              <div>
+                <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#ffd700", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span>🏆</span> จัดการทำเนียบแชมป์ & สถิติการแข่งขันย้อนหลัง
+                </h2>
+                <p style={{ margin: 0, fontSize: "14px", color: "rgba(255,255,255,0.75)", lineHeight: "1.5" }}>
+                  ตั้งค่าเปิด/ปิดการแสดงผลแต่ละปี (2021 - 2024), แก้ไขข้อมูลสุดยอดแฟนพันธุ์แท้ และปรับแต่งคะแนนการแข่งขันในอดีต
+                </p>
+              </div>
+
+              <Link
+                href="/history"
+                target="_blank"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 18px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(135deg, #ffd700 0%, #ffaa00 100%)",
+                  color: "#050b14",
+                  fontSize: "13px",
+                  fontWeight: "800",
+                  textDecoration: "none",
+                  boxShadow: "0 0 15px rgba(255, 215, 0, 0.35)",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <span>↗️</span> ดูหน้าทำเนียบแชมป์จริง
+              </Link>
+            </div>
+
+            {/* Notification message */}
+            {historyAdminNotice && (
+              <div style={{
+                background: "rgba(16, 185, 129, 0.2)",
+                border: "1px solid #10b981",
+                color: "#6ee7b7",
+                borderRadius: "10px",
+                padding: "12px 18px",
+                marginBottom: "20px",
+                fontWeight: "700",
+                fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px"
+              }}>
+                {historyAdminNotice}
+              </div>
+            )}
+
+            {/* CARD 1: เปิด/ปิด การแสดงผลแต่ละปี */}
+            <div style={{
+              background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
+              border: "1px solid rgba(255, 215, 0, 0.3)",
+              borderRadius: "16px",
+              padding: "24px",
+              marginBottom: "24px"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+                <div>
+                  <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#ffd700", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>👁️</span> ติ๊กเปิด / ปิด การแสดงผลคะแนนและแชมป์แต่ละปี
+                  </h3>
+                  <p style={{ margin: 0, fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                    ปีที่ถูกปิดการแสดงผล จะไม่ปรากฏทั้งการ์ดทำเนียบแชมป์และแท็บตารางคะแนนในหน้า /history
+                  </p>
+                </div>
+              </div>
+
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "16px"
+              }}>
+                {["2024", "2023", "2022", "2021"].map((yr) => {
+                  const isEnabled = adminHistoryData?.enabledYears?.[yr] !== false;
+                  const champ = adminHistoryData?.champions?.find((c) => String(c.year) === yr);
+
+                  return (
+                    <div
+                      key={yr}
+                      style={{
+                        background: isEnabled ? "rgba(0, 229, 255, 0.05)" : "rgba(239, 68, 68, 0.05)",
+                        border: isEnabled ? "1px solid rgba(0, 229, 255, 0.35)" : "1px solid rgba(239, 68, 68, 0.3)",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                          <span style={{ fontSize: "18px", fontWeight: "800", color: "#ffd700" }}>
+                            ปี {yr}
+                          </span>
+                          <span style={{
+                            fontSize: "11px",
+                            fontWeight: "800",
+                            padding: "3px 8px",
+                            borderRadius: "12px",
+                            background: isEnabled ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
+                            color: isEnabled ? "#34d399" : "#f87171",
+                            border: isEnabled ? "1px solid #10b981" : "1px solid #ef4444"
+                          }}>
+                            {isEnabled ? "🟢 เปิดแสดงผล" : "🔴 ปิดการแสดงผล"}
+                          </span>
+                        </div>
+
+                        {champ ? (
+                          <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)" }}>
+                            <span style={{ fontWeight: "700", color: "#67e8f9" }}>{champ.nickname ? `${champ.name} (${champ.nickname})` : champ.name}</span>
+                            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "2px" }}>
+                              หัวข้อ: {champ.topic}
+                            </div>
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>ไม่มีข้อมูลแชมป์</div>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleYearVisibility(yr)}
+                        disabled={savingHistoryAdmin}
+                        style={{
+                          width: "100%",
+                          padding: "8px 14px",
+                          borderRadius: "8px",
+                          fontSize: "13px",
+                          fontWeight: "700",
+                          cursor: savingHistoryAdmin ? "not-allowed" : "pointer",
+                          border: "none",
+                          background: isEnabled
+                            ? "linear-gradient(90deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.35) 100%)"
+                            : "linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%)",
+                          color: isEnabled ? "#fca5a5" : "#6ee7b7",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "6px",
+                          transition: "all 0.15s ease"
+                        }}
+                      >
+                        {isEnabled ? "คลิกเพื่อปิดการแสดงผล" : "คลิกเพื่อเปิดการแสดงผล"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* CARD 2: แก้ไขตารางคะแนนย้อนหลัง */}
+            <div style={{
+              background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
+              border: "1px solid rgba(0, 229, 255, 0.25)",
+              borderRadius: "16px",
+              padding: "24px",
+              marginBottom: "24px"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", flexWrap: "wrap", gap: "12px" }}>
+                <div>
+                  <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#80d0ff", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>📊</span> แก้ไขตารางคะแนนย้อนหลัง
+                  </h3>
+                  <p style={{ margin: 0, fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                    เลือกปีการแข่งขันที่ต้องการแก้ไขคะแนน หรือปรับปรุงรายละเอียดผู้เข้าแข่งขัน
+                  </p>
+                </div>
+
+                {/* Year Selection Pills */}
+                <div style={{ display: "flex", gap: "8px", background: "rgba(3, 8, 20, 0.8)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(0, 229, 255, 0.2)" }}>
+                  {["2024", "2023", "2022", "2021"].map((yr) => (
+                    <button
+                      key={yr}
+                      type="button"
+                      onClick={() => {
+                        setSelectedAdminYear(yr);
+                        setEditingContestantIdx(null);
+                      }}
+                      style={{
+                        padding: "7px 16px",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        fontWeight: "700",
+                        border: "none",
+                        cursor: "pointer",
+                        background: selectedAdminYear === yr ? "linear-gradient(135deg, #00e5ff 0%, #0088cc 100%)" : "transparent",
+                        color: selectedAdminYear === yr ? "#030814" : "rgba(255,255,255,0.7)",
+                        boxShadow: selectedAdminYear === yr ? "0 0 10px rgba(0, 229, 255, 0.4)" : "none",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      ปี {yr}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Contestant Edit Form Drawer / Box (when editing) */}
+              {editingContestantIdx !== null && (
+                <div style={{
+                  background: "linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(255, 215, 0, 0.06) 100%)",
+                  border: "2px solid #00e5ff",
+                  borderRadius: "14px",
+                  padding: "20px",
+                  marginBottom: "24px",
+                  boxShadow: "0 0 25px rgba(0, 229, 255, 0.25)"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span style={{ fontSize: "20px" }}>✏️</span>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: "16px", fontWeight: "800", color: "#ffd700" }}>
+                          แก้ไขคะแนน: {contestantFormData.nickname ? `${contestantFormData.name} (${contestantFormData.nickname})` : contestantFormData.name}
+                        </h4>
+                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                          หัวข้อ: {contestantFormData.topic} | ปี {selectedAdminYear}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingContestantIdx(null)}
+                      style={{
+                        background: "rgba(255,255,255,0.1)",
+                        border: "none",
+                        color: "#fff",
+                        padding: "6px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "12px"
+                      }}
+                    >
+                      ✕ ยกเลิก
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveHistoryContestant}>
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                      gap: "14px",
+                      marginBottom: "16px"
+                    }}>
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                          ชื่อจริง
+                        </label>
+                        <input
+                          type="text"
+                          value={contestantFormData.name}
+                          onChange={(e) => setContestantFormData({ ...contestantFormData, name: e.target.value })}
+                          style={{
+                            width: "100%",
+                            padding: "9px 12px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#fff",
+                            fontSize: "13px"
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                          ชื่อเล่น
+                        </label>
+                        <input
+                          type="text"
+                          value={contestantFormData.nickname}
+                          onChange={(e) => setContestantFormData({ ...contestantFormData, nickname: e.target.value })}
+                          style={{
+                            width: "100%",
+                            padding: "9px 12px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#fff",
+                            fontSize: "13px"
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                          หัวข้อแฟนพันธุ์แท้
+                        </label>
+                        <input
+                          type="text"
+                          value={contestantFormData.topic}
+                          onChange={(e) => setContestantFormData({ ...contestantFormData, topic: e.target.value })}
+                          style={{
+                            width: "100%",
+                            padding: "9px 12px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#ffd700",
+                            fontSize: "13px",
+                            fontWeight: "600"
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                          อันดับคะแนน (Rank)
+                        </label>
+                        <input
+                          type="text"
+                          value={contestantFormData.rank}
+                          onChange={(e) => setContestantFormData({ ...contestantFormData, rank: e.target.value })}
+                          placeholder="เช่น 1 หรือ 10 (ร่วม)"
+                          style={{
+                            width: "100%",
+                            padding: "9px 12px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#fff",
+                            fontSize: "13px"
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                          ลำดับการแข่งขัน (Order)
+                        </label>
+                        <input
+                          type="number"
+                          value={contestantFormData.order}
+                          onChange={(e) => setContestantFormData({ ...contestantFormData, order: e.target.value })}
+                          placeholder="เช่น 1, 2, 3..."
+                          style={{
+                            width: "100%",
+                            padding: "9px 12px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#fff",
+                            fontSize: "13px"
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                          อันดับผลโพล (Poll Rank)
+                        </label>
+                        <input
+                          type="number"
+                          value={contestantFormData.pollRank}
+                          onChange={(e) => setContestantFormData({ ...contestantFormData, pollRank: e.target.value })}
+                          placeholder="เช่น 1, 2, 3..."
+                          style={{
+                            width: "100%",
+                            padding: "9px 12px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#fff",
+                            fontSize: "13px"
+                          }}
+                        />
+                      </div>
+
+                      <div style={{ gridColumn: "span 2" }}>
+                        <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                          URL รูปภาพผู้เข้าแข่งขัน
+                        </label>
+                        <input
+                          type="text"
+                          value={contestantFormData.image || ""}
+                          onChange={(e) => setContestantFormData({ ...contestantFormData, image: e.target.value })}
+                          placeholder="https://... หรือเว้นว่างเพื่อใช้ Avatar เริ่มต้น"
+                          style={{
+                            width: "100%",
+                            padding: "9px 12px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1px solid rgba(0, 229, 255, 0.4)",
+                            color: "#fff",
+                            fontSize: "13px"
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Scores row */}
+                    <div style={{
+                      background: "rgba(3, 8, 20, 0.6)",
+                      border: "1px solid rgba(0, 229, 255, 0.2)",
+                      borderRadius: "10px",
+                      padding: "16px",
+                      marginBottom: "18px"
+                    }}>
+                      <div style={{ fontSize: "13px", fontWeight: "700", color: "#67e8f9", marginBottom: "12px" }}>
+                        🎯 คะแนนแต่ละหมวดการแข่งขัน (รอบคัดเลือก)
+                      </div>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+                        gap: "12px",
+                        alignItems: "end"
+                      }}>
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>
+                            3 วินาที (25)
+                          </label>
+                          <input
+                            type="number"
+                            value={contestantFormData.scores["3sec"]}
+                            onChange={(e) => {
+                              const v = e.target.value === "" ? "" : Number(e.target.value);
+                              const newScores = { ...contestantFormData.scores, "3sec": v };
+                              const total = [newScores["3sec"], newScores.qa, newScores.jigsaw, newScores.attribute]
+                                .reduce((acc, n) => acc + (typeof n === "number" && !isNaN(n) ? n : 0), 0);
+                              setContestantFormData({ ...contestantFormData, scores: newScores, totalScore: total });
+                            }}
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#081326",
+                              border: "1px solid rgba(0, 229, 255, 0.4)",
+                              color: "#fff",
+                              fontSize: "14px",
+                              fontWeight: "700",
+                              textAlign: "center"
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>
+                            คำถาม-คำตอบ (25)
+                          </label>
+                          <input
+                            type="number"
+                            value={contestantFormData.scores.qa}
+                            onChange={(e) => {
+                              const v = e.target.value === "" ? "" : Number(e.target.value);
+                              const newScores = { ...contestantFormData.scores, qa: v };
+                              const total = [newScores["3sec"], newScores.qa, newScores.jigsaw, newScores.attribute]
+                                .reduce((acc, n) => acc + (typeof n === "number" && !isNaN(n) ? n : 0), 0);
+                              setContestantFormData({ ...contestantFormData, scores: newScores, totalScore: total });
+                            }}
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#081326",
+                              border: "1px solid rgba(0, 229, 255, 0.4)",
+                              color: "#fff",
+                              fontSize: "14px",
+                              fontWeight: "700",
+                              textAlign: "center"
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>
+                            จิ๊กซอว์ (25)
+                          </label>
+                          <input
+                            type="number"
+                            value={contestantFormData.scores.jigsaw}
+                            onChange={(e) => {
+                              const v = e.target.value === "" ? "" : Number(e.target.value);
+                              const newScores = { ...contestantFormData.scores, jigsaw: v };
+                              const total = [newScores["3sec"], newScores.qa, newScores.jigsaw, newScores.attribute]
+                                .reduce((acc, n) => acc + (typeof n === "number" && !isNaN(n) ? n : 0), 0);
+                              setContestantFormData({ ...contestantFormData, scores: newScores, totalScore: total });
+                            }}
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#081326",
+                              border: "1px solid rgba(0, 229, 255, 0.4)",
+                              color: "#fff",
+                              fontSize: "14px",
+                              fontWeight: "700",
+                              textAlign: "center"
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>
+                            คุณสมบัติ (25)
+                          </label>
+                          <input
+                            type="number"
+                            value={contestantFormData.scores.attribute}
+                            onChange={(e) => {
+                              const v = e.target.value === "" ? "" : Number(e.target.value);
+                              const newScores = { ...contestantFormData.scores, attribute: v };
+                              const total = [newScores["3sec"], newScores.qa, newScores.jigsaw, newScores.attribute]
+                                .reduce((acc, n) => acc + (typeof n === "number" && !isNaN(n) ? n : 0), 0);
+                              setContestantFormData({ ...contestantFormData, scores: newScores, totalScore: total });
+                            }}
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#081326",
+                              border: "1px solid rgba(0, 229, 255, 0.4)",
+                              color: "#fff",
+                              fontSize: "14px",
+                              fontWeight: "700",
+                              textAlign: "center"
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#ffd700", fontWeight: "800", marginBottom: "4px" }}>
+                            คะแนนรวม (Total)
+                          </label>
+                          <input
+                            type="number"
+                            value={contestantFormData.totalScore}
+                            onChange={(e) => setContestantFormData({ ...contestantFormData, totalScore: Number(e.target.value) || 0 })}
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "rgba(255, 215, 0, 0.15)",
+                              border: "1px solid #ffd700",
+                              color: "#ffd700",
+                              fontSize: "15px",
+                              fontWeight: "900",
+                              textAlign: "center"
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <button
+                        type="submit"
+                        disabled={savingHistoryAdmin}
+                        style={{
+                          padding: "10px 22px",
+                          borderRadius: "8px",
+                          background: "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)",
+                          color: "#030814",
+                          fontSize: "14px",
+                          fontWeight: "800",
+                          border: "none",
+                          cursor: savingHistoryAdmin ? "not-allowed" : "pointer",
+                          boxShadow: "0 0 15px rgba(0, 229, 255, 0.4)"
+                        }}
+                      >
+                        {savingHistoryAdmin ? "⏳ กำลังบันทึก..." : "💾 บันทึกคะแนนลงตาราง"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingContestantIdx(null)}
+                        style={{
+                          padding: "10px 18px",
+                          borderRadius: "8px",
+                          background: "rgba(255,255,255,0.08)",
+                          color: "#fff",
+                          fontSize: "14px",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          cursor: "pointer"
+                        }}
+                      >
+                        ยกเลิก
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Table of Contestants for Selected Year */}
+              <div style={{ overflowX: "auto", borderRadius: "10px", border: "1px solid rgba(0, 229, 255, 0.2)" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                  <thead>
+                    <tr style={{ background: "rgba(0, 229, 255, 0.1)", color: "#80d0ff", borderBottom: "1px solid rgba(0, 229, 255, 0.25)" }}>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "70px" }}>อันดับ</th>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "75px" }}>ลำดับแข่ง</th>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "75px" }}>อันดับโพล</th>
+                      <th style={{ padding: "10px 14px" }}>ผู้เข้าแข่งขัน & หัวข้อ</th>
+                      <th style={{ padding: "10px 10px", textAlign: "center", width: "65px" }}>3 วิ</th>
+                      <th style={{ padding: "10px 10px", textAlign: "center", width: "75px" }}>ถาม-ตอบ</th>
+                      <th style={{ padding: "10px 10px", textAlign: "center", width: "70px" }}>จิ๊กซอว์</th>
+                      <th style={{ padding: "10px 10px", textAlign: "center", width: "75px" }}>คุณสมบัติ</th>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "80px", color: "#ffd700", fontWeight: "800" }}>รวม</th>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "100px" }}>การจัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const season = adminHistoryData?.seasons?.[selectedAdminYear];
+                      const qList = season?.qualifying || [];
+
+                      if (qList.length === 0) {
+                        return (
+                          <tr>
+                            <td colSpan="10" style={{ padding: "30px", textAlign: "center", color: "rgba(255,255,255,0.5)" }}>
+                              ไม่มีข้อมูลการแข่งขันสำหรับปี {selectedAdminYear}
+                            </td>
+                          </tr>
+                        );
+                      }
+
+                      return qList.map((player, idx) => {
+                        const isBeingEdited = editingContestantIdx === idx;
+                        return (
+                          <tr
+                            key={idx}
+                            style={{
+                              borderBottom: "1px solid rgba(255,255,255,0.06)",
+                              background: isBeingEdited ? "rgba(0, 229, 255, 0.12)" : idx % 2 === 0 ? "rgba(3, 8, 20, 0.4)" : "rgba(8, 19, 38, 0.4)",
+                              transition: "all 0.15s ease"
+                            }}
+                          >
+                            <td style={{ padding: "10px 12px", textAlign: "center", fontWeight: "800", color: "#ffd700" }}>
+                              {player.rank || "-"}
+                            </td>
+                            <td style={{ padding: "10px 12px", textAlign: "center", color: "rgba(255,255,255,0.7)" }}>
+                              {player.order !== undefined ? `#${player.order}` : "-"}
+                            </td>
+                            <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                              <span style={{
+                                padding: "2px 6px",
+                                borderRadius: "6px",
+                                fontSize: "11px",
+                                fontWeight: "700",
+                                background: player.pollRank && Number(player.pollRank) <= 5 ? "rgba(255, 215, 0, 0.15)" : "rgba(0, 229, 255, 0.08)",
+                                color: player.pollRank && Number(player.pollRank) <= 5 ? "#ffd700" : "#67e8f9",
+                                border: player.pollRank && Number(player.pollRank) <= 5 ? "1px solid rgba(255, 215, 0, 0.4)" : "1px solid rgba(0, 229, 255, 0.2)"
+                              }}>
+                                {player.pollRank ? `#${player.pollRank}` : "-"}
+                              </span>
+                            </td>
+                            <td style={{ padding: "10px 14px" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                <div style={{
+                                  width: "32px",
+                                  height: "32px",
+                                  borderRadius: "50%",
+                                  overflow: "hidden",
+                                  background: "rgba(0, 229, 255, 0.1)",
+                                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0
+                                }}>
+                                  {player.image ? (
+                                    <img src={player.image} alt={player.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                  ) : (
+                                    <span style={{ fontSize: "14px" }}>👤</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <div style={{ fontWeight: "700", color: "#fff", fontSize: "13px" }}>
+                                    {player.name} {player.nickname && <span style={{ color: "#ffd700", fontSize: "12px" }}>({player.nickname})</span>}
+                                  </div>
+                                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                                    {player.topic}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td style={{ padding: "10px", textAlign: "center", color: "#e2e8f0" }}>{player.scores?.["3sec"] ?? 0}</td>
+                            <td style={{ padding: "10px", textAlign: "center", color: "#e2e8f0" }}>{player.scores?.qa ?? 0}</td>
+                            <td style={{ padding: "10px", textAlign: "center", color: "#e2e8f0" }}>{player.scores?.jigsaw ?? 0}</td>
+                            <td style={{ padding: "10px", textAlign: "center", color: "#e2e8f0" }}>{player.scores?.attribute ?? 0}</td>
+                            <td style={{ padding: "10px 12px", textAlign: "center", fontWeight: "800", color: "#ffd700", fontSize: "14px" }}>
+                              {player.totalScore ?? 0}
+                            </td>
+                            <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                              <button
+                                type="button"
+                                onClick={() => handleSelectContestantForEdit(idx, player)}
+                                style={{
+                                  padding: "5px 10px",
+                                  borderRadius: "6px",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                  background: isBeingEdited ? "rgba(0, 229, 255, 0.3)" : "rgba(0, 229, 255, 0.12)",
+                                  color: "#00e5ff",
+                                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease"
+                                }}
+                              >
+                                {isBeingEdited ? "กำลังแก้ไข" : "✏️ แก้ไข"}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* CARD 3: ข้อมูลสุดยอดแฟนพันธุ์แท้แห่งปี (ทำเนียบแชมป์) */}
+            <div style={{
+              background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
+              border: "1px solid rgba(255, 215, 0, 0.35)",
+              borderRadius: "16px",
+              padding: "24px",
+              marginBottom: "24px"
+            }}>
+              <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#ffd700", margin: "0 0 16px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>👑</span> แก้ไขข้อมูลทำเนียบแชมป์ (สุดยอดแฟนพันธุ์แท้แห่งปี {editChampData.year})
+              </h3>
+
+              <form onSubmit={handleSaveChampionInfo}>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  gap: "14px",
+                  marginBottom: "16px"
+                }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", color: "#ffd700", fontWeight: "700", marginBottom: "4px" }}>
+                      เลือกปีแชมป์ที่ต้องการแก้ไข
+                    </label>
+                    <select
+                      value={editChampData.year}
+                      onChange={(e) => {
+                        const yr = e.target.value;
+                        const c = adminHistoryData?.champions?.find((champ) => String(champ.year) === yr);
+                        if (c) {
+                          setEditChampData({
+                            year: yr,
+                            name: c.name || "",
+                            nickname: c.nickname || "",
+                            topic: c.topic || "",
+                            badge: c.badge || "",
+                            description: c.description || "",
+                            image: c.image || ""
+                          });
+                        } else {
+                          setEditChampData({
+                            year: yr,
+                            name: "",
+                            nickname: "",
+                            topic: "",
+                            badge: "",
+                            description: "",
+                            image: ""
+                          });
+                        }
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(255, 215, 0, 0.5)",
+                        color: "#ffd700",
+                        fontSize: "14px",
+                        fontWeight: "700"
+                      }}
+                    >
+                      <option value="2024">ปี 2024 (ณชนน - เจสัน)</option>
+                      <option value="2023">ปี 2023 (ณัฐพงษ์ - อั้ม)</option>
+                      <option value="2022">ปี 2022 (มาลัภร์ชัย - หนึ่ง)</option>
+                      <option value="2021">ปี 2021 (พงศ์ภรณ์ - ยูโร)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                      ชื่อจริง - นามสกุล *
+                    </label>
+                    <input
+                      type="text"
+                      value={editChampData.name}
+                      onChange={(e) => setEditChampData({ ...editChampData, name: e.target.value })}
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#fff",
+                        fontSize: "13px"
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                      ชื่อเล่น
+                    </label>
+                    <input
+                      type="text"
+                      value={editChampData.nickname}
+                      onChange={(e) => setEditChampData({ ...editChampData, nickname: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#fff",
+                        fontSize: "13px"
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                      หัวข้อแฟนพันธุ์แท้ *
+                    </label>
+                    <input
+                      type="text"
+                      value={editChampData.topic}
+                      onChange={(e) => setEditChampData({ ...editChampData, topic: e.target.value })}
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#ffd700",
+                        fontSize: "13px",
+                        fontWeight: "700"
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                      ตราสัญลักษณ์ / ฉายา (Badge)
+                    </label>
+                    <input
+                      type="text"
+                      value={editChampData.badge}
+                      onChange={(e) => setEditChampData({ ...editChampData, badge: e.target.value })}
+                      placeholder="เช่น 🏆 แชมป์คนล่าสุด"
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#fff",
+                        fontSize: "13px"
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                      URL รูปภาพแชมป์
+                    </label>
+                    <input
+                      type="text"
+                      value={editChampData.image}
+                      onChange={(e) => setEditChampData({ ...editChampData, image: e.target.value })}
+                      placeholder="https://... หรือ /images/champions/..."
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#fff",
+                        fontSize: "13px"
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: "16px" }}>
+                  <label style={{ display: "block", fontSize: "12px", color: "#80d0ff", fontWeight: "700", marginBottom: "4px" }}>
+                    คำบรรยายความสำเร็จ / ไฮไลต์รอบชิงชนะเลิศ
+                  </label>
+                  <textarea
+                    rows="3"
+                    value={editChampData.description}
+                    onChange={(e) => setEditChampData({ ...editChampData, description: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: "8px",
+                      background: "#050b14",
+                      border: "1px solid rgba(0, 229, 255, 0.4)",
+                      color: "#fff",
+                      fontSize: "13px",
+                      lineHeight: "1.5"
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                  <button
+                    type="submit"
+                    disabled={savingHistoryAdmin}
+                    style={{
+                      padding: "10px 24px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, #ffd700 0%, #ffaa00 100%)",
+                      color: "#050b14",
+                      fontSize: "14px",
+                      fontWeight: "800",
+                      border: "none",
+                      cursor: savingHistoryAdmin ? "not-allowed" : "pointer",
+                      boxShadow: "0 0 15px rgba(255, 215, 0, 0.4)"
+                    }}
+                  >
+                    {savingHistoryAdmin ? "⏳ กำลังบันทึก..." : `💾 บันทึกข้อมูลทำเนียบแชมป์ปี ${editChampData.year}`}
+                  </button>
+
+                  {editChampData.image && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                      <span>พรีวิวรูป:</span>
+                      <img
+                        src={editChampData.image}
+                        alt="Preview"
+                        style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover", border: "1px solid #ffd700" }}
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </form>
             </div>
           </div>
         )}

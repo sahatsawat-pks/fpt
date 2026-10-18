@@ -1,0 +1,2509 @@
+{
+  "enabledYears": {
+    "2021": true,
+    "2022": true,
+    "2023": true,
+    "2024": false
+  },
+  "champions": [
+    {
+      "year": 2021,
+      "title": "สุดยอดแฟนพันธุ์แท้แห่งปี 2021",
+      "name": "พงศ์ภรณ์ เครือแก้ว",
+      "nickname": "ยูโร",
+      "topic": "BNK48",
+      "badge": "🏆 ปฐมบทแชมป์คนแรก",
+      "description": "จารึกประวัติศาสตร์หน้าแรกของฉบับ Fanmade คว้าชัยในรอบชิงชนะเลิศด้วย 'หมวดจิ๊กซอว์' ไปถึง 15 คะแนน ก้าวขึ้นเป็นสุดยอดแฟนพันธุ์แท้แห่งปีคนแรกอย่างสง่างาม",
+      "image": "/img/champions/2021.png"
+    },
+    {
+      "year": 2022,
+      "title": "สุดยอดแฟนพันธุ์แท้แห่งปี 2022",
+      "name": "มาลัภร์ชัย ไชสีฮาด",
+      "nickname": "หนึ่ง",
+      "topic": "Ragnarok Online",
+      "badge": "🏆 ตำนานคะแนนเต็มรอบชิง",
+      "description": "ระเบิดฟอร์มไร้เทียมทาน กวาด 25 คะแนนเต็มในรอบชิงชนะเลิศจาก 'หมวดคำถาม-คำตอบ' คว้าตำแหน่งสุดยอดแฟนพันธุ์แท้แห่งปี 2022 ไปครองอย่างยิ่งใหญ่",
+      "image": "/img/champions/2022.png"
+    },
+    {
+      "year": 2023,
+      "title": "สุดยอดแฟนพันธุ์แท้แห่งปี 2023",
+      "name": "ณัฐพงษ์ อ่ำกลาง",
+      "nickname": "อั้ม",
+      "topic": "วง Queen",
+      "badge": "🏆 เจ้าแห่งร็อกคลาสสิก",
+      "description": "โชว์ความแม่นยำระดับเทพในรอบชิงชนะเลิศ เฉือนคว้าชัยจาก 'หมวดคำถาม-คำตอบ' ไปด้วย 20 คะแนน สถาปนาตนเองขึ้นเป็นสุดยอดแฟนพันธุ์แท้แห่งปี 2023",
+      "image": "/img/champions/2023.png"
+    },
+    {
+      "year": 2024,
+      "title": "สุดยอดแฟนพันธุ์แท้แห่งปี 2024",
+      "name": "ณชนน ยุงคุณ",
+      "nickname": "เจสัน",
+      "topic": "มวยปล้ำ WWE",
+      "badge": "🏆 แชมป์คนล่าสุด",
+      "description": "ฟอร์มร้อนแรงตั้งแต่รอบคัดเลือกจนถึงนัดชิง ปิดเกมใน 'หมวด 3 วินาที' ไปได้ถึง 11 คะแนน ผงาดคว้าแชมป์สุดยอดแฟนพันธุ์แท้แห่งปี 2024 ได้สำเร็จ",
+      "image": "/img/champions/2024.png"
+    }
+  ],
+  "seasons": {
+    "2021": {
+      "info": {
+        "year": 2021,
+        "title": "แฟนพันธุ์แท้แห่งปี 2021",
+        "host": "เปเล่ ณัฐวัฒน์ วุฒิช่วย",
+        "producers": [
+          "ณัฐวัฒน์ วุฒิช่วย",
+          "สหัสวรรษ นิจพันธ์",
+          "ชัยนันท์ วรรณสมพร"
+        ],
+        "executiveProducer": "ศุภวิชญ์ งามสม",
+        "firstAirDate": "ศุกร์ 1 ตุลาคม 2021",
+        "lastAirDate": "ศุกร์ 31 ธันวาคม 2021",
+        "episodes": "13 ตอน (พิเศษ 3 ตอน)",
+        "championName": "พงศ์ภรณ์ เครือแก้ว (ยูโร)",
+        "championTopic": "BNK48"
+      },
+      "qualifying": [
+        {
+          "date": "8 ตุลาคม 2021",
+          "rank": "4",
+          "order": 1,
+          "pollRank": 3,
+          "nickname": "แบงค์",
+          "name": "ธนพัฒน์",
+          "topic": "BNK48",
+          "scores": {
+            "3sec": 10,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 20
+          },
+          "totalScore": 50,
+          "image": "/img/history/2021/แบงค์.png"
+        },
+        {
+          "date": "8 ตุลาคม 2021",
+          "rank": "6",
+          "order": 2,
+          "pollRank": 2,
+          "nickname": "นัท",
+          "name": "นันทวัฒน์",
+          "topic": "The Mask Singer Thailand",
+          "scores": {
+            "3sec": 15,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 0
+          },
+          "totalScore": 35,
+          "image": "/img/history/2021/นัท.png"
+        },
+        {
+          "date": "8 ตุลาคม 2021\n16 ตุลาคม 2021",
+          "rank": "13",
+          "order": 3,
+          "pollRank": 5,
+          "nickname": "โอ๊ค",
+          "name": "นวพล",
+          "topic": "Workpoint",
+          "scores": {
+            "3sec": 17,
+            "qa": 0,
+            "jigsaw": 5,
+            "attribute": 0
+          },
+          "totalScore": 22,
+          "image": "/img/history/2021/โอ๊ค.png"
+        },
+        {
+          "date": "16 ตุลาคม 2021",
+          "rank": "2",
+          "order": 4,
+          "pollRank": 9,
+          "nickname": "เก่ง",
+          "name": "กิตติพงษ์",
+          "topic": "ซีรีส์เกม Resident Evil",
+          "scores": {
+            "3sec": 17,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 15
+          },
+          "totalScore": 67,
+          "image": "/img/history/2021/เก่ง.png"
+        },
+        {
+          "date": "16 ตุลาคม 2021\n22 ตุลาคม 2021",
+          "rank": "3",
+          "order": 5,
+          "pollRank": 1,
+          "nickname": "ไอซ์ทิม",
+          "name": "ธนกฤต",
+          "topic": "โลกของเรา",
+          "scores": {
+            "3sec": 2,
+            "qa": 20,
+            "jigsaw": 25,
+            "attribute": 15
+          },
+          "totalScore": 62,
+          "image": "/img/history/2021/ไอซ์.png"
+        },
+        {
+          "date": "22 ตุลาคม 2021",
+          "rank": "9",
+          "order": 6,
+          "pollRank": 10,
+          "nickname": "โฟร์",
+          "name": "ภคพล",
+          "topic": "Microsoft Windows",
+          "scores": {
+            "3sec": 2,
+            "qa": 0,
+            "jigsaw": 15,
+            "attribute": 10
+          },
+          "totalScore": 27,
+          "image": "/img/history/2021/โฟร์.png"
+        },
+        {
+          "date": "29 ตุลาคม 2021",
+          "rank": "1",
+          "order": 7,
+          "pollRank": 8,
+          "nickname": "กร",
+          "name": "วรงกร",
+          "topic": "James Bond 007",
+          "scores": {
+            "3sec": 20,
+            "qa": 20,
+            "jigsaw": 20,
+            "attribute": 15
+          },
+          "totalScore": 75,
+          "image": "/img/history/2021/กร.png"
+        },
+        {
+          "date": "29 ตุลาคม 2021\n5 พฤศจิกายน 2021",
+          "rank": "7",
+          "order": 8,
+          "pollRank": 12,
+          "nickname": "เมฆ",
+          "name": "ถิรวัฒน์",
+          "topic": "Minecraft Java Edition",
+          "scores": {
+            "3sec": 9,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 29,
+          "image": "/img/history/2021/เมฆ.png"
+        },
+        {
+          "date": "5 พฤศจิกายน 2021",
+          "rank": "16",
+          "order": 9,
+          "pollRank": 15,
+          "nickname": "ชีส",
+          "name": "ธีรวีร์",
+          "topic": "Cartoon Network",
+          "scores": {
+            "3sec": 1,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 1,
+          "image": "/img/history/2021/ชีส.png"
+        },
+        {
+          "date": "5 พฤศจิกายน 2021\n12 พฤศจิกายน 2021",
+          "rank": "5",
+          "order": 10,
+          "pollRank": 13,
+          "nickname": "ยูโร",
+          "name": "พงค์ภรณ์",
+          "topic": "BNK48",
+          "scores": {
+            "3sec": 14,
+            "qa": 15,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 44,
+          "image": "/img/history/2021/ยูโร.png"
+        },
+        {
+          "date": "12 พฤศจิกายน 2021",
+          "rank": "10",
+          "order": 11,
+          "pollRank": 16,
+          "nickname": "วา",
+          "name": "อันวา",
+          "topic": "ช่อง Workpoint",
+          "scores": {
+            "3sec": 6,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 0
+          },
+          "totalScore": 26,
+          "image": "/img/history/2021/วา.png"
+        },
+        {
+          "date": "19 พฤศจิกายน 2021",
+          "rank": "10",
+          "order": 12,
+          "pollRank": 6,
+          "nickname": "ก๊อง",
+          "name": "เชาว์วรรธน์",
+          "topic": "iAM48 Thailand",
+          "scores": {
+            "3sec": 11,
+            "qa": 0,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 26,
+          "image": "/img/history/2021/ก๊อง.png"
+        },
+        {
+          "date": "19 พฤศจิกายน 2021",
+          "rank": "12",
+          "order": 13,
+          "pollRank": 14,
+          "nickname": "ท๊อป",
+          "name": "สุทธิพงษ์",
+          "topic": "Workpoint",
+          "scores": {
+            "3sec": 5,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 25,
+          "image": "/img/history/2021/ท็อป.png"
+        },
+        {
+          "date": "27 พฤศจิกายน 2021",
+          "rank": "8",
+          "order": 14,
+          "pollRank": 7,
+          "nickname": "แมน",
+          "name": "ปกรณ์",
+          "topic": "เกมโชว์ไทย",
+          "scores": {
+            "3sec": 3,
+            "qa": 25,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 28,
+          "image": "/img/history/2021/แมน.png"
+        },
+        {
+          "date": "27 พฤศจิกายน 2021\n3 ธันวาคม 2021",
+          "rank": "14",
+          "order": 15,
+          "pollRank": 4,
+          "nickname": "ซิมส์",
+          "name": "สุกฤษฎิ์",
+          "topic": "K-POP",
+          "scores": {
+            "3sec": 14,
+            "qa": 5,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 19,
+          "image": "/img/history/2021/ซิมส์.png"
+        },
+        {
+          "date": "3 ธันวาคม 2021",
+          "rank": "15",
+          "order": 16,
+          "pollRank": 11,
+          "nickname": "เติ๊ด",
+          "name": "รัฐศาสตร์",
+          "topic": "บอร์ดเกม",
+          "scores": {
+            "3sec": 4,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 4,
+          "image": "/img/history/2021/เติ๊ด.png"
+        }
+      ],
+      "playoffs": {
+        "roundName": "รอบตัดเชือก (Playoff)",
+        "gameType": "แอ็คชั่นเกม (Action Game)",
+        "players": [
+          {
+            "date": "11 ธันวาคม 2021",
+            "rank": "4",
+            "order": 1,
+            "pollRank": 12,
+            "nickname": "เมฆ",
+            "name": "ถิรวัฒน์",
+            "topic": "Minecraft Java Edition",
+            "actionGameScore": 0,
+            "result": "ตกรอบ",
+            "image": "/img/history/2021/เมฆ.png"
+          },
+          {
+            "date": "",
+            "rank": "1",
+            "order": 2,
+            "pollRank": 10,
+            "nickname": "โฟร์",
+            "name": "ภคพล",
+            "topic": "Microsoft Windows",
+            "actionGameScore": 20,
+            "result": "เข้ารอบ",
+            "image": "/img/history/2021/โฟร์.png"
+          },
+          {
+            "date": "",
+            "rank": "2",
+            "order": 3,
+            "pollRank": 7,
+            "nickname": "แมน",
+            "name": "ปกรณ์",
+            "topic": "เกมโชว์ไทย",
+            "actionGameScore": 10,
+            "result": "ตกรอบ",
+            "image": "/img/history/2021/แมน.png"
+          },
+          {
+            "date": "",
+            "rank": "2",
+            "order": 4,
+            "pollRank": 2,
+            "nickname": "นัท",
+            "name": "นันทวัฒน์",
+            "topic": "The Mask Singer Thailand",
+            "actionGameScore": 10,
+            "result": "ตกรอบ",
+            "image": "/img/history/2021/นัท.png"
+          }
+        ]
+      },
+      "finals": [
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 1/4",
+          "players": [
+            {
+              "date": "17 ธันวาคม 2021",
+              "rank": "1",
+              "order": 1,
+              "pollRank": 13,
+              "nickname": "ยูโร",
+              "name": "พงค์ภรณ์",
+              "topic": "BNK48",
+              "scores": {
+                "3sec": null,
+                "qa": 20,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/ยูโร.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 2,
+              "pollRank": 3,
+              "nickname": "แบงค์",
+              "name": "ธนพัฒน์",
+              "topic": "BNK48",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": 20,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/แบงค์.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 3,
+              "pollRank": 9,
+              "nickname": "เก่ง",
+              "name": "กิตติพงษ์",
+              "topic": "ซีรีส์เกม Resident Evil",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": 20,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/เก่ง.png"
+            },
+            {
+              "date": "",
+              "rank": "6",
+              "order": 4,
+              "pollRank": 1,
+              "nickname": "ไอซ์ทิม",
+              "name": "ธนกฤต",
+              "topic": "โลกของเรา",
+              "scores": {
+                "3sec": null,
+                "qa": 0,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2021/ไอซ์.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 5,
+              "pollRank": 10,
+              "nickname": "โฟร์",
+              "name": "ภคพล",
+              "topic": "Microsoft Windows",
+              "scores": {
+                "3sec": null,
+                "qa": 20,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/โฟร์.png"
+            },
+            {
+              "date": "17 ธันวาคม 2021\n24 ธันวาคม 2021",
+              "rank": "1",
+              "order": 6,
+              "pollRank": 8,
+              "nickname": "กร",
+              "name": "วรงกร",
+              "topic": "James Bond 007",
+              "scores": {
+                "3sec": null,
+                "qa": 20,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/กร.png"
+            }
+          ]
+        },
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 2/4",
+          "players": [
+            {
+              "date": "24 ธันวาคม 2021",
+              "rank": "1",
+              "order": 1,
+              "pollRank": 8,
+              "nickname": "กร",
+              "name": "วรงกร",
+              "topic": "James Bond 007",
+              "scores": {
+                "3sec": null,
+                "qa": "X",
+                "jigsaw": 20,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/กร.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 2,
+              "pollRank": 13,
+              "nickname": "ยูโร",
+              "name": "พงค์ภรณ์",
+              "topic": "BNK48",
+              "scores": {
+                "3sec": null,
+                "qa": "X",
+                "jigsaw": null,
+                "attribute": 20
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/ยูโร.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 3,
+              "pollRank": 9,
+              "nickname": "เก่ง",
+              "name": "กิตติพงษ์",
+              "topic": "ซีรีส์เกม Resident Evil",
+              "scores": {
+                "3sec": null,
+                "qa": 20,
+                "jigsaw": "X",
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2021/เก่ง.png"
+            },
+            {
+              "date": "",
+              "rank": "5",
+              "order": 4,
+              "pollRank": 3,
+              "nickname": "แบงค์",
+              "name": "ธนพัฒน์",
+              "topic": "BNK48",
+              "scores": {
+                "3sec": null,
+                "qa": 0,
+                "jigsaw": "X",
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2021/แบงค์.png"
+            },
+            {
+              "date": "",
+              "rank": "5",
+              "order": 5,
+              "pollRank": 10,
+              "nickname": "โฟร์",
+              "name": "ภคพล",
+              "topic": "Microsoft Windows",
+              "scores": {
+                "3sec": null,
+                "qa": "X",
+                "jigsaw": 0,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2021/โฟร์.png"
+            }
+          ]
+        },
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 3/4",
+          "players": [
+            {
+              "date": "31 ธันวาคม 2021",
+              "rank": "3",
+              "order": 1,
+              "pollRank": 9,
+              "nickname": "เก่ง",
+              "name": "กิตติพงษ์",
+              "topic": "ซีรีส์เกม Resident Evil",
+              "scores": {
+                "3sec": 6,
+                "qa": "X",
+                "jigsaw": "X",
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2021/เก่ง.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 2,
+              "pollRank": 13,
+              "nickname": "ยูโร",
+              "name": "พงค์ภรณ์",
+              "topic": "BNK48",
+              "scores": {
+                "3sec": null,
+                "qa": "X",
+                "jigsaw": 15,
+                "attribute": "X"
+              },
+              "result": "FAN OF THE YEAR 2021",
+              "image": "/img/history/2021/ยูโร.png"
+            },
+            {
+              "date": "",
+              "rank": "2",
+              "order": 3,
+              "pollRank": 8,
+              "nickname": "กร",
+              "name": "วรงกร",
+              "topic": "James Bond 007",
+              "scores": {
+                "3sec": null,
+                "qa": "X",
+                "jigsaw": "X",
+                "attribute": 0
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2021/กร.png"
+            }
+          ]
+        }
+      ]
+    },
+    "2022": {
+      "info": {
+        "year": 2022,
+        "title": "แฟนพันธุ์แท้แห่งปี 2022",
+        "host": "เปเล่ ณัฐวัฒน์ วุฒิช่วย",
+        "producers": [
+          "ณัฐวัฒน์ วุฒิช่วย",
+          "สหัสวรรษ นิจพันธ์",
+          "ชัยนันท์ วรรณสมพร"
+        ],
+        "executiveProducer": "ศุภวิชญ์ งามสม",
+        "firstAirDate": "ศุกร์ 4 พฤศจิกายน 2022",
+        "lastAirDate": "ศุกร์ 3 มีนาคม 2023",
+        "episodes": "13 ตอน (พิเศษ 3 ตอน)",
+        "championName": "มาลัภร์ชัย ไชสีฮาด (หนึ่ง)",
+        "championTopic": "Ragnarok Online"
+      },
+      "qualifying": [
+        {
+          "date": "18 พฤศจิกายน 2022",
+          "rank": "4",
+          "order": 1,
+          "pollRank": 11,
+          "nickname": "พีท",
+          "name": "สหัสวรรษ นิจพันธ์",
+          "topic": "Dead by Daylight",
+          "scores": {
+            "3sec": 11,
+            "qa": 20,
+            "jigsaw": 10,
+            "attribute": 25
+          },
+          "totalScore": 66,
+          "image": "/img/history/2022/Dead By Daylight.png"
+        },
+        {
+          "date": "18 พฤศจิกายน 2022\n25 พฤศจิกายน 2022",
+          "rank": "16",
+          "order": 2,
+          "pollRank": 1,
+          "nickname": "นัท",
+          "name": "นันทวัฒน์ สาริกา",
+          "topic": "The Mask Singer Thailand ครั้งที่ 2",
+          "scores": {
+            "3sec": 19,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 39,
+          "image": "/img/history/2022/The Mask Singer Thailand.png"
+        },
+        {
+          "date": "25 พฤศจิกายน 2022",
+          "rank": "18",
+          "order": 3,
+          "pollRank": 19,
+          "nickname": "ฟลุ๊ค",
+          "name": "อภิวัฒน์ ช่วยแสง",
+          "topic": "Horimiya",
+          "scores": {
+            "3sec": 7,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 5
+          },
+          "totalScore": 32,
+          "image": "/img/history/2022/Horimiya.png"
+        },
+        {
+          "date": "25 พฤศจิกายน 2022\n2 ธันวาคม 2022",
+          "rank": "14",
+          "order": 4,
+          "pollRank": 13,
+          "nickname": "โอ๊ค",
+          "name": "นวพล พรหล่อ",
+          "topic": "Workpoint ครั้งที่ 2",
+          "scores": {
+            "3sec": 12,
+            "qa": 25,
+            "jigsaw": 5,
+            "attribute": 0
+          },
+          "totalScore": 42,
+          "image": "/img/history/2022/Workpoint.png"
+        },
+        {
+          "date": "2 ธันวาคม 2022",
+          "rank": "2",
+          "order": 5,
+          "pollRank": 23,
+          "nickname": "ต้นน้ำ",
+          "name": "พัชธรสิษฐ์ นามเมือง",
+          "topic": "เกมโชว์สหราชอาณาจักร",
+          "scores": {
+            "3sec": 11,
+            "qa": 20,
+            "jigsaw": 25,
+            "attribute": 15
+          },
+          "totalScore": 71,
+          "image": "/img/history/2022/UK Gameshow.png"
+        },
+        {
+          "date": "2 ธันวาคม 2022",
+          "rank": "23",
+          "order": 6,
+          "pollRank": 10,
+          "nickname": "จี้",
+          "name": "คะนึงสิริ นันทจิตปราโมทย์",
+          "topic": "ไฮคิว! คู่ตบฟ้าประทาน",
+          "scores": {
+            "3sec": 7,
+            "qa": 0,
+            "jigsaw": 10,
+            "attribute": 0
+          },
+          "totalScore": 17,
+          "image": "/img/history/2022/Haikyuu!.png"
+        },
+        {
+          "date": "2 ธันวาคม 2022\n9 ธันวาคม 2022",
+          "rank": "26",
+          "order": 7,
+          "pollRank": 16,
+          "nickname": "เมฆ",
+          "name": "ถิรวัฒน์ ทองพิระ",
+          "topic": "Tilly Birds",
+          "scores": {
+            "3sec": 1,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 1,
+          "image": "/img/history/2022/Tilly Birds.png"
+        },
+        {
+          "date": "9 ธันวาคม 2022",
+          "rank": "19",
+          "order": 8,
+          "pollRank": 17,
+          "nickname": "ก๊อง",
+          "name": "เชาว์วรรธน์ จันทร์สุข",
+          "topic": "ค่ายหนัง GTH/GDH",
+          "scores": {
+            "3sec": 11,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 0
+          },
+          "totalScore": 31,
+          "image": "/img/history/2022/GTH GDH.png"
+        },
+        {
+          "date": "9 ธันวาคม 2022\n16 ธันวาคม 2022",
+          "rank": "8",
+          "order": 9,
+          "pollRank": 6,
+          "nickname": "ปาร์ค",
+          "name": "พศวัต พุ่มเงิน",
+          "topic": "VTuber",
+          "scores": {
+            "3sec": 21,
+            "qa": 25,
+            "jigsaw": 10,
+            "attribute": 5
+          },
+          "totalScore": 61,
+          "image": "/img/history/2022/VTuber.png"
+        },
+        {
+          "date": "16 ธันวาคม 2022",
+          "rank": "6",
+          "order": 10,
+          "pollRank": 20,
+          "nickname": "ปัน",
+          "name": "ปฏิปัน อัศวภูไชย",
+          "topic": "สุนทราภรณ์",
+          "scores": {
+            "3sec": 23,
+            "qa": 25,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 63,
+          "image": "/img/history/2022/สุนทราภรณ์.png"
+        },
+        {
+          "date": "23 ธันวาคม 2022",
+          "rank": "20",
+          "order": 11,
+          "pollRank": 24,
+          "nickname": "เอิร์ธ",
+          "name": "วงศธร นิธิวัฒนา",
+          "topic": "Dragon Ball",
+          "scores": {
+            "3sec": 8,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 28,
+          "image": "/img/history/2022/Dragonballs.png"
+        },
+        {
+          "date": "23 ธันวาคม 2022\n30 ธันวาคม 2022",
+          "rank": "1",
+          "order": 12,
+          "pollRank": 25,
+          "nickname": "หนึ่ง",
+          "name": "มาลัภร์ชัย ไชสีฮาด",
+          "topic": "Ragnarok Online",
+          "scores": {
+            "3sec": 7,
+            "qa": 20,
+            "jigsaw": 25,
+            "attribute": 20
+          },
+          "totalScore": 72,
+          "image": "/img/history/2022/Ragnarok.png"
+        },
+        {
+          "date": "30 ธันวาคม 2022",
+          "rank": "9",
+          "order": 13,
+          "pollRank": 14,
+          "nickname": "สร",
+          "name": "สรศักดิ์ ชัยเจริญ",
+          "topic": "มวยปล้ำ WWE",
+          "scores": {
+            "3sec": 24,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 15
+          },
+          "totalScore": 59,
+          "image": "/img/history/2022/WWE.png"
+        },
+        {
+          "date": "30 ธันวาคม 2022\n6 มกราคม 2023",
+          "rank": "7",
+          "order": 14,
+          "pollRank": 12,
+          "nickname": "ซ่า",
+          "name": "นัทธสม บุญมา",
+          "topic": "วง Cocktail",
+          "scores": {
+            "3sec": 17,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 25
+          },
+          "totalScore": 62,
+          "image": "/img/history/2022/Cocktail.png"
+        },
+        {
+          "date": "6 มกราคม 2023",
+          "rank": "12",
+          "order": 15,
+          "pollRank": 22,
+          "nickname": "โอม",
+          "name": "จิรวัฒน์ บุญสมสิทธิ์",
+          "topic": "Arknights",
+          "scores": {
+            "3sec": 19,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 10
+          },
+          "totalScore": 49,
+          "image": "/img/history/2022/Arknight.png"
+        },
+        {
+          "date": "6 มกราคม 2023\n13 มกราคม 2023",
+          "rank": "10",
+          "order": 16,
+          "pollRank": 5,
+          "nickname": "นนท์",
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "topic": "ยอดนักสืบจิ๋วโคนัน",
+          "scores": {
+            "3sec": 22,
+            "qa": 20,
+            "jigsaw": 10,
+            "attribute": 0
+          },
+          "totalScore": 52,
+          "image": "/img/history/2022/ยอดนักสืบจิ๋วโคนัน.png"
+        },
+        {
+          "date": "13 มกราคม 2023",
+          "rank": "24",
+          "order": 17,
+          "pollRank": 15,
+          "nickname": "นัท",
+          "name": "ณัฐกมล มานะดี",
+          "topic": "Cookie Run Kingdom",
+          "scores": {
+            "3sec": 7,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 7,
+          "image": "/img/history/2022/Cookie Run Kingdom.png"
+        },
+        {
+          "date": "13 มกราคม 2023\n20 มกราคม 2023",
+          "rank": "21",
+          "order": 18,
+          "pollRank": 18,
+          "nickname": "นุ๊ก",
+          "name": "กวิน โฆษิตตานนท์",
+          "topic": "Hyperdimension Neptunia",
+          "scores": {
+            "3sec": 21,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 21,
+          "image": "/img/history/2022/Neptunia.png"
+        },
+        {
+          "date": "20 มกราคม 2023",
+          "rank": "17",
+          "order": 19,
+          "pollRank": 9,
+          "nickname": "โอ๋",
+          "name": "ธนะวิทย์ ฤทธิรัตน์",
+          "topic": "Last Idol Thailand",
+          "scores": {
+            "3sec": 14,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 20
+          },
+          "totalScore": 34,
+          "image": "/img/history/2022/Last Idol TH.png"
+        },
+        {
+          "date": "20 มกราคม 2023\n27 มกราคม 2023",
+          "rank": "25",
+          "order": 20,
+          "pollRank": 21,
+          "nickname": "วีที",
+          "name": "ชนาธิป วรสิงห์",
+          "topic": "League of Legends",
+          "scores": {
+            "3sec": 6,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 6,
+          "image": "/img/history/2022/LoL.png"
+        },
+        {
+          "date": "27 มกราคม 2023",
+          "rank": "15",
+          "order": 21,
+          "pollRank": 4,
+          "nickname": "ริท",
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "topic": "รถเมล์ ขสมก.",
+          "scores": {
+            "3sec": 20,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 40,
+          "image": "/img/history/2022/ขสมก..png"
+        },
+        {
+          "date": "3 กุมภาพันธ์ 2023",
+          "rank": "5",
+          "order": 22,
+          "pollRank": 8,
+          "nickname": "เก่ง",
+          "name": "กิตติพงษ์ หนองมีทรัพย์",
+          "topic": "ซีรีส์เกม Resident Evil ครั้งที่ 2",
+          "scores": {
+            "3sec": 19,
+            "qa": 0,
+            "jigsaw": 25,
+            "attribute": 20
+          },
+          "totalScore": 64,
+          "image": "/img/history/2022/Resident Evil.png"
+        },
+        {
+          "date": "3 กุมภาพันธ์ 2023\n10 กุมภาพันธ์ 2023",
+          "rank": "22",
+          "order": 23,
+          "pollRank": 26,
+          "nickname": "แบงค์",
+          "name": "พัสกร ชูทรัพย์",
+          "topic": "Project SEKAI",
+          "scores": {
+            "3sec": 9,
+            "qa": 10,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 19,
+          "image": "/img/history/2022/Project Sekai.png"
+        },
+        {
+          "date": "10 กุมภาพันธ์ 2023",
+          "rank": "13",
+          "order": 24,
+          "pollRank": 2,
+          "nickname": "ไอซ์",
+          "name": "ธนกฤต บุญพงษา",
+          "topic": "รัฐสมาชิกสหประชาชาติ",
+          "scores": {
+            "3sec": 24,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 44,
+          "image": "/img/history/2022/รัฐสมาชิก UN.png"
+        },
+        {
+          "date": "10 กุมภาพันธ์ 2023\n17 กุมภาพันธ์ 2023",
+          "rank": "3",
+          "order": 25,
+          "pollRank": 7,
+          "nickname": "เติ๊ด",
+          "name": "รัฐศาสตร์ สายโท",
+          "topic": "บอร์ดเกม ครั้งที่ 2",
+          "scores": {
+            "3sec": 17,
+            "qa": 25,
+            "jigsaw": 20,
+            "attribute": 5
+          },
+          "totalScore": 67,
+          "image": "/img/history/2022/Board Game.png"
+        },
+        {
+          "date": "17 กุมภาพันธ์ 2023",
+          "rank": "11",
+          "order": 26,
+          "pollRank": 3,
+          "nickname": "คิว",
+          "name": "ศักรินทร์ เสนีวงษ์",
+          "topic": "Marvel Cinematic Universe",
+          "scores": {
+            "3sec": 5,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 25
+          },
+          "totalScore": 50,
+          "image": "/img/history/2022/MCU.png"
+        }
+      ],
+      "playoffs": {
+        "roundName": "รอบตัดเชือก (Playoff)",
+        "gameType": "แอ็คชั่นเกม (Action Game)",
+        "players": [
+          {
+            "date": "",
+            "rank": "5",
+            "order": 5,
+            "pollRank": 20,
+            "nickname": "ปัน",
+            "name": "ปฏิปัน อัศวภูไชย",
+            "topic": "สุนทราภรณ์",
+            "actionGameScore": 5,
+            "result": "ตกรอบ",
+            "image": "/img/history/2022/สุนทราภรณ์.png"
+          },
+          {
+            "date": "",
+            "rank": "1",
+            "order": 1,
+            "pollRank": 12,
+            "nickname": "ซ่า",
+            "name": "นัทธสม บุญมา",
+            "topic": "วง Cocktail",
+            "actionGameScore": 20,
+            "result": "เข้ารอบ",
+            "image": "/img/history/2022/Cocktail.png"
+          },
+          {
+            "date": "",
+            "rank": "2",
+            "order": 3,
+            "pollRank": 6,
+            "nickname": "ปาร์ค",
+            "name": "พศวัต พุ่มเงิน",
+            "topic": "VTuber",
+            "actionGameScore": 15,
+            "result": "ตกรอบ",
+            "image": "/img/history/2022/VTuber.png"
+          },
+          {
+            "date": "",
+            "rank": "4",
+            "order": 4,
+            "pollRank": 14,
+            "nickname": "สร",
+            "name": "สรศักดิ์ ชัยเจริญ",
+            "topic": "มวยปล้ำ WWE",
+            "actionGameScore": 10,
+            "result": "ตกรอบ",
+            "image": "/img/history/2022/WWE.png"
+          },
+          {
+            "date": "",
+            "rank": "2",
+            "order": 2,
+            "pollRank": 5,
+            "nickname": "นนท์",
+            "name": "นัทธภพ ธนวัฒนาเจริญ",
+            "topic": "ยอดนักสืบจิ๋วโคนัน",
+            "actionGameScore": 15,
+            "result": "ตกรอบ",
+            "image": "/img/history/2022/ยอดนักสืบจิ๋วโคนัน.png"
+          }
+        ]
+      },
+      "finals": [
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 1/4",
+          "players": [
+            {
+              "date": "",
+              "rank": "2",
+              "order": 1,
+              "pollRank": 23,
+              "nickname": "ต้นน้ำ",
+              "name": "พัชธรสิษฐ์ นามเมือง",
+              "topic": "เกมโชว์สหราชอาณาจักร",
+              "scores": {
+                "3sec": null,
+                "qa": 20,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2022/UK Gameshow.png"
+            },
+            {
+              "date": "",
+              "rank": "2",
+              "order": 2,
+              "pollRank": 8,
+              "nickname": "เก่ง",
+              "name": "กิตติพงษ์ หนองมีทรัพย์",
+              "topic": "ซีรีส์เกม Resident Evil ครั้งที่ 2",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": 20,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2022/Resident Evil.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 3,
+              "pollRank": 25,
+              "nickname": "หนึ่ง",
+              "name": "มาลัภร์ชัย ไชสีฮาด",
+              "topic": "Ragnarok Online",
+              "scores": {
+                "3sec": null,
+                "qa": 25,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "FAN OF THE YEAR 2022",
+              "image": "/img/history/2022/Ragnarok.png"
+            },
+            {
+              "date": "",
+              "rank": "4",
+              "order": 4,
+              "pollRank": 11,
+              "nickname": "พีท",
+              "name": "สหัสวรรษ นิจพันธ์",
+              "topic": "Dead by Daylight",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": 0
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2022/Dead By Daylight.png"
+            },
+            {
+              "date": "",
+              "rank": "4",
+              "order": 5,
+              "pollRank": 12,
+              "nickname": "ซ่า",
+              "name": "นัทธสม บุญมา",
+              "topic": "วง Cocktail",
+              "scores": {
+                "3sec": null,
+                "qa": 0,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2022/Cocktail.png"
+            },
+            {
+              "date": "",
+              "rank": "4",
+              "order": 6,
+              "pollRank": 7,
+              "nickname": "เติ๊ด",
+              "name": "รัฐศาสตร์ สายโท",
+              "topic": "บอร์ดเกม ครั้งที่ 2",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": 0,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2022/Board Game.png"
+            }
+          ]
+        }
+      ]
+    },
+    "2023": {
+      "info": {
+        "year": 2023,
+        "title": "แฟนพันธุ์แท้แห่งปี 2023",
+        "host": "เปเล่ ณัฐวัฒน์ วุฒิช่วย",
+        "producers": [
+          "ณัฐวัฒน์ วุฒิช่วย",
+          "วรงกร แจ่มปัญญา",
+          "นันทวัฒน์ สาริกา",
+          "พงศ์ภรณ์ เครือแก้ว",
+          "รัฐศาสตร์ สายโท"
+        ],
+        "executiveProducer": "ศุภวิชญ์ งามสม",
+        "firstAirDate": "ศุกร์ 6 ตุลาคม 2023",
+        "lastAirDate": "ศุกร์ 23 กุมภาพันธ์ 2024",
+        "episodes": "19 ตอน (พิเศษ 2 ตอน)",
+        "championName": "ณัฐพงษ์ อ่ำกลาง (อั้ม)",
+        "championTopic": "วง Queen"
+      },
+      "qualifying": [
+        {
+          "date": "20 ตุลาคม 2023",
+          "rank": "15",
+          "order": 1,
+          "pollRank": 5,
+          "nickname": "กัปตัน",
+          "name": "กันตชาติ ศรีเพ็ชร",
+          "topic": "เครื่องบินพาณิชย์",
+          "scores": {
+            "3sec": 16,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 15
+          },
+          "totalScore": 51,
+          "image": "/img/history/2023/เครื่องบินพาณิชย์.png"
+        },
+        {
+          "date": "20 ตุลาคม 2023\n27 ตุลาคม 2023",
+          "rank": "13",
+          "order": 2,
+          "pollRank": 16,
+          "nickname": "ศีล",
+          "name": "พัทธ์ศีล ปุญศิริ",
+          "topic": "D4DJ",
+          "scores": {
+            "3sec": 12,
+            "qa": 25,
+            "jigsaw": 10,
+            "attribute": 5
+          },
+          "totalScore": 52,
+          "image": "/img/history/2023/D4DJ.png"
+        },
+        {
+          "date": "27 ตุลาคม 2023",
+          "rank": "2",
+          "order": 3,
+          "pollRank": 9,
+          "nickname": "อั้ม",
+          "name": "ณัฐพงษ์ อ่ำกลาง",
+          "topic": "วง Queen",
+          "scores": {
+            "3sec": 25,
+            "qa": 25,
+            "jigsaw": 0,
+            "attribute": 25
+          },
+          "totalScore": 75,
+          "image": "/img/history/2023/วง Queen (1).png"
+        },
+        {
+          "date": "27 ตุลาคม 2023\n3 พฤศจิกายน 2023",
+          "rank": "19",
+          "order": 4,
+          "pollRank": 11,
+          "nickname": "นนท์",
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "topic": "ยอดนักสืบจิ๋วโคนัน ครั้งที่ 2",
+          "scores": {
+            "3sec": 18,
+            "qa": 0,
+            "jigsaw": 25,
+            "attribute": 0
+          },
+          "totalScore": 43,
+          "image": "/img/history/2023/ยอดนักสืบจิ๋วโคนัน.png"
+        },
+        {
+          "date": "3 พฤศจิกายน 2023",
+          "rank": "2",
+          "order": 5,
+          "pollRank": 3,
+          "nickname": "เติ๊ด",
+          "name": "รัฐศาสตร์ สายโท",
+          "topic": "บอร์ดเกม ครั้งที่ 3",
+          "scores": {
+            "3sec": 15,
+            "qa": 20,
+            "jigsaw": 25,
+            "attribute": 15
+          },
+          "totalScore": 75,
+          "image": "/img/history/2023/Board Game (1).png"
+        },
+        {
+          "date": "3 พฤศจิกายน 2023\n10 พฤศจิกายน 2023",
+          "rank": "12",
+          "order": 6,
+          "pollRank": 14,
+          "nickname": "ปอนด์",
+          "name": "กิตติธัช มีภู่",
+          "topic": "Plants vs. Zombies",
+          "scores": {
+            "3sec": 14,
+            "qa": 5,
+            "jigsaw": 15,
+            "attribute": 20
+          },
+          "totalScore": 54,
+          "image": "/img/history/2023/Plants VS Zombies.png"
+        },
+        {
+          "date": "10 พฤศจิกายน 2023",
+          "rank": "17",
+          "order": 7,
+          "pollRank": 1,
+          "nickname": "ปาร์ค",
+          "name": "พศวัต พุ่มเงิน",
+          "topic": "VTuber ครั้งที่ 2",
+          "scores": {
+            "3sec": 20,
+            "qa": 25,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 45,
+          "image": "/img/history/2023/VTuber.png"
+        },
+        {
+          "date": "10 พฤศจิกายน 2023",
+          "rank": "25",
+          "order": 8,
+          "pollRank": 22,
+          "nickname": "ชีส",
+          "name": "ธีรวีร์ จรูญศรีโชติ",
+          "topic": "Mario Party ครั้งที่ 2",
+          "scores": {
+            "3sec": 15,
+            "qa": 0,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 30,
+          "image": "/img/history/2023/Mario Party.png"
+        },
+        {
+          "date": "17 พฤศจิกายน 2023\n24 พฤศจิกายน 2023",
+          "rank": "7",
+          "order": 9,
+          "pollRank": 21,
+          "nickname": "น้ำมนต์",
+          "name": "กิตติเกษม ทรัพย์วงษ์",
+          "topic": "Arcaea",
+          "scores": {
+            "3sec": 16,
+            "qa": 10,
+            "jigsaw": 25,
+            "attribute": 10
+          },
+          "totalScore": 61,
+          "image": "/img/history/2023/Arcaea.png"
+        },
+        {
+          "date": "24 พฤศจิกายน 2023",
+          "rank": "19",
+          "order": 10,
+          "pollRank": 26,
+          "nickname": "เอิร์ธ",
+          "name": "วงศธร นิธิวัฒนา",
+          "topic": "Cardfight Vanguard",
+          "scores": {
+            "3sec": 3,
+            "qa": 25,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 43,
+          "image": "/img/history/2023/Cardfight Vanguard.png"
+        },
+        {
+          "date": "24 พฤศจิกายน 2023\n1 ธันวาคม 2023",
+          "rank": "27",
+          "order": 11,
+          "pollRank": 20,
+          "nickname": "ต้า",
+          "name": "วินทกร คำภีระ",
+          "topic": "Genshin Impact",
+          "scores": {
+            "3sec": 6,
+            "qa": 15,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 21,
+          "image": "/img/history/2023/Genshin Impact (2).png"
+        },
+        {
+          "date": "1 ธันวาคม 2023\n8 ธันวาคม 2023",
+          "rank": "1",
+          "order": 12,
+          "pollRank": 7,
+          "nickname": "ปัน",
+          "name": "ปฏิปัน อัศวภูไชย",
+          "topic": "สุนทราภรณ์",
+          "scores": {
+            "3sec": 23,
+            "qa": 25,
+            "jigsaw": 20,
+            "attribute": 10
+          },
+          "totalScore": 78,
+          "image": "/img/history/2023/สุนทราภรณ์.png"
+        },
+        {
+          "date": "8 ธันวาคม 2023",
+          "rank": "16",
+          "order": 13,
+          "pollRank": 13,
+          "nickname": "เก่ง",
+          "name": "กิตติพงษ์ หนองมีทรัพย์",
+          "topic": "เกมซีรีส์ Yakuza",
+          "scores": {
+            "3sec": 12,
+            "qa": 25,
+            "jigsaw": 10,
+            "attribute": 0
+          },
+          "totalScore": 47,
+          "image": "/img/history/2023/เกมซีรีส์ Yakuza.png"
+        },
+        {
+          "date": "8 ธันวาคม 2023\n15 ธันวาคม 2023",
+          "rank": "5",
+          "order": 14,
+          "pollRank": 6,
+          "nickname": "คิว",
+          "name": "ศักรินทร์ เสนีวงษ์",
+          "topic": "Marvel Cinematic Universe ครั้งที่ 2",
+          "scores": {
+            "3sec": 10,
+            "qa": 25,
+            "jigsaw": 20,
+            "attribute": 15
+          },
+          "totalScore": 70,
+          "image": "/img/history/2023/MCU.png"
+        },
+        {
+          "date": "15 ธันวาคม 2023\n22 ธันวาคม 2023",
+          "rank": "7",
+          "order": 15,
+          "pollRank": 19,
+          "nickname": "แฟรงค์",
+          "name": "ณัฐดนัย วงศ์ปัญญา",
+          "topic": "ไอดอลหญิงไทย ครั้งที่ 2",
+          "scores": {
+            "3sec": 11,
+            "qa": 0,
+            "jigsaw": 25,
+            "attribute": 25
+          },
+          "totalScore": 61,
+          "image": "/img/history/2023/ไอดอลหญิงไทย.png"
+        },
+        {
+          "date": "22 ธันวาคม 2023",
+          "rank": "11",
+          "order": 16,
+          "pollRank": 8,
+          "nickname": "ซ่า",
+          "name": "นัทธสม บุญมา",
+          "topic": "มวยปล้ำ WWE",
+          "scores": {
+            "3sec": 20,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 55,
+          "image": "/img/history/2023/WWE.png"
+        },
+        {
+          "date": "29 ธันวาคม 2023",
+          "rank": "2",
+          "order": 17,
+          "pollRank": 24,
+          "nickname": "เฟิร์ส",
+          "name": "พงศพัศ เอมลา",
+          "topic": "Kobaryo",
+          "scores": {
+            "3sec": 15,
+            "qa": 25,
+            "jigsaw": 20,
+            "attribute": 15
+          },
+          "totalScore": 75,
+          "image": "/img/history/2023/Kobaryo.png"
+        },
+        {
+          "date": "29 ธันวาคม 2023\n5 มกราคม 2024",
+          "rank": "23",
+          "order": 18,
+          "pollRank": 23,
+          "nickname": "พีม",
+          "name": "พีรภัทร หมื่นหาญ",
+          "topic": "ฟุตบอลไทยลีก 1",
+          "scores": {
+            "3sec": 19,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 39,
+          "image": "/img/history/2023/ฟุตบอลไทยลีก 1.png"
+        },
+        {
+          "date": "5 มกราคม 2024",
+          "rank": "21",
+          "order": 19,
+          "pollRank": 12,
+          "nickname": "ภัค",
+          "name": "ภัคธร ดวงใหญ่",
+          "topic": "วง Cocktail",
+          "scores": {
+            "3sec": 21,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 41,
+          "image": "/img/history/2023/Cocktail.png"
+        },
+        {
+          "date": "5 มกราคม 2024\n12 มกราคม 2024",
+          "rank": "10",
+          "order": 20,
+          "pollRank": 10,
+          "nickname": "นุ๊ก",
+          "name": "กวิน โฆษิตานนท์",
+          "topic": "Hyperdimension Neptunia ครั้งที่ 2",
+          "scores": {
+            "3sec": 22,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 57,
+          "image": "/img/history/2023/Hyperdimension Neptunia.png"
+        },
+        {
+          "date": "12 มกราคม 2024",
+          "rank": "17",
+          "order": 21,
+          "pollRank": 2,
+          "nickname": "นัท",
+          "name": "นันทวัฒน์ สาริกา",
+          "topic": "Tattoo Colour",
+          "scores": {
+            "3sec": 20,
+            "qa": 0,
+            "jigsaw": 25,
+            "attribute": 0
+          },
+          "totalScore": 45,
+          "image": "/img/history/2023/Tattoo Colour.png"
+        },
+        {
+          "date": "12 มกราคม 2024\n19 มกราคม 2024",
+          "rank": "24",
+          "order": 22,
+          "pollRank": 27,
+          "nickname": "ณัฐ",
+          "name": "ณัฐพัชร์ หฤษฎ์จิรสิน",
+          "topic": "เหรียญกษาปณ์ไทย",
+          "scores": {
+            "3sec": 6,
+            "qa": 0,
+            "jigsaw": 15,
+            "attribute": 10
+          },
+          "totalScore": 31,
+          "image": "/img/history/2023/เหรียญกษาปณ์ไทย.png"
+        },
+        {
+          "date": "19 มกราคม 2024",
+          "rank": "13",
+          "order": 23,
+          "pollRank": 15,
+          "nickname": "โอ๋",
+          "name": "ธนะวิทย์ ฤทธิรัตน์",
+          "topic": "48Group Thailand",
+          "scores": {
+            "3sec": 17,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 52,
+          "image": "/img/history/2023/48Group Thailand.png"
+        },
+        {
+          "date": "19 มกราคม 2024\n26 มกราคม 2024",
+          "rank": "6",
+          "order": 24,
+          "pollRank": 25,
+          "nickname": "พงเพียว",
+          "name": "ภควัฒน์ ฉิมทิน",
+          "topic": "บอร์ดเกม",
+          "scores": {
+            "3sec": 12,
+            "qa": 0,
+            "jigsaw": 25,
+            "attribute": 25
+          },
+          "totalScore": 62,
+          "image": "/img/history/2023/Board Game (2).png"
+        },
+        {
+          "date": "26 มกราคม 2024",
+          "rank": "26",
+          "order": 25,
+          "pollRank": 17,
+          "nickname": "ม่อน",
+          "name": "อิทธิกร ใจมั่น",
+          "topic": "Genshin Impact",
+          "scores": {
+            "3sec": 2,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 22,
+          "image": "/img/history/2023/Genshin Impact (3).png"
+        },
+        {
+          "date": "26 มกราคม 2024\n2 กุมภาพันธ์ 2024",
+          "rank": "22",
+          "order": 26,
+          "pollRank": 18,
+          "nickname": "ฟลุ๊ค",
+          "name": "อภิวัฒน์ ช่วยแสง",
+          "topic": "Masayuki Suzuki",
+          "scores": {
+            "3sec": 15,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 5
+          },
+          "totalScore": 40,
+          "image": "/img/history/2023/Masayuki Suzuki.png"
+        },
+        {
+          "date": "2 กุมภาพันธ์ 2024",
+          "rank": "9",
+          "order": 27,
+          "pollRank": 4,
+          "nickname": "ไอซ์",
+          "name": "ธนกฤต บุญพงษา",
+          "topic": "Saint Seiya",
+          "scores": {
+            "3sec": 25,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 0
+          },
+          "totalScore": 60,
+          "image": "/img/history/2023/Saint Seiya.png"
+        }
+      ],
+      "playoffs": null,
+      "finals": [
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 1/5",
+          "players": [
+            {
+              "date": "",
+              "rank": "1",
+              "order": 1,
+              "pollRank": 7,
+              "nickname": "ปัน",
+              "name": "ปฏิปัน อัศวภูไชย",
+              "topic": "สุนทราภรณ์",
+              "scores": {
+                "3sec": null,
+                "qa": 25,
+                "actionGame": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2023/สุนทราภรณ์.png"
+            },
+            {
+              "date": "",
+              "rank": "4",
+              "order": 2,
+              "pollRank": 24,
+              "nickname": "เฟิร์ส",
+              "name": "พงศพัศ เอมลา",
+              "topic": "Kobaryo",
+              "scores": {
+                "3sec": null,
+                "qa": 0,
+                "actionGame": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2023/Kobaryo.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 3,
+              "pollRank": 3,
+              "nickname": "เติ๊ด",
+              "name": "รัฐศาสตร์ สายโท",
+              "topic": "บอร์ดเกม ครั้งที่ 3",
+              "scores": {
+                "3sec": null,
+                "qa": 25,
+                "actionGame": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2023/Board Game (1).png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 4,
+              "pollRank": 9,
+              "nickname": "อั้ม",
+              "name": "ณัฐพงษ์ อ่ำกลาง",
+              "topic": "วง Queen",
+              "scores": {
+                "3sec": 25,
+                "qa": null,
+                "actionGame": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2023/วง Queen (1).png"
+            },
+            {
+              "date": "",
+              "rank": "4",
+              "order": 5,
+              "pollRank": 6,
+              "nickname": "คิว",
+              "name": "ศักรินทร์ เสนีวงษ์",
+              "topic": "Marvel Cinematic Universe ครั้งที่ 2",
+              "scores": {
+                "3sec": null,
+                "qa": 0,
+                "actionGame": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2023/MCU.png"
+            }
+          ]
+        },
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 2/5",
+          "players": [
+            {
+              "date": "",
+              "rank": "3",
+              "order": 1,
+              "pollRank": 7,
+              "nickname": "ปัน",
+              "name": "ปฏิปัน อัศวภูไชย",
+              "topic": "สุนทราภรณ์",
+              "scores": {
+                "3sec": null,
+                "qa": "X",
+                "actionGame": 5,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2023/สุนทราภรณ์.png"
+            },
+            {
+              "date": "",
+              "rank": "2",
+              "order": 2,
+              "pollRank": 3,
+              "nickname": "เติ๊ด",
+              "name": "รัฐศาสตร์ สายโท",
+              "topic": "บอร์ดเกม ครั้งที่ 3",
+              "scores": {
+                "3sec": 16,
+                "qa": "X",
+                "actionGame": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2023/Board Game (1).png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 3,
+              "pollRank": 9,
+              "nickname": "อั้ม",
+              "name": "ณัฐพงษ์ อ่ำกลาง",
+              "topic": "วง Queen",
+              "scores": {
+                "3sec": "X",
+                "qa": 20,
+                "actionGame": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "FAN OF THE YEAR 2023",
+              "image": "/img/history/2023/วง Queen (1).png"
+            }
+          ]
+        }
+      ]
+    },
+    "2024": {
+      "info": {
+        "year": 2024,
+        "title": "แฟนพันธุ์แท้แห่งปี 2024",
+        "host": "เปเล่ ณัฐวัฒน์ วุฒิช่วย",
+        "producers": [
+          "ณัฐวัฒน์ วุฒิช่วย",
+          "วรงกร แจ่มปัญญา",
+          "นันทวัฒน์ สาริกา",
+          "พงศ์ภรณ์ เครือแก้ว",
+          "รัฐศาสตร์ สายโท",
+          "ณัฐกมล มานะดี",
+          "ศักรินทร์ เสนีวงษ์"
+        ],
+        "executiveProducer": "ศุภวิชญ์ งามสม",
+        "firstAirDate": "ศุกร์ 6 ตุลาคม 2023",
+        "lastAirDate": "ศุกร์ 17 มีนาคม 2024",
+        "episodes": "19 ตอน (พิเศษ 2 ตอน)",
+        "championName": "ณชนน ยุงคุณ (เจสัน)",
+        "championTopic": "มวยปล้ำ WWE"
+      },
+      "qualifying": [
+        {
+          "date": "",
+          "rank": "19",
+          "order": 1,
+          "pollRank": 18,
+          "nickname": "โอเว่น",
+          "name": "อดิเทพ พฤกธารา",
+          "topic": "Cookie Run Ovenbreak",
+          "scores": {
+            "3sec": 12,
+            "qa": 0,
+            "jigsaw": 10,
+            "attribute": 0
+          },
+          "totalScore": 22,
+          "image": "/img/history/2024/Cookie Run Ovenbreak.png"
+        },
+        {
+          "date": "",
+          "rank": "12",
+          "order": 2,
+          "pollRank": 15,
+          "nickname": "ก๊อปปี้",
+          "name": "นิธิกร วิชัยวงค์",
+          "topic": "ขบวนการ 5 สี",
+          "scores": {
+            "3sec": 12,
+            "qa": 20,
+            "jigsaw": 10,
+            "attribute": 10
+          },
+          "totalScore": 52,
+          "image": "/img/history/2024/ขบวนการ 5 สี.png"
+        },
+        {
+          "date": "",
+          "rank": "7",
+          "order": 3,
+          "pollRank": 2,
+          "nickname": "ปาร์ค",
+          "name": "พศวัต พุ่มเงิน",
+          "topic": "hololive",
+          "scores": {
+            "3sec": 25,
+            "qa": 0,
+            "jigsaw": 15,
+            "attribute": 20
+          },
+          "totalScore": 60,
+          "image": "/img/history/2024/hololive.png"
+        },
+        {
+          "date": "",
+          "rank": "15",
+          "order": 4,
+          "pollRank": 23,
+          "nickname": "พีท",
+          "name": "สหัสวรรษ นิจพันธ์",
+          "topic": "ภาพยนตร์ชุด SAW",
+          "scores": {
+            "3sec": 4,
+            "qa": 25,
+            "jigsaw": 10,
+            "attribute": 0
+          },
+          "totalScore": 39,
+          "image": "/img/history/2024/SAW.png"
+        },
+        {
+          "date": "",
+          "rank": "5",
+          "order": 5,
+          "pollRank": 14,
+          "nickname": "ใบข้าว",
+          "name": "ชนกมล บุญจบ",
+          "topic": "Phigros",
+          "scores": {
+            "3sec": 21,
+            "qa": 20,
+            "jigsaw": 5,
+            "attribute": 15
+          },
+          "totalScore": 61,
+          "image": "/img/history/2024/Phigros.png"
+        },
+        {
+          "date": "",
+          "rank": "13",
+          "order": 6,
+          "pollRank": 5,
+          "nickname": "เติ๊ด",
+          "name": "รัฐศาสตร์ สายโท",
+          "topic": "บอร์ดเกม ครั้งที่ 4",
+          "scores": {
+            "3sec": 20,
+            "qa": 20,
+            "jigsaw": 5,
+            "attribute": 0
+          },
+          "totalScore": 45,
+          "image": "/img/history/2023/Board Game (1).png"
+        },
+        {
+          "date": "",
+          "rank": "7",
+          "order": 7,
+          "pollRank": 1,
+          "nickname": "หมี",
+          "name": "ศุภกร นิลสุวรรณ",
+          "topic": "วง Coldplay",
+          "scores": {
+            "3sec": 25,
+            "qa": 0,
+            "jigsaw": 25,
+            "attribute": 10
+          },
+          "totalScore": 60,
+          "image": "/img/history/2024/Coldplay.png"
+        },
+        {
+          "date": "",
+          "rank": "22",
+          "order": 8,
+          "pollRank": 17,
+          "nickname": "เสี่ยวจี",
+          "name": "กฤตมุข สามารถ",
+          "topic": "บาสเก็ตบอล NBA",
+          "scores": {
+            "3sec": 12,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 12,
+          "image": "/img/history/2024/บาสเก็ตบอล NBA.png"
+        },
+        {
+          "date": "",
+          "rank": "11",
+          "order": 9,
+          "pollRank": 21,
+          "nickname": "ต้า",
+          "name": "วินทกร คำภีระ",
+          "topic": "Genshin Impact",
+          "scores": {
+            "3sec": 5,
+            "qa": 20,
+            "jigsaw": 10,
+            "attribute": 20
+          },
+          "totalScore": 55,
+          "image": "/img/history/2024/Genshin Impact.png"
+        },
+        {
+          "date": "",
+          "rank": "10",
+          "order": 10,
+          "pollRank": 20,
+          "nickname": "ศีล",
+          "name": "พัทธ์ศีล ปุญศิริ",
+          "topic": "Inori Minase",
+          "scores": {
+            "3sec": 8,
+            "qa": 10,
+            "jigsaw": 15,
+            "attribute": 25
+          },
+          "totalScore": 58,
+          "image": "/img/history/2024/Inori Minase.png"
+        },
+        {
+          "date": "",
+          "rank": "2",
+          "order": 11,
+          "pollRank": 16,
+          "nickname": "ปืน",
+          "name": "ธวัชชัย แสงสว่าง",
+          "topic": "ไอ้มดแดง",
+          "scores": {
+            "3sec": 15,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 10
+          },
+          "totalScore": 60,
+          "image": "/img/history/2024/ไอ้มดแดง.png"
+        },
+        {
+          "date": "",
+          "rank": "21",
+          "order": 12,
+          "pollRank": 8,
+          "nickname": "นุ๊ก",
+          "name": "กวิน โฆษิตตานนท์",
+          "topic": "Mario Kart Series",
+          "scores": {
+            "3sec": 18,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 18,
+          "image": "/img/history/2024/Mario Kart Series.png"
+        },
+        {
+          "date": "",
+          "rank": "18",
+          "order": 13,
+          "pollRank": 22,
+          "nickname": "ซ่า",
+          "name": "นัทธสม บุญมา",
+          "topic": "มวยปล้ำ AEW",
+          "scores": {
+            "3sec": 20,
+            "qa": 10,
+            "jigsaw": 0,
+            "attribute": 5
+          },
+          "totalScore": 35,
+          "image": "/img/history/2024/AEW.png"
+        },
+        {
+          "date": "",
+          "rank": "3",
+          "order": 14,
+          "pollRank": 13,
+          "nickname": "พีม",
+          "name": "พีรภัทร หมื่นหาญ",
+          "topic": "ฟุตบอลพรีเมียร์ลีก",
+          "scores": {
+            "3sec": 23,
+            "qa": 20,
+            "jigsaw": 10,
+            "attribute": 15
+          },
+          "totalScore": 68,
+          "image": "/img/history/2024/พรีเมียร์ลีก.png"
+        },
+        {
+          "date": "",
+          "rank": "20",
+          "order": 15,
+          "pollRank": 9,
+          "nickname": "กัปตัน",
+          "name": "กันตชาติ ศรีเพ็ชร",
+          "topic": "Valorant",
+          "scores": {
+            "3sec": 5,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 15
+          },
+          "totalScore": 20,
+          "image": "/img/history/2024/Valorant.png"
+        },
+        {
+          "date": "",
+          "rank": "16",
+          "order": 16,
+          "pollRank": 6,
+          "nickname": "ตฤณ",
+          "name": "ณฤกร วงศบูรณะ",
+          "topic": "Tattoo Colour",
+          "scores": {
+            "3sec": 13,
+            "qa": 25,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 38,
+          "image": "/img/history/2024/Tattoo Colour.png"
+        },
+        {
+          "date": "",
+          "rank": "2",
+          "order": 17,
+          "pollRank": 10,
+          "nickname": "ทาโร่",
+          "name": "ปรมัย สัมเภาว์มาลย์",
+          "topic": "ไอ้มดแดง",
+          "scores": {
+            "3sec": 15,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 20
+          },
+          "totalScore": 70,
+          "image": "/img/history/2024/ไอ้มดแดง (2).png"
+        },
+        {
+          "date": "",
+          "rank": "23",
+          "order": 18,
+          "pollRank": 12,
+          "nickname": "อ๋อมแอ๋ม",
+          "name": "มีคณา สมใจเพ็ง",
+          "topic": "Workpoint",
+          "scores": {
+            "3sec": 2,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 2,
+          "image": "/img/history/2024/Workpoint.png"
+        },
+        {
+          "date": "",
+          "rank": "17",
+          "order": 19,
+          "pollRank": 4,
+          "nickname": "ปอนด์",
+          "name": "กิตติธัช มีภู่",
+          "topic": "Plants vs. Zombies",
+          "scores": {
+            "3sec": 21,
+            "qa": 5,
+            "jigsaw": 10,
+            "attribute": 0
+          },
+          "totalScore": 36,
+          "image": "/img/history/2024/Plants VS. Zombies.png"
+        },
+        {
+          "date": "",
+          "rank": "3",
+          "order": 20,
+          "pollRank": 11,
+          "nickname": "ริท",
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "topic": "รถเมล์ ขสมก.",
+          "scores": {
+            "3sec": 23,
+            "qa": 25,
+            "jigsaw": 15,
+            "attribute": 5
+          },
+          "totalScore": 68,
+          "image": "/img/history/2024/ขสมก..png"
+        },
+        {
+          "date": "",
+          "rank": "14",
+          "order": 21,
+          "pollRank": 19,
+          "nickname": "เอิร์น",
+          "name": "พัชราภรณ์ ขวัญพรมสี",
+          "topic": "Honkai Impact 3rd",
+          "scores": {
+            "3sec": 20,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 0
+          },
+          "totalScore": 40,
+          "image": "/img/history/2024/Honkai Impact 3rd.png"
+        },
+        {
+          "date": "",
+          "rank": "1",
+          "order": 22,
+          "pollRank": 7,
+          "nickname": "เจสัน",
+          "name": "ณชนน ยุงคุณ",
+          "topic": "มวยปล้ำ WWE",
+          "scores": {
+            "3sec": 22,
+            "qa": 25,
+            "jigsaw": 25,
+            "attribute": 0
+          },
+          "totalScore": 72,
+          "image": "/img/history/2024/WWE.png"
+        },
+        {
+          "date": "",
+          "rank": "5",
+          "order": 23,
+          "pollRank": 3,
+          "nickname": "การ์ด",
+          "name": "พลากร ผ่านสำแดง",
+          "topic": "Death Note ครั้งที่ 2",
+          "scores": {
+            "3sec": 16,
+            "qa": 20,
+            "jigsaw": 20,
+            "attribute": 5
+          },
+          "totalScore": 61,
+          "image": "/img/history/2024/Death Note.png"
+        }
+      ],
+      "playoffs": null,
+      "finals": [
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 1/4",
+          "players": [
+            {
+              "date": "",
+              "rank": "1",
+              "order": 1,
+              "pollRank": 7,
+              "nickname": "เจสัน",
+              "name": "ณชนน ยุงคุณ",
+              "topic": "มวยปล้ำ WWE",
+              "scores": {
+                "3sec": null,
+                "qa": 20,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2024/WWE.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 4,
+              "pollRank": 10,
+              "nickname": "ทาโร่",
+              "name": "ปรมัย สัมเภาว์มาลย์",
+              "topic": "ไอ้มดแดง",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": 20,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2024/ไอ้มดแดง (2).png"
+            },
+            {
+              "date": "",
+              "rank": "4",
+              "order": 2,
+              "pollRank": 11,
+              "nickname": "ริท",
+              "name": "ฤทธิชัย ภูสิญามณี",
+              "topic": "รถเมล์ ขสมก. ครั้งที่ 2",
+              "scores": {
+                "3sec": 16,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2024/ขสมก..png"
+            },
+            {
+              "date": "",
+              "rank": "5",
+              "order": 3,
+              "pollRank": 13,
+              "nickname": "พีม",
+              "name": "พีรภัทร หมื่นหาญ",
+              "topic": "ฟุตบอลพรีเมียร์ลีก",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": 0
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2024/พรีเมียร์ลีก.png"
+            },
+            {
+              "date": "",
+              "rank": "5",
+              "order": 5,
+              "pollRank": 14,
+              "nickname": "ใบข้าว",
+              "name": "ชนกมล บุญจบ",
+              "topic": "Phigros",
+              "scores": {
+                "3sec": null,
+                "qa": 0,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2024/Phigros.png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 6,
+              "pollRank": 3,
+              "nickname": "การ์ด",
+              "name": "พลากร ผ่านสำแดง",
+              "topic": "Death Note ครั้งที่ 2",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": 20,
+                "attribute": null
+              },
+              "result": "เข้ารอบ",
+              "image": "/img/history/2024/Death Note.png"
+            }
+          ]
+        },
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 2/4",
+          "players": [
+            {
+              "date": "",
+              "rank": "3",
+              "order": 1,
+              "pollRank": 3,
+              "nickname": "การ์ด",
+              "name": "พลากร ผ่านสำแดง",
+              "topic": "Death Note ครั้งที่ 2",
+              "scores": {
+                "3sec": null,
+                "qa": 0,
+                "jigsaw": "X",
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2024/Death Note.png"
+            },
+            {
+              "date": "",
+              "rank": "2",
+              "order": 2,
+              "pollRank": 10,
+              "nickname": "ทาโร่",
+              "name": "ปรมัย สัมเภาว์มาลย์",
+              "topic": "ไอ้มดแดง",
+              "scores": {
+                "3sec": null,
+                "qa": 10,
+                "jigsaw": "X",
+                "attribute": null
+              },
+              "result": "ตกรอบ",
+              "image": "/img/history/2024/ไอ้มดแดง (2).png"
+            },
+            {
+              "date": "",
+              "rank": "1",
+              "order": 3,
+              "pollRank": 7,
+              "nickname": "เจสัน",
+              "name": "ณชนน ยุงคุณ",
+              "topic": "มวยปล้ำ WWE",
+              "scores": {
+                "3sec": 11,
+                "qa": "X",
+                "jigsaw": null,
+                "attribute": null
+              },
+              "result": "FAN OF THE YEAR 2024",
+              "image": "/img/history/2024/WWE.png"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

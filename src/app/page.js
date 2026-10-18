@@ -8,13 +8,17 @@ function calculateDenseRanks(items) {
   if (!Array.isArray(items)) return [];
   const played = [];
 
-  for (const item of items) {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
     const s = item.scores || {};
     const hasAnyScore = ["3sec", "qa", "jigsaw", "attribute"].some(
       (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
     ) || (Number(item.totalScore) || 0) > 0;
     if (hasAnyScore) {
-      played.push(item);
+      played.push({
+        ...item,
+        playOrder: item.order || item.playOrder || (i + 1),
+      });
     }
   }
 
@@ -303,6 +307,7 @@ export default function MainPage() {
   // Search, Filter & Spotlight Interactive States
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // 'all' | 'qualified' | 'pending' | 'eliminated'
+  const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
   const [selectedSpotlight, setSelectedSpotlight] = useState(null);
 
   // Auth & Protection State
@@ -458,22 +463,29 @@ export default function MainPage() {
     rank5Label = "";
   }
 
-  const filteredStandings = denseRankedLeaderboard.filter((item) => {
-    const q = searchQuery.trim().toLowerCase();
-    const matchesQuery = !q ||
-      item.name?.toLowerCase().includes(q) ||
-      item.nickname?.toLowerCase().includes(q) ||
-      item.topic?.toLowerCase().includes(q);
+  const filteredStandings = denseRankedLeaderboard
+    .filter((item) => {
+      const q = searchQuery.trim().toLowerCase();
+      const matchesQuery = !q ||
+        item.name?.toLowerCase().includes(q) ||
+        item.nickname?.toLowerCase().includes(q) ||
+        item.topic?.toLowerCase().includes(q);
 
-    if (!matchesQuery) return false;
+      if (!matchesQuery) return false;
 
-    if (statusFilter === "all") return true;
-    const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
-    if (statusFilter === "qualified") return evalStatus.isGuaranteedQualified;
-    if (statusFilter === "pending") return !evalStatus.isGuaranteedQualified && !evalStatus.isEliminated;
-    if (statusFilter === "eliminated") return evalStatus.isEliminated;
-    return true;
-  });
+      if (statusFilter === "all") return true;
+      const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+      if (statusFilter === "qualified") return evalStatus.isGuaranteedQualified;
+      if (statusFilter === "pending") return !evalStatus.isGuaranteedQualified && !evalStatus.isEliminated;
+      if (statusFilter === "eliminated") return evalStatus.isEliminated;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === "order") {
+        return (Number(a.playOrder) || 999) - (Number(b.playOrder) || 999);
+      }
+      return (Number(a.rank) || 999) - (Number(b.rank) || 999);
+    });
 
   const filteredPoll = pollList.filter((item) => {
     const q = searchQuery.trim().toLowerCase();
@@ -688,6 +700,22 @@ export default function MainPage() {
             >
               ตารางคะแนน
             </a>
+            <Link
+              href="/history"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#ffd700",
+                fontWeight: "700",
+                fontSize: "14px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <span>🏆</span> ทำเนียบแชมป์
+            </Link>
             <Link
               href="/draw"
               style={{
@@ -1243,33 +1271,85 @@ export default function MainPage() {
                     )}
                   </div>
 
-                  <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
-                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>กรองสถานะ:</span>
-                    {[
-                      { key: "all", label: "ทั้งหมด" },
-                      { key: "qualified", label: "🟢 เข้ารอบ" },
-                      { key: "pending", label: "⏳ รอผล" },
-                      { key: "eliminated", label: "🔴 ตกรอบ" },
-                    ].map((f) => (
-                      <button
-                        key={f.key}
-                        type="button"
-                        onClick={() => setStatusFilter(f.key)}
-                        style={{
-                          padding: "5px 12px",
-                          borderRadius: "20px",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          background: statusFilter === f.key ? "#00e5ff" : "rgba(255,255,255,0.06)",
-                          color: statusFilter === f.key ? "#030812" : "rgba(255,255,255,0.8)",
-                          border: "none",
-                          cursor: "pointer",
-                          transition: "all 0.15s"
-                        }}
-                      >
-                        {f.label}
-                      </button>
-                    ))}
+                  <div style={{ display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap" }}>
+                    {/* Sort Switcher */}
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>เรียงตาราง:</span>
+                      <div style={{
+                        display: "inline-flex",
+                        background: "rgba(0, 15, 30, 0.8)",
+                        padding: "3px",
+                        borderRadius: "8px",
+                        border: "1px solid rgba(0, 229, 255, 0.3)"
+                      }}>
+                        <button
+                          type="button"
+                          onClick={() => setSortBy("rank")}
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            background: sortBy === "rank" ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)" : "transparent",
+                            color: sortBy === "rank" ? "#030814" : "rgba(255,255,255,0.7)",
+                            boxShadow: sortBy === "rank" ? "0 0 10px rgba(255, 215, 0, 0.4)" : "none",
+                            transition: "all 0.2s ease"
+                          }}
+                        >
+                          🏆 ตามอันดับ
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSortBy("order")}
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            background: sortBy === "order" ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)" : "transparent",
+                            color: sortBy === "order" ? "#030814" : "rgba(255,255,255,0.7)",
+                            boxShadow: sortBy === "order" ? "0 0 10px rgba(0, 229, 255, 0.4)" : "none",
+                            transition: "all 0.2s ease"
+                          }}
+                        >
+                          🎲 ตามลำดับแข่ง
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Status Filter */}
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>กรองสถานะ:</span>
+                      {[
+                        { key: "all", label: "ทั้งหมด" },
+                        { key: "qualified", label: "🟢 เข้ารอบ" },
+                        { key: "pending", label: "⏳ รอผล" },
+                        { key: "eliminated", label: "🔴 ตกรอบ" },
+                      ].map((f) => (
+                        <button
+                          key={f.key}
+                          type="button"
+                          onClick={() => setStatusFilter(f.key)}
+                          style={{
+                            padding: "5px 12px",
+                            borderRadius: "20px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            background: statusFilter === f.key ? "#00e5ff" : "rgba(255,255,255,0.06)",
+                            color: statusFilter === f.key ? "#030812" : "rgba(255,255,255,0.8)",
+                            border: "none",
+                            cursor: "pointer",
+                            transition: "all 0.15s"
+                          }}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

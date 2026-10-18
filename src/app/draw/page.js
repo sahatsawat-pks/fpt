@@ -767,6 +767,21 @@ export default function BallDrawPage() {
             🏠 หน้าหลัก
           </Link>
           <Link
+            href="/history"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255, 215, 0, 0.15)",
+              color: "#ffd700",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(255, 215, 0, 0.4)",
+              fontWeight: "700"
+            }}
+          >
+            🏆 ทำเนียบแชมป์
+          </Link>
+          <Link
             href="/game"
             style={{
               padding: "6px 14px",

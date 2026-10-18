@@ -13,6 +13,8 @@ const DEFAULT_SETTINGS = {
   homePassword: "",
   protectDraw: false,
   drawPassword: "",
+  protectHistory: false,
+  historyPassword: "",
 };
 
 function readSettings() {
@@ -59,6 +61,8 @@ export async function GET(request) {
       homePassword: settings.homePassword || "",
       protectDraw: Boolean(settings.protectDraw),
       drawPassword: settings.drawPassword || "",
+      protectHistory: Boolean(settings.protectHistory),
+      historyPassword: settings.historyPassword || "",
     });
   }
 
@@ -69,6 +73,7 @@ export async function GET(request) {
     requirePassword: Boolean(settings.gamePassword),
     protectHome: Boolean(settings.protectHome),
     protectDraw: Boolean(settings.protectDraw),
+    protectHistory: Boolean(settings.protectHistory),
   });
 }
 
@@ -108,6 +113,15 @@ export async function POST(request) {
       return NextResponse.json({ success: true, valid: match });
     }
 
+    // Verify history/champions password action
+    if (body.action === "verify_history") {
+      if (!current.protectHistory) {
+        return NextResponse.json({ success: true, valid: true });
+      }
+      const match = String(body.password || "").trim() === String(current.historyPassword || "").trim();
+      return NextResponse.json({ success: true, valid: match });
+    }
+
     // Update settings (only when admin verified or updating settings)
     if (body.action === "update") {
       const newSettings = { ...current };
@@ -137,6 +151,13 @@ export async function POST(request) {
         newSettings.drawPassword = String(body.drawPassword || "").trim();
       }
 
+      if (body.protectHistory !== undefined) {
+        newSettings.protectHistory = Boolean(body.protectHistory);
+      }
+      if (body.historyPassword !== undefined) {
+        newSettings.historyPassword = String(body.historyPassword || "").trim();
+      }
+
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
         success: true,
@@ -149,6 +170,8 @@ export async function POST(request) {
           homePassword: newSettings.homePassword,
           protectDraw: newSettings.protectDraw,
           drawPassword: newSettings.drawPassword,
+          protectHistory: newSettings.protectHistory,
+          historyPassword: newSettings.historyPassword,
         },
       });
     }

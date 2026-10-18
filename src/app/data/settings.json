@@ -5,5 +5,7 @@
   "protectHome": false,
   "homePassword": "fanoftheyear2026",
   "protectDraw": false,
-  "drawPassword": "fanoftheyear2026"
+  "drawPassword": "fanoftheyear2026",
+  "protectHistory": false,
+  "historyPassword": "fanoftheyear2026"
 }
