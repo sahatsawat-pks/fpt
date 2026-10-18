@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Matter from "matter-js";
 import { playAudio, stopAudio } from "../soundUtils";
 
 const BALL_COLORS = [
@@ -16,22 +17,6 @@ const BALL_COLORS = [
   { name: "เหลือง", top: "linear-gradient(135deg, #fadb14 0%, #ad8b00 100%)", bottom: "rgba(173, 139, 0, 0.4)", glow: "#fadb14", text: "#fff" },
   { name: "น้ำเงิน", top: "linear-gradient(135deg, #1890ff 0%, #096dd9 100%)", bottom: "rgba(9, 109, 217, 0.4)", glow: "#1890ff", text: "#fff" },
 ];
-
-// Calculate realistic bottom-heavy resting coordinates for balls inside the bowl
-function calculateRestingCoords(index, total) {
-  const cols = Math.min(5, Math.max(3, Math.ceil(Math.sqrt(total * 1.3))));
-  const row = Math.floor(index / cols);
-  const col = index % cols;
-  const rowOffset = (row % 2 === 1) ? 3 : -3;
-  const xBase = 50 + (col - (cols - 1) / 2) * (50 / Math.max(cols, 1)) + rowOffset;
-  const distFromCenter = Math.abs(xBase - 50) / 25;
-  const bowlCurve = Math.pow(distFromCenter, 2) * 5.5;
-  const yBase = 76 - row * 10 + bowlCurve;
-  return {
-    x: Math.max(22, Math.min(78, xBase)),
-    y: Math.max(30, Math.min(80, yBase)),
-  };
-}
 
 export default function BallDrawPage() {
   // Auth state
@@ -70,6 +55,15 @@ export default function BallDrawPage() {
   const soundRef = useRef(null);
   const revealSoundRef = useRef(null);
   const [soundMuted, setSoundMuted] = useState(false);
+
+  // Matter.js Physics Engine Refs
+  const engineRef = useRef(null);
+  const runnerRef = useRef(null);
+  const ballBodiesRef = useRef({});
+  const ballElementsRef = useRef({});
+  const jarRef = useRef(null);
+  const droppingIdRef = useRef(null);
+  const drawnIdsRef = useRef(new Set());
 
   // 1. Check protection & auth on mount
   useEffect(() => {
@@ -168,7 +162,114 @@ export default function BallDrawPage() {
     };
   }, [isAuthenticated]);
 
-  // Initialize Balls from text lines with realistic bottom-stacked resting positions
+  // 1.1 Initialize Matter.js Physics Engine and Jar Walls
+  useEffect(() => {
+    const Engine = Matter.Engine;
+    const Runner = Matter.Runner;
+    const Bodies = Matter.Bodies;
+    const Composite = Matter.Composite;
+    const Events = Matter.Events;
+
+    const engine = Engine.create({
+      gravity: { x: 0, y: 1.15, scale: 0.001 },
+    });
+    engineRef.current = engine;
+
+    // Realistic glass jar curved perimeter profile (matching 440px wide x 380px high jar)
+    const jarProfile = [
+      { x: 100, y: 25 },
+      { x: 340, y: 25 },
+      { x: 380, y: 65 },
+      { x: 405, y: 115 },
+      { x: 418, y: 175 },
+      { x: 415, y: 235 },
+      { x: 395, y: 290 },
+      { x: 355, y: 335 },
+      { x: 295, y: 362 },
+      { x: 220, y: 368 },
+      { x: 145, y: 362 },
+      { x: 85, y: 335 },
+      { x: 45, y: 290 },
+      { x: 25, y: 235 },
+      { x: 22, y: 175 },
+      { x: 35, y: 115 },
+      { x: 60, y: 65 },
+      { x: 100, y: 25 },
+    ];
+
+    const walls = [];
+    for (let i = 0; i < jarProfile.length - 1; i++) {
+      const p1 = jarProfile[i];
+      const p2 = jarProfile[i + 1];
+      const midX = (p1.x + p2.x) / 2;
+      const midY = (p1.y + p2.y) / 2;
+      const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+
+      walls.push(
+        Bodies.rectangle(midX, midY, length + 4, 30, {
+          isStatic: true,
+          angle: angle,
+          friction: 0.08,
+          restitution: 0.55,
+        })
+      );
+    }
+    Composite.add(engine.world, walls);
+
+    const runner = Runner.create();
+    runnerRef.current = runner;
+    Runner.run(runner, engine);
+
+    // Continuous 60fps direct DOM transform sync
+    Events.on(engine, "afterUpdate", () => {
+      Object.entries(ballBodiesRef.current).forEach(([idStr, body]) => {
+        const id = Number(idStr);
+        if (!body) return;
+        if (droppingIdRef.current === id) return;
+        if (drawnIdsRef.current.has(id)) return;
+        const el = ballElementsRef.current[id];
+        if (el) {
+          el.style.transform = `translate3d(${body.position.x}px, ${body.position.y}px, 0) translate(-50%, -50%) rotate(${body.angle}rad)`;
+        }
+      });
+    });
+
+    return () => {
+      Runner.stop(runner);
+      Engine.clear(engine);
+    };
+  }, []);
+
+  // Spawn dynamic physics bodies inside the jar
+  const spawnPhysicsBodies = (ballList) => {
+    const engine = engineRef.current;
+    if (!engine) return;
+
+    // Remove existing bodies
+    Object.values(ballBodiesRef.current).forEach((body) => {
+      if (body) Matter.Composite.remove(engine.world, body);
+    });
+    ballBodiesRef.current = {};
+    drawnIdsRef.current = new Set();
+    droppingIdRef.current = null;
+
+    // Add new bodies with slightly randomized spawn spread
+    ballList.forEach((b, idx) => {
+      const startX = 140 + (idx % 6) * 32 + (Math.random() - 0.5) * 14;
+      const startY = 80 + Math.floor(idx / 6) * 34 + (Math.random() - 0.5) * 10;
+      const body = Matter.Bodies.circle(startX, startY, 27, {
+        restitution: 0.65,
+        friction: 0.05,
+        frictionAir: 0.015,
+        density: 0.002,
+      });
+      Matter.Composite.add(engine.world, body);
+      ballBodiesRef.current[b.id] = body;
+    });
+  };
+
+  // Initialize Balls from text lines
   const initializeBalls = (lines) => {
     const validLines = lines
       .map((line) => line.trim())
@@ -190,7 +291,8 @@ export default function BallDrawPage() {
     // Create anonymous eggs in jar (no fixed numbers or names attached!)
     const list = validLines.map((_, idx) => {
       const colorScheme = BALL_COLORS[idx % BALL_COLORS.length];
-      const resting = calculateRestingCoords(idx, validLines.length);
+      const startX = 140 + (idx % 6) * 32;
+      const startY = 80 + Math.floor(idx / 6) * 34;
 
       return {
         id: idx + 1,
@@ -198,13 +300,14 @@ export default function BallDrawPage() {
         bottomColor: colorScheme.bottom,
         glowColor: colorScheme.glow,
         drawn: false,
-        x: resting.x,
-        y: resting.y,
-        rotation: (idx * 27) % 360,
+        x: startX,
+        y: startY,
+        rotation: 0,
       };
     });
 
     setBalls(list);
+    spawnPhysicsBodies(list);
     setDrawnList([]);
     setCurrentDrawn(null);
     setShowEggModal(false);
@@ -244,44 +347,52 @@ export default function BallDrawPage() {
     }, 180);
   };
 
-  // Realistic Jar Shaking & Gravity Falling
+  // Realistic Jar Shaking with dynamic turbulent physical pulses
   const handleShuffle = () => {
     if (isShuffling) return;
     setIsShuffling(true);
     playShuffleSound();
 
-    // Phase 1: Turbulent explosion upwards & random scattering
-    setBalls((prev) =>
-      prev.map((b) => ({
-        ...b,
-        x: 18 + Math.random() * 64,
-        y: 15 + Math.random() * 45,
-        rotation: (Math.random() - 0.5) * 360,
-      }))
-    );
-
-    // Phase 2: Gravity pulls them down naturally after 650ms
-    setTimeout(() => {
-      const remaining = balls.filter((b) => !b.drawn);
-      setBalls((prev) => {
-        let activeIdx = 0;
-        return prev.map((b) => {
-          if (b.drawn) return b;
-          const resting = calculateRestingCoords(activeIdx++, remaining.length);
-          return {
-            ...b,
-            x: resting.x,
-            y: resting.y,
-            rotation: (activeIdx * 33) % 360,
-          };
-        });
+    let shakeTicks = 0;
+    const shakeInterval = setInterval(() => {
+      shakeTicks++;
+      Object.values(ballBodiesRef.current).forEach((body) => {
+        if (!body) return;
+        const forceX = (Math.random() - 0.5) * 0.048 * body.mass;
+        const forceY = (-0.032 - Math.random() * 0.04) * body.mass;
+        Matter.Body.applyForce(body, body.position, { x: forceX, y: forceY });
+        Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.35);
       });
-    }, 650);
+      if (shakeTicks >= 8) {
+        clearInterval(shakeInterval);
+        setTimeout(() => {
+          setIsShuffling(false);
+        }, 650);
+      }
+    }, 90);
+  };
 
-    // Phase 3: Shaking completes
-    setTimeout(() => {
-      setIsShuffling(false);
-    }, 1250);
+  // Interactive mouse swirl stirring
+  const handleMouseMoveJar = (e) => {
+    if (isShuffling) return;
+    const rect = jarRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    Object.values(ballBodiesRef.current).forEach((body) => {
+      if (!body) return;
+      const dx = body.position.x - mouseX;
+      const dy = body.position.y - mouseY;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 50 && dist > 2) {
+        const force = ((50 - dist) / 50) * 0.007 * body.mass;
+        Matter.Body.applyForce(body, body.position, {
+          x: (dx / dist) * force,
+          y: (dy / dist) * force - 0.002 * body.mass,
+        });
+      }
+    });
   };
 
   // Process Ball Draw with Chute Drop & Suspense Egg Modal
@@ -298,13 +409,22 @@ export default function BallDrawPage() {
     // 1. Play drop sound and animate ball into the bottom chute
     playDropSound();
     setDroppingBallId(ball.id);
+    droppingIdRef.current = ball.id;
 
-    // Move ball down towards center bottom chute
-    setBalls((prev) =>
-      prev.map((b) =>
-        b.id === ball.id ? { ...b, x: 50, y: 92, rotation: b.rotation + 180 } : b
-      )
-    );
+    // Remove physics body so surrounding balls naturally fall and fill the gap
+    const body = ballBodiesRef.current[ball.id];
+    if (body && engineRef.current) {
+      Matter.Composite.remove(engineRef.current.world, body);
+      delete ballBodiesRef.current[ball.id];
+    }
+
+    // Animate DOM element into bottom chute
+    const el = ballElementsRef.current[ball.id];
+    if (el) {
+      el.style.transition = "transform 0.4s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 0.4s ease";
+      el.style.transform = "translate3d(220px, 440px, 0) translate(-50%, -50%) scale(0.65)";
+      el.style.opacity = "0.3";
+    }
 
     const drawOrder = drawnList.length + 1;
     const drawnItem = {
@@ -319,6 +439,7 @@ export default function BallDrawPage() {
 
     // 2. After chute drop finishes (420ms), show suspense egg modal
     setTimeout(() => {
+      drawnIdsRef.current.add(ball.id);
       setBalls((prev) =>
         prev.map((b) => (b.id === ball.id ? { ...b, drawn: true } : b))
       );
@@ -327,6 +448,7 @@ export default function BallDrawPage() {
       setEggState("closed");
       setShowEggModal(true);
       setDroppingBallId(null);
+      droppingIdRef.current = null;
       playSuspenseSound();
 
       // In auto-simulation: automatically open egg shell, then unroll slip
@@ -966,17 +1088,21 @@ export default function BallDrawPage() {
                 </div>
 
                 {/* 2. Glass Urn Body (Curved Sphere with 3D Reflections) */}
-                <div style={{
-                  position: "relative",
-                  width: "440px",
-                  height: "380px",
-                  borderRadius: "44% 44% 48% 48% / 36% 36% 54% 54%",
-                  border: "3px solid rgba(0, 229, 255, 0.55)",
-                  background: "radial-gradient(ellipse at 35% 25%, rgba(255, 255, 255, 0.22) 0%, rgba(0, 229, 255, 0.08) 40%, rgba(2, 12, 30, 0.65) 100%)",
-                  boxShadow: "0 0 45px rgba(0, 229, 255, 0.3), inset 0 -30px 50px rgba(0, 229, 255, 0.25), inset 0 20px 30px rgba(255,255,255,0.2)",
-                  backdropFilter: "blur(2px)",
-                  overflow: "hidden"
-                }}>
+                <div
+                  ref={jarRef}
+                  onMouseMove={handleMouseMoveJar}
+                  style={{
+                    position: "relative",
+                    width: "440px",
+                    height: "380px",
+                    borderRadius: "44% 44% 48% 48% / 36% 36% 54% 54%",
+                    border: "3px solid rgba(0, 229, 255, 0.55)",
+                    background: "radial-gradient(ellipse at 35% 25%, rgba(255, 255, 255, 0.22) 0%, rgba(0, 229, 255, 0.08) 40%, rgba(2, 12, 30, 0.65) 100%)",
+                    boxShadow: "0 0 45px rgba(0, 229, 255, 0.3), inset 0 -30px 50px rgba(0, 229, 255, 0.25), inset 0 20px 30px rgba(255,255,255,0.2)",
+                    backdropFilter: "blur(2px)",
+                    overflow: "hidden"
+                  }}
+                >
                   {/* Left Curved Glass Highlight Glare */}
                   <div style={{
                     position: "absolute",
@@ -1005,25 +1131,29 @@ export default function BallDrawPage() {
                     pointerEvents: "none"
                   }}></div>
 
-                  {/* Balls inside the bowl with Natural Resting Physics / Turbulent Shaking */}
+                  {/* Balls inside the bowl with Real Matter.js 2D Physics */}
                   {balls.map((ball) => {
                     const isDropping = droppingBallId === ball.id;
                     return (
                       <button
                         key={ball.id}
+                        ref={(el) => {
+                          if (el) ballElementsRef.current[ball.id] = el;
+                          else delete ballElementsRef.current[ball.id];
+                        }}
                         type="button"
                         onClick={() => processDrawBall(ball)}
                         disabled={ball.drawn || isShuffling || isDropping}
-                        title={`คลิกเพื่อหยิบลูกบอล #${ball.ballNumber} (${ball.name})`}
+                        title={`คลิกเพื่อหยิบลูกบอล #${ball.id}`}
                         style={{
                           position: "absolute",
-                          left: `${ball.x}%`,
-                          top: `${ball.y}%`,
+                          left: 0,
+                          top: 0,
                           transform: isDropping
-                            ? "translate(-50%, -50%) scale(0.65) translateY(50px)"
-                            : `translate(-50%, -50%) rotate(${ball.rotation}deg) scale(1)`,
-                          width: "56px",
-                          height: "56px",
+                            ? "translate3d(220px, 440px, 0) translate(-50%, -50%) scale(0.65)"
+                            : `translate3d(${ball.x}px, ${ball.y}px, 0) translate(-50%, -50%) rotate(${ball.rotation}deg)`,
+                          width: "54px",
+                          height: "54px",
                           borderRadius: "50%",
                           background: ball.color,
                           border: "2px solid rgba(255,255,255,0.9)",
@@ -1036,48 +1166,65 @@ export default function BallDrawPage() {
                           justifyContent: "center",
                           cursor: isDropping || isShuffling ? "default" : "pointer",
                           opacity: isDropping ? 0.3 : 1,
-                          transition: isShuffling
-                            ? "all 0.15s ease"
-                            : isDropping
-                            ? "all 0.4s cubic-bezier(0.55, 0.055, 0.675, 0.19)"
-                            : "left 0.7s cubic-bezier(0.34, 1.4, 0.64, 1), top 0.7s cubic-bezier(0.34, 1.4, 0.64, 1), transform 0.25s ease",
-                          zIndex: isDropping ? 20 : 6
+                          transition: isDropping
+                            ? "transform 0.4s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 0.4s ease"
+                            : "box-shadow 0.2s ease, opacity 0.2s ease",
+                          zIndex: isDropping ? 20 : 6,
+                          userSelect: "none",
+                          padding: 0,
+                          willChange: "transform"
                         }}
                         onMouseEnter={(e) => {
                           if (!isShuffling && !isDropping) {
-                            e.currentTarget.style.transform = `translate(-50%, -50%) scale(1.22) translateY(-8px)`;
+                            const inner = e.currentTarget.firstElementChild;
+                            if (inner) inner.style.transform = "scale(1.18)";
                             e.currentTarget.style.zIndex = "15";
+                            e.currentTarget.style.boxShadow = `0 12px 24px rgba(0,0,0,0.8), 0 0 25px ${ball.glowColor}, inset 0 -8px 14px rgba(0,0,0,0.5), inset 0 8px 14px rgba(255,255,255,0.8)`;
                           }
                         }}
                         onMouseLeave={(e) => {
                           if (!isShuffling && !isDropping) {
-                            e.currentTarget.style.transform = `translate(-50%, -50%) rotate(${ball.rotation}deg) scale(1)`;
+                            const inner = e.currentTarget.firstElementChild;
+                            if (inner) inner.style.transform = "scale(1)";
                             e.currentTarget.style.zIndex = "6";
+                            e.currentTarget.style.boxShadow = `0 8px 18px rgba(0,0,0,0.65), 0 0 16px ${ball.glowColor}88, inset 0 -8px 14px rgba(0,0,0,0.5), inset 0 8px 14px rgba(255,255,255,0.6)`;
                           }
                         }}
                       >
-                        {/* 3D Pearl Gloss Curve (No numbers on eggs) */}
                         <div style={{
-                          position: "absolute",
-                          top: "6px",
-                          left: "8px",
-                          width: "18px",
-                          height: "10px",
+                          width: "100%",
+                          height: "100%",
                           borderRadius: "50%",
-                          background: "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, transparent 70%)",
-                          transform: "rotate(-25deg)",
+                          position: "relative",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          transition: "transform 0.15s ease",
                           pointerEvents: "none"
-                        }} />
-                        <div style={{
-                          position: "absolute",
-                          bottom: "6px",
-                          right: "7px",
-                          width: "12px",
-                          height: "7px",
-                          borderRadius: "50%",
-                          background: "radial-gradient(circle, rgba(255,255,255,0.45) 0%, transparent 70%)",
-                          pointerEvents: "none"
-                        }} />
+                        }}>
+                          {/* 3D Pearl Gloss Curve (No numbers on eggs) */}
+                          <div style={{
+                            position: "absolute",
+                            top: "6px",
+                            left: "8px",
+                            width: "18px",
+                            height: "10px",
+                            borderRadius: "50%",
+                            background: "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, transparent 70%)",
+                            transform: "rotate(-25deg)",
+                            pointerEvents: "none"
+                          }} />
+                          <div style={{
+                            position: "absolute",
+                            bottom: "6px",
+                            right: "7px",
+                            width: "12px",
+                            height: "7px",
+                            borderRadius: "50%",
+                            background: "radial-gradient(circle, rgba(255,255,255,0.45) 0%, transparent 70%)",
+                            pointerEvents: "none"
+                          }} />
+                        </div>
                       </button>
                     );
                   })}

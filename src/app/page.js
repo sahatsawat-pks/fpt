@@ -3,13 +3,28 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-// Dense Ranking Calculation
+// Dense Ranking Calculation - Only contestants with recorded scores appear in standings
 function calculateDenseRanks(items) {
   if (!Array.isArray(items)) return [];
-  const sorted = [...items].sort((a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0));
+  const played = [];
+
+  for (const item of items) {
+    const s = item.scores || {};
+    const hasAnyScore = ["3sec", "qa", "jigsaw", "attribute"].some(
+      (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+    ) || (Number(item.totalScore) || 0) > 0;
+    if (hasAnyScore) {
+      played.push(item);
+    }
+  }
+
+  const sortedPlayed = [...played].sort(
+    (a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0)
+  );
+
   let currentRank = 0;
   let lastScore = null;
-  return sorted.map((item) => {
+  const rankedPlayed = sortedPlayed.map((item) => {
     const scoreVal = Number(item.totalScore) || 0;
     if (lastScore === null || scoreVal !== lastScore) {
       currentRank += 1;
@@ -20,25 +35,29 @@ function calculateDenseRanks(items) {
       rank: currentRank,
     };
   });
+
+  return rankedPlayed;
 }
 
 function getRank5Info(allRankedPlayers) {
   if (!Array.isArray(allRankedPlayers) || allRankedPlayers.length === 0) return null;
-  const rank5Players = allRankedPlayers.filter((p) => p.rank === 5);
-  if (rank5Players.length > 0) {
-    const score = Number(rank5Players[0].totalScore) || 0;
-    const names = rank5Players
+  const completed = allRankedPlayers.filter((p) => {
+    const s = p.scores || {};
+    return ["3sec", "qa", "jigsaw", "attribute"].every(
+      (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+    );
+  });
+  if (completed.length >= 5) {
+    const sorted = [...completed].sort(
+      (a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0)
+    );
+    const score = Number(sorted[4].totalScore) || 0;
+    const tied = sorted.filter((p) => (Number(p.totalScore) || 0) === score);
+    const names = tied
       .map((p) => (p.nickname ? `${p.nickname} (${p.name})` : p.name))
       .join(", ");
-    const shortNames = rank5Players.map((p) => p.nickname || p.name).join(", ");
-    return { score, names, shortNames, players: rank5Players };
-  }
-  const distinctScores = Array.from(
-    new Set(allRankedPlayers.map((p) => Number(p.totalScore) || 0))
-  ).sort((a, b) => b - a);
-  if (distinctScores.length >= 5) {
-    const score = distinctScores[4];
-    return { score, names: `${score} คะแนน`, shortNames: `${score} คะแนน`, players: [] };
+    const shortNames = tied.map((p) => p.nickname || p.name).join(", ");
+    return { score, names, shortNames, players: tied };
   }
   return null;
 }
@@ -54,7 +73,7 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
       rank5Info: null,
       isEliminated: false,
       isGuaranteedQualified: false,
-      statusText: "⏳ รอผล",
+      statusText: "⏳ รอแข่ง",
       statusClass: "status-pending",
       reason: "",
     };
@@ -66,12 +85,29 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
     (key) => scoresObj[key] !== null && scoresObj[key] !== undefined && scoresObj[key] !== ""
   );
   const isCompleted = playedCategories.length === 4;
-  const unplayedCount = Math.max(0, 4 - playedCategories.length);
-  const currentTotal = Number(item.totalScore) || 0;
-  const maxPossibleScore = currentTotal + unplayedCount * 25;
+  const isUnplayed = playedCategories.length === 0;
 
   const rank5Info = getRank5Info(allRankedPlayers);
   const cutoff5 = rank5Info?.score ?? null;
+
+  if (isUnplayed) {
+    return {
+      isCompleted: false,
+      unplayedCount: 4,
+      maxPossibleScore: 100,
+      cutoff5,
+      rank5Info,
+      isEliminated: false,
+      isGuaranteedQualified: false,
+      statusText: "⏳ รอแข่ง",
+      statusClass: "status-pending",
+      reason: "ยังไม่ได้เริ่มต้นการแข่งขัน (คะแนนเต็มสูงสุดที่เป็นไปได้คือ 100 คะแนน)",
+    };
+  }
+
+  const unplayedCount = Math.max(0, 4 - playedCategories.length);
+  const currentTotal = Number(item.totalScore) || 0;
+  const maxPossibleScore = currentTotal + unplayedCount * 25;
 
   // Check for in-progress player
   const inProgressPlayer = (allRankedPlayers || []).find((p) => {
@@ -79,7 +115,7 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
     const pPlayed = ["3sec", "qa", "jigsaw", "attribute"].filter(
       (k) => pScores[k] !== null && pScores[k] !== undefined && pScores[k] !== ""
     );
-    return pPlayed.length < 4;
+    return pPlayed.length > 0 && pPlayed.length < 4;
   });
 
   let activePlayer = null;
@@ -359,8 +395,16 @@ export default function MainPage() {
   const denseRankedLeaderboard = calculateDenseRanks(leaderboard);
   const rank5Info = getRank5Info(denseRankedLeaderboard);
 
-  const targetN = parseInt(totalContestants, 10) || 23;
-  const currentN = denseRankedLeaderboard.length;
+  // Completed contestants: MUST have all 4 categories filled in admin
+  const completedContestants = leaderboard.filter((item) => {
+    const s = item.scores || {};
+    return ["3sec", "qa", "jigsaw", "attribute"].every(
+      (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+    );
+  });
+
+  const targetN = parseInt(totalContestants, 10) || leaderboard.length || 22;
+  const currentN = completedContestants.length;
   const remainingN = Math.max(0, targetN - currentN);
 
   const qualifiedCount = denseRankedLeaderboard.filter((item) => {
@@ -369,7 +413,7 @@ export default function MainPage() {
   }).length;
 
   // Check if competition has any recorded scores
-  const hasStartedCompetition = denseRankedLeaderboard.some((p) => {
+  const hasStartedCompetition = leaderboard.some((p) => {
     const scores = p.scores || {};
     const total = Number(p.totalScore) || 0;
     if (total > 0) return true;
@@ -379,11 +423,40 @@ export default function MainPage() {
   });
 
   const top5Contestants = denseRankedLeaderboard
-    .filter((p) => (Number(p.totalScore) || 0) > 0 || (p.scores && Object.values(p.scores).some(v => v !== null && v !== "")))
-    .filter((p) => p.rank <= 5)
+    .filter((p) => typeof p.rank === "number" && p.rank <= 5)
     .slice(0, 5);
 
-  const highestScore = denseRankedLeaderboard.length > 0 ? Math.max(...denseRankedLeaderboard.map(p => Number(p.totalScore) || 0)) : 0;
+  const scoredPlayers = leaderboard.filter((p) => {
+    const s = p.scores || {};
+    return ["3sec", "qa", "jigsaw", "attribute"].some(
+      (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+    ) || (Number(p.totalScore) || 0) > 0;
+  });
+  const highestScore = scoredPlayers.length > 0
+    ? Math.max(...scoredPlayers.map(p => Number(p.totalScore) || 0))
+    : 0;
+
+  // 5th rank cutoff (ปากเหว)
+  const sortedCompleted = [...completedContestants].sort(
+    (a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0)
+  );
+
+  let rank5Score = 0;
+  let rank5Label = "";
+
+  if (sortedCompleted.length >= 5) {
+    rank5Score = Number(sortedCompleted[4].totalScore) || 0;
+    const tied = sortedCompleted.filter(
+      (p) => (Number(p.totalScore) || 0) === rank5Score
+    );
+    rank5Label = tied.map((p) => p.nickname || p.name).join(", ");
+  } else if (sortedCompleted.length > 0) {
+    rank5Score = 0;
+    rank5Label = `รอแข่งครบ 5 คน (${currentN}/5)`;
+  } else {
+    rank5Score = 0;
+    rank5Label = "";
+  }
 
   const filteredStandings = denseRankedLeaderboard.filter((item) => {
     const q = searchQuery.trim().toLowerCase();
@@ -781,7 +854,7 @@ export default function MainPage() {
                 🏆 ตารางคะแนนแข่งขัน
               </a>
 
-              <Link
+              {/* <Link
                 href="/draw"
                 style={{
                   display: "inline-flex",
@@ -799,7 +872,7 @@ export default function MainPage() {
                 }}
               >
                 🔮 จำลองจับลูกบอล
-              </Link>
+              </Link> */}
             </div>
           </div>
       </section>
@@ -950,18 +1023,28 @@ export default function MainPage() {
             <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
               👑 คะแนนสูงสุด: <strong style={{ color: "#ffd700", fontSize: "16px" }}>{highestScore}</strong> คะแนน
             </div>
-            {rank5Info && (
-              <div style={{
-                fontSize: "13px",
-                color: "#ffd700",
-                background: "rgba(255, 215, 0, 0.12)",
-                padding: "4px 12px",
-                borderRadius: "12px",
-                border: "1px solid rgba(255, 215, 0, 0.3)"
-              }}>
-                🎯 เกณฑ์อันดับ 5: <strong>{rank5Info.shortNames}</strong> ({rank5Info.score} คะแนน)
-              </div>
-            )}
+            <div style={{
+              fontSize: "13px",
+              color: "#ffd700",
+              background: "rgba(255, 215, 0, 0.12)",
+              padding: "4px 12px",
+              borderRadius: "12px",
+              border: "1px solid rgba(255, 215, 0, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px"
+            }}>
+              <span>🎯</span>
+              <span>คะแนนอันดับ 5 (ปากเหว):</span>
+              <strong style={{ color: "#ffd700", fontSize: "15px" }}>
+                {rank5Score} คะแนน
+              </strong>
+              {rank5Label && (
+                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)" }}>
+                  ({rank5Label})
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1247,7 +1330,7 @@ export default function MainPage() {
                           margin: 0,
                           textShadow: "0 2px 10px rgba(0,0,0,0.8)"
                         }}>
-                          THE FAN TOURNAMENT 2026/27 • STANDINGS
+                          FAN OF THE YEAR 2026 • STANDINGS
                         </h2>
                       </div>
                       <div style={{ transform: "skewX(16deg)", fontSize: "12px", color: "rgba(255,255,255,0.7)", fontStyle: "italic" }}>
@@ -1366,7 +1449,7 @@ export default function MainPage() {
                     {/* Data Rows */}
                     {filteredStandings.length === 0 ? (
                       <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(255,255,255,0.5)" }}>
-                        ไม่พบข้อมูลผู้เข้าแข่งขันที่ตรงกับการค้นหา
+                        {searchQuery || statusFilter !== "all" ? "ไม่พบข้อมูลผู้เข้าแข่งขันที่ตรงกับเงื่อนไขการค้นหา" : "ยังไม่มีข้อมูลผู้เข้าแข่งขันที่มีคะแนนในระบบ"}
                       </div>
                     ) : (
                       filteredStandings.map((item) => {
@@ -2060,7 +2143,8 @@ export default function MainPage() {
               alignItems: "center",
               justifyContent: "center",
               zIndex: 2000,
-              padding: "20px"
+              padding: "20px",
+              animation: "spotlightBackdropFade 0.22s ease-out forwards"
             }}
           >
             <div
@@ -2073,7 +2157,10 @@ export default function MainPage() {
                 borderRadius: "24px",
                 padding: "28px",
                 boxShadow: "0 0 50px rgba(0, 229, 255, 0.35)",
-                position: "relative"
+                position: "relative",
+                animation: "spotlightModalZoom 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+                transformOrigin: "center center",
+                willChange: "transform, opacity"
               }}
             >
               <button

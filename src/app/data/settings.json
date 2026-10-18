@@ -2,8 +2,8 @@
   "gamePassword": "fanpantae_2026",
   "adminPassword": "admin_fan_2026",
   "totalContestants": 22,
-  "protectHome": true,
+  "protectHome": false,
   "homePassword": "fanoftheyear2026",
-  "protectDraw": true,
+  "protectDraw": false,
   "drawPassword": "fanoftheyear2026"
 }

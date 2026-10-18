@@ -8,7 +8,7 @@ const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
 const DEFAULT_SETTINGS = {
   gamePassword: "fanpantae_2026",
   adminPassword: "admin_fan_2026",
-  totalContestants: 23,
+  totalContestants: 22,
   protectHome: false,
   homePassword: "",
   protectDraw: false,
