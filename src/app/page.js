@@ -1,1661 +1,2383 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import GAME_CONFIG from "./config";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
-// Helper: Resolve local folder paths to Next.js public folder serving path
-const resolveImagePath = (path) => {
-  if (!path) return "";
-  // Check if it is a local path containing /src/app/img/ or /app/img/ or similar
-  const match = path.match(/(?:src\/app\/img|app\/img|img)\/(.+)$/);
-  if (match) {
-    return `/img/${match[1]}`;
+// Dense Ranking Calculation
+function calculateDenseRanks(items) {
+  if (!Array.isArray(items)) return [];
+  const sorted = [...items].sort((a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0));
+  let currentRank = 0;
+  let lastScore = null;
+  return sorted.map((item) => {
+    const scoreVal = Number(item.totalScore) || 0;
+    if (lastScore === null || scoreVal !== lastScore) {
+      currentRank += 1;
+      lastScore = scoreVal;
+    }
+    return {
+      ...item,
+      rank: currentRank,
+    };
+  });
+}
+
+function getRank5Info(allRankedPlayers) {
+  if (!Array.isArray(allRankedPlayers) || allRankedPlayers.length === 0) return null;
+  const rank5Players = allRankedPlayers.filter((p) => p.rank === 5);
+  if (rank5Players.length > 0) {
+    const score = Number(rank5Players[0].totalScore) || 0;
+    const names = rank5Players
+      .map((p) => (p.nickname ? `${p.nickname} (${p.name})` : p.name))
+      .join(", ");
+    const shortNames = rank5Players.map((p) => p.nickname || p.name).join(", ");
+    return { score, names, shortNames, players: rank5Players };
   }
-  return path;
-};
+  const distinctScores = Array.from(
+    new Set(allRankedPlayers.map((p) => Number(p.totalScore) || 0))
+  ).sort((a, b) => b - a);
+  if (distinctScores.length >= 5) {
+    const score = distinctScores[4];
+    return { score, names: `${score} คะแนน`, shortNames: `${score} คะแนน`, players: [] };
+  }
+  return null;
+}
 
-export default function Home() {
-  // ---- Panel State ----
-  const [currentPanel, setCurrentPanel] = useState("setup"); // 'setup', 'config', 'game'
-  
-  // ---- Setup Form State ----
-  const [contestantName, setContestantName] = useState("");
-  const [topic, setTopic] = useState("");
+// Strict Guaranteed Qualification & Elimination Evaluator
+function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
+  if (!item) {
+    return {
+      isCompleted: false,
+      unplayedCount: 4,
+      maxPossibleScore: 100,
+      cutoff5: null,
+      rank5Info: null,
+      isEliminated: false,
+      isGuaranteedQualified: false,
+      statusText: "⏳ รอผล",
+      statusClass: "status-pending",
+      reason: "",
+    };
+  }
 
-  // ---- Game State ----
-  const [scores, setScores] = useState({
-    "3sec": null,
-    "qa": null,
-    "jigsaw": null,
-    "attribute": null,
-  });
-  const [currentGame, setCurrentGame] = useState(null); // null, '3sec', 'qa', 'jigsaw', 'attribute'
-
-  // ---- Config Panel State ----
-  const [threeSecMode, setThreeSecMode] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("fpt_threeSecMode") || "1set";
-    }
-    return "1set";
-  });
-  const [jigsawMode, setJigsawMode] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("fpt_jigsawMode") || "square";
-    }
-    return "square";
-  });
-  const [jigsawImage, setJigsawImage] = useState(GAME_CONFIG.jigsaw.image || "");
-  const [jigsawQuestion, setJigsawQuestion] = useState(GAME_CONFIG.jigsaw.question || "");
-  const [jigsawAnswer, setJigsawAnswer] = useState(GAME_CONFIG.jigsaw.answer || "");
-  const [threeSecQuestions, setThreeSecQuestions] = useState(GAME_CONFIG.threeSeconds || []);
-  const [threeSecSetHeaders, setThreeSecSetHeaders] = useState(
-    GAME_CONFIG.threeSecondsHeaders || ["", "", "", "", ""]
+  const targetN = parseInt(totalContestants, 10) || 23;
+  const scoresObj = item.scores || {};
+  const playedCategories = ["3sec", "qa", "jigsaw", "attribute"].filter(
+    (key) => scoresObj[key] !== null && scoresObj[key] !== undefined && scoresObj[key] !== ""
   );
-  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const isCompleted = playedCategories.length === 4;
+  const unplayedCount = Math.max(0, 4 - playedCategories.length);
+  const currentTotal = Number(item.totalScore) || 0;
+  const maxPossibleScore = currentTotal + unplayedCount * 25;
 
-  // ---- Result Overlay State ----
-  const [resultOverlay, setResultOverlay] = useState({
-    show: false,
-    icon: "",
-    text: "",
-    score: null,
+  const rank5Info = getRank5Info(allRankedPlayers);
+  const cutoff5 = rank5Info?.score ?? null;
+
+  // Check for in-progress player
+  const inProgressPlayer = (allRankedPlayers || []).find((p) => {
+    const pScores = p.scores || {};
+    const pPlayed = ["3sec", "qa", "jigsaw", "attribute"].filter(
+      (k) => pScores[k] !== null && pScores[k] !== undefined && pScores[k] !== ""
+    );
+    return pPlayed.length < 4;
   });
 
-  // ---- Config Operations ----
-  const handleSaveConfig = async () => {
-    // Update local state and in-memory GAME_CONFIG object
-    GAME_CONFIG.jigsaw.image = jigsawImage;
-    GAME_CONFIG.jigsaw.question = jigsawQuestion;
-    GAME_CONFIG.jigsaw.answer = jigsawAnswer;
-    GAME_CONFIG.threeSeconds = threeSecQuestions;
-    GAME_CONFIG.threeSecondsHeaders = threeSecSetHeaders;
+  let activePlayer = null;
+  if (inProgressPlayer) {
+    const pScores = inProgressPlayer.scores || {};
+    const pPlayedCount = ["3sec", "qa", "jigsaw", "attribute"].filter(
+      (k) => pScores[k] !== null && pScores[k] !== undefined && pScores[k] !== ""
+    ).length;
+    const pTotal = Number(inProgressPlayer.totalScore) || 0;
+    activePlayer = {
+      id: inProgressPlayer.id,
+      totalScore: pTotal,
+      maxPossibleScore: pTotal + (4 - pPlayedCount) * 25,
+      isCompleted: false,
+    };
+  }
 
-    // Save UI settings to local storage
-    localStorage.setItem("fpt_threeSecMode", threeSecMode);
-    localStorage.setItem("fpt_jigsawMode", jigsawMode);
+  // Completed players excluding this item and active player
+  const otherCompletedPlayers = (allRankedPlayers || []).filter((p) => {
+    if (String(p.id) === String(item.id)) return false;
+    if (activePlayer && String(p.id) === String(activePlayer.id)) return false;
+    const pScores = p.scores || {};
+    const pPlayed = ["3sec", "qa", "jigsaw", "attribute"].filter(
+      (k) => pScores[k] !== null && pScores[k] !== undefined && pScores[k] !== ""
+    );
+    return pPlayed.length === 4;
+  });
 
-    try {
-      const response = await fetch("/api/save-config", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ config: GAME_CONFIG }),
-      });
-      
-      const result = await response.json();
-      if (result.success) {
-        alert("บันทึกการตั้งค่าลงไฟล์ config.js สำเร็จแล้ว! หน้าเว็บจะรีโหลดและอัปเดตข้อมูลล่าสุด");
+  // Distinct scores strictly above current total
+  const compDistinctScoresAboveCurrent = Array.from(
+    new Set(
+      otherCompletedPlayers
+        .map((p) => Number(p.totalScore) || 0)
+        .filter((sc) => sc > currentTotal)
+    )
+  ).sort((a, b) => b - a);
+
+  const totalCompletedCount = (allRankedPlayers || []).filter((p) => {
+    if (activePlayer && String(p.id) === String(activePlayer.id)) return false;
+    const pScores = p.scores || {};
+    const pPlayed = ["3sec", "qa", "jigsaw", "attribute"].filter(
+      (k) => pScores[k] !== null && pScores[k] !== undefined && pScores[k] !== ""
+    );
+    return pPlayed.length === 4;
+  }).length;
+
+  const totalStartedOrCompleted = totalCompletedCount + (activePlayer ? 1 : 0);
+  const remainingUnplayedContestants = Math.max(0, targetN - totalStartedOrCompleted);
+
+  let activeCanBeatCurrent = 0;
+  if (activePlayer && String(activePlayer.id) !== String(item.id)) {
+    if (activePlayer.maxPossibleScore > currentTotal) {
+      activeCanBeatCurrent = 1;
+    }
+  }
+
+  const maxPossibleDistinctAbove =
+    compDistinctScoresAboveCurrent.length + activeCanBeatCurrent + remainingUnplayedContestants;
+  const worstCaseRank = 1 + maxPossibleDistinctAbove;
+
+  // Elimination check:
+  const scoreForElimCheck = isCompleted ? currentTotal : maxPossibleScore;
+  const compDistinctScoresAboveForElim = Array.from(
+    new Set(
+      otherCompletedPlayers
+        .map((p) => Number(p.totalScore) || 0)
+        .filter((sc) => sc > scoreForElimCheck)
+    )
+  ).sort((a, b) => b - a);
+
+  let guaranteedDistinctAbove = compDistinctScoresAboveForElim.length;
+
+  if (activePlayer && String(activePlayer.id) !== String(item.id)) {
+    if (activePlayer.totalScore > scoreForElimCheck) {
+      const canTieExisting = compDistinctScoresAboveForElim.some(
+        (sc) => sc >= activePlayer.totalScore && sc <= activePlayer.maxPossibleScore
+      );
+      if (!canTieExisting) {
+        guaranteedDistinctAbove += 1;
+      }
+    }
+  }
+
+  let isEliminated = false;
+  let isGuaranteedQualified = false;
+  let statusText = "⏳ รอผล";
+  let statusClass = "status-pending";
+  let reason = "";
+
+  if (currentTotal >= 100) {
+    isGuaranteedQualified = true;
+    statusText = "🟢 เข้ารอบ";
+    statusClass = "status-qualified";
+    reason = "ได้คะแนนเต็ม 100 คะแนน การันตีเข้ารอบอัตโนมัติ";
+  } else if (worstCaseRank <= 5) {
+    isGuaranteedQualified = true;
+    statusText = "🟢 เข้ารอบ";
+    statusClass = "status-qualified";
+    const riskCount = activeCanBeatCurrent + remainingUnplayedContestants;
+    reason =
+      riskCount === 0
+        ? `การันตีอันดับ ${item.rank} ใน 5 คนสุดท้ายแล้ว`
+        : `การันตีอันดับใน 5 คนสุดท้ายแล้ว (มีผู้เข้าแข่งขันที่อาจทำคะแนนแซงได้ไม่เกิน ${Math.max(0, 4 - compDistinctScoresAboveCurrent.length)} คน)`;
+  } else if (guaranteedDistinctAbove >= 5) {
+    isEliminated = true;
+    statusText = "🔴 ตกรอบ";
+    statusClass = "status-eliminated";
+    if (isCompleted) {
+      reason = "มีผู้ทำคะแนนสูงกว่า 5 อันดับแน่นอนแล้ว (ตกรอบ)";
+    } else {
+      reason = rank5Info
+        ? `คะแนนสูงสุดที่ทำได้ (${maxPossibleScore} คะแนน) ไม่สามารถขึ้นไปติด 5 อันดับแรกได้แล้ว (ตกรอบ)`
+        : `คะแนนสูงสุดที่เป็นไปได้คือ ${maxPossibleScore} คะแนน ไม่เพียงพอที่จะถึง 5 อันดับแรก (ตกรอบ)`;
+    }
+  } else {
+    statusText = "⏳ รอผล";
+    statusClass = "status-pending";
+    if (isCompleted) {
+      if (item.rank <= 5) {
+        reason = `อยู่อันดับ ${item.rank} (ลุ้นจากผู้เข้าแข่งขันที่เหลืออีก ${remainingUnplayedContestants + (activePlayer ? 1 : 0)} คน)`;
       } else {
-        alert("เกิดข้อผิดพลาดในการเขียนไฟล์: " + result.error);
+        reason = `อยู่อันดับ ${item.rank} (ลุ้นให้คะแนนของผู้เล่นอื่นไม่ผลักอันดับ)`;
+      }
+    } else {
+      if (item.rank < 5 && rank5Info) {
+        reason = `คะแนนปัจจุบัน (${currentTotal} คะแนน) อยู่ใน 5 อันดับแรก (คะแนนสูงสุดที่ทำได้คือ ${maxPossibleScore} คะแนน)`;
+      } else if (item.rank === 5) {
+        reason = `คะแนนปัจจุบัน (${currentTotal} คะแนน) ครองอันดับ 5 ร่วม (คะแนนสูงสุดที่ทำได้คือ ${maxPossibleScore} คะแนน)`;
+      } else if (rank5Info) {
+        reason = `คะแนนสูงสุดที่ทำได้คือ ${maxPossibleScore} คะแนน (ลุ้นเบียดอันดับ 5 คือ ${rank5Info.shortNames} ${rank5Info.score} คะแนน)`;
+      } else {
+        reason = `คะแนนสูงสุดที่ทำได้คือ ${maxPossibleScore} คะแนน`;
+      }
+    }
+  }
+
+  return {
+    isCompleted,
+    unplayedCount,
+    maxPossibleScore,
+    cutoff5,
+    rank5Info,
+    isEliminated,
+    isGuaranteedQualified,
+    statusText,
+    statusClass,
+    reason,
+  };
+}
+
+const POLL_CONTESTANTS = [
+  { pollRank: 1, name: "ศุภกร นิลสุวรรณ", nickname: "หมี", topic: "วง Coldplay", percent: "10.26%" },
+  { pollRank: 2, name: "สหัสวรรษ นิจพันธ์", nickname: "พีท", topic: "รถไฟฟ้าไทย", percent: "7.43%" },
+  { pollRank: 3, name: "กันตชาติ ศรีเพ็ชร", nickname: "กัปตัน", topic: "สโมสรฟุตบอลลิเวอร์พูล", percent: "7.20%" },
+  { pollRank: 4, name: "สิปโปทัย ศรีบุญเรือง", nickname: "กัส", topic: "ประวัติศาสตร์กรุงรัตนโกสินทร์", percent: "6.39%" },
+  { pollRank: 5, name: "คุณอินทร์ บุญสิน", nickname: "อินทร์", topic: "วง Queen", percent: "6.27%" },
+  { pollRank: 6, name: "ภควัต ศรศุกลรัตน์", nickname: "อาร์ม", topic: "การเมืองไทย", percent: "5.72%" },
+  { pollRank: 7, name: "เชาว์วรรธน์ จันทร์สุข", nickname: "ก๊อง", topic: "Workpoint", percent: "5.39%" },
+  { pollRank: 8, name: "ธวัชชัย แสงสว่าง", nickname: "ปืน", topic: "ไอ้มดแดง", percent: "5.22%" },
+  { pollRank: 9, name: "ธนกร สุขปาน", nickname: "ออม", topic: "เพลงลูกทุ่ง", percent: "5.02%" },
+  { pollRank: 10, name: "นัทธภพ ธนวัฒนาเจริญ", nickname: "นนท์", topic: "Battle Spirits", percent: "4.42%" },
+  { pollRank: 11, name: "พัชราภรณ์ ขวัญพรหมสี", nickname: "เอิร์น", topic: "Honkai Impact 3rd", percent: "4.06%" },
+  { pollRank: 12, name: "ณัฐภัทร แก้วสินธุ์", nickname: "นที", topic: "MasterChef Thailand", percent: "4.02%" },
+  { pollRank: 13, name: "ณัฐดนัย วงศ์ปัญญา", nickname: "แฟรงค์", topic: "Honkai: Star Rail", percent: "3.94%" },
+  { pollRank: 14, name: "พีรภัทร หมื่นหาญ", nickname: "พีม", topic: "Club Friday The Series", percent: "3.61%" },
+  { pollRank: 15, name: "ปวัน ธนพรพันธ์", nickname: "ป๊ะ", topic: "รายการ Taskmaster", percent: "3.36%" },
+  { pollRank: 16, name: "ณัฐวุฒิ โนรี", nickname: "แสตมป์", topic: "Thai Boy Love Series", percent: "3.26%" },
+  { pollRank: 17, name: "ณฤกร วงศบูรณะ", nickname: "ตฤณ", topic: "Tattoo Colour", percent: "3.02%" },
+  { pollRank: 18, name: "พัทธ์ศีล ปุญศิริ", nickname: "ศีล", topic: "บอร์ดเกม", percent: "2.96%" },
+  { pollRank: 19, name: "รติพงษ์ กมลเกียรติพัฒน์", nickname: "นิว", topic: "ไพ่ทาโรต์", percent: "2.81%" },
+  { pollRank: 20, name: "ธนพัฒน์ สง่าแสง", nickname: "แบงค์", topic: "48Group Thailand", percent: "2.30%" },
+  { pollRank: 21, name: "ฤทธิชัย ภูสิญามณี", nickname: "ริท", topic: "วง Serious Bacon", percent: "1.71%" },
+  { pollRank: 22, name: "นิธิกร วิชัยวงศ์", nickname: "ก๊อปปี้", topic: "ขบวนการ 5 สี", percent: "1.66%" },
+];
+
+export default function MainPage() {
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [totalContestants, setTotalContestants] = useState(23);
+  const [loading, setLoading] = useState(true);
+
+  // Tab State: 'standings' | 'poll'
+  const [activeTableTab, setActiveTableTab] = useState("standings");
+
+  // Search, Filter & Spotlight Interactive States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all"); // 'all' | 'qualified' | 'pending' | 'eliminated'
+  const [selectedSpotlight, setSelectedSpotlight] = useState(null);
+
+  // Auth & Protection State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [protectHome, setProtectHome] = useState(false);
+  const [homePasswordInput, setHomePasswordInput] = useState("");
+  const [homeAuthError, setHomeAuthError] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  // Load leaderboard & settings
+  const fetchData = async () => {
+    try {
+      const [scoresRes, settingsRes] = await Promise.all([
+        fetch("/api/scores"),
+        fetch("/api/settings"),
+      ]);
+      const scoresData = await scoresRes.json();
+      const settingsData = await settingsRes.json();
+
+      if (scoresData.success && Array.isArray(scoresData.data)) {
+        setLeaderboard(scoresData.data);
+      }
+      if (settingsData.success) {
+        if (settingsData.totalContestants) {
+          setTotalContestants(settingsData.totalContestants);
+        }
+        const isProtected = Boolean(settingsData.protectHome);
+        setProtectHome(isProtected);
+        if (!isProtected) {
+          setIsAuthenticated(true);
+        } else {
+          const stored = sessionStorage.getItem("fpt_home_auth");
+          if (stored === "true") {
+            setIsAuthenticated(true);
+          } else {
+            setIsAuthenticated(false);
+          }
+        }
       }
     } catch (err) {
-      console.error(err);
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      console.error("Failed to fetch homepage data:", err);
+    } finally {
+      setLoading(false);
+      setAuthChecking(false);
     }
-
-    setCurrentPanel("setup");
   };
 
-  const handleQuestionChange = (index, field, value) => {
-    const updated = [...threeSecQuestions];
-    updated[index] = { ...updated[index], [field]: value };
-    setThreeSecQuestions(updated);
+  useEffect(() => {
+    fetchData();
+    // Poll every 3 seconds for real-time live scoring sync with admin
+    const timer = setInterval(fetchData, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleHomeLogin = async (e) => {
+    if (e) e.preventDefault();
+    if (!homePasswordInput.trim()) {
+      setHomeAuthError("กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบ");
+      return;
+    }
+    setIsVerifying(true);
+    setHomeAuthError("");
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify_home", password: homePasswordInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("fpt_home_auth", "true");
+        setHomePasswordInput("");
+      } else {
+        setHomeAuthError("รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
+      }
+    } catch (err) {
+      setHomeAuthError("เกิดข้อผิดพลาดในการตรวจสอบรหัสผ่าน");
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
-  const handleSetHeaderChange = (index, value) => {
-    const updated = [...threeSecSetHeaders];
-    updated[index] = value;
-    setThreeSecSetHeaders(updated);
-  };
+  const denseRankedLeaderboard = calculateDenseRanks(leaderboard);
+  const rank5Info = getRank5Info(denseRankedLeaderboard);
 
-  // Helper: get the number of sets based on mode
-  const getSetCount = (mode) => {
-    if (mode === "1set") return 1;
-    if (mode === "2sets") return 2;
-    if (mode === "3sets") return 3;
-    if (mode === "5sets") return 5;
-    return 1;
-  };
+  const targetN = parseInt(totalContestants, 10) || 23;
+  const currentN = denseRankedLeaderboard.length;
+  const remainingN = Math.max(0, targetN - currentN);
 
-  const getSetSizes = (mode) => {
-    if (mode === "1set") return [25];
-    if (mode === "2sets") return [15, 10];
-    if (mode === "3sets") return [10, 10, 5];
-    if (mode === "5sets") return [5, 5, 5, 5, 5];
-    return [25];
-  };
+  const qualifiedCount = denseRankedLeaderboard.filter((item) => {
+    const st = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+    return st.isGuaranteedQualified;
+  }).length;
 
-  // ---- Game Play Navigation & Scoring ----
-  const handleStartGame = () => {
-    setCurrentPanel("game");
-  };
+  // Check if competition has any recorded scores
+  const hasStartedCompetition = denseRankedLeaderboard.some((p) => {
+    const scores = p.scores || {};
+    const total = Number(p.totalScore) || 0;
+    if (total > 0) return true;
+    return ["3sec", "qa", "jigsaw", "attribute"].some(
+      (k) => scores[k] !== null && scores[k] !== undefined && scores[k] !== ""
+    );
+  });
 
-  const setGameScore = (gameKey, score) => {
-    setScores((prev) => ({ ...prev, [gameKey]: score }));
-  };
+  const top5Contestants = denseRankedLeaderboard
+    .filter((p) => (Number(p.totalScore) || 0) > 0 || (p.scores && Object.values(p.scores).some(v => v !== null && v !== "")))
+    .filter((p) => p.rank <= 5)
+    .slice(0, 5);
 
-  const showResultPopup = (icon, text, score) => {
-    setResultOverlay({
-      show: true,
-      icon,
-      text,
-      score,
-    });
-  };
+  const highestScore = denseRankedLeaderboard.length > 0 ? Math.max(...denseRankedLeaderboard.map(p => Number(p.totalScore) || 0)) : 0;
 
-  const closeResultPopup = () => {
-    setResultOverlay({ show: false, icon: "", text: "", score: null });
-    setCurrentGame(null);
-  };
+  const filteredStandings = denseRankedLeaderboard.filter((item) => {
+    const q = searchQuery.trim().toLowerCase();
+    const matchesQuery = !q ||
+      item.name?.toLowerCase().includes(q) ||
+      item.nickname?.toLowerCase().includes(q) ||
+      item.topic?.toLowerCase().includes(q);
 
-  const totalScore = Object.values(scores).reduce((acc, curr) => acc + (curr || 0), 0);
+    if (!matchesQuery) return false;
+
+    if (statusFilter === "all") return true;
+    const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+    if (statusFilter === "qualified") return evalStatus.isGuaranteedQualified;
+    if (statusFilter === "pending") return !evalStatus.isGuaranteedQualified && !evalStatus.isEliminated;
+    if (statusFilter === "eliminated") return evalStatus.isEliminated;
+    return true;
+  });
+
+  const filteredPoll = POLL_CONTESTANTS.filter((item) => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      item.name?.toLowerCase().includes(q) ||
+      item.nickname?.toLowerCase().includes(q) ||
+      item.topic?.toLowerCase().includes(q)
+    );
+  });
+
+  if (authChecking) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "#030814",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#00e5ff",
+        fontSize: "18px",
+        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif"
+      }}>
+        กำลังโหลด...
+      </div>
+    );
+  }
+
+  if (protectHome && !isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "radial-gradient(circle at 50% 40%, #0c2d5e 0%, #061633 45%, #020712 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif",
+        color: "#ffffff"
+      }}>
+        <div style={{
+          maxWidth: "440px",
+          width: "100%",
+          background: "linear-gradient(150deg, rgba(16, 32, 60, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",
+          border: "2px solid rgba(0, 229, 255, 0.4)",
+          borderRadius: "24px",
+          padding: "40px 30px",
+          textAlign: "center",
+          boxShadow: "0 0 50px rgba(0, 229, 255, 0.3)"
+        }}>
+          <div style={{
+            width: "74px",
+            height: "74px",
+            borderRadius: "50%",
+            background: "rgba(0, 229, 255, 0.15)",
+            border: "2px solid #00e5ff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "32px",
+            margin: "0 auto 20px",
+            boxShadow: "0 0 25px rgba(0, 229, 255, 0.5)"
+          }}>
+            🔒
+          </div>
+
+          <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#00e5ff", marginBottom: "6px" }}>
+            แฟนพันธุ์แท้ 2026
+          </h2>
+          <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.65)", marginBottom: "26px" }}>
+            หน้านี้ได้รับการป้องกันด้วยรหัสผ่าน กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบ
+          </p>
+
+          <form onSubmit={handleHomeLogin}>
+            <div style={{ marginBottom: "18px" }}>
+              <input
+                type="password"
+                value={homePasswordInput}
+                onChange={(e) => setHomePasswordInput(e.target.value)}
+                placeholder="กรอกรหัสผ่านเข้าหน้าแรก..."
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  background: "#050b14",
+                  border: "1px solid rgba(0, 229, 255, 0.5)",
+                  color: "#ffffff",
+                  fontSize: "16px",
+                  textAlign: "center",
+                  outline: "none"
+                }}
+                autoFocus
+              />
+            </div>
+
+            {homeAuthError && (
+              <div style={{
+                color: "#ff7875",
+                fontSize: "13px",
+                marginBottom: "16px",
+                padding: "8px 12px",
+                borderRadius: "6px",
+                background: "rgba(255, 77, 79, 0.15)",
+                border: "1px solid rgba(255, 77, 79, 0.3)"
+              }}>
+                {homeAuthError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isVerifying}
+              style={{
+                width: "100%",
+                padding: "13px",
+                borderRadius: "10px",
+                background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                color: "#030812",
+                fontWeight: "800",
+                fontSize: "16px",
+                border: "none",
+                cursor: "pointer",
+                boxShadow: "0 0 20px rgba(0, 229, 255, 0.4)"
+              }}
+            >
+              {isVerifying ? "กำลังตรวจสอบ..." : "🔓 เข้าสู่หน้าหลัก"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <main style={{ width: "100%", height: "100%" }}>
-      {/* ==============================
-           SETUP PANEL
-           ============================== */}
-      {currentPanel === "setup" && (
-        <div id="setupPanel" className="panel active">
-          <div className="setup-bg-effects">
-            <div className="floating-orb orb1"></div>
-            <div className="floating-orb orb2"></div>
-            <div className="floating-orb orb3"></div>
-          </div>
-          <div className="setup-container">
-            <div className="setup-logo">
-              <div className="logo-icon">🏆</div>
-              <h1>แฟนพันธุ์แท้ Trial Run</h1>
-              <p className="setup-year">2026</p>
-            </div>
-            <div className="setup-form">
-              <div className="form-group">
-                <label htmlFor="contestantName">
-                  <span className="label-icon">👤</span> ชื่อผู้เข้าแข่งขัน
-                </label>
-                <input
-                  type="text"
-                  id="contestantName"
-                  placeholder="กรุณาใส่ชื่อ"
-                  value={contestantName}
-                  onChange={(e) => setContestantName(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="eventTopic">
-                  <span className="label-icon">📌</span> หัวข้อ
-                </label>
-                <input
-                  type="text"
-                  id="eventTopic"
-                  placeholder="เช่น Tilly Birds, One Piece, ..."
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                />
-              </div>
-              <div className="setup-actions">
-                <button onClick={handleStartGame} className="btn-start" id="btnStart">
-                  <span className="btn-text">เริ่มการแข่งขัน</span>
-                  <span className="btn-arrow">→</span>
-                </button>
-                <button onClick={() => setCurrentPanel("config")} className="btn-config" id="btnConfig">
-                  <span className="btn-icon">⚙️</span>
-                  <span>ตั้งค่าเกม</span>
-                </button>
-              </div>
-            </div>
+    <div style={{
+      minHeight: "100vh",
+      background: "#030814",
+      color: "#ffffff",
+      fontFamily: "'Sukhumvit Set', 'Kanit', sans-serif"
+    }}>
+      {/* ========================================================
+          1. TOP NAVIGATION BAR (Themed after official Fan Pan Tae)
+         ======================================================== */}
+      <nav style={{
+        background: "linear-gradient(90deg, #0077b6 0%, #0096c7 50%, #0077b6 100%)",
+        borderBottom: "2px solid #00e5ff",
+        boxShadow: "0 4px 20px rgba(0, 180, 216, 0.35)",
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
+        padding: "0 24px"
+      }}>
+        <div style={{
+          maxWidth: "1320px",
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          height: "64px"
+        }}>
+          {/* Logo */}
+          {/* Logo / Brand */}
+          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <img
+              src="/img/logo.png"
+              alt="FANPANTAE 2026"
+              style={{
+                height: "42px",
+                width: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 12px rgba(0, 229, 255, 0.7))"
+              }}
+            />
+          </Link>
+
+          {/* Nav Links */}
+          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <Link
+              href="/"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                background: "rgba(0, 229, 255, 0.25)",
+                color: "#ffffff",
+                fontWeight: "700",
+                fontSize: "14px",
+                textDecoration: "none"
+              }}
+            >
+              หน้าแรก
+            </Link>
+            <a
+              href="#leaderboard"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTableTab("standings");
+                const el = document.getElementById("leaderboard");
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#e0f2fe",
+                fontWeight: "600",
+                fontSize: "14px",
+                textDecoration: "none",
+                transition: "background 0.2s",
+                cursor: "pointer"
+              }}
+            >
+              ตารางคะแนน
+            </a>
+            <Link
+              href="/draw"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#e0f2fe",
+                fontWeight: "600",
+                fontSize: "14px",
+                textDecoration: "none"
+              }}
+            >
+              จำลองจับลูกบอล
+            </Link>
+            {/* <Link
+              href="/game"
+              style={{
+                padding: "8px 18px",
+                borderRadius: "6px",
+                background: "rgba(3, 105, 161, 0.6)",
+                border: "1px solid rgba(0, 229, 255, 0.5)",
+                color: "#ffffff",
+                fontWeight: "800",
+                fontSize: "14px",
+                textDecoration: "none",
+                marginLeft: "6px",
+                boxShadow: "0 2px 10px rgba(0,0,0,0.2)"
+              }}
+            >
+              🎮 เข้าเล่นเกม
+            </Link> */}
+            <Link
+              href="/admin"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#dbeafe",
+                fontWeight: "600",
+                fontSize: "14px",
+                textDecoration: "none"
+              }}
+            >
+              Admin เท่านั้น
+            </Link>
           </div>
         </div>
-      )}
+      </nav>
 
-      {/* ==============================
-           CONFIG PANEL
-           ============================== */}
-      {currentPanel === "config" && (
-        <div id="configPanel" className="panel active" style={{ display: "block" }}>
-          <div className="setup-bg-effects">
-            <div className="floating-orb orb1"></div>
-            <div className="floating-orb orb2"></div>
-            <div className="floating-orb orb3"></div>
+      {/* ========================================================
+          2. HERO SECTION (Based on Screenshot from fanpantae.net)
+         ======================================================== */}
+      <section style={{
+        position: "relative",
+        minHeight: "560px",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "radial-gradient(circle at 50% 40%, #0c2d5e 0%, #061633 45%, #020712 100%)",
+        padding: "60px 24px"
+      }}>
+        {/* Radiating perspective light streaks (Stars & beams) */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: `
+            radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 150px 80px, #00e5ff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 300px 180px, #ffffff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 450px 60px, #00e5ff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 600px 250px, #ffffff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 750px 100px, #00e5ff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 900px 190px, #ffffff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 1100px 70px, #00e5ff, rgba(0,0,0,0))
+          `,
+          backgroundSize: "600px 350px",
+          opacity: 0.8
+        }}></div>
+
+        {/* Central burst rays */}
+        <div style={{
+          position: "absolute",
+          top: "40%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "900px",
+          height: "900px",
+          background: "conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(0, 229, 255, 0.08) 30deg, transparent 60deg, rgba(0, 180, 216, 0.12) 90deg, transparent 130deg, rgba(0, 229, 255, 0.08) 180deg, transparent 240deg, rgba(0, 180, 216, 0.1) 300deg, transparent 360deg)",
+          filter: "blur(20px)",
+          pointerEvents: "none"
+        }}></div>
+
+        {/* Hero Content Container */}
+        <div style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: "960px",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }}>
+          {/* Main Official Logo with Neon Glow */}
+          <div style={{
+            position: "relative",
+            maxWidth: "760px",
+            width: "92%",
+            margin: "0 auto 16px",
+            filter: "drop-shadow(0 0 35px rgba(0, 229, 255, 0.75)) drop-shadow(0 0 70px rgba(0, 180, 216, 0.45))",
+            transition: "transform 0.3s ease"
+          }}>
+            <img
+              src="/img/logo.png"
+              alt="FANPANTAE 2026"
+              style={{
+                width: "100%",
+                height: "auto",
+                objectFit: "contain",
+                display: "block"
+              }}
+            />
           </div>
-          <div className="config-container">
-            <div className="config-header">
-              <button className="config-back-btn" onClick={() => setCurrentPanel("setup")}>
-                <span>←</span> กลับ
-              </button>
-              <h1>⚙️ ตั้งค่าเกม</h1>
-              <div className="config-back-btn" style={{ visibility: "hidden" }}>placeholder</div>
+
+          <h2 style={{
+            fontSize: "26px",
+            fontWeight: "800",
+            color: "#e0f2fe",
+            marginBottom: "30px",
+            textShadow: "0 2px 14px rgba(0,0,0,0.9)",
+            letterSpacing: "1px"
+          }}>
+            แฟนพันธุ์แท้แห่งปี 2026
+          </h2>
+
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
+              <a
+                href="#leaderboard"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTableTab("standings");
+                  const el = document.getElementById("leaderboard");
+                  if (el) {
+                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }
+                }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "30px",
+                  background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                  color: "#030812",
+                  fontSize: "16px",
+                  fontWeight: "800",
+                  textDecoration: "none",
+                  boxShadow: "0 0 25px rgba(0, 229, 255, 0.6)",
+                  transition: "transform 0.2s ease",
+                  cursor: "pointer"
+                }}
+              >
+                🏆 ตารางคะแนนแข่งขัน
+              </a>
+
+              <Link
+                href="/draw"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "30px",
+                  background: "rgba(0, 30, 60, 0.7)",
+                  border: "2px solid #00e5ff",
+                  color: "#00e5ff",
+                  fontSize: "16px",
+                  fontWeight: "800",
+                  textDecoration: "none",
+                  boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)"
+                }}
+              >
+                🔮 จำลองจับลูกบอล
+              </Link>
             </div>
+          </div>
+      </section>
 
-            {/* 3 Seconds Config */}
-            <section className="config-section">
-              <h2 className="config-section-title">
-                <span className="section-icon">⏱️</span>
-                3 วินาที — รูปแบบชุดคำถาม
-              </h2>
-              <div className="config-cards-row">
-                <div
-                  className={`config-card ${threeSecMode === "1set" ? "selected" : ""}`}
-                  onClick={() => setThreeSecMode("1set")}
-                >
-                  <div className="config-card-visual">
-                    <div className="set-bar-diagram">
-                      <div className="set-bar" style={{ flex: 25 }}><span>25</span></div>
-                    </div>
-                  </div>
-                  <div className="config-card-label">1 ชุด</div>
-                  <div className="config-card-desc">25 ข้อ</div>
-                  <div className="config-card-check">✓</div>
-                </div>
+      {/* ========================================================
+          3. LEADERBOARD SECTION (ตารางคะแนนการแข่งขัน)
+         ======================================================== */}
+      {/* ========================================================
+          3. LEADERBOARD & POLL SECTION
+         ======================================================== */}
+      <section id="leaderboard" style={{
+        maxWidth: "1280px",
+        margin: "0 auto",
+        padding: "50px 20px 80px"
+      }}>
+        {/* Section Title */}
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <div style={{
+            display: "inline-block",
+            padding: "4px 16px",
+            borderRadius: "20px",
+            background: "rgba(0, 229, 255, 0.15)",
+            border: "1px solid #00e5ff",
+            color: "#00e5ff",
+            fontSize: "13px",
+            fontWeight: "800",
+            marginBottom: "10px"
+          }}>
+            FAN OF THE YEAR 2026 STANDINGS & POLL
+          </div>
+          <h2 style={{
+            fontSize: "32px",
+            fontWeight: "900",
+            background: "linear-gradient(90deg, #ffffff 0%, #80d0ff 50%, #00e5ff 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            margin: "0 0 8px 0"
+          }}>
+            {activeTableTab === "standings" ? "ตารางคะแนนการแข่งขัน แฟนพันธุ์แท้ 2026" : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
+          </h2>
+          <p style={{ fontSize: "15px", color: "rgba(255, 255, 255, 0.65)", margin: 0 }}>
+            {activeTableTab === "standings"
+              ? "คะแนนอัปเดตแบบเรียลไทม์จากห้องควบคุมแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 คนสุดท้าย"
+              : "อันดับความนิยมและผลการสำรวจความคิดเห็นแฟนพันธุ์แท้แห่งปี 2026"}
+          </p>
+        </div>
 
-                <div
-                  className={`config-card ${threeSecMode === "2sets" ? "selected" : ""}`}
-                  onClick={() => setThreeSecMode("2sets")}
-                >
-                  <div className="config-card-visual">
-                    <div className="set-bar-diagram">
-                      <div className="set-bar color-1" style={{ flex: 15 }}><span>15</span></div>
-                      <div className="set-bar color-2" style={{ flex: 10 }}><span>10</span></div>
-                    </div>
-                  </div>
-                  <div className="config-card-label">2 ชุด</div>
-                  <div className="config-card-desc">15 / 10 ข้อ</div>
-                  <div className="config-card-check">✓</div>
-                </div>
+        {/* Dual Tab Switcher Buttons */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "14px",
+          marginBottom: "32px",
+          flexWrap: "wrap"
+        }}>
+          <button
+            type="button"
+            onClick={() => setActiveTableTab("standings")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "12px 28px",
+              borderRadius: "14px",
+              background: activeTableTab === "standings"
+                ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)"
+                : "rgba(16, 32, 60, 0.65)",
+              color: activeTableTab === "standings" ? "#030812" : "#80d0ff",
+              border: activeTableTab === "standings" ? "1px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.25)",
+              fontSize: "16px",
+              fontWeight: "800",
+              cursor: "pointer",
+              boxShadow: activeTableTab === "standings" ? "0 0 25px rgba(0, 229, 255, 0.5)" : "none",
+              transition: "all 0.2s ease"
+            }}
+          >
+            🏆 ตารางคะแนนการแข่งขัน
+          </button>
 
-                <div
-                  className={`config-card ${threeSecMode === "3sets" ? "selected" : ""}`}
-                  onClick={() => setThreeSecMode("3sets")}
-                >
-                  <div className="config-card-visual">
-                    <div className="set-bar-diagram">
-                      <div className="set-bar color-1" style={{ flex: 10 }}><span>10</span></div>
-                      <div className="set-bar color-2" style={{ flex: 10 }}><span>10</span></div>
-                      <div className="set-bar color-3" style={{ flex: 5 }}><span>5</span></div>
-                    </div>
-                  </div>
-                  <div className="config-card-label">3 ชุด</div>
-                  <div className="config-card-desc">10 / 10 / 5 ข้อ</div>
-                  <div className="config-card-check">✓</div>
-                </div>
+          <button
+            type="button"
+            onClick={() => setActiveTableTab("poll")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "12px 28px",
+              borderRadius: "14px",
+              background: activeTableTab === "poll"
+                ? "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)"
+                : "rgba(16, 32, 60, 0.65)",
+              color: activeTableTab === "poll" ? "#030812" : "#ffd700",
+              border: activeTableTab === "poll" ? "1px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.25)",
+              fontSize: "16px",
+              fontWeight: "800",
+              cursor: "pointer",
+              boxShadow: activeTableTab === "poll" ? "0 0 25px rgba(255, 215, 0, 0.5)" : "none",
+              transition: "all 0.2s ease"
+            }}
+          >
+            📊 ตารางอันดับโพลล์ (Poll)
+          </button>
+        </div>
 
-                <div
-                  className={`config-card ${threeSecMode === "5sets" ? "selected" : ""}`}
-                  onClick={() => setThreeSecMode("5sets")}
-                >
-                  <div className="config-card-visual">
-                    <div className="set-bar-diagram">
-                      <div className="set-bar color-1" style={{ flex: 5 }}><span>5</span></div>
-                      <div className="set-bar color-2" style={{ flex: 5 }}><span>5</span></div>
-                      <div className="set-bar color-3" style={{ flex: 5 }}><span>5</span></div>
-                      <div className="set-bar color-4" style={{ flex: 5 }}><span>5</span></div>
-                      <div className="set-bar color-5" style={{ flex: 5 }}><span>5</span></div>
-                    </div>
-                  </div>
-                  <div className="config-card-label">5 ชุด</div>
-                  <div className="config-card-desc">5/5/5/5/5 ข้อ</div>
-                  <div className="config-card-check">✓</div>
-                </div>
+        {/* ========================================================
+            BROADCAST LIVE PULSE HUD TICKER
+           ======================================================== */}
+        <div style={{
+          background: "linear-gradient(90deg, rgba(3, 15, 38, 0.95) 0%, rgba(10, 30, 60, 0.9) 50%, rgba(3, 15, 38, 0.95) 100%)",
+          border: "1px solid rgba(0, 229, 255, 0.35)",
+          borderRadius: "16px",
+          padding: "14px 22px",
+          marginBottom: "32px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "16px",
+          boxShadow: "0 4px 25px rgba(0, 229, 255, 0.15)"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+              background: "rgba(239, 68, 68, 0.2)",
+              border: "1px solid rgba(239, 68, 68, 0.6)",
+              color: "#ff7875",
+              fontSize: "12px",
+              fontWeight: "900",
+              letterSpacing: "1px"
+            }}>
+              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444" }}></span>
+              LIVE FEED
+            </span>
+            <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>
+              แข่งแล้ว <strong style={{ color: "#00e5ff" }}>{currentN}</strong> / {targetN} คน
+            </span>
+            <span style={{ color: "rgba(255,255,255,0.3)" }}>•</span>
+            <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>
+              การันตี 5 คนสุดท้ายแล้ว <strong style={{ color: "#86efac" }}>{qualifiedCount}</strong> คน
+            </span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
+              👑 คะแนนสูงสุด: <strong style={{ color: "#ffd700", fontSize: "16px" }}>{highestScore}</strong> คะแนน
+            </div>
+            {rank5Info && (
+              <div style={{
+                fontSize: "13px",
+                color: "#ffd700",
+                background: "rgba(255, 215, 0, 0.12)",
+                padding: "4px 12px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255, 215, 0, 0.3)"
+              }}>
+                🎯 เกณฑ์อันดับ 5: <strong>{rank5Info.shortNames}</strong> ({rank5Info.score} คะแนน)
               </div>
+            )}
+          </div>
+        </div>
 
-              {/* Set Headers Input - show when 1 or more sets */}
-              {getSetCount(threeSecMode) >= 1 && (
-                <div className="set-headers-config">
-                  <div className="set-headers-config-title">
-                    📝 หัวข้อประจำแต่ละชุด
-                  </div>
-                  {getSetSizes(threeSecMode).map((size, idx) => (
-                    <div className="set-header-input-group" key={idx}>
-                      <span className="set-header-input-label">ชุดที่ {idx + 1} ({size} ข้อ)</span>
-                      <input
-                        type="text"
-                        className="set-header-input"
-                        value={threeSecSetHeaders[idx] || ""}
-                        onChange={(e) => handleSetHeaderChange(idx, e.target.value)}
-                        placeholder={`เช่น นี่คือภาพของนักร้องคนใด`}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Jigsaw Config */}
-            <section className="config-section">
-              <h2 className="config-section-title">
-                <span className="section-icon">🧩</span>
-                จิ๊กซอว์ — รูปแบบภาพ
-              </h2>
-              <div className="config-cards-row jigsaw-config-row">
-                <div
-                  className={`config-card ${jigsawMode === "portrait" ? "selected" : ""}`}
-                  onClick={() => setJigsawMode("portrait")}
+        {/* ========================================================
+            TAB 1: LIVE TOURNAMENT STANDINGS
+           ======================================================== */}
+        {activeTableTab === "standings" && (
+          <div key="standings-tab-view" className="table-slide-down">
+            {!hasStartedCompetition ? (
+              <div style={{
+                textAlign: "center",
+                padding: "80px 24px",
+                background: "linear-gradient(150deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                borderRadius: "20px",
+                border: "1px dashed rgba(0, 229, 255, 0.4)",
+                boxShadow: "0 10px 40px rgba(0,0,0,0.5)"
+              }}>
+                <div style={{ fontSize: "56px", marginBottom: "16px" }}>⏳</div>
+                <h3 style={{
+                  fontSize: "28px",
+                  fontWeight: "900",
+                  color: "#ffd700",
+                  letterSpacing: "1px",
+                  marginBottom: "12px",
+                  textShadow: "0 2px 10px rgba(255, 215, 0, 0.3)"
+                }}>
+                  ยังไม่เริ่มต้นการแข่งขัน
+                </h3>
+                <p style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.7)", maxWidth: "520px", margin: "0 auto 28px", lineHeight: "1.6" }}>
+                  ตารางคะแนนจะเริ่มแสดงผลแบบเรียลไทม์ทันทีที่มีการบันทึกคะแนนจากห้องควบคุมการแข่งขัน
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTableTab("poll")}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "12px 24px",
+                    borderRadius: "24px",
+                    background: "rgba(0, 229, 255, 0.15)",
+                    border: "1px solid #00e5ff",
+                    color: "#00e5ff",
+                    fontWeight: "700",
+                    fontSize: "15px",
+                    cursor: "pointer",
+                    boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)"
+                  }}
                 >
-                  <div className="config-card-visual">
-                    <div className="jigsaw-shape-preview portrait-shape">
-                      <div className="shape-grid">
-                        {[...Array(25)].map((_, i) => <span key={i}></span>)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="config-card-label">แนวตั้ง</div>
-                  <div className="config-card-desc">3 : 4</div>
-                  <div className="config-card-check">✓</div>
-                </div>
-
-                <div
-                  className={`config-card ${jigsawMode === "landscape" ? "selected" : ""}`}
-                  onClick={() => setJigsawMode("landscape")}
-                >
-                  <div className="config-card-visual">
-                    <div className="jigsaw-shape-preview landscape-shape">
-                      <div className="shape-grid">
-                        {[...Array(25)].map((_, i) => <span key={i}></span>)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="config-card-label">แนวนอน</div>
-                  <div className="config-card-desc">4 : 3</div>
-                  <div className="config-card-check">✓</div>
-                </div>
-
-                <div
-                  className={`config-card ${jigsawMode === "square" ? "selected" : ""}`}
-                  onClick={() => setJigsawMode("square")}
-                >
-                  <div className="config-card-visual">
-                    <div className="jigsaw-shape-preview square-shape">
-                      <div className="shape-grid">
-                        {[...Array(25)].map((_, i) => <span key={i}></span>)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="config-card-label">จัตุรัส</div>
-                  <div className="config-card-desc">1 : 1</div>
-                  <div className="config-card-check">✓</div>
-                </div>
+                  📊 ดูตารางอันดับโพลล์ (Poll) คลิกที่นี่
+                </button>
               </div>
+            ) : (
+              <div>
+                {/* Top 5 Finalist Showcase Cards */}
+                {top5Contestants.length > 0 && (
+                  <div style={{ marginBottom: "36px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                      <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
+                        <span>🌟</span> โถง 5 คนสุดท้าย (Top 5 Finalists Spotlight)
+                      </h3>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>คลิกที่การ์ดเพื่อดูสถิติเจาะลึก</span>
+                    </div>
 
-              <div className="jigsaw-inputs-container" style={{ marginTop: "16px" }}>
-                <div className="q-input-group">
-                  <label htmlFor="jigsawImage">🖼️ ลิงก์รูปภาพจิ๊กซอว์ (Image Path / URL)</label>
-                  <input
-                    type="text"
-                    id="jigsawImage"
-                    placeholder="เช่น images/jigsaw_answer.jpg หรือ URL รูปภาพ"
-                    value={jigsawImage}
-                    onChange={(e) => setJigsawImage(e.target.value)}
-                  />
-                </div>
-                <div className="q-input-group">
-                  <label htmlFor="jigsawQuestion">❓ คำถามของภาพจิ๊กซอว์</label>
-                  <input
-                    type="text"
-                    id="jigsawQuestion"
-                    placeholder="เช่น ภาพต่อไปนี้คือสถานที่ใด"
-                    value={jigsawQuestion}
-                    onChange={(e) => setJigsawQuestion(e.target.value)}
-                  />
-                </div>
-                <div className="q-input-group">
-                  <label htmlFor="jigsawAnswer">🔑 คำตอบของภาพจิ๊กซอว์</label>
-                  <input
-                    type="text"
-                    id="jigsawAnswer"
-                    placeholder="เช่น Tilly Birds"
-                    value={jigsawAnswer}
-                    onChange={(e) => setJigsawAnswer(e.target.value)}
-                  />
-                </div>
-              </div>
-            </section>
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+                      gap: "14px"
+                    }}>
+                      {top5Contestants.map((c) => {
+                        const st = evaluatePlayerStatus(c, denseRankedLeaderboard, targetN);
+                        const isRank1 = c.rank === 1;
+                        return (
+                          <div
+                            key={c.id}
+                            onClick={() => setSelectedSpotlight(c)}
+                            style={{
+                              background: isRank1
+                                ? "linear-gradient(150deg, rgba(255, 215, 0, 0.18) 0%, rgba(20, 25, 45, 0.95) 100%)"
+                                : "linear-gradient(150deg, rgba(0, 229, 255, 0.1) 0%, rgba(10, 20, 38, 0.95) 100%)",
+                              border: isRank1 ? "2px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.35)",
+                              borderRadius: "16px",
+                              padding: "18px 14px",
+                              textAlign: "center",
+                              cursor: "pointer",
+                              position: "relative",
+                              transition: "all 0.25s ease",
+                              boxShadow: isRank1 ? "0 8px 30px rgba(255, 215, 0, 0.25)" : "0 4px 20px rgba(0,0,0,0.4)"
+                            }}
+                          >
+                            <div style={{
+                              position: "absolute",
+                              top: "10px",
+                              left: "10px",
+                              padding: "2px 8px",
+                              borderRadius: "10px",
+                              fontSize: "11px",
+                              fontWeight: "900",
+                              background: isRank1 ? "#ffd700" : "rgba(0, 229, 255, 0.2)",
+                              color: isRank1 ? "#000" : "#00e5ff"
+                            }}>
+                              {c.rank === 1 ? "🥇 NO. 1" : c.rank === 2 ? "🥈 NO. 2" : c.rank === 3 ? "🥉 NO. 3" : `NO. ${c.rank}`}
+                            </div>
 
-            {/* 3 Seconds Questions Editor Accordion */}
-            <section className="config-section">
-              <div className={`config-accordion ${isAccordionOpen ? "active" : ""}`} id="accordionQuestions">
-                <div className="config-accordion-header" onClick={() => setIsAccordionOpen(!isAccordionOpen)}>
-                  <span>✏️ แก้ไขข้อมูลคำถาม 3 วินาที (คำถาม 25 ข้อ)</span>
-                  <span className="accordion-arrow">▼</span>
-                </div>
-                <div
-                  className="config-accordion-content"
-                  style={{ maxHeight: isAccordionOpen ? "700px" : "0px", padding: isAccordionOpen ? "20px" : "0px" }}
-                >
-                  <div className="questions-editor-grid" id="threeSecQuestionsEditor">
-                    {threeSecQuestions.map((q, i) => (
-                      <div className="q-edit-row" key={i}>
-                        <div className="q-edit-number">{i + 1}</div>
-                        <div className="q-input-group">
-                          <label>คำถาม</label>
-                          <input
-                            type="text"
-                            value={q.question || ""}
-                            onChange={(e) => handleQuestionChange(i, "question", e.target.value)}
-                            placeholder={`คำถามข้อที่ ${i + 1}`}
-                          />
-                        </div>
-                        <div className="q-input-group">
-                          <label>รูปภาพ (เว้นว่างได้)</label>
-                          <input
-                            type="text"
-                            value={q.image || ""}
-                            onChange={(e) => handleQuestionChange(i, "image", e.target.value)}
-                            placeholder={`เช่น images/q${i + 1}.jpg`}
-                          />
-                        </div>
-                        <div className="q-input-group">
-                          <label>เสียง (เว้นว่างได้)</label>
-                          <input
-                            type="text"
-                            value={q.audio || ""}
-                            onChange={(e) => handleQuestionChange(i, "audio", e.target.value)}
-                            placeholder={`เช่น audio/q${i + 1}.mp3`}
-                          />
-                        </div>
-                        <div className="q-input-group">
-                          <label>คำตอบ</label>
-                          <input
-                            type="text"
-                            value={q.answer || ""}
-                            onChange={(e) => handleQuestionChange(i, "answer", e.target.value)}
-                            placeholder="คำตอบที่ถูกต้อง"
-                          />
-                        </div>
-                      </div>
+                            <div style={{
+                              width: "70px",
+                              height: "70px",
+                              borderRadius: "50%",
+                              margin: "12px auto 10px",
+                              overflow: "hidden",
+                              border: isRank1 ? "3px solid #ffd700" : "2px solid #00e5ff",
+                              boxShadow: isRank1 ? "0 0 16px rgba(255, 215, 0, 0.6)" : "0 0 10px rgba(0, 229, 255, 0.4)",
+                              background: "#081020"
+                            }}>
+                              {c.image ? (
+                                <img src={c.image} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              ) : (
+                                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px" }}>👤</div>
+                              )}
+                            </div>
+
+                            <h4 style={{ fontSize: "15px", fontWeight: "800", color: "#fff", margin: "0 0 2px" }}>
+                              {c.nickname ? `${c.nickname} (${c.name})` : c.name}
+                            </h4>
+                            <p style={{ fontSize: "12px", color: "#80d0ff", margin: "0 0 10px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {c.topic}
+                            </p>
+
+                            <div style={{
+                              fontSize: "24px",
+                              fontWeight: "900",
+                              color: isRank1 ? "#ffd700" : "#00e5ff",
+                              textShadow: "0 0 12px currentColor"
+                            }}>
+                              {c.totalScore ?? 0} <span style={{ fontSize: "12px", fontWeight: "600", color: "rgba(255,255,255,0.6)" }}>แต้ม</span>
+                            </div>
+
+                            <div style={{ marginTop: "8px" }}>
+                              <span style={{
+                                fontSize: "11px",
+                                padding: "3px 8px",
+                                borderRadius: "12px",
+                                fontWeight: "700",
+                                background: st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.2)" : "rgba(234, 179, 8, 0.2)",
+                                color: st.isGuaranteedQualified ? "#86efac" : "#fde047"
+                              }}>
+                                {st.statusText}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Search & Filter Bar */}
+                <div style={{
+                  background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                  border: "1px solid rgba(0, 229, 255, 0.25)",
+                  borderRadius: "14px",
+                  padding: "14px 18px",
+                  marginBottom: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "12px"
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: "1", minWidth: "260px" }}>
+                    <span style={{ fontSize: "16px" }}>🔍</span>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="ค้นหาชื่อจริง, ชื่อเล่น หรือหัวข้อแฟนพันธุ์แท้..."
+                      style={{
+                        width: "100%",
+                        background: "rgba(0, 15, 30, 0.8)",
+                        border: "1px solid rgba(0, 229, 255, 0.3)",
+                        borderRadius: "8px",
+                        padding: "8px 14px",
+                        color: "#fff",
+                        fontSize: "14px",
+                        outline: "none"
+                      }}
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: "14px" }}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>กรองสถานะ:</span>
+                    {[
+                      { key: "all", label: "ทั้งหมด" },
+                      { key: "qualified", label: "🟢 เข้ารอบ" },
+                      { key: "pending", label: "⏳ รอผล" },
+                      { key: "eliminated", label: "🔴 ตกรอบ" },
+                    ].map((f) => (
+                      <button
+                        key={f.key}
+                        type="button"
+                        onClick={() => setStatusFilter(f.key)}
+                        style={{
+                          padding: "5px 12px",
+                          borderRadius: "20px",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          background: statusFilter === f.key ? "#00e5ff" : "rgba(255,255,255,0.06)",
+                          color: statusFilter === f.key ? "#030812" : "rgba(255,255,255,0.8)",
+                          border: "none",
+                          cursor: "pointer",
+                          transition: "all 0.15s"
+                        }}
+                      >
+                        {f.label}
+                      </button>
                     ))}
                   </div>
                 </div>
-              </div>
-            </section>
 
-            <button onClick={handleSaveConfig} className="btn-start config-save-btn">
-              <span className="btn-text">💾 บันทึกการตั้งค่า</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ==============================
-           MAIN GAME PANEL
-           ============================== */}
-      {currentPanel === "game" && (
-        <div id="gamePanel" className="panel active">
-          {/* Top Header Bar */}
-          <header className="game-header" id="gameHeader">
-            <div className="header-left">
-              <div className="topic-badge" id="topicBadge">
-                <span className="badge-label">หัวข้อ</span>
-                <span className="badge-value" id="topicDisplay">{topic || "-"}</span>
-              </div>
-            </div>
-            <div className="header-center">
-              {currentGame && (
-                <div className="current-game-indicator" id="currentGameIndicator">
-                  <span className="game-indicator-icon">
-                    {currentGame === "3sec" && "⏱️"}
-                    {currentGame === "qa" && "❓"}
-                    {currentGame === "jigsaw" && "🧩"}
-                    {currentGame === "attribute" && "🎯"}
-                  </span>
-                  <span className="game-indicator-text">
-                    {currentGame === "3sec" && "หมวด 1: 3 วินาที"}
-                    {currentGame === "qa" && "หมวด 2: ถาม-ตอบ"}
-                    {currentGame === "jigsaw" && "หมวด 3: จิ๊กซอว์"}
-                    {currentGame === "attribute" && "หมวด 4: คุณสมบัติ"}
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="header-right">
-              <div className="score-panel">
-                <div className="total-score-box">
-                  <span className="total-label">Total</span>
-                  <span className="total-value" id="totalScoreDisplay">{totalScore}</span>
-                </div>
-                <div className="category-scores">
-                  <div className="cat-score" id="catScore1" title="3 วินาที">
-                    <span className="cat-label">3วิ</span>
-                    <span className="cat-value">{scores["3sec"] !== null ? scores["3sec"] : "-"}</span>
-                  </div>
-                  <div className="cat-score" id="catScore2" title="ถาม-ตอบ">
-                    <span className="cat-label">ถาม</span>
-                    <span className="cat-value">{scores["qa"] !== null ? scores["qa"] : "-"}</span>
-                  </div>
-                  <div className="cat-score" id="catScore3" title="จิ๊กซอว์">
-                    <span className="cat-label">จิ๊ก</span>
-                    <span className="cat-value">{scores["jigsaw"] !== null ? scores["jigsaw"] : "-"}</span>
-                  </div>
-                  <div className="cat-score" id="catScore4" title="คุณสมบัติ">
-                    <span className="cat-label">คุณ</span>
-                    <span className="cat-value">{scores["attribute"] !== null ? scores["attribute"] : "-"}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="contestant-box">
-                <span className="contestant-name" id="contestantDisplay">{contestantName || "ผู้เข้าแข่งขัน"}</span>
-              </div>
-            </div>
-          </header>
-
-          {/* Game Menu */}
-          {currentGame === null && (
-            <div id="gameMenu" className="game-menu">
-              <h2 className="menu-title">เลือกหมวดเกม</h2>
-              <div className="menu-grid">
-                <button
-                  className={`game-card ${scores["3sec"] !== null ? "completed" : ""}`}
-                  id="menuCard1"
-                  onClick={() => setCurrentGame("3sec")}
-                >
-                  <div className="card-glow"></div>
-                  <div className="card-content">
-                    <div className="card-number">1</div>
-                    <div className="card-icon">⏱️</div>
-                    <h3>3 วินาที</h3>
-                    <p>25 คำถาม • 1 คะแนน/ข้อ</p>
-                    <div className="card-score-display" id="menuScore1">
-                      {scores["3sec"] !== null ? scores["3sec"] : "-"}
-                    </div>
-                  </div>
-                </button>
-                <button
-                  className={`game-card ${scores["qa"] !== null ? "completed" : ""}`}
-                  id="menuCard2"
-                  onClick={() => setCurrentGame("qa")}
-                >
-                  <div className="card-glow"></div>
-                  <div className="card-content">
-                    <div className="card-number">2</div>
-                    <div className="card-icon">❓</div>
-                    <h3>ถาม-ตอบ</h3>
-                    <p>1 คำถาม • 25 คะแนน</p>
-                    <div className="card-score-display" id="menuScore2">
-                      {scores["qa"] !== null ? scores["qa"] : "-"}
-                    </div>
-                  </div>
-                </button>
-                <button
-                  className={`game-card ${scores["jigsaw"] !== null ? "completed" : ""}`}
-                  id="menuCard3"
-                  onClick={() => setCurrentGame("jigsaw")}
-                >
-                  <div className="card-glow"></div>
-                  <div className="card-content">
-                    <div className="card-number">3</div>
-                    <div className="card-icon">🧩</div>
-                    <h3>จิ๊กซอว์</h3>
-                    <p>ภาพปริศนา • 25 คะแนน</p>
-                    <div className="card-score-display" id="menuScore3">
-                      {scores["jigsaw"] !== null ? scores["jigsaw"] : "-"}
-                    </div>
-                  </div>
-                </button>
-                <button
-                  className={`game-card ${scores["attribute"] !== null ? "completed" : ""}`}
-                  id="menuCard4"
-                  onClick={() => setCurrentGame("attribute")}
-                >
-                  <div className="card-glow"></div>
-                  <div className="card-content">
-                    <div className="card-number">4</div>
-                    <div className="card-icon">🎯</div>
-                    <h3>คุณสมบัติ</h3>
-                    <p>5 ข้อมูล • 25 คะแนน</p>
-                    <div className="card-score-display" id="menuScore4">
-                      {scores["attribute"] !== null ? scores["attribute"] : "-"}
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Game Content Area */}
-          {currentGame !== null && (
-            <div id="gameContent" className="game-content active">
-              {currentGame === "3sec" && (
-                <ThreeSecondsGame
-                  threeSecQuestions={threeSecQuestions}
-                  threeSecMode={threeSecMode}
-                  threeSecSetHeaders={threeSecSetHeaders}
-                  onComplete={(score) => {
-                    setGameScore("3sec", score);
-                  }}
-                  onResult={showResultPopup}
-                  onBack={() => setCurrentGame(null)}
-                />
-              )}
-              {currentGame === "qa" && (
-                <QAGame
-                  onComplete={(score) => {
-                    setGameScore("qa", score);
-                  }}
-                  onResult={showResultPopup}
-                  onBack={() => setCurrentGame(null)}
-                />
-              )}
-              {currentGame === "jigsaw" && (
-                <JigsawGame
-                  jigsawMode={jigsawMode}
-                  jigsawImage={jigsawImage}
-                  jigsawAnswer={jigsawAnswer}
-                  jigsawQuestion={jigsawQuestion}
-                  onComplete={(score) => {
-                    setGameScore("jigsaw", score);
-                  }}
-                  onResult={showResultPopup}
-                  onBack={() => setCurrentGame(null)}
-                />
-              )}
-              {currentGame === "attribute" && (
-                <AttributeGame
-                  onComplete={(score) => {
-                    setGameScore("attribute", score);
-                  }}
-                  onResult={showResultPopup}
-                  onBack={() => setCurrentGame(null)}
-                />
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Result Overlay */}
-      {resultOverlay.show && (
-        <div id="resultOverlay" className="result-overlay active">
-          <div className="result-card">
-            <div className="result-icon" id="resultIcon">{resultOverlay.icon}</div>
-            <div className="result-text" id="resultText">{resultOverlay.text}</div>
-            <div className="result-score" id="resultScore">
-              {resultOverlay.score !== null ? `+${resultOverlay.score} คะแนน` : ""}
-            </div>
-            <button className="btn-result-ok" onClick={closeResultPopup}>ตกลง</button>
-          </div>
-        </div>
-      )}
-    </main>
-  );
-}
-
-// ==========================================
-// ⏱️ SUB-COMPONENT: GAME 1 (3 SECONDS)
-// ==========================================
-function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders = [], onComplete, onResult, onBack }) {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [startQ, setStartQ] = useState(0);
-  const [endQ, setEndQ] = useState(25);
-  const [totalInSet, setTotalInSet] = useState(25);
-  const [currentQ, setCurrentQ] = useState(0);
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(3.0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [roundActive, setRoundActive] = useState(false);
-  const [answerRevealed, setAnswerRevealed] = useState(false);
-  const [isRoundCorrect, setIsRoundCorrect] = useState(null); // true = correct, false = incorrect, null = skip/pending
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-
-  const timerRef = useRef(null);
-  const audioRef = useRef(null);
-  const circumference = 326.73;
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
-  const startRoundWithSet = (start, end, idx) => {
-    setStartQ(start);
-    setEndQ(end);
-    setTotalInSet(end - start);
-    setCurrentQ(start);
-    setScore(0);
-    setTimeLeft(3.0);
-    setIsRunning(false);
-    setRoundActive(false);
-    setAnswerRevealed(false);
-    setIsRoundCorrect(null);
-    setIsGameOver(false);
-    setGameStarted(true);
-    setIsAudioPlaying(false);
-  };
-
-  const startTimer = () => {
-    if (isRunning) return;
-    setIsRunning(true);
-    setRoundActive(true);
-
-    const startTime = Date.now();
-    const duration = 3000;
-
-    timerRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, (duration - elapsed) / 1000);
-      setTimeLeft(remaining);
-
-      if (remaining <= 0) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-        setIsRunning(false);
-        setTimeLeft(0.0);
-      }
-    }, 50);
-  };
-
-  const playQuestionAudio = (forceRestart = true) => {
-    const q = threeSecQuestions[currentQ];
-    if (!q?.audio) {
-      startTimer();
-      return;
-    }
-
-    if (audioRef.current && forceRestart) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-
-    if (!audioRef.current || forceRestart) {
-      const audioPath = resolveImagePath(q.audio);
-      const audio = new Audio(audioPath);
-      audioRef.current = audio;
-
-      audio.onplay = () => setIsAudioPlaying(true);
-      audio.onended = () => {
-        setIsAudioPlaying(false);
-      };
-      audio.onpause = () => setIsAudioPlaying(false);
-    }
-
-    setRoundActive(true); // Reveal question box when audio starts
-    audioRef.current.play().catch(err => {
-      console.error("Audio play failed:", err);
-      setIsAudioPlaying(false);
-    });
-  };
-
-  const handleAnswer = (correct) => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    setIsRunning(false);
-    setAnswerRevealed(true);
-    setIsRoundCorrect(correct);
-  };
-
-  const handleSkip = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    setIsRunning(false);
-    setAnswerRevealed(true);
-    setIsRoundCorrect(null); // null is skip
-  };
-
-  const handleNextQ = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    if (isRoundCorrect === true) {
-      const nextScore = score + 1;
-      const nextQ = currentQ + 1;
-      setScore(nextScore);
-      
-      if (nextQ >= endQ) {
-        setIsGameOver(true);
-        onComplete(nextScore);
-      } else {
-        setCurrentQ(nextQ);
-        setTimeLeft(3.0);
-        setRoundActive(false);
-        setAnswerRevealed(false);
-        setIsRoundCorrect(null);
-        setIsAudioPlaying(false);
-      }
-    } else if (isRoundCorrect === false) {
-      handleEndGame(false);
-    } else {
-      // Skipped
-      const nextQ = currentQ + 1;
-      if (nextQ >= endQ) {
-        setIsGameOver(true);
-        onComplete(score);
-      } else {
-        setCurrentQ(nextQ);
-        setTimeLeft(3.0);
-        setRoundActive(false);
-        setAnswerRevealed(false);
-        setIsRoundCorrect(null);
-        setIsAudioPlaying(false);
-      }
-    }
-  };
-
-  const handleEndGame = (completed) => {
-    setIsGameOver(true);
-    onComplete(score);
-  };
-
-  const getTimerProgressStyle = () => {
-    const offset = circumference * (1 - timeLeft / 3);
-    let stroke = "var(--accent)";
-    if (timeLeft <= 1.0) stroke = "#ff1744";
-    else if (timeLeft <= 2.0) stroke = "#ff9100";
-
-    return {
-      strokeDashoffset: offset,
-      stroke,
-    };
-  };
-
-  const getTimerTextColor = () => {
-    if (timeLeft <= 1.0) return "#ff1744";
-    if (timeLeft <= 2.0) return "#ff9100";
-    return "#ffffff";
-  };
-
-  const getSetIndexForQuestion = (qIndex, mode) => {
-    if (mode === "1set") return 0;
-    if (mode === "2sets") {
-      if (qIndex < 15) return 0;
-      return 1;
-    }
-    if (mode === "3sets") {
-      if (qIndex < 10) return 0;
-      if (qIndex < 20) return 1;
-      return 2;
-    }
-    if (mode === "5sets") {
-      if (qIndex < 5) return 0;
-      if (qIndex < 10) return 1;
-      if (qIndex < 15) return 2;
-      if (qIndex < 20) return 3;
-      return 4;
-    }
-    return 0;
-  };
-
-  // Generate sets selection HTML
-  if (!gameStarted) {
-    let setsInfo = [];
-    if (threeSecMode === "1set") {
-      setsInfo = [{ name: "ชุดที่ 1", count: 25, header: threeSecSetHeaders[0] }];
-    } else if (threeSecMode === "2sets") {
-      setsInfo = [
-        { name: "ชุดที่ 1", count: 15, header: threeSecSetHeaders[0] },
-        { name: "ชุดที่ 2", count: 10, header: threeSecSetHeaders[1] },
-      ];
-    } else if (threeSecMode === "3sets") {
-      setsInfo = [
-        { name: "ชุดที่ 1", count: 10, header: threeSecSetHeaders[0] },
-        { name: "ชุดที่ 2", count: 10, header: threeSecSetHeaders[1] },
-        { name: "ชุดที่ 3", count: 5, header: threeSecSetHeaders[2] },
-      ];
-    } else if (threeSecMode === "5sets") {
-      setsInfo = [
-        { name: "ชุดที่ 1", count: 5, header: threeSecSetHeaders[0] },
-        { name: "ชุดที่ 2", count: 5, header: threeSecSetHeaders[1] },
-        { name: "ชุดที่ 3", count: 5, header: threeSecSetHeaders[2] },
-        { name: "ชุดที่ 4", count: 5, header: threeSecSetHeaders[3] },
-        { name: "ชุดที่ 5", count: 5, header: threeSecSetHeaders[4] },
-      ];
-    }
-
-    return (
-      <div className="waiting-start">
-        <div className="waiting-title">⏱️ 3 วินาที</div>
-        <div className="waiting-desc">
-          ตอบคำถามให้ถูกต้องภายใน 3 วินาทีต่อข้อ<br />
-          <strong>ตอบถูก = +1 คะแนน | ตอบผิด = จบการแข่งขันทันที!</strong><br />
-          ระบบจะเล่นต่อกันทุกชุดโดยอัตโนมัติอย่างต่อเนื่อง
-        </div>
-
-        <div className="three-sec-roadmap-container" style={{
-          background: "rgba(255, 255, 255, 0.03)",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          borderRadius: "16px",
-          padding: "24px",
-          width: "100%",
-          maxWidth: "500px",
-          margin: "20px auto",
-          textAlign: "left"
-        }}>
-          <div style={{ fontSize: "16px", fontWeight: "700", color: "var(--gold)", marginBottom: "16px", textAlign: "center" }}>
-            📋 โครงสร้างชุดคำถาม ({threeSecMode === "1set" ? "1 ชุด" : threeSecMode === "2sets" ? "2 ชุด" : threeSecMode === "3sets" ? "3 ชุด" : "5 ชุด"} - รวม 25 ข้อ)
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            {setsInfo.map((s, idx) => (
-              <div key={idx} style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "12px",
-                background: "rgba(255, 255, 255, 0.03)",
-                padding: "12px 16px",
-                borderRadius: "10px",
-                borderLeft: "4px solid var(--gold)"
-              }}>
+                {/* Legend Bar
                 <div style={{
-                  background: "var(--gradient-gold)",
-                  color: "var(--primary)",
-                  borderRadius: "50%",
-                  width: "24px",
-                  height: "24px",
+                  display: "flex",
+                  gap: "20px",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  background: "rgba(0, 15, 30, 0.6)",
+                  padding: "10px 18px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  marginBottom: "16px",
+                  fontSize: "13px"
+                }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#86efac", fontWeight: "600" }}>
+                    <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }}></span>
+                    🟢 เข้ารอบ: การันตี 5 คนสุดท้ายแน่นอนแล้ว (หรือได้ 100 คะแนนเต็ม)
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#fde047", fontWeight: "600" }}>
+                    <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#eab308", display: "inline-block" }}></span>
+                    ⏳ รอผล: ยังมีสิทธิ์ลุ้นติด 5 อันดับแรก
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#fca5a5", fontWeight: "600" }}>
+                    <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ef4444", display: "inline-block" }}></span>
+                    🔴 ตกรอบ: มีผู้ทำคะแนนสูงกว่า 5 อันดับแน่นอนแล้ว หรือคะแนนสูงสุดไม่สามารถถึงอันดับ 5 ได้
+                  </span>
+                </div> */}
+
+                {/* Tournament Graphics Container (THE FAN TOURNAMENT 2026/27) */}
+                <div style={{
+                  overflowX: "auto",
+                  padding: "10px 4px 20px"
+                }}>
+                  <div style={{ minWidth: "980px" }}>
+                    {/* Top Main Tournament Banner Pill */}
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      background: "linear-gradient(90deg, #020712 0%, #0a172e 50%, #020712 100%)",
+                      border: "2px solid rgba(255, 255, 255, 0.4)",
+                      borderRadius: "14px",
+                      transform: "skewX(-16deg)",
+                      padding: "10px 30px",
+                      marginBottom: "16px",
+                      boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7), inset 0 1px 3px rgba(255, 255, 255, 0.6)"
+                    }}>
+                      <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "12px" }}>
+                        <span style={{ fontSize: "20px" }}>🏆</span>
+                        <h2 style={{
+                          fontStyle: "italic",
+                          fontWeight: "900",
+                          fontSize: "20px",
+                          letterSpacing: "2px",
+                          color: "#ffffff",
+                          margin: 0,
+                          textShadow: "0 2px 10px rgba(0,0,0,0.8)"
+                        }}>
+                          THE FAN TOURNAMENT 2026/27 • STANDINGS
+                        </h2>
+                      </div>
+                      <div style={{ transform: "skewX(16deg)", fontSize: "12px", color: "rgba(255,255,255,0.7)", fontStyle: "italic" }}>
+                        แฟนพันธุ์แท้แห่งปี 2026
+                      </div>
+                    </div>
+
+                    {/* Column Headers Row (Slanted Pills matching the 5 score boxes) */}
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      marginBottom: "10px"
+                    }}>
+                      {/* Left spacer for rank & contestant */}
+                      <div style={{ width: "56px" }}></div>
+                      <div style={{ flex: 1, paddingLeft: "8px" }}>
+                        <span style={{
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          color: "rgba(255,255,255,0.5)",
+                          textTransform: "uppercase",
+                          letterSpacing: "1px"
+                        }}>
+                          ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง)
+                        </span>
+                      </div>
+
+                      {/* 5 Column Header Pills */}
+                      <div style={{
+                        width: "74px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        transform: "skewX(-16deg)",
+                        background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)",
+                        border: "2px solid #52c41a",
+                        boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}>
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#86efac" }}>
+                          3 วินาที
+                        </span>
+                      </div>
+
+                      <div style={{
+                        width: "74px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        transform: "skewX(-16deg)",
+                        background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
+                        border: "2px solid #e0e0e0",
+                        boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}>
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>
+                          ถาม-ตอบ
+                        </span>
+                      </div>
+
+                      <div style={{
+                        width: "74px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        transform: "skewX(-16deg)",
+                        background: "linear-gradient(180deg, #300f13 0%, #150507 100%)",
+                        border: "2px solid #ff4d4f",
+                        boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}>
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#fca5a5" }}>
+                          จิ๊กซอว์
+                        </span>
+                      </div>
+
+                      <div style={{
+                        width: "74px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        transform: "skewX(-16deg)",
+                        background: "linear-gradient(180deg, #0a2538 0%, #03101a 100%)",
+                        border: "2px solid #00e5ff",
+                        boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}>
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>
+                          คุณสมบัติ
+                        </span>
+                      </div>
+
+                      <div style={{
+                        width: "86px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        transform: "skewX(-16deg)",
+                        background: "linear-gradient(180deg, #332608 0%, #140e02 100%)",
+                        border: "2.5px solid #ffd700",
+                        boxShadow: "0 0 14px rgba(255, 215, 0, 0.5)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}>
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "13px", color: "#ffd700" }}>
+                          คะแนน
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Data Rows */}
+                    {filteredStandings.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(255,255,255,0.5)" }}>
+                        ไม่พบข้อมูลผู้เข้าแข่งขันที่ตรงกับการค้นหา
+                      </div>
+                    ) : (
+                      filteredStandings.map((item) => {
+                        const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+                        const isEliminated = evalStatus.isEliminated;
+                        const isTopSafe = (item.rank || 99) <= 4;
+                        const borderColor = isTopSafe ? "#ffd700" : isEliminated ? "#ff4d4f" : "#ffd700";
+                        const glowShadow = isTopSafe ? "0 0 14px rgba(255, 215, 0, 0.45)" : isEliminated ? "0 0 14px rgba(255, 77, 79, 0.45)" : "0 0 12px rgba(255, 215, 0, 0.35)";
+
+                        return (
+                          <div
+                            key={item.id}
+                            onClick={() => setSelectedSpotlight(item)}
+                            title="คลิกเพื่อดูสถิติและคะแนนเจาะลึก"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              marginBottom: "8px",
+                              cursor: "pointer",
+                              transition: "transform 0.15s ease, filter 0.15s ease"
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
+                              e.currentTarget.style.filter = "brightness(1.15)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "scale(1) translateX(0)";
+                              e.currentTarget.style.filter = "brightness(1)";
+                            }}
+                          >
+                            {/* 1. Slanted Rank Box */}
+                            <div style={{
+                              width: "56px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                              border: `2.5px solid ${borderColor}`,
+                              boxShadow: glowShadow,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "26px",
+                                color: item.rank === 1 ? "#ffd700" : "#ffffff",
+                                textShadow: item.rank === 1 ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)"
+                              }}>
+                                {item.rank}
+                              </span>
+                            </div>
+
+                            {/* 2. Slanted Contestant Info Pill */}
+                            <div style={{
+                              flex: 1,
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, rgba(14, 28, 52, 0.95) 0%, rgba(5, 12, 24, 0.98) 100%)",
+                              border: `2.5px solid ${borderColor}`,
+                              boxShadow: glowShadow,
+                              display: "flex",
+                              alignItems: "center",
+                              padding: "0 18px",
+                              overflow: "hidden"
+                            }}>
+                              <div style={{
+                                transform: "skewX(16deg)",
+                                width: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: "10px"
+                              }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                                  {/* Photo */}
+                                  <div style={{
+                                    width: "32px",
+                                    height: "32px",
+                                    borderRadius: "50%",
+                                    overflow: "hidden",
+                                    background: "rgba(0, 229, 255, 0.1)",
+                                    border: "1.5px solid #00e5ff",
+                                    flexShrink: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                  }}>
+                                    {item.image ? (
+                                      <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                    ) : (
+                                      <span style={{ fontSize: "15px" }}>👤</span>
+                                    )}
+                                  </div>
+
+                                  {/* Nickname & Full Name in True Tournament Typography */}
+                                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    <span style={{
+                                      fontStyle: "italic",
+                                      fontWeight: "900",
+                                      fontSize: "20px",
+                                      color: isTopSafe ? "#ffd700" : "#ffffff",
+                                      letterSpacing: "0.5px"
+                                    }}>
+                                      {item.nickname || item.name.split(" ")[0]}
+                                    </span>
+                                    <span style={{
+                                      fontStyle: "italic",
+                                      fontWeight: "700",
+                                      fontSize: "15px",
+                                      color: "rgba(255, 255, 255, 0.85)"
+                                    }}>
+                                      {item.name}
+                                    </span>
+                                    <span style={{
+                                      fontSize: "12px",
+                                      color: "#80d0ff",
+                                      fontStyle: "normal",
+                                      marginLeft: "6px",
+                                      opacity: 0.85
+                                    }}>
+                                      • {item.topic}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Status Chip */}
+                                <div style={{ flexShrink: 0 }}>
+                                  <span style={{
+                                    fontSize: "11px",
+                                    fontWeight: "800",
+                                    padding: "3px 8px",
+                                    borderRadius: "12px",
+                                    background: evalStatus.statusClass === "status-qualified"
+                                      ? "rgba(34, 197, 94, 0.25)"
+                                      : evalStatus.statusClass === "status-eliminated"
+                                      ? "rgba(239, 68, 68, 0.25)"
+                                      : "rgba(234, 179, 8, 0.25)",
+                                    color: evalStatus.statusClass === "status-qualified"
+                                      ? "#86efac"
+                                      : evalStatus.statusClass === "status-eliminated"
+                                      ? "#fca5a5"
+                                      : "#fde047",
+                                    border: `1px solid ${
+                                      evalStatus.statusClass === "status-qualified"
+                                        ? "#22c55e"
+                                        : evalStatus.statusClass === "status-eliminated"
+                                        ? "#ef4444"
+                                        : "#eab308"
+                                    }`
+                                  }}>
+                                    {evalStatus.statusText}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 3. Five Slanted Score Boxes */}
+                            {/* Score 1: 3 วินาที (Green Border) */}
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #102917 0%, #05130a 100%)",
+                              border: "2.5px solid #52c41a",
+                              boxShadow: "0 0 10px rgba(82, 196, 26, 0.35)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
+                                {item.scores?.["3sec"] ?? "-"}
+                              </span>
+                            </div>
+
+                            {/* Score 2: ถาม-ตอบ (Silver Border) */}
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #242a32 0%, #0f1216 100%)",
+                              border: "2.5px solid #d9d9d9",
+                              boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
+                                {item.scores?.qa ?? "-"}
+                              </span>
+                            </div>
+
+                            {/* Score 3: จิ๊กซอว์ (Red Border) */}
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #2d0e12 0%, #150507 100%)",
+                              border: "2.5px solid #ff4d4f",
+                              boxShadow: "0 0 10px rgba(255, 77, 79, 0.35)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
+                                {item.scores?.jigsaw ?? "-"}
+                              </span>
+                            </div>
+
+                            {/* Score 4: คุณสมบัติ (Cyan Border) */}
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #092436 0%, #031018 100%)",
+                              border: "2.5px solid #00e5ff",
+                              boxShadow: "0 0 10px rgba(0, 229, 255, 0.35)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
+                                {item.scores?.attribute ?? "-"}
+                              </span>
+                            </div>
+
+                            {/* Score 5: คะแนนรวม (Gold Border with Glow) */}
+                            <div style={{
+                              width: "86px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)",
+                              border: "3px solid #ffd700",
+                              boxShadow: "0 0 18px rgba(255, 215, 0, 0.55)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "26px",
+                                color: item.totalScore === 100 ? "#52c41a" : "#ffd700",
+                                textShadow: item.totalScore === 100 ? "0 0 14px rgba(82, 196, 26, 0.9)" : "0 0 12px rgba(255, 215, 0, 0.8)"
+                              }}>
+                                {item.totalScore ?? 0}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 2: POLL RANKING TABLE (ตารางอันดับโพลล์)
+           ======================================================== */}
+        {activeTableTab === "poll" && (
+          <div key="poll-tab-view" className="table-slide-down">
+            {/* Top 3 Poll Favorites Podium Cards */}
+            <div style={{ marginBottom: "32px" }}>
+              <div style={{ textAlign: "center", marginBottom: "16px" }}>
+                <span style={{
+                  fontSize: "13px",
+                  color: "#ffd700",
+                  fontWeight: "800",
+                  padding: "4px 16px",
+                  borderRadius: "20px",
+                  background: "rgba(255, 215, 0, 0.15)",
+                  border: "1px solid rgba(255, 215, 0, 0.35)",
+                  display: "inline-block"
+                }}>
+                  ⭐ ขวัญใจมหาชน 3 อันดับแรกจากผลโพลล์ (Top 3 Fan Favorites)
+                </span>
+              </div>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "16px",
+                maxWidth: "860px",
+                margin: "0 auto"
+              }}>
+                {POLL_CONTESTANTS.slice(0, 3).map((item) => {
+                  const matched = leaderboard.find((c) =>
+                    (c.name && item.name && c.name.trim() === item.name.trim()) ||
+                    (c.topic && item.topic && c.topic.trim() === item.topic.trim())
+                  );
+                  const is1 = item.pollRank === 1;
+                  return (
+                    <div
+                      key={item.pollRank}
+                      onClick={() => setSelectedSpotlight(matched || { ...item, scores: {}, totalScore: 0 })}
+                      style={{
+                        background: is1
+                          ? "linear-gradient(150deg, rgba(255, 215, 0, 0.22) 0%, rgba(20, 25, 45, 0.95) 100%)"
+                          : "linear-gradient(150deg, rgba(255, 255, 255, 0.08) 0%, rgba(10, 20, 38, 0.95) 100%)",
+                        border: is1 ? "2px solid #ffd700" : "1px solid rgba(255, 255, 255, 0.2)",
+                        borderRadius: "18px",
+                        padding: "20px 16px",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        boxShadow: is1 ? "0 8px 30px rgba(255, 215, 0, 0.3)" : "none",
+                        transition: "transform 0.2s"
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                    >
+                      <div style={{ fontSize: "28px", marginBottom: "6px" }}>
+                        {item.pollRank === 1 ? "🥇" : item.pollRank === 2 ? "🥈" : "🥉"}
+                      </div>
+                      <div style={{
+                        width: "68px",
+                        height: "68px",
+                        borderRadius: "50%",
+                        margin: "0 auto 10px",
+                        overflow: "hidden",
+                        border: is1 ? "3px solid #ffd700" : "2px solid #ffffff",
+                        background: "#081020"
+                      }}>
+                        {matched?.image ? (
+                          <img src={matched.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px" }}>👤</div>
+                        )}
+                      </div>
+                      <h4 style={{ fontSize: "16px", fontWeight: "800", color: "#fff", margin: "0 0 2px" }}>
+                        {item.nickname} ({item.name})
+                      </h4>
+                      <p style={{ fontSize: "13px", color: "#ffd700", margin: "0 0 8px", fontWeight: "600" }}>
+                        {item.topic}
+                      </p>
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+                        โพลล์อันดับ <strong style={{ color: "#ffd700" }}>#{item.pollRank}</strong>
+                      </div>
+                      <div style={{
+                        padding: "4px 14px",
+                        borderRadius: "14px",
+                        background: is1 ? "rgba(255, 215, 0, 0.25)" : "rgba(0, 229, 255, 0.15)",
+                        border: is1 ? "1.5px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
+                        color: is1 ? "#ffd700" : "#67e8f9",
+                        fontWeight: "900",
+                        fontSize: "14px",
+                        display: "inline-block",
+                        boxShadow: is1 ? "0 0 12px rgba(255, 215, 0, 0.4)" : "none"
+                      }}>
+                        คิดเป็น {item.percent}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Poll Search Bar */}
+            <div style={{
+              background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+              border: "1px solid rgba(255, 215, 0, 0.3)",
+              borderRadius: "14px",
+              padding: "14px 18px",
+              marginBottom: "20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px"
+            }}>
+              <span style={{ fontSize: "16px" }}>🔍</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ค้นหาชื่อจริง, ชื่อเล่น หรือหัวข้อในผลโพลล์..."
+                style={{
+                  width: "100%",
+                  background: "rgba(0, 15, 30, 0.8)",
+                  border: "1px solid rgba(255, 215, 0, 0.3)",
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  outline: "none"
+                }}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: "14px" }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Poll Tournament Graphic Layout */}
+            <div style={{
+              overflowX: "auto",
+              paddingBottom: "16px"
+            }}>
+              <div style={{ minWidth: "980px" }}>
+                {/* Top Main Tournament Banner Pill */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: "linear-gradient(90deg, #020712 0%, #0a172e 50%, #020712 100%)",
+                  border: "2px solid rgba(255, 255, 255, 0.4)",
+                  borderRadius: "14px",
+                  transform: "skewX(-16deg)",
+                  padding: "10px 30px",
+                  marginBottom: "16px",
+                  boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7), inset 0 1px 3px rgba(255, 255, 255, 0.6)"
+                }}>
+                  <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "12px" }}>
+                    <span style={{ fontSize: "20px" }}>📊</span>
+                    <h2 style={{
+                      fontStyle: "italic",
+                      fontWeight: "900",
+                      fontSize: "20px",
+                      letterSpacing: "2px",
+                      color: "#ffffff",
+                      margin: 0,
+                      textShadow: "0 2px 10px rgba(0,0,0,0.8)"
+                    }}>
+                      THE FAN POLL RANKINGS 2026 • POPULAR VOTES
+                    </h2>
+                  </div>
+                  <div style={{ transform: "skewX(16deg)", fontSize: "12px", color: "rgba(255,255,255,0.7)", fontStyle: "italic" }}>
+                    ผลโพลล์แฟนพันธุ์แท้แห่งปี 2026
+                  </div>
+                </div>
+
+                {/* Column Headers Row (Slanted Pills) */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "10px"
+                }}>
+                  {/* Rank Header */}
+                  <div style={{
+                    width: "56px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: "linear-gradient(180deg, #332608 0%, #140e02 100%)",
+                    border: "2px solid #ffd700",
+                    boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
+                      อันดับ
+                    </span>
+                  </div>
+
+                  {/* Contestant Name Header */}
+                  <div style={{
+                    flex: 1,
+                    height: "32px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
+                    border: "2px solid rgba(255, 255, 255, 0.4)",
+                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 18px"
+                  }}>
+                    <span style={{
+                      transform: "skewX(16deg)",
+                      fontStyle: "italic",
+                      fontWeight: "900",
+                      fontSize: "13px",
+                      color: "#ffffff",
+                      letterSpacing: "1px"
+                    }}>
+                      ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง)
+                    </span>
+                  </div>
+
+                  {/* Topic Header */}
+                  <div style={{
+                    width: "260px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: "linear-gradient(180deg, #0a2538 0%, #03101a 100%)",
+                    border: "2px solid #00e5ff",
+                    boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>
+                      หัวข้อแฟนพันธุ์แท้
+                    </span>
+                  </div>
+
+                  {/* Percentage Header */}
+                  <div style={{
+                    width: "110px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: "linear-gradient(180deg, #332608 0%, #140e02 100%)",
+                    border: "2px solid #ffd700",
+                    boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
+                      คิดเป็น %
+                    </span>
+                  </div>
+
+                  {/* Popularity Badge Header */}
+                  <div style={{
+                    width: "120px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
+                    border: "2px solid #e0e0e0",
+                    boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>
+                      อันดับโพลล์
+                    </span>
+                  </div>
+                </div>
+
+                {/* Poll Data Rows */}
+                {filteredPoll.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(255,255,255,0.5)" }}>
+                    ไม่พบข้อมูลโพลล์ที่ตรงกับการค้นหา
+                  </div>
+                ) : (
+                  filteredPoll.map((item) => {
+                    const matchedContestant = leaderboard.find((c) =>
+                      (c.name && item.name && (c.name.trim() === item.name.trim() || c.name.includes(item.name) || item.name.includes(c.name))) ||
+                      (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim()) ||
+                      (c.topic && item.topic && (c.topic.trim() === item.topic.trim() || item.topic.includes(c.topic) || c.topic.includes(item.topic)))
+                    );
+                    const photo = matchedContestant?.image || null;
+                    const isRank1 = item.pollRank === 1;
+                    const isRank2 = item.pollRank === 2;
+                    const isRank3 = item.pollRank === 3;
+                    const isTop5 = item.pollRank <= 5;
+
+                    const borderColor = isTop5
+                      ? "#ffd700"
+                      : "rgba(255, 255, 255, 0.3)";
+
+                    const glowShadow = isRank1
+                      ? "0 0 18px rgba(255, 215, 0, 0.6)"
+                      : isTop5
+                      ? "0 0 14px rgba(255, 215, 0, 0.45)"
+                      : "0 0 8px rgba(0, 0, 0, 0.5)";
+
+                    return (
+                      <div
+                        key={item.pollRank}
+                        onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
+                        title="คลิกเพื่อดูสถิติเจาะลึก"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "8px",
+                          cursor: "pointer",
+                          transition: "transform 0.15s ease, filter 0.15s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
+                          e.currentTarget.style.filter = "brightness(1.15)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "scale(1) translateX(0)";
+                          e.currentTarget.style.filter = "brightness(1)";
+                        }}
+                      >
+                        {/* 1. Slanted Rank Box (Yellow highlight for Top 5 matching image) */}
+                        <div style={{
+                          width: "56px",
+                          height: "48px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: isTop5
+                            ? "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)"
+                            : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                          border: isTop5 ? "2.5px solid #fff566" : "2.5px solid rgba(255, 255, 255, 0.3)",
+                          boxShadow: isTop5 ? "0 0 14px rgba(255, 215, 0, 0.6)" : "0 0 6px rgba(0,0,0,0.5)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0
+                        }}>
+                          <span style={{
+                            transform: "skewX(16deg)",
+                            fontStyle: "italic",
+                            fontWeight: "900",
+                            fontSize: "24px",
+                            color: isTop5 ? "#000000" : "#ffffff",
+                            textShadow: isTop5 ? "none" : "0 2px 6px rgba(0,0,0,0.8)"
+                          }}>
+                            {item.pollRank}
+                          </span>
+                        </div>
+
+                        {/* 2. Slanted Contestant Info Pill */}
+                        <div style={{
+                          flex: 1,
+                          height: "48px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, rgba(14, 28, 52, 0.95) 0%, rgba(5, 12, 24, 0.98) 100%)",
+                          border: `2.5px solid ${borderColor}`,
+                          boxShadow: glowShadow,
+                          display: "flex",
+                          alignItems: "center",
+                          padding: "0 18px",
+                          overflow: "hidden"
+                        }}>
+                          <div style={{
+                            transform: "skewX(16deg)",
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px"
+                          }}>
+                            {/* Photo */}
+                            <div style={{
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              overflow: "hidden",
+                              background: "rgba(0, 229, 255, 0.1)",
+                              border: `1.5px solid ${isTop5 ? "#ffd700" : "#00e5ff"}`,
+                              flexShrink: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center"
+                            }}>
+                              {photo ? (
+                                <img src={photo} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              ) : (
+                                <span style={{ fontSize: "15px" }}>👤</span>
+                              )}
+                            </div>
+
+                            {/* Nickname & Full Name */}
+                            <div style={{ display: "flex", alignItems: "baseline", gap: "8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              <span style={{
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "20px",
+                                color: isTop5 ? "#ffd700" : "#ffffff",
+                                letterSpacing: "0.5px"
+                              }}>
+                                {item.nickname || item.name.split(" ")[0]}
+                              </span>
+                              <span style={{
+                                fontStyle: "italic",
+                                fontWeight: "700",
+                                fontSize: "15px",
+                                color: "#ffffff",
+                                opacity: 0.9
+                              }}>
+                                {item.name}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 3. Slanted Topic Box */}
+                        <div style={{
+                          width: "260px",
+                          height: "48px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #092436 0%, #031018 100%)",
+                          border: "2.5px solid #00e5ff",
+                          boxShadow: "0 0 10px rgba(0, 229, 255, 0.35)",
+                          display: "flex",
+                          alignItems: "center",
+                          padding: "0 14px",
+                          flexShrink: 0,
+                          overflow: "hidden"
+                        }}>
+                          <div style={{
+                            transform: "skewX(16deg)",
+                            width: "100%",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                          }}>
+                            <span style={{
+                              fontStyle: "italic",
+                              fontWeight: "700",
+                              fontSize: "14px",
+                              color: "#67e8f9"
+                            }}>
+                              {item.topic}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 4. Slanted Percentage Box (คิดเป็น %) */}
+                        <div style={{
+                          width: "110px",
+                          height: "48px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: isTop5
+                            ? "linear-gradient(180deg, #2c2007 0%, #130d02 100%)"
+                            : "linear-gradient(180deg, #092436 0%, #031018 100%)",
+                          border: isTop5 ? "2.5px solid #ffd700" : "2.5px solid #00e5ff",
+                          boxShadow: isTop5 ? "0 0 14px rgba(255, 215, 0, 0.45)" : "0 0 10px rgba(0, 229, 255, 0.35)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0
+                        }}>
+                          <span style={{
+                            transform: "skewX(16deg)",
+                            fontStyle: "italic",
+                            fontWeight: "900",
+                            fontSize: "18px",
+                            color: isTop5 ? "#ffd700" : "#67e8f9",
+                            textShadow: isTop5 ? "0 0 10px rgba(255, 215, 0, 0.7)" : "0 0 8px rgba(0, 229, 255, 0.5)"
+                          }}>
+                            {item.percent}
+                          </span>
+                        </div>
+
+                        {/* 5. Slanted Popularity Badge */}
+                        <div style={{
+                          width: "120px",
+                          height: "48px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: isRank1
+                            ? "linear-gradient(180deg, #2c2007 0%, #130d02 100%)"
+                            : isRank2
+                            ? "linear-gradient(180deg, #242a32 0%, #0f1216 100%)"
+                            : isRank3
+                            ? "linear-gradient(180deg, #261608 0%, #120a03 100%)"
+                            : isTop5
+                            ? "linear-gradient(180deg, #241d08 0%, #120e03 100%)"
+                            : "linear-gradient(180deg, #101c2b 0%, #070e17 100%)",
+                          border: `2.5px solid ${borderColor}`,
+                          boxShadow: glowShadow,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0
+                        }}>
+                          <span style={{
+                            transform: "skewX(16deg)",
+                            fontStyle: "italic",
+                            fontWeight: "900",
+                            fontSize: "13px",
+                            color: isRank1 ? "#ffd700" : isRank2 ? "#ffffff" : isRank3 ? "#f59e0b" : isTop5 ? "#ffd700" : "rgba(255,255,255,0.7)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px"
+                          }}>
+                            {isRank1 ? "🥇 อันดับ 1" : isRank2 ? "🥈 อันดับ 2" : isRank3 ? "🥉 อันดับ 3" : isTop5 ? "⭐ Top 5" : `POLL #${item.pollRank}`}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+
+                {/* Poll Score Formula Footnote Banner (อิงจากภาพสรุปผลโพลล์) */}
+                <div style={{
+                  marginTop: "24px",
+                  padding: "14px 24px",
+                  borderRadius: "14px",
+                  background: "linear-gradient(90deg, rgba(0, 119, 182, 0.3) 0%, rgba(3, 105, 161, 0.6) 50%, rgba(0, 119, 182, 0.3) 100%)",
+                  border: "1.5px solid rgba(0, 229, 255, 0.5)",
+                  textAlign: "center",
+                  color: "#ffffff",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                  letterSpacing: "0.5px",
+                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.4)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontWeight: "800",
-                  fontSize: "12px",
-                  flexShrink: 0,
-                  marginTop: "2px"
-                }}>{idx + 1}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "700", fontSize: "14px" }}>
-                    <span>{s.name}</span>
-                    <span style={{ color: "var(--gold-light)" }}>{s.count} ข้อ</span>
-                  </div>
-                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px", fontStyle: "italic" }}>
-                    &quot;{s.header && s.header.trim() !== "" ? s.header : "ไม่มีหัวข้อเฉพาะ"}&quot;
-                  </div>
+                  gap: "10px"
+                }}>
+                  <span style={{ fontSize: "18px" }}>ℹ️</span>
+                  <span>การคิดคะแนน : คะแนนรอบ Audition (10%) + คะแนนจากรอบทดลอง (40%) + คะแนนโหวตผ่านฟอร์มโพลล์ (50%)</span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        <button
-          className="btn-game btn-start-round"
-          onClick={() => startRoundWithSet(0, 25, 0)}
-          style={{ width: "100%", maxWidth: "320px", marginTop: "12px" }}
-        >
-          🎮 เริ่มการแข่งขัน (25 ข้อรวด)
-        </button>
-        <button className="btn-game btn-back" onClick={onBack} style={{ marginTop: "16px" }}>
-          กลับ
-        </button>
-      </div>
-    );
-  }
-
-  // Jบเกมแล้ว
-  if (isGameOver) {
-    const isCompleted = currentQ >= endQ;
-    const failedQNum = currentQ - startQ + 1;
-    return (
-      <div className="three-sec-container">
-        <div className={`game-ended-banner ${isCompleted ? "success" : ""}`}>
-          {isCompleted
-            ? "🎉 จบเกม 3 วินาที ครบทุกข้อในชุด!"
-            : `⏱️ จบเกม 3 วินาที ที่ข้อที่ ${failedQNum}`}
-        </div>
-        <div style={{ marginTop: "24px" }}>
-          <span className="three-sec-score-label">คะแนนที่ได้:</span>
-          <span className="three-sec-score-val" style={{ fontSize: "64px" }}>
-            {score}
-          </span>
-          <span className="three-sec-score-label"> / {totalInSet}</span>
-        </div>
-        <button className="btn-game btn-start-round" onClick={onBack} style={{ marginTop: "24px" }}>
-          กลับหน้าหลัก
-        </button>
-      </div>
-    );
-  }
-
-  const q = threeSecQuestions[currentQ];
-  const hasImage = q?.image && q.image.trim() !== "";
-  const qNum = currentQ - startQ + 1;
-
-  const currentSetIndex = getSetIndexForQuestion(currentQ, threeSecMode);
-  const currentSetHeader = threeSecSetHeaders[currentSetIndex];
-
-  return (
-    <div className="three-sec-container">
-      {currentSetHeader && currentSetHeader.trim() !== "" && (
-        <div className="three-sec-set-header">{currentSetHeader}</div>
-      )}
-      <div className="three-sec-status">
-        <span className="three-sec-qnum">ข้อที่ {qNum} / {totalInSet}</span>
-        <span className="three-sec-score-label">คะแนนสะสม:</span>
-        <span className="three-sec-score-val">{score}</span>
-      </div>
-
-      {hasImage ? (
-        <div className="three-sec-main-area">
-          {!roundActive ? (
-            <div className="three-sec-question-box placeholder-box" style={{
+        {/* ========================================================
+            CONTESTANT SPOTLIGHT MODAL (ลูกเล่นดูสถิติเจาะลึก)
+           ======================================================== */}
+        {selectedSpotlight && (
+          <div
+            onClick={() => setSelectedSpotlight(null)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0, 0, 0, 0.82)",
+              backdropFilter: "blur(8px)",
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              minHeight: "260px",
-              background: "rgba(255, 255, 255, 0.02)",
-              border: "2px dashed rgba(255, 255, 255, 0.15)",
-              borderRadius: "var(--radius)",
-              padding: "40px"
-            }}>
-              <div style={{ fontSize: "50px", marginBottom: "16px", animation: "pulse-glow 2s infinite" }}>⏱️</div>
-              <div style={{ fontSize: "20px", fontWeight: "700", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
-              <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginTop: "8px" }}>กดปุ่มด้านล่างเพื่อเริ่มจับเวลาและเปิดคำถาม</div>
-            </div>
-          ) : (
-            q && (
-              <div className="three-sec-question-box">
-                <img src={resolveImagePath(q.image)} className="three-sec-question-image" alt="คำถาม" />
-                <div className="three-sec-question-text">{q.question}</div>
-                
-                {answerRevealed && (
-                  <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                    marginTop: "20px",
-                    padding: "16px 24px",
-                    borderRadius: "var(--radius)",
-                    fontSize: "20px",
-                    fontWeight: "800",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "10px",
-                    animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                  }}>
-                    <span className="answer-text" style={{ textDecoration: "underline" }}>{q.answer}</span>
-                  </div>
-                )}
-              </div>
-            )
-          )}
-
-          <div className={`three-sec-timer-ring ${timeLeft === 0 ? "time-up" : ""}`} id="timerRing">
-            <svg viewBox="0 0 120 120">
-              <circle className="timer-bg" cx="60" cy="60" r="52" />
-              <circle
-                className="timer-progress"
-                id="timerProgress"
-                cx="60"
-                cy="60"
-                r="52"
-                strokeDasharray={circumference}
-                style={getTimerProgressStyle()}
-              />
-            </svg>
-            <div className="timer-text" id="timerText" style={{ color: getTimerTextColor() }}>
-              {timeLeft === 0 ? "0.0" : timeLeft.toFixed(1)}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className={`three-sec-timer-ring ${timeLeft === 0 ? "time-up" : ""}`} id="timerRing">
-            <svg viewBox="0 0 120 120">
-              <circle className="timer-bg" cx="60" cy="60" r="52" />
-              <circle
-                className="timer-progress"
-                id="timerProgress"
-                cx="60"
-                cy="60"
-                r="52"
-                strokeDasharray={circumference}
-                style={getTimerProgressStyle()}
-              />
-            </svg>
-            <div className="timer-text" id="timerText" style={{ color: getTimerTextColor() }}>
-              {timeLeft === 0 ? "0.0" : timeLeft.toFixed(1)}
-            </div>
-          </div>
-
-          {!roundActive ? (
-            <div className="three-sec-question-box placeholder-box" style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: "260px",
-              background: "rgba(255, 255, 255, 0.02)",
-              border: "2px dashed rgba(255, 255, 255, 0.15)",
-              borderRadius: "var(--radius)",
-              padding: "40px"
-            }}>
-              <div style={{ fontSize: "50px", marginBottom: "16px", animation: "pulse-glow 2s infinite" }}>⏱️</div>
-              <div style={{ fontSize: "20px", fontWeight: "700", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
-              <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginTop: "8px" }}>กดปุ่มด้านล่างเพื่อเริ่มจับเวลาและเปิดคำถาม</div>
-            </div>
-          ) : (
-            q && (
-              <div className="three-sec-question-box">
-                <div className="three-sec-question-text">{q.question}</div>
-                
-                {answerRevealed && (
-                  <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                    marginTop: "20px",
-                    padding: "16px 24px",
-                    borderRadius: "var(--radius)",
-                    fontSize: "20px",
-                    fontWeight: "800",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "10px",
-                    animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                  }}>
-                    <span className="answer-text" style={{ textDecoration: "underline" }}>{q.answer}</span>
-                  </div>
-                )}
-              </div>
-            )
-          )}
-        </>
-      )}
-
-      <div className="three-sec-controls" id="threeSecControls">
-        {!roundActive ? (
-          <button className="btn-game btn-action" onClick={q?.audio ? () => playQuestionAudio() : startTimer}>
-            {q?.audio ? "🔊 เล่นเสียง" : "แสดงคำถาม / เริ่มจับเวลา"}
-          </button>
-        ) : !answerRevealed ? (
-          <>
-            {q?.audio && (
-              <>
-                <button 
-                  className={`btn-game btn-reveal ${isAudioPlaying ? "playing" : ""}`} 
-                  onClick={() => playQuestionAudio(true)}
-                  style={{ 
-                    background: isAudioPlaying ? "var(--gold)" : "",
-                    color: isAudioPlaying ? "var(--primary)" : ""
-                  }}
-                >
-                  {isAudioPlaying ? "⌛ กำลังเล่น..." : "🔊 เล่นเสียงอีกรอบ"}
-                </button>
-                <button className="btn-game btn-action" onClick={startTimer} style={{ background: "var(--accent)" }}>
-                  ⏱️ เริ่มจับเวลา
-                </button>
-              </>
-            )}
-            <button className="btn-game btn-correct" onClick={() => handleAnswer(true)}>✓ ถูก</button>
-            <button className="btn-game btn-wrong" onClick={() => handleAnswer(false)}>✗ ผิด</button>
-            <button className="btn-game btn-skip" onClick={handleSkip}>ข้าม</button>
-          </>
-        ) : (
-          <button 
-            className={`btn-game ${isRoundCorrect === false ? "btn-wrong" : "btn-correct"}`} 
-            onClick={handleNextQ}
-            style={{ width: "100%", maxWidth: "320px" }}
+              zIndex: 2000,
+              padding: "20px"
+            }}
           >
-            {isRoundCorrect === false ? "✗ จบการแข่งขัน" : "ข้อถัดไป →"}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// ❓ SUB-COMPONENT: GAME 2 (Q&A)
-// ==========================================
-function QAGame({ onComplete, onResult, onBack }) {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [currentPoints, setCurrentPoints] = useState(25);
-  const [choicesVisible, setChoicesVisible] = useState(false);
-  const [eliminatedIndices, setEliminatedIndices] = useState([]);
-  const [answered, setAnswered] = useState(false);
-
-  const cfg = GAME_CONFIG.qa;
-  const letters = ["ก", "ข", "ค", "ง", "จ"];
-
-  const handleStart = () => {
-    setGameStarted(true);
-    setCurrentPoints(25);
-    setChoicesVisible(false);
-    setEliminatedIndices([]);
-    setAnswered(false);
-  };
-
-  const handleShowChoices = () => {
-    if (choicesVisible) return;
-    setChoicesVisible(true);
-    if (!answered) {
-      setCurrentPoints(20);
-    }
-  };
-
-  const handleEliminate = () => {
-    if (!choicesVisible) return;
-
-    const correctIndex = cfg.choices.indexOf(cfg.answer);
-
-    // Find non-eliminated wrong choice
-    const available = [];
-    cfg.choices.forEach((_, i) => {
-      if (i !== correctIndex && !eliminatedIndices.includes(i)) {
-        available.push(i);
-      }
-    });
-
-    if (available.length === 0) return;
-
-    const randomIdx = available[Math.floor(Math.random() * available.length)];
-    setEliminatedIndices((prev) => [...prev, randomIdx]);
-    if (!answered) {
-      setCurrentPoints((prev) => Math.max(0, prev - 5));
-    }
-  };
-
-  const handleAnswer = (correct) => {
-    if (answered) return;
-    setAnswered(true);
-
-    const score = correct ? currentPoints : 0;
-    onComplete(score);
-  };
-
-  if (!gameStarted) {
-    return (
-      <div className="waiting-start">
-        <div className="waiting-title">❓ ถาม-ตอบ</div>
-        <div className="waiting-desc">
-          คำถาม 1 ข้อ เต็ม 25 คะแนน<br />
-          ขอดูตัวเลือก = เหลือ 20 คะแนน<br />
-          ตัดตัวเลือก = -5 คะแนน/ครั้ง<br />
-          ตอบผิด = 0 คะแนน
-        </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button className="btn-game btn-start-round" onClick={handleStart}>เริ่มเกม</button>
-          <button className="btn-game btn-back" onClick={onBack}>กลับ</button>
-        </div>
-      </div>
-    );
-  }
-
-  const remaining = cfg.choices.length - eliminatedIndices.length;
-
-  return (
-    <div className="qa-container">
-      <div>
-        <div className="qa-points-label">คะแนนที่จะได้</div>
-        <div className="qa-points-display" id="qaPointsDisplay">{currentPoints}</div>
-      </div>
-
-      <div className="qa-question-text">{cfg.question}</div>
-
-      <div className="qa-choices-grid" id="qaChoicesGrid">
-        {cfg.choices.map((choice, i) => {
-          let cls = "qa-choice";
-          if (!choicesVisible) cls += " hidden";
-          else if (eliminatedIndices.includes(i)) cls += " eliminated";
-
-          return (
-            <div className={cls} key={i} id={`qaChoice${i}`}>
-              <span className="qa-choice-letter">{letters[i]}</span>
-              <span>{choice}</span>
-            </div>
-          );
-        })}
-      </div>
-
-      {answered && (
-        <div style={{
-          marginTop: "16px",
-          padding: "16px 24px",
-          background: "rgba(255, 255, 255, 0.05)",
-          border: "2px solid rgba(255, 255, 255, 0.1)",
-          borderRadius: "var(--radius)",
-          fontSize: "20px",
-          fontWeight: "800",
-          textAlign: "center",
-          color: "var(--gold-light)",
-          animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-          marginBottom: "16px",
-          width: "100%",
-          maxWidth: "700px"
-        }}>
-          บันทึกผลการแข่งขันแล้ว
-        </div>
-      )}
-
-      <div className="qa-controls" id="qaControls">
-        {!answered ? (
-          <>
-            <button className="btn-game btn-correct" onClick={() => handleAnswer(true)}>✓ ตอบถูก</button>
-            <button className="btn-game btn-wrong" onClick={() => handleAnswer(false)}>✗ ตอบผิด</button>
-          </>
-        ) : null}
-        
-        {!choicesVisible ? (
-          <button className="btn-game btn-reveal" onClick={handleShowChoices}>ขอดูตัวเลือก</button>
-        ) : (
-          remaining > 2 && (
-            <button className="btn-game btn-reveal" onClick={handleEliminate}>
-              ตัดตัวเลือก {answered ? "" : "(-5)"}
-            </button>
-          )
-        )}
-        
-        <button className="btn-game btn-back" onClick={onBack}>กลับ</button>
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// 🧩 SUB-COMPONENT: GAME 3 (JIGSAW)
-// ==========================================
-function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, onComplete, onResult, onBack }) {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [currentPoints, setCurrentPoints] = useState(25);
-  const [openedPieces, setOpenedPieces] = useState([]);
-  const [answered, setAnswered] = useState(false);
-  const [firstOpen, setFirstOpen] = useState(true);
-
-  const hasImage = jigsawImage && jigsawImage.trim() !== "";
-
-  const handleStart = () => {
-    setGameStarted(true);
-    setCurrentPoints(25);
-    setOpenedPieces([]);
-    setAnswered(false);
-    setFirstOpen(true);
-  };
-
-  const handleOpenPiece = (index) => {
-    if (openedPieces.includes(index)) return;
-
-    setOpenedPieces((prev) => [...prev, index]);
-
-    if (!answered) {
-      if (firstOpen) {
-        setFirstOpen(false);
-        // First open is free
-      } else {
-        setCurrentPoints((prev) => Math.max(0, prev - 5));
-      }
-    }
-  };
-
-  const handleAnswer = (correct) => {
-    if (answered) return;
-    setAnswered(true);
-
-    const score = correct ? currentPoints : 0;
-    onComplete(score);
-  };
-
-  if (!gameStarted) {
-    return (
-      <div className="waiting-start">
-        <div className="waiting-title">🧩 จิ๊กซอว์</div>
-        <div className="waiting-desc">
-          ภาพปริศนา 25 ช่อง (5×5)<br />
-          เปิดช่องแรก = 25 คะแนน<br />
-          เปิดเพิ่ม = -5 คะแนน/ช่อง<br />
-          ตอบผิด = 0 คะแนน
-        </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button className="btn-game btn-start-round" onClick={handleStart}>เริ่มเกม</button>
-          <button className="btn-game btn-back" onClick={onBack}>กลับ</button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="jigsaw-container">
-      <div>
-        <div className="jigsaw-points-label">คะแนนที่จะได้</div>
-        <div className="jigsaw-points-display" id="jigsawPointsDisplay">{currentPoints}</div>
-      </div>
-
-      {jigsawQuestion && jigsawQuestion.trim() !== "" && (
-        <div className="jigsaw-question-text" style={{
-          fontSize: "22px",
-          fontWeight: "700",
-          textAlign: "center",
-          color: "rgba(255, 255, 255, 0.9)",
-          margin: "12px 0",
-          textShadow: "0 2px 10px rgba(0,0,0,0.5)"
-        }}>
-          {jigsawQuestion}
-        </div>
-      )}
-
-      <div className={`jigsaw-board ${jigsawMode || "square"}`}>
-        {hasImage ? (
-          <img src={resolveImagePath(jigsawImage)} className="jigsaw-image" alt="ภาพปริศนา" />
-        ) : (
-          <div className="jigsaw-no-image">ไม่มีรูปภาพ (กรุณาตั้งค่าในหน้าตั้งค่าเกม)</div>
-        )}
-        <div className="jigsaw-grid" id="jigsawGrid">
-          {[...Array(25)].map((_, i) => {
-            const isOpened = openedPieces.includes(i);
-            return (
-              <div
-                className={`jigsaw-piece ${isOpened ? "opened" : ""}`}
-                key={i}
-                id={`jPiece${i}`}
-                onClick={() => handleOpenPiece(i)}
-                title={isOpened ? "" : `คลิกเพื่อเปิดช่อง ${i + 1}`}
-              >
-                {isOpened ? "" : i + 1}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {answered && (
-        <div style={{
-          marginTop: "16px",
-          padding: "16px 24px",
-          background: "rgba(255, 255, 255, 0.05)",
-          border: "2px solid rgba(255, 255, 255, 0.1)",
-          borderRadius: "var(--radius)",
-          fontSize: "20px",
-          fontWeight: "800",
-          textAlign: "center",
-          color: "var(--gold-light)",
-          animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-          marginBottom: "16px",
-          width: "100%",
-          maxWidth: "500px"
-        }}>
-          บันทึกผลการแข่งขันแล้ว
-        </div>
-      )}
-
-      <div className="jigsaw-controls" id="jigsawControls">
-        {!answered ? (
-          <>
-            <button className="btn-game btn-correct" onClick={() => handleAnswer(true)}>✓ ตอบถูก</button>
-            <button className="btn-game btn-wrong" onClick={() => handleAnswer(false)}>✗ ตอบผิด</button>
-          </>
-        ) : null}
-        <button className="btn-game btn-back" onClick={onBack}>กลับ</button>
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// 🎯 SUB-COMPONENT: GAME 4 (ATTRIBUTE)
-// ==========================================
-function AttributeGame({ onComplete, onResult, onBack }) {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [currentPoints, setCurrentPoints] = useState(25);
-  const [revealedClues, setRevealedClues] = useState([]);
-  const [answered, setAnswered] = useState(false);
-
-  const cfg = GAME_CONFIG.attribute;
-
-  const handleStart = () => {
-    setGameStarted(true);
-    setCurrentPoints(25);
-    setRevealedClues([]);
-    setAnswered(false);
-  };
-
-  const handleRevealClueIndex = (idx) => {
-    if (revealedClues.includes(idx)) return;
-
-    setRevealedClues((prev) => [...prev, idx]);
-
-    // Points deduction only if not answered, not the bonus clue (index 5), and not the first normal clue opened
-    if (!answered && idx !== 5) {
-      const normalRevealedCount = revealedClues.filter(c => c !== 5).length;
-      const isFirstNormal = normalRevealedCount === 0;
-      if (!isFirstNormal) {
-        setCurrentPoints((prev) => Math.max(0, prev - 5));
-      }
-    }
-  };
-
-  const handleRevealNextClue = () => {
-    // Find next normal clue (0-4) that is not revealed yet
-    const nextIdx = [0, 1, 2, 3, 4].find((i) => !revealedClues.includes(i));
-    if (nextIdx !== undefined) {
-      handleRevealClueIndex(nextIdx);
-    }
-  };
-
-  const handleAnswer = (correct) => {
-    if (answered) return;
-    setAnswered(true);
-
-    const score = correct ? currentPoints : 0;
-    onComplete(score);
-  };
-
-  if (!gameStarted) {
-    return (
-      <div className="waiting-start">
-        <div className="waiting-title">🎯 คุณสมบัติ</div>
-        <div className="waiting-desc">
-          ข้อมูลคุณสมบัติ 5 ข้อ นำไปสู่คำตอบเดียว<br />
-          เลือกเปิดข้อมูลข้อใดก่อนก็ได้ (1-5)<br />
-          <strong>เปิดข้อมูลแรก = ฟรี (25 คะแนน) | เปิดข้อถัดไป = -5 คะแนน/ข้อ</strong><br />
-          ตอบผิด = 0 คะแนน
-        </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button className="btn-game btn-start-round" onClick={handleStart}>เริ่มเกม</button>
-          <button className="btn-game btn-back" onClick={onBack}>กลับ</button>
-        </div>
-      </div>
-    );
-  }
-
-  const nextUnrevealed = [0, 1, 2, 3, 4].find((i) => !revealedClues.includes(i)) !== undefined;
-  const displayCluesCount = Math.max(6, cfg.clues.length);
-
-  return (
-    <div className="attr-container">
-      <div>
-        <div className="attr-points-label">คะแนนที่จะได้</div>
-        <div className="attr-points-display" id="attrPointsDisplay">{currentPoints}</div>
-      </div>
-
-      <div className="attr-question-text">{cfg.question}</div>
-
-      <div className="attr-clues-list" id="attrCluesList">
-        {Array.from({ length: displayCluesCount }).map((_, i) => {
-          if (i > 5) return null; // We support up to 6 clues (5 normal, 1 bonus)
-          const clue = cfg.clues[i] || (i === 5 ? cfg.answer : "ไม่มีข้อมูล");
-          const isRevealed = revealedClues.includes(i);
-          const isBonus = i === 5;
-          const rowClass = `attr-clue-row ${isBonus ? "bonus-clue" : ""} ${isRevealed ? "revealed" : "hidden"}`;
-          return (
             <div
-              className={rowClass}
-              key={i}
-              id={`attrClue${i}`}
-              onClick={() => handleRevealClueIndex(i)}
+              onClick={(e) => e.stopPropagation()}
               style={{
-                cursor: !isRevealed ? "pointer" : "default"
+                maxWidth: "520px",
+                width: "100%",
+                background: "linear-gradient(160deg, #0d213a 0%, #06101e 100%)",
+                border: "2px solid #00e5ff",
+                borderRadius: "24px",
+                padding: "28px",
+                boxShadow: "0 0 50px rgba(0, 229, 255, 0.35)",
+                position: "relative"
               }}
             >
-              <div className="attr-clue-number">{isBonus ? "?" : (i + 1)}</div>
-              <div className="attr-clue-content">
-                {isRevealed ? (
-                  clue
-                ) : (
-                  <span style={{ fontSize: "14px", opacity: 0.6, color: isBonus ? "rgba(255, 23, 68, 0.8)" : "var(--gold-light)" }}>
-                    🔒 คลิกเพื่อเปิด{isBonus ? "คำตอบ" : `ข้อมูลคุณสมบัติข้อที่ ${i + 1}`}
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {!answered ? (
-        <div className="attr-instruction" style={{
-          fontSize: "14px",
-          color: "rgba(255,255,255,0.6)",
-          marginTop: "12px",
-          marginBottom: "6px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          background: "rgba(255, 255, 255, 0.03)",
-          padding: "10px 16px",
-          borderRadius: "10px",
-          border: "1px dashed rgba(255, 255, 255, 0.1)"
-        }}>
-          <span>💡</span>
-          <span>คลิกที่ข้อ 1-5 ด้านบนเพื่อเลือกเปิดคุณสมบัติ (เปิดอันแรกฟรี อันถัดไปหักข้อละ 5 คะแนน)</span>
-        </div>
-      ) : null}
-
-      {answered && (
-        <div style={{
-          marginTop: "16px",
-          padding: "16px 24px",
-          background: "rgba(255, 255, 255, 0.05)",
-          border: "2px solid rgba(255, 255, 255, 0.1)",
-          borderRadius: "var(--radius)",
-          fontSize: "20px",
-          fontWeight: "800",
-          textAlign: "center",
-          color: "var(--gold-light)",
-          animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-          marginBottom: "16px",
-          width: "100%",
-          maxWidth: "700px"
-        }}>
-          บันทึกผลการแข่งขันแล้ว
-        </div>
-      )}
-
-      <div className="attr-controls" id="attrControls">
-        {!answered ? (
-          <>
-            {nextUnrevealed && (
-              <button className="btn-game btn-reveal" onClick={handleRevealNextClue}>
-                {revealedClues.filter(c => c !== 5).length === 0 ? "เปิดข้อมูลแรก" : "เปิดเพิ่ม (-5)"}
+              <button
+                onClick={() => setSelectedSpotlight(null)}
+                style={{
+                  position: "absolute",
+                  top: "16px",
+                  right: "16px",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  color: "#fff",
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  fontSize: "16px"
+                }}
+              >
+                ✕
               </button>
-            )}
-            <button className="btn-game btn-correct" onClick={() => handleAnswer(true)}>✓ ตอบถูก</button>
-            <button className="btn-game btn-wrong" onClick={() => handleAnswer(false)}>✗ ตอบผิด</button>
-          </>
-        ) : (
-          nextUnrevealed && (
-            <button className="btn-game btn-reveal" onClick={handleRevealNextClue}>
-              เปิดข้อมูลเพิ่ม
-            </button>
-          )
+
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <div style={{
+                  width: "100px",
+                  height: "100px",
+                  borderRadius: "50%",
+                  margin: "0 auto 12px",
+                  overflow: "hidden",
+                  border: "3px solid #00e5ff",
+                  boxShadow: "0 0 25px rgba(0, 229, 255, 0.5)",
+                  background: "#081020"
+                }}>
+                  {selectedSpotlight.image ? (
+                    <img src={selectedSpotlight.image} alt={selectedSpotlight.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px" }}>👤</div>
+                  )}
+                </div>
+
+                <h3 style={{ fontSize: "22px", fontWeight: "900", color: "#fff", margin: "0 0 4px" }}>
+                  {selectedSpotlight.name} {selectedSpotlight.nickname ? `(${selectedSpotlight.nickname})` : ""}
+                </h3>
+                <div style={{
+                  display: "inline-block",
+                  padding: "4px 14px",
+                  borderRadius: "20px",
+                  background: "rgba(0, 229, 255, 0.15)",
+                  border: "1px solid #00e5ff",
+                  color: "#00e5ff",
+                  fontSize: "13px",
+                  fontWeight: "700"
+                }}>
+                  หัวข้อ: {selectedSpotlight.topic}
+                </div>
+              </div>
+
+              {/* Score Breakdown (if in Standings / has scores) */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.7)",
+                border: "1px solid rgba(0, 229, 255, 0.2)",
+                borderRadius: "16px",
+                padding: "16px",
+                marginBottom: "18px"
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                  <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>คะแนนรวมสะสม</span>
+                  <span style={{ fontSize: "28px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 14px rgba(255,215,0,0.6)" }}>
+                    {selectedSpotlight.totalScore ?? 0} <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>/ 100</span>
+                  </span>
+                </div>
+
+                {/* 4 Category Bars */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {[
+                    { label: "⏱️ 3 วินาที", score: selectedSpotlight.scores?.["3sec"], max: 25 },
+                    { label: "❓ ถาม-ตอบ", score: selectedSpotlight.scores?.qa, max: 25 },
+                    { label: "🧩 จิ๊กซอว์", score: selectedSpotlight.scores?.jigsaw, max: 25 },
+                    { label: "🎯 คุณสมบัติ", score: selectedSpotlight.scores?.attribute, max: 25 },
+                  ].map((cat) => {
+                    const val = cat.score !== null && cat.score !== undefined && cat.score !== "" ? Number(cat.score) : null;
+                    const pct = val !== null ? Math.min(100, (val / cat.max) * 100) : 0;
+                    return (
+                      <div key={cat.label}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
+                          <span style={{ color: "#dbeafe" }}>{cat.label}</span>
+                          <strong style={{ color: val !== null ? "#00e5ff" : "rgba(255,255,255,0.4)" }}>
+                            {val !== null ? `${val} / 25` : "ยังไม่แข่ง"}
+                          </strong>
+                        </div>
+                        <div style={{ width: "100%", height: "8px", background: "rgba(255,255,255,0.1)", borderRadius: "4px", overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: "linear-gradient(90deg, #00e5ff, #ffd700)", borderRadius: "4px", transition: "width 0.5s ease" }}></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Evaluation Analysis */}
+              {(() => {
+                const st = evaluatePlayerStatus(selectedSpotlight, denseRankedLeaderboard, targetN);
+                return (
+                  <div style={{
+                    padding: "12px 16px",
+                    borderRadius: "12px",
+                    background: st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.15)" : st.isEliminated ? "rgba(239, 68, 68, 0.15)" : "rgba(234, 179, 8, 0.15)",
+                    border: `1px solid ${st.isGuaranteedQualified ? "#22c55e" : st.isEliminated ? "#ef4444" : "#eab308"}`,
+                    fontSize: "13px",
+                    color: "#fff"
+                  }}>
+                    <div style={{ fontWeight: "800", marginBottom: "4px", color: st.isGuaranteedQualified ? "#86efac" : st.isEliminated ? "#fca5a5" : "#fde047" }}>
+                      สถานะการันตี: {st.statusText}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.85)", lineHeight: "1.4" }}>
+                      {st.reason || "รอคะแนนการแข่งขันหมวดถัดไป"}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <button
+                type="button"
+                onClick={() => setSelectedSpotlight(null)}
+                style={{
+                  width: "100%",
+                  marginTop: "16px",
+                  padding: "10px",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: "14px",
+                  fontWeight: "700",
+                  cursor: "pointer"
+                }}
+              >
+                ปิดหน้าต่าง
+              </button>
+            </div>
+          </div>
         )}
-        <button className="btn-game btn-back" onClick={onBack}>กลับ</button>
-      </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{
+        background: "rgba(3, 8, 20, 0.98)",
+        borderTop: "1px solid rgba(0, 229, 255, 0.2)",
+        padding: "30px 20px",
+        textAlign: "center",
+        fontSize: "14px",
+        color: "rgba(255,255,255,0.5)"
+      }}>
+        <div style={{ maxWidth: "160px", margin: "0 auto 10px" }}>
+          <img src="/img/logo.png" alt="FANPANTAE 2026" style={{ width: "100%", height: "auto", opacity: 0.6 }} />
+        </div>
+        <p style={{ margin: "0 0 8px 0" }}>
+          แฟนพันธุ์แท้แห่งปี 2026
+        </p>
+        <p style={{ fontSize: "12px", margin: 0, color: "rgba(255,255,255,0.3)" }}>
+          ระบบจำลองการแข่งขันและคำนวณคะแนนอัตโนมัติ สำหรับทีมงานและผู้ชม
+        </p>
+      </footer>
     </div>
   );
 }

@@ -10,187 +10,187 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-        "หลังจิ๊กซอว์นี้ นี่คือภาพของบุคคลที่เกี่ยวข้องกับวง Bodyslam ที่มีชื่อว่าอะไร",
-        "นี่คือคุณสมบัติของเพลงอะไร"
+        "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+        "ชื่อเพลงที่คุณกำลังจะได้ยินต่อไปนี้ ใครเป็นนักร้อง"
     ],
     "threeSeconds": [
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_1.mp3",
-            "answer": "ยาพิษ"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/01.png",
+            "audio": null,
+            "answer": "KAITO"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_2.mp3",
-            "answer": "อกหัก"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/02.png",
+            "audio": null,
+            "answer": "Megurine Luka"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_3.mp3",
-            "answer": "ขอบฟ้า"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/03.png",
+            "audio": null,
+            "answer": "GUMI"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_4.mp3",
-            "answer": "คนที่คุณรัก"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/04.png",
+            "audio": null,
+            "answer": "Kagamine Rin"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_5.mp3",
-            "answer": "ความเชื่อ"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/05.png",
+            "audio": null,
+            "answer": "Kagamine Len"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_6.mp3",
-            "answer": "คราม"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/06.png",
+            "audio": null,
+            "answer": "MEIKA Hime"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_7.mp3",
-            "answer": "เรือเล็กควรออกจากฝั่ง"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/07.png",
+            "audio": null,
+            "answer": "Yuzuki Yukari"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_8.mp3",
-            "answer": "คิดฮอด"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/08.png",
+            "audio": null,
+            "answer": "Camui Gackpo"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_9.mp3",
-            "answer": "งมงาย"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/09.png",
+            "audio": null,
+            "answer": "MAYU"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_10.mp3",
-            "answer": "ปลายทาง"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/10.png",
+            "audio": null,
+            "answer": "Fukase"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_11.mp3",
-            "answer": "149.6"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/11.png",
+            "audio": null,
+            "answer": "Nekomura Iroha"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_12.mp3",
-            "answer": "เตรียมตัวตาย"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/12.png",
+            "audio": null,
+            "answer": "Amehare Hau"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_13.mp3",
-            "answer": "ยิ่งรู้ยิ่งไม่เข้าใจ"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/13.png",
+            "audio": null,
+            "answer": "SeeU"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_14.mp3",
-            "answer": "ความซื่อสัตย์"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/14.png",
+            "audio": null,
+            "answer": "Sweet ANN"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/img/BD_15.mp3",
-            "answer": "วันสิ้นปี"
+            "question": "นี่คือตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
+            "image": "public/img/15.png",
+            "audio": null,
+            "answer": "IA"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "World is Mine",
             "image": null,
-            "audio": "public/img/BD_16.mp3",
-            "answer": "ห้ามใจ"
+            "audio": null,
+            "answer": "Hatsune Miku"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "ECHO",
             "image": null,
-            "audio": "public/img/BD_17.mp3",
-            "answer": "นาฬิกาตาย"
+            "audio": null,
+            "answer": "GUMI"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "The Lost One's Weeping",
             "image": null,
-            "audio": "public/img/BD_18.mp3",
-            "answer": "เงา"
+            "audio": null,
+            "answer": "Kagamine Rin"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "Just Be Friends",
             "image": null,
-            "audio": "public/img/BD_19.mp3",
-            "answer": "ครึ่ง ๆ กลาง ๆ"
+            "audio": null,
+            "answer": "Megurine Luka"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "Servant of Evil",
             "image": null,
-            "audio": "public/img/BD_20.mp3",
-            "answer": "เหว"
+            "audio": null,
+            "answer": "Kagamine Len"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "Chururira Chururira Daddadda!",
             "image": null,
-            "audio": "public/img/BD_21.mp3",
-            "answer": "ภาพลวงตา"
+            "audio": null,
+            "answer": "Yuzuki Yukari"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "Matoryoshka",
             "image": null,
-            "audio": "public/img/BD_22.mp3",
-            "answer": "Away"
+            "audio": null,
+            "answer": "Hatsune Miku / GUMI"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "Hide and Seek",
             "image": null,
-            "audio": "public/img/BD_23.mp3",
-            "answer": "ดัม-มะ-ชา-ติ"
+            "audio": null,
+            "answer": "SeeU"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "Blessed Messiah and the Tower of AI",
             "image": null,
-            "audio": "public/img/BD_24.mp3",
-            "answer": "ปิดปรับปรุง"
+            "audio": null,
+            "answer": "Hatsune Miku, Kagamine Len, Kagamine Rin, Megurine Luka, Camui Gackpo, GUMI, IA, MAYU, MEIKO, KAITO"
         },
         {
-            "question": "ช่วงต้นของเพลงที่กำลังจะได้ยินนี้ มาจากเพลงที่มีชื่อว่าอะไร",
+            "question": "Senbonzakura",
             "image": null,
-            "audio": "public/img/BD_25.mp3",
-            "answer": "แสงสุดท้าย"
+            "audio": null,
+            "answer": "Hatsune Miku"
         }
     ],
     "qa": {
-        "question": "เพลงแรกของ Bodyslam ที่ใช้เทคโนโลยีในการทำ MV แบบ 360 องศา คือเพลงที่มีชื่อว่าอะไร",
-        "answer": "วิชาตัวเบา",
+        "question": "เพลงในซีรีส์ \"The Daughter of Evil\" มีเพลงรวมกันทั้งหมดกี่เพลง และ มีการพูดถึงอาณาจักรหรือประเทศ รวมกันทั้งหมดกี่ประเทศ",
+        "answer": "13 เพลง / 6 ประเทศ",
         "choices": [
-            "149.6",
-            "วิชาตัวเบา",
-            "เรือเล็กควรออกจากฝั่ง",
-            "ครึ่งๆ กลางๆ",
-            "ปรากฏการณ์ผีเสื้อ"
+            "3 เพลง / 2 ประเทศ",
+            "7 เพลง / 4 ประเทศ",
+            "9 เพลง / 4 ประเทศ",
+            "11 เพลง / 5 ประเทศ",
+            "13 เพลง / 6 ประเทศ"
         ]
     },
     "jigsaw": {
         "image": "public/img/jigsaw.png",
-        "answer": "ตูน บอดี้สแลม",
-        "question": "หลังจิ๊กซอว์นี้ นี่คือภาพของบุคคลที่เกี่ยวข้องกับวง Bodyslam ที่มีชื่อว่าอะไร"
+        "answer": "The Disappearance of Hatsune Miku",
+        "question": "หลังจิ๊กซอว์นี้ มาจาก MV เพลงที่มีชื่อว่าอะไร"
     },
     "attribute": {
+        "question": "นี่คือคุณสมบัติของตัวละครใน Vocaloid ที่มีชื่อว่าอะไร",
         "clues": [
-            "มีปล่อยเป็นซิงเกิล",
-            "ชื่อเพลงมี 2 พยางค์",
-            "1 ในเพลงที่เคยได้รับรางวัลจาก คมชัดลึก อวอร์ดส์",
-            "ตูนร้อง กบ Big Ass แต่ง",
-            "อยู่ในอัลบั้ม Save My Life"
+            "เพศหญิง",
+            "ผมเหลือง ตาฟ้า",
+            "1 ในกลุ่ม Virtual Singer จาก Project Sekai",
+            "ปรากฎครั้งแรกใน Vocaloid2 Engine",
+            "มีฝาแฝด"
         ],
-        "answer": "ยาพิษ"
+        "answer": "Kagamine Rin"
     }
 };
 

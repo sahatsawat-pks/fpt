@@ -1,0 +1,332 @@
+[
+  {
+    "id": "1",
+    "name": "นัทธภพ ธนวัฒนาเจริญ",
+    "nickname": "นนท์",
+    "topic": "Battle Spirits",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-09T00:00:00.000Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "2",
+    "name": "เชาว์วรรธน์ จันทร์สุข",
+    "nickname": "ก๊อง",
+    "topic": "Workpoint",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-09T00:00:00.000Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "3",
+    "name": "สิปโปทัย ศรีบุญเรือง",
+    "nickname": "กัส",
+    "topic": "ประวัติศาสตร์กรุงรัตนโกสินทร์",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-09T00:00:00.000Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1788967304174",
+    "name": "ณัฐวุฒิ โนรี",
+    "nickname": "แสตมป์",
+    "topic": "Thai BL Series",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-09T15:21:44.174Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789062078265",
+    "name": "นิธิกร วิชัยวงศ์",
+    "nickname": "ก๊อปปี้",
+    "topic": "ขบวนการ 5 สี",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-10T17:41:18.265Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789065395102",
+    "name": "ธนกร สุขปาน",
+    "nickname": "ออม",
+    "topic": "เพลงลูกทุ่ง",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-10T18:36:35.102Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789138018257",
+    "name": "ณัฐภัทร แก้วสินธุ์",
+    "nickname": "นที",
+    "topic": "Masterchef Thailand",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-11T14:46:58.331Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789142295084",
+    "name": "ศุภกร นิลสุวรรณ",
+    "nickname": "หมี",
+    "topic": "Coldplay",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-11T15:58:15.140Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789145226598",
+    "name": "สหัสวรรษ นิจพันธ์",
+    "nickname": "พีท",
+    "topic": "รถไฟฟ้าไทย",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-11T16:47:06.621Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789230923273",
+    "name": "ณฤกร วงศบูรณะ",
+    "nickname": "ตฤณ",
+    "topic": "Tattoo Colour",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-12T16:35:23.279Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789234970194",
+    "name": "กันตชาติ ศรีเพ็ชร",
+    "nickname": "กัปตัน",
+    "topic": "Liverpool FC",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-12T17:42:50.214Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789401836614",
+    "name": "ณัฐดนัย วงศ์ปัญญา",
+    "nickname": "แฟรงค์",
+    "topic": "Honkai: Star Rail",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-14T16:03:56.681Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789483525832",
+    "name": "พีรภัทร หมื่นหาญ",
+    "nickname": "พีม",
+    "topic": "Club Friday the Series",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-15T14:45:25.852Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789574067810",
+    "name": "รติพงษ์ กมลเกียรติพัฒน์",
+    "nickname": "นิว",
+    "topic": "ไพ่ทาโร่ต์",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-16T15:54:27.832Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789578168525",
+    "name": "ธนพัฒน์ สง่าแสง",
+    "nickname": "แบงค์",
+    "topic": "48Group Thailand",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-16T17:02:48.538Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789659229825",
+    "name": "ฤทธิชัย ภูสิญามณี",
+    "nickname": "ริท",
+    "topic": "Serious Bacon",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-17T15:33:49.842Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789835314062",
+    "name": "พัชราภรณ์ ขวัญพรมสี",
+    "nickname": "เอิร์น",
+    "topic": "Honkai Impact 3rd",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-19T16:28:34.097Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1789999311449",
+    "name": "ปวัน ธนพรพันธ์",
+    "nickname": "ป๊ะ",
+    "topic": "Taskmaster",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-21T14:01:51.544Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1790086849039",
+    "name": "ภควัต ศรสุกลรัตน์",
+    "nickname": "อาร์ม",
+    "topic": "การเมืองไทย",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-22T14:20:49.071Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1790094443279",
+    "name": "ธวัชชัย แสงสว่าง",
+    "nickname": "ปืน",
+    "topic": "ไอ้มดแดง (Kamen Rider)",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-22T16:27:23.296Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1790098261610",
+    "name": "พัทธ์ศีล ปุญศิริ",
+    "nickname": "ศีล",
+    "topic": "บอร์ดเกม",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-09-22T17:31:01.627Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  },
+  {
+    "id": "1791609566809",
+    "name": "คุณอินทร์ บุญสิน",
+    "nickname": "อินทร์",
+    "topic": "วง Queen",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "createdAt": "2026-10-10T05:19:26.839Z",
+    "updatedAt": "2026-10-18T17:35:21.421Z"
+  }
+]
