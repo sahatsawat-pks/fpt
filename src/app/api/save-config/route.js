@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { saveKVData } from "@/lib/kv";
 
 export async function POST(request) {
   try {
@@ -9,11 +10,13 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: "Missing config data" }, { status: 400 });
     }
 
-    // Resolve the path to src/app/config.js
-    const filePath = path.join(process.cwd(), "src/app/config.js");
+    // Save to KV
+    await saveKVData("fpt_game_config", data.config);
 
-    // Format the file contents dynamically
-    const fileContent = `/*
+    // Attempt to write to local config.js if filesystem is writable
+    try {
+      const filePath = path.join(process.cwd(), "src/app/config.js");
+      const fileContent = `/*
  * ============================================
  *  CONFIG - สุดยอดแฟนพันธุ์แห่งปี 2026
  * ============================================
@@ -27,9 +30,12 @@ const GAME_CONFIG = ${JSON.stringify(data.config, null, 4)};
 
 export default GAME_CONFIG;
 `;
-
-    // Write back to src/app/config.js
-    fs.writeFileSync(filePath, fileContent, "utf-8");
+      fs.writeFileSync(filePath, fileContent, "utf-8");
+    } catch (fsErr) {
+      if (fsErr.code !== "EROFS") {
+        console.error("Local config write error:", fsErr);
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

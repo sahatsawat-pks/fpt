@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { getKVData, saveKVData } from "@/lib/kv";
 
 const DATA_FILE = path.join(process.cwd(), "src/app/data/game_leaderboard.json");
 
 function readData() {
   try {
     if (!fs.existsSync(DATA_FILE)) {
-      fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-      fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), "utf-8");
+      try {
+        fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
+        fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), "utf-8");
+      } catch (e) {}
       return [];
     }
     const content = fs.readFileSync(DATA_FILE, "utf-8");
@@ -24,23 +27,26 @@ function writeData(data) {
     fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
   } catch (err) {
-    console.error("Error writing game leaderboard data:", err);
+    if (err.code !== "EROFS") {
+      console.error("Error writing game leaderboard data:", err);
+    }
   }
 }
 
 export async function GET() {
-  const data = readData();
-  return NextResponse.json({ success: true, data });
+  const data = await getKVData("fpt_game_leaderboard", readData);
+  return NextResponse.json({ success: true, data: data || [] });
 }
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    let currentData = readData();
+    let currentData = await getKVData("fpt_game_leaderboard", readData);
+    if (!Array.isArray(currentData)) currentData = [];
 
     if (body.action === "delete" && body.id) {
       currentData = currentData.filter((item) => item.id !== body.id);
-      writeData(currentData);
+      await saveKVData("fpt_game_leaderboard", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
     }
 
@@ -56,7 +62,7 @@ export async function POST(request) {
         totalScore: 0,
         updatedAt: new Date().toISOString(),
       }));
-      writeData(currentData);
+      await saveKVData("fpt_game_leaderboard", currentData, writeData);
       return NextResponse.json({
         success: true,
         message: "รีเซ็ตคะแนนเกมเรียบร้อยแล้ว",
@@ -66,7 +72,7 @@ export async function POST(request) {
 
     if (body.action === "clear_all") {
       currentData = [];
-      writeData(currentData);
+      await saveKVData("fpt_game_leaderboard", currentData, writeData);
       return NextResponse.json({
         success: true,
         message: "ล้างข้อมูลตารางคะแนนในเกมเรียบร้อยแล้ว",
@@ -117,7 +123,7 @@ export async function POST(request) {
         image: contestantPhoto !== undefined ? contestantPhoto : (currentData[existingIdx].image || ""),
         updatedAt: new Date().toISOString(),
       };
-      writeData(currentData);
+      await saveKVData("fpt_game_leaderboard", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData, record: currentData[existingIdx] });
     }
 
@@ -133,7 +139,7 @@ export async function POST(request) {
     };
 
     currentData.push(newRecord);
-    writeData(currentData);
+    await saveKVData("fpt_game_leaderboard", currentData, writeData);
 
     return NextResponse.json({ success: true, data: currentData, newRecord });
   } catch (error) {

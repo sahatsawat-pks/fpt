@@ -1214,9 +1214,9 @@ export default function MainPage() {
                 {/* Tournament Graphics Container (THE FAN TOURNAMENT 2026/27) */}
                 <div style={{
                   overflowX: "auto",
-                  padding: "10px 4px 20px"
+                  padding: "12px 24px 28px 24px"
                 }}>
-                  <div style={{ minWidth: "980px" }}>
+                  <div style={{ minWidth: "980px", padding: "0 14px", boxSizing: "border-box" }}>
                     {/* Top Main Tournament Banner Pill */}
                     <div style={{
                       display: "flex",
@@ -1641,100 +1641,7 @@ export default function MainPage() {
            ======================================================== */}
         {activeTableTab === "poll" && (
           <div key="poll-tab-view" className="table-slide-down">
-            {/* Top 3 Poll Favorites Podium Cards */}
-            <div style={{ marginBottom: "32px" }}>
-              <div style={{ textAlign: "center", marginBottom: "16px" }}>
-                <span style={{
-                  fontSize: "13px",
-                  color: "#ffd700",
-                  fontWeight: "800",
-                  padding: "4px 16px",
-                  borderRadius: "20px",
-                  background: "rgba(255, 215, 0, 0.15)",
-                  border: "1px solid rgba(255, 215, 0, 0.35)",
-                  display: "inline-block"
-                }}>
-                  ⭐ ขวัญใจมหาชน 3 อันดับแรกจากผลโพลล์ (Top 3 Fan Favorites)
-                </span>
-              </div>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: "16px",
-                maxWidth: "860px",
-                margin: "0 auto"
-              }}>
-                {POLL_CONTESTANTS.slice(0, 3).map((item) => {
-                  const matched = leaderboard.find((c) =>
-                    (c.name && item.name && c.name.trim() === item.name.trim()) ||
-                    (c.topic && item.topic && c.topic.trim() === item.topic.trim())
-                  );
-                  const is1 = item.pollRank === 1;
-                  return (
-                    <div
-                      key={item.pollRank}
-                      onClick={() => setSelectedSpotlight(matched || { ...item, scores: {}, totalScore: 0 })}
-                      style={{
-                        background: is1
-                          ? "linear-gradient(150deg, rgba(255, 215, 0, 0.22) 0%, rgba(20, 25, 45, 0.95) 100%)"
-                          : "linear-gradient(150deg, rgba(255, 255, 255, 0.08) 0%, rgba(10, 20, 38, 0.95) 100%)",
-                        border: is1 ? "2px solid #ffd700" : "1px solid rgba(255, 255, 255, 0.2)",
-                        borderRadius: "18px",
-                        padding: "20px 16px",
-                        textAlign: "center",
-                        cursor: "pointer",
-                        boxShadow: is1 ? "0 8px 30px rgba(255, 215, 0, 0.3)" : "none",
-                        transition: "transform 0.2s"
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-                    >
-                      <div style={{ fontSize: "28px", marginBottom: "6px" }}>
-                        {item.pollRank === 1 ? "🥇" : item.pollRank === 2 ? "🥈" : "🥉"}
-                      </div>
-                      <div style={{
-                        width: "68px",
-                        height: "68px",
-                        borderRadius: "50%",
-                        margin: "0 auto 10px",
-                        overflow: "hidden",
-                        border: is1 ? "3px solid #ffd700" : "2px solid #ffffff",
-                        background: "#081020"
-                      }}>
-                        {matched?.image ? (
-                          <img src={matched.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                        ) : (
-                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px" }}>👤</div>
-                        )}
-                      </div>
-                      <h4 style={{ fontSize: "16px", fontWeight: "800", color: "#fff", margin: "0 0 2px" }}>
-                        {item.nickname} ({item.name})
-                      </h4>
-                      <p style={{ fontSize: "13px", color: "#ffd700", margin: "0 0 8px", fontWeight: "600" }}>
-                        {item.topic}
-                      </p>
-                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
-                        โพลล์อันดับ <strong style={{ color: "#ffd700" }}>#{item.pollRank}</strong>
-                      </div>
-                      <div style={{
-                        padding: "4px 14px",
-                        borderRadius: "14px",
-                        background: is1 ? "rgba(255, 215, 0, 0.25)" : "rgba(0, 229, 255, 0.15)",
-                        border: is1 ? "1.5px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
-                        color: is1 ? "#ffd700" : "#67e8f9",
-                        fontWeight: "900",
-                        fontSize: "14px",
-                        display: "inline-block",
-                        boxShadow: is1 ? "0 0 12px rgba(255, 215, 0, 0.4)" : "none"
-                      }}>
-                        คิดเป็น {item.percent}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
+            
             {/* Poll Search Bar */}
             <div style={{
               background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
@@ -1777,9 +1684,9 @@ export default function MainPage() {
             {/* Poll Tournament Graphic Layout */}
             <div style={{
               overflowX: "auto",
-              paddingBottom: "16px"
+              padding: "12px 24px 28px 24px"
             }}>
-              <div style={{ minWidth: "980px" }}>
+              <div style={{ minWidth: "980px", padding: "0 14px", boxSizing: "border-box" }}>
                 {/* Top Main Tournament Banner Pill */}
                 <div style={{
                   display: "flex",

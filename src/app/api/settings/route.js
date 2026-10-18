@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { getKVData, saveKVData } from "@/lib/kv";
 
 const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
 
@@ -17,8 +18,10 @@ const DEFAULT_SETTINGS = {
 function readSettings() {
   try {
     if (!fs.existsSync(SETTINGS_FILE)) {
-      fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
-      fs.writeFileSync(SETTINGS_FILE, JSON.stringify(DEFAULT_SETTINGS, null, 2), "utf-8");
+      try {
+        fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
+        fs.writeFileSync(SETTINGS_FILE, JSON.stringify(DEFAULT_SETTINGS, null, 2), "utf-8");
+      } catch (e) {}
       return DEFAULT_SETTINGS;
     }
     const content = fs.readFileSync(SETTINGS_FILE, "utf-8");
@@ -34,14 +37,17 @@ function writeSettings(data) {
     fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
     fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2), "utf-8");
   } catch (err) {
-    console.error("Error writing settings:", err);
+    if (err.code !== "EROFS") {
+      console.error("Error writing settings:", err);
+    }
   }
 }
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const isAdmin = searchParams.get("admin") === "1";
-  const settings = readSettings();
+  const rawSettings = await getKVData("fpt_settings", readSettings);
+  const settings = { ...DEFAULT_SETTINGS, ...rawSettings };
 
   if (isAdmin) {
     return NextResponse.json({
@@ -69,7 +75,8 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const current = readSettings();
+    const rawSettings = await getKVData("fpt_settings", readSettings);
+    const current = { ...DEFAULT_SETTINGS, ...rawSettings };
 
     // Verify game password action
     if (body.action === "verify_game") {
@@ -130,7 +137,7 @@ export async function POST(request) {
         newSettings.drawPassword = String(body.drawPassword || "").trim();
       }
 
-      writeSettings(newSettings);
+      await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
         success: true,
         message: "บันทึกการตั้งค่าเรียบร้อยแล้ว",
