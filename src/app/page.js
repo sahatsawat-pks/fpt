@@ -120,14 +120,26 @@ function calculateDenseRanks(items) {
       (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
     ) || (Number(item.totalScore) || 0) > 0;
     if (hasAnyScore) {
-      played.push({
-        ...item,
-        playOrder: item.order || item.playOrder || (i + 1),
-      });
+      played.push(item);
     }
   }
 
-  const sortedPlayed = [...played].sort(
+  // Sort played contestants by competition entry order (order or chronological timestamp)
+  const playedChronological = [...played].sort((a, b) => {
+    if (a.order && b.order) return Number(a.order) - Number(b.order);
+    if (a.order) return -1;
+    if (b.order) return 1;
+    const timeA = new Date(a.firstPlayedAt || a.updatedAt || a.createdAt || 0).getTime();
+    const timeB = new Date(b.firstPlayedAt || b.updatedAt || b.createdAt || 0).getTime();
+    return timeA - timeB;
+  });
+
+  const playedWithOrder = playedChronological.map((item, idx) => ({
+    ...item,
+    playOrder: Number(item.order) || (idx + 1),
+  }));
+
+  const sortedPlayed = [...playedWithOrder].sort(
     (a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0)
   );
 

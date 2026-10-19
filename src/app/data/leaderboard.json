@@ -5,15 +5,16 @@
     "nickname": "นนท์",
     "topic": "Battle Spirits",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 17,
+      "qa": 25,
+      "jigsaw": 25,
+      "attribute": 5
     },
-    "totalScore": 0,
+    "totalScore": 72,
     "createdAt": "2026-09-09T00:00:00.000Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0"
+    "updatedAt": "2026-10-19T18:49:21.006Z",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0",
+    "order": 4
   },
   {
     "id": "2",
@@ -28,7 +29,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-09T00:00:00.000Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
   },
   {
@@ -44,7 +45,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-09T00:00:00.000Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczMpg3NPj_C_0lXZ55wQnYy3uBdKxWYsCYSfNyh4TC5T802iCIilGvzTZVtTYlKpVFkdWWLlSt8RBq0gHtckzQclQUElkO3nXjkdK5DiMl1uuIvbX6cmoWVgZwoCDs0MhqBpyEULkO1DERQqMl5I6lxJ=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -60,7 +61,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-09T15:21:44.174Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczPioiz5362-yx4IyFh5ujVIiP8u9T9HO9Szx73eo7RNgAv1vpU_NXF4AhPHts5qXPf0-Tc-FDkoC--krXYTr5CpHbd2alN0a3Mvv0qG_WLVqHKcs79yVOctUXLqdqw1J-1Yv1hIYaMBr61YOXK2oRaJ=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -76,7 +77,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-10T17:41:18.265Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczNGXiRybdHr50jnZ5cSGVWylSyacpr0_lKea-J997YP8DTnyd2LSErW43LVIV1jv05TzvFz9X3BwyMZ1NDAk0AFH9d5tlu-9ZBq54sW8LK3wfGKAH6cdN-Y2BS3jHh4jxLuJIsoSxuhPwbvBALA7kO_=w1125-h1125-s-no-gm?authuser=0"
   },
   {
@@ -92,7 +93,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-10T18:36:35.102Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczPP8nZ07EZHdzSIrVCyY_JJVLoAVFwc5nWH4E4FzJRHd5UckRRz9r4TGQSJQTK4G0Rff5XYSUMNfr4hsnds_foBX_6RMxRhCfoHUKdVPhK7MqOh9VpytXXVd-pLYaFTHr9xw0QM5q7T2VZahmTWhEtl=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -108,7 +109,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-11T14:46:58.331Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczN8o5FXqfPvxqOJs1do7f6f9mxT29Uah3nW-H2erXV1B5DsWhlnT2Acsq2rLJsMW-7g61ODyOzeSNohiJcv7AcIr-bM0JJPltRCNxrKU_qX_fqhdFIvEGOb-jJfe3CUI_FByhfFMQ9Dr7cPChdMDL4-=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -124,7 +125,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-11T15:58:15.140Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -140,7 +141,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-11T16:47:06.621Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczPoC2xml6zXT5f6Rkrhn2-C7pGQR3lBdbLg_vBJrGDf6d6YMwkInztmpAkWbSDOVG6kXmOEobzum3qCp7wWMRFCanLPnH3AKEdEk_Tpw8h5dVxMk6zvRrRllEGzX4JOEdk1H5Hn-CTO5x62y3Sp3Nm0=w1125-h1125-s-no-gm?authuser=0"
   },
   {
@@ -156,7 +157,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-12T16:35:23.279Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -172,7 +173,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-12T17:42:50.214Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm?authuser=0"
   },
   {
@@ -188,7 +189,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-14T16:03:56.681Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm?authuser=0"
   },
   {
@@ -204,7 +205,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-15T14:45:25.852Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm?authuser=0"
   },
   {
@@ -220,7 +221,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-16T15:54:27.832Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczPalqWB79ObwsPqJVjlBoLGr-31QtzntceySm9B0TC7LItpwpfkpXmrZNUof2TKuOv2dBhk1KbQAGS_TBEt-AwfqtpiPmaoN_DURhOEGoA3R4T7NHbgYP_4-B69D2xS01de-BWLa3YFQo5QtBiLpQgC=w1125-h1125-s-no-gm?authuser=0"
   },
   {
@@ -229,15 +230,16 @@
     "nickname": "แบงค์",
     "topic": "48Group Thailand",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 13,
+      "qa": 10,
+      "jigsaw": 25,
+      "attribute": 10
     },
-    "totalScore": 0,
+    "totalScore": 58,
     "createdAt": "2026-09-16T17:02:48.538Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0"
+    "updatedAt": "2026-10-19T16:22:15.311Z",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0",
+    "order": 2
   },
   {
     "id": "1789659229825",
@@ -245,15 +247,16 @@
     "nickname": "ริท",
     "topic": "Serious Bacon",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 13,
+      "qa": 20,
+      "jigsaw": 0,
+      "attribute": 15
     },
-    "totalScore": 0,
+    "totalScore": 48,
     "createdAt": "2026-09-17T15:33:49.842Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0"
+    "updatedAt": "2026-10-19T17:28:30.792Z",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0",
+    "order": 3
   },
   {
     "id": "1789835314062",
@@ -268,7 +271,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-19T16:28:34.097Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczOkN98O0LDhBcQhE4X4iE67B322lQ1L3iZKvqZyP5LXaH37LibFcH26AbonLsUzAkxKXARjmy2s0hT7n83PQ0_hiVbM8TUigd-_RRr_9wH5bI8GUXg93DH5tmYRC7yNHrzFxoPMhtp7n7WE7JzTSgk9=w1125-h1125-s-no-gm?authuser=0"
   },
   {
@@ -284,7 +287,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-21T14:01:51.544Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczO-YpFN5q79SsyFUxl5MQ3agmPlDe6UWUcCwudDt4eidO1Z1-o9Acx5WZpy5T6KURHpit0PdLvVpIT09QiDHNoYHmHUIYgoIrHlLfA_dxi3pXbx0AjAzSunbslVKnc6B6526DOPP0XwwFmb7SHmNjES=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -300,7 +303,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-22T14:20:49.071Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczOXZ7x2lelKztH88AKbMMCOY3kEca65A0ke-9gVHZ3bjA-US37R2F-PQKOztqpRzHcmQaRfen2rY6jE26F4GPby3gG8o1ZdVfsxbzB6g0N6Cz6epHSO57s17ofVHCodPHJfdyQdTt-mjTc_M9i6bKKq=w1117-h1117-s-no-gm?authuser=0"
   },
   {
@@ -309,15 +312,16 @@
     "nickname": "ปืน",
     "topic": "ไอ้มดแดง (Kamen Rider)",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 15,
+      "qa": 20,
+      "jigsaw": 15,
+      "attribute": 10
     },
-    "totalScore": 0,
+    "totalScore": 60,
     "createdAt": "2026-09-22T16:27:23.296Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOBBW412A6o3q8m8jpCV4GQGf950z__lIFfIeCe5C2S5Czet7-xK5sxHDzR_tHJ-gulxlBel1bbfc-MCgUpVz8EfOUE1j357cl5GRj0DwjOvhTDG__oQdipozW_e8qklM9jgx_jHXZW72kVH0AVya_1=w1125-h1125-s-no-gm?authuser=0"
+    "updatedAt": "2026-10-19T14:38:07.505Z",
+    "image": "https://lh3.googleusercontent.com/pw/AP1GczOBBW412A6o3q8m8jpCV4GQGf950z__lIFfIeCe5C2S5Czet7-xK5sxHDzR_tHJ-gulxlBel1bbfc-MCgUpVz8EfOUE1j357cl5GRj0DwjOvhTDG__oQdipozW_e8qklM9jgx_jHXZW72kVH0AVya_1=w1125-h1125-s-no-gm?authuser=0",
+    "order": 1
   },
   {
     "id": "1790098261610",
@@ -332,7 +336,7 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-22T17:31:01.627Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
+    "updatedAt": "2026-10-19T01:48:56.618Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm?authuser=0"
   },
   {
@@ -341,14 +345,15 @@
     "nickname": "อินทร์",
     "topic": "วง Queen",
     "scores": {
-      "3sec": null,
+      "3sec": 0,
       "qa": null,
       "jigsaw": null,
       "attribute": null
     },
     "totalScore": 0,
     "createdAt": "2026-10-10T05:19:26.839Z",
-    "updatedAt": "2026-10-18T20:29:16.665Z",
-    "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0"
+    "updatedAt": "2026-10-19T19:01:35.696Z",
+    "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0",
+    "order": 5
   }
 ]

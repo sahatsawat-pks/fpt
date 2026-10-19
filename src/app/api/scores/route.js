@@ -166,6 +166,13 @@ export async function POST(request) {
     const targetTotal = typeof totalScore === "number" ? totalScore : calculatedTotal;
 
     if (existingIdx !== -1) {
+      const hasScores = Object.values(formattedScores).some((v) => v !== null && v !== "");
+      let existingOrder = body.order !== undefined ? (Number(body.order) || null) : currentData[existingIdx].order;
+      if (!existingOrder && hasScores) {
+        const maxOrder = currentData.reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
+        existingOrder = maxOrder + 1;
+      }
+
       currentData[existingIdx] = {
         ...currentData[existingIdx],
         name: name !== undefined ? (name || "ผู้เข้าแข่งขัน").trim() : currentData[existingIdx].name,
@@ -173,6 +180,7 @@ export async function POST(request) {
         topic: topic !== undefined ? (topic || "-").trim() : currentData[existingIdx].topic,
         scores: formattedScores,
         totalScore: targetTotal,
+        order: existingOrder !== undefined ? existingOrder : currentData[existingIdx].order,
         image: contestantPhoto !== undefined ? contestantPhoto : (currentData[existingIdx].image || ""),
         updatedAt: new Date().toISOString(),
       };
