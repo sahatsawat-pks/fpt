@@ -1554,14 +1554,44 @@ export default function MainPage() {
                       gap: "8px",
                       marginBottom: "10px"
                     }}>
-                      {/* Left spacer for rank & contestant */}
-                      <div style={{ width: "56px" }}></div>
-                      <div style={{ flex: 1, paddingLeft: "8px" }}>
+                      {/* Rank Header */}
+                      <div style={{
+                        width: "56px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        transform: "skewX(-16deg)",
+                        background: "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                        border: "2px solid #ffd700",
+                        boxShadow: "0 0 10px rgba(255, 215, 0, 0.35)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0
+                      }}>
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
+                          อันดับ
+                        </span>
+                      </div>
+
+                      {/* Contestant Name Header */}
+                      <div style={{
+                        flex: 1,
+                        height: "32px",
+                        borderRadius: "8px",
+                        transform: "skewX(-16deg)",
+                        background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
+                        border: "2px solid rgba(255, 255, 255, 0.4)",
+                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "0 18px"
+                      }}>
                         <span style={{
-                          fontSize: "12px",
-                          fontWeight: "800",
-                          color: "rgba(255,255,255,0.5)",
-                          textTransform: "uppercase",
+                          transform: "skewX(16deg)",
+                          fontStyle: "italic",
+                          fontWeight: "900",
+                          fontSize: "13px",
+                          color: "#ffffff",
                           letterSpacing: "1px"
                         }}>
                           ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง)
