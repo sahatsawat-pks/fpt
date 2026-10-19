@@ -38,6 +38,88 @@ function resolveContestantAvatar(item, year) {
   return "";
 }
 
+function getScorePillStyle(score, categoryKey) {
+  const is25 = score !== null && score !== undefined && score !== "" && score !== "-" && Number(score) === 25;
+  const is0 = score !== null && score !== undefined && score !== "" && score !== "-" && Number(score) === 0;
+
+  if (is25) {
+    return {
+      container: {
+        background: "linear-gradient(135deg, #ffe58f 0%, #ffd700 50%, #d48806 100%)",
+        border: "2px solid #fff566",
+        boxShadow: "0 0 16px rgba(255, 215, 0, 0.75)",
+      },
+      text: {
+        color: "#000000",
+        textShadow: "none",
+      },
+    };
+  }
+
+  if (is0) {
+    return {
+      container: {
+        background: "linear-gradient(180deg, #780616 0%, #3a0007 100%)",
+        border: "2px solid #ff4d4f",
+        boxShadow: "0 0 12px rgba(255, 77, 79, 0.55)",
+      },
+      text: {
+        color: "#ffffff",
+        textShadow: "0 0 8px rgba(255, 77, 79, 0.7)",
+      },
+    };
+  }
+
+  const defaultStyles = {
+    "3sec": {
+      container: {
+        background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)",
+        border: "2px solid #52c41a",
+        boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)",
+      },
+      text: {
+        color: "#86efac",
+        textShadow: "0 0 8px rgba(134, 239, 172, 0.6)",
+      },
+    },
+    qa: {
+      container: {
+        background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
+        border: "2px solid #e0e0e0",
+        boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
+      },
+      text: {
+        color: "#f3f4f6",
+        textShadow: "0 0 8px rgba(255, 255, 255, 0.6)",
+      },
+    },
+    jigsaw: {
+      container: {
+        background: "linear-gradient(180deg, #300f13 0%, #150507 100%)",
+        border: "2px solid #ff4d4f",
+        boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)",
+      },
+      text: {
+        color: "#fca5a5",
+        textShadow: "0 0 8px rgba(252, 165, 165, 0.6)",
+      },
+    },
+    attribute: {
+      container: {
+        background: "linear-gradient(180deg, #0a2538 0%, #03101a 100%)",
+        border: "2px solid #00e5ff",
+        boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
+      },
+      text: {
+        color: "#67e8f9",
+        textShadow: "0 0 8px rgba(103, 232, 249, 0.6)",
+      },
+    },
+  };
+
+  return defaultStyles[categoryKey] || defaultStyles.qa;
+}
+
 export default function HistoryPage() {
   const [data, setData] = useState(historyData);
   const [activeYear, setActiveYear] = useState("2024");
@@ -1253,108 +1335,120 @@ export default function HistoryPage() {
                         </div>
 
                         {/* 3. 3 วินาที Pill */}
-                        <div style={{
-                          width: "74px",
-                          height: "48px",
-                          borderRadius: "8px",
-                          transform: "skewX(-16deg)",
-                          background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)",
-                          border: "2px solid #52c41a",
-                          boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0
-                        }}>
-                          <span style={{
-                            transform: "skewX(16deg)",
-                            fontStyle: "italic",
-                            fontWeight: "900",
-                            fontSize: "20px",
-                            color: "#86efac",
-                            textShadow: "0 0 8px rgba(134, 239, 172, 0.6)"
-                          }}>
-                            {item.scores?.["3sec"] ?? 0}
-                          </span>
-                        </div>
+                        {(() => {
+                          const sc = item.scores?.["3sec"] ?? 0;
+                          const pill = getScorePillStyle(sc, "3sec");
+                          return (
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              ...pill.container,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "20px",
+                                ...pill.text
+                              }}>
+                                {sc}
+                              </span>
+                            </div>
+                          );
+                        })()}
 
                         {/* 4. ถาม-ตอบ Pill */}
-                        <div style={{
-                          width: "74px",
-                          height: "48px",
-                          borderRadius: "8px",
-                          transform: "skewX(-16deg)",
-                          background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
-                          border: "2px solid #e0e0e0",
-                          boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0
-                        }}>
-                          <span style={{
-                            transform: "skewX(16deg)",
-                            fontStyle: "italic",
-                            fontWeight: "900",
-                            fontSize: "20px",
-                            color: "#f3f4f6",
-                            textShadow: "0 0 8px rgba(255, 255, 255, 0.6)"
-                          }}>
-                            {item.scores?.qa ?? 0}
-                          </span>
-                        </div>
+                        {(() => {
+                          const sc = item.scores?.qa ?? 0;
+                          const pill = getScorePillStyle(sc, "qa");
+                          return (
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              ...pill.container,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "20px",
+                                ...pill.text
+                              }}>
+                                {sc}
+                              </span>
+                            </div>
+                          );
+                        })()}
 
                         {/* 5. จิ๊กซอว์ Pill */}
-                        <div style={{
-                          width: "74px",
-                          height: "48px",
-                          borderRadius: "8px",
-                          transform: "skewX(-16deg)",
-                          background: "linear-gradient(180deg, #300f13 0%, #150507 100%)",
-                          border: "2px solid #ff4d4f",
-                          boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0
-                        }}>
-                          <span style={{
-                            transform: "skewX(16deg)",
-                            fontStyle: "italic",
-                            fontWeight: "900",
-                            fontSize: "20px",
-                            color: "#fca5a5",
-                            textShadow: "0 0 8px rgba(252, 165, 165, 0.6)"
-                          }}>
-                            {item.scores?.jigsaw ?? 0}
-                          </span>
-                        </div>
+                        {(() => {
+                          const sc = item.scores?.jigsaw ?? 0;
+                          const pill = getScorePillStyle(sc, "jigsaw");
+                          return (
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              ...pill.container,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "20px",
+                                ...pill.text
+                              }}>
+                                {sc}
+                              </span>
+                            </div>
+                          );
+                        })()}
 
                         {/* 6. คุณสมบัติ Pill */}
-                        <div style={{
-                          width: "74px",
-                          height: "48px",
-                          borderRadius: "8px",
-                          transform: "skewX(-16deg)",
-                          background: "linear-gradient(180deg, #0a2538 0%, #03101a 100%)",
-                          border: "2px solid #00e5ff",
-                          boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0
-                        }}>
-                          <span style={{
-                            transform: "skewX(16deg)",
-                            fontStyle: "italic",
-                            fontWeight: "900",
-                            fontSize: "20px",
-                            color: "#67e8f9",
-                            textShadow: "0 0 8px rgba(103, 232, 249, 0.6)"
-                          }}>
-                            {item.scores?.attribute ?? 0}
-                          </span>
-                        </div>
+                        {(() => {
+                          const sc = item.scores?.attribute ?? 0;
+                          const pill = getScorePillStyle(sc, "attribute");
+                          return (
+                            <div style={{
+                              width: "74px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              ...pill.container,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "20px",
+                                ...pill.text
+                              }}>
+                                {sc}
+                              </span>
+                            </div>
+                          );
+                        })()}
 
                         {/* 7. คะแนนรวม Pill */}
                         <div style={{
@@ -1674,6 +1768,8 @@ export default function HistoryPage() {
                             {["3sec", "qa", "jigsaw", "attribute"].map((cat) => {
                               const sc = item.scores?.[cat];
                               if (sc === undefined || sc === null) return null;
+                              const is25 = sc !== "X" && Number(sc) === 25;
+                              const is0 = sc !== "X" && Number(sc) === 0;
                               return (
                                 <div
                                   key={cat}
@@ -1682,18 +1778,27 @@ export default function HistoryPage() {
                                     height: "44px",
                                     borderRadius: "8px",
                                     transform: "skewX(-16deg)",
-                                    background: "rgba(0, 15, 30, 0.8)",
-                                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                                    background: is25
+                                      ? "linear-gradient(135deg, #ffe58f 0%, #ffd700 50%, #d48806 100%)"
+                                      : is0
+                                      ? "linear-gradient(180deg, #780616 0%, #3a0007 100%)"
+                                      : "rgba(0, 15, 30, 0.8)",
+                                    border: is25 ? "2px solid #fff566" : is0 ? "2px solid #ff4d4f" : "1px solid rgba(255, 255, 255, 0.2)",
+                                    boxShadow: is25 ? "0 0 12px rgba(255, 215, 0, 0.75)" : is0 ? "0 0 10px rgba(255, 77, 79, 0.55)" : "none",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center"
                                   }}
                                 >
                                   <div style={{ transform: "skewX(16deg)", textAlign: "center" }}>
-                                    <div style={{ fontSize: "8px", color: "rgba(255,255,255,0.5)" }}>
+                                    <div style={{ fontSize: "8px", color: is25 ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.5)" }}>
                                       {cat === "3sec" ? "3 วินาที" : cat === "qa" ? "ถาม-ตอบ" : cat === "jigsaw" ? "จิ๊กซอว์" : "คุณสมบัติ"}
                                     </div>
-                                    <div style={{ fontSize: "15px", fontWeight: "900", color: sc === "X" ? "#ff4d4f" : "#ffd700" }}>
+                                    <div style={{
+                                      fontSize: "15px",
+                                      fontWeight: "900",
+                                      color: is25 ? "#000000" : is0 ? "#ffffff" : sc === "X" ? "#ff4d4f" : "#ffd700"
+                                    }}>
                                       {sc}
                                     </div>
                                   </div>
@@ -1846,22 +1951,79 @@ export default function HistoryPage() {
                 คะแนนรอบคัดเลือกแยกตามหมวด:
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px", textAlign: "center" }}>
-                <div style={{ background: "rgba(82, 196, 26, 0.15)", border: "1px solid #52c41a", borderRadius: "8px", padding: "8px 4px" }}>
-                  <div style={{ fontSize: "10px", color: "#86efac" }}>3 วินาที</div>
-                  <div style={{ fontSize: "18px", fontWeight: "900", color: "#86efac" }}>{selectedSpotlight.scores?.["3sec"] ?? 0}</div>
-                </div>
-                <div style={{ background: "rgba(255, 255, 255, 0.1)", border: "1px solid #fff", borderRadius: "8px", padding: "8px 4px" }}>
-                  <div style={{ fontSize: "10px", color: "#fff" }}>ถาม-ตอบ</div>
-                  <div style={{ fontSize: "18px", fontWeight: "900", color: "#fff" }}>{selectedSpotlight.scores?.qa ?? 0}</div>
-                </div>
-                <div style={{ background: "rgba(255, 77, 79, 0.15)", border: "1px solid #ff4d4f", borderRadius: "8px", padding: "8px 4px" }}>
-                  <div style={{ fontSize: "10px", color: "#fca5a5" }}>จิ๊กซอว์</div>
-                  <div style={{ fontSize: "18px", fontWeight: "900", color: "#fca5a5" }}>{selectedSpotlight.scores?.jigsaw ?? 0}</div>
-                </div>
-                <div style={{ background: "rgba(0, 229, 255, 0.15)", border: "1px solid #00e5ff", borderRadius: "8px", padding: "8px 4px" }}>
-                  <div style={{ fontSize: "10px", color: "#67e8f9" }}>คุณสมบัติ</div>
-                  <div style={{ fontSize: "18px", fontWeight: "900", color: "#67e8f9" }}>{selectedSpotlight.scores?.attribute ?? 0}</div>
-                </div>
+                {[
+                  { label: "3 วินาที", score: selectedSpotlight.scores?.["3sec"] ?? 0, cat: "3sec" },
+                  { label: "ถาม-ตอบ", score: selectedSpotlight.scores?.qa ?? 0, cat: "qa" },
+                  { label: "จิ๊กซอว์", score: selectedSpotlight.scores?.jigsaw ?? 0, cat: "jigsaw" },
+                  { label: "คุณสมบัติ", score: selectedSpotlight.scores?.attribute ?? 0, cat: "attribute" }
+                ].map((item) => {
+                  const is25 = Number(item.score) === 25;
+                  const is0 = Number(item.score) === 0;
+                  return (
+                    <div
+                      key={item.label}
+                      style={{
+                        background: is25
+                          ? "linear-gradient(135deg, #ffe58f 0%, #ffd700 50%, #d48806 100%)"
+                          : is0
+                          ? "linear-gradient(180deg, #780616 0%, #3a0007 100%)"
+                          : item.cat === "3sec"
+                          ? "rgba(82, 196, 26, 0.15)"
+                          : item.cat === "qa"
+                          ? "rgba(255, 255, 255, 0.1)"
+                          : item.cat === "jigsaw"
+                          ? "rgba(255, 77, 79, 0.15)"
+                          : "rgba(0, 229, 255, 0.15)",
+                        border: is25
+                          ? "1.5px solid #fff566"
+                          : is0
+                          ? "1.5px solid #ff4d4f"
+                          : item.cat === "3sec"
+                          ? "1px solid #52c41a"
+                          : item.cat === "qa"
+                          ? "1px solid #fff"
+                          : item.cat === "jigsaw"
+                          ? "1px solid #ff4d4f"
+                          : "1px solid #00e5ff",
+                        borderRadius: "8px",
+                        padding: "8px 4px",
+                        boxShadow: is25 ? "0 0 10px rgba(255,215,0,0.5)" : is0 ? "0 0 8px rgba(255,77,79,0.4)" : "none"
+                      }}
+                    >
+                      <div style={{
+                        fontSize: "10px",
+                        color: is25
+                          ? "rgba(0,0,0,0.75)"
+                          : item.cat === "3sec"
+                          ? "#86efac"
+                          : item.cat === "qa"
+                          ? "#fff"
+                          : item.cat === "jigsaw"
+                          ? "#fca5a5"
+                          : "#67e8f9"
+                      }}>
+                        {item.label}
+                      </div>
+                      <div style={{
+                        fontSize: "18px",
+                        fontWeight: "900",
+                        color: is25
+                          ? "#000000"
+                          : is0
+                          ? "#ffffff"
+                          : item.cat === "3sec"
+                          ? "#86efac"
+                          : item.cat === "qa"
+                          ? "#fff"
+                          : item.cat === "jigsaw"
+                          ? "#fca5a5"
+                          : "#67e8f9"
+                      }}>
+                        {item.score}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

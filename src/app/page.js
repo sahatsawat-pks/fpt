@@ -3,6 +3,88 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+function getScorePillStyle(score, categoryKey) {
+  const is25 = score !== null && score !== undefined && score !== "" && score !== "-" && Number(score) === 25;
+  const is0 = score !== null && score !== undefined && score !== "" && score !== "-" && Number(score) === 0;
+
+  if (is25) {
+    return {
+      container: {
+        background: "linear-gradient(135deg, #ffe58f 0%, #ffd700 50%, #d48806 100%)",
+        border: "2.5px solid #fff566",
+        boxShadow: "0 0 16px rgba(255, 215, 0, 0.75)",
+      },
+      text: {
+        color: "#000000",
+        textShadow: "none",
+      },
+    };
+  }
+
+  if (is0) {
+    return {
+      container: {
+        background: "linear-gradient(180deg, #780616 0%, #3a0007 100%)",
+        border: "2.5px solid #ff4d4f",
+        boxShadow: "0 0 12px rgba(255, 77, 79, 0.55)",
+      },
+      text: {
+        color: "#ffffff",
+        textShadow: "0 0 8px rgba(255, 77, 79, 0.7)",
+      },
+    };
+  }
+
+  const defaultStyles = {
+    "3sec": {
+      container: {
+        background: "linear-gradient(180deg, #102917 0%, #05130a 100%)",
+        border: "2.5px solid #52c41a",
+        boxShadow: "0 0 10px rgba(82, 196, 26, 0.35)",
+      },
+      text: {
+        color: "#ffffff",
+        textShadow: "none",
+      },
+    },
+    qa: {
+      container: {
+        background: "linear-gradient(180deg, #242a32 0%, #0f1216 100%)",
+        border: "2.5px solid #d9d9d9",
+        boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
+      },
+      text: {
+        color: "#ffffff",
+        textShadow: "none",
+      },
+    },
+    jigsaw: {
+      container: {
+        background: "linear-gradient(180deg, #2d0e12 0%, #150507 100%)",
+        border: "2.5px solid #ff4d4f",
+        boxShadow: "0 0 10px rgba(255, 77, 79, 0.35)",
+      },
+      text: {
+        color: "#ffffff",
+        textShadow: "none",
+      },
+    },
+    attribute: {
+      container: {
+        background: "linear-gradient(180deg, #092436 0%, #031018 100%)",
+        border: "2.5px solid #00e5ff",
+        boxShadow: "0 0 10px rgba(0, 229, 255, 0.35)",
+      },
+      text: {
+        color: "#ffffff",
+        textShadow: "none",
+      },
+    },
+  };
+
+  return defaultStyles[categoryKey] || defaultStyles.qa;
+}
+
 // Dense Ranking Calculation - Only contestants with recorded scores appear in standings
 function calculateDenseRanks(items) {
   if (!Array.isArray(items)) return [];
@@ -1694,80 +1776,96 @@ export default function MainPage() {
 
                             {/* 3. Five Slanted Score Boxes */}
                             {/* Score 1: 3 วินาที (Green Border) */}
-                            <div style={{
-                              width: "74px",
-                              height: "48px",
-                              borderRadius: "8px",
-                              transform: "skewX(-16deg)",
-                              background: "linear-gradient(180deg, #102917 0%, #05130a 100%)",
-                              border: "2.5px solid #52c41a",
-                              boxShadow: "0 0 10px rgba(82, 196, 26, 0.35)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0
-                            }}>
-                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
-                                {item.scores?.["3sec"] ?? "-"}
-                              </span>
-                            </div>
+                            {(() => {
+                              const sc = item.scores?.["3sec"];
+                              const pill = getScorePillStyle(sc, "3sec");
+                              return (
+                                <div style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...pill.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0
+                                }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
+                                    {sc ?? "-"}
+                                  </span>
+                                </div>
+                              );
+                            })()}
 
                             {/* Score 2: ถาม-ตอบ (Silver Border) */}
-                            <div style={{
-                              width: "74px",
-                              height: "48px",
-                              borderRadius: "8px",
-                              transform: "skewX(-16deg)",
-                              background: "linear-gradient(180deg, #242a32 0%, #0f1216 100%)",
-                              border: "2.5px solid #d9d9d9",
-                              boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0
-                            }}>
-                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
-                                {item.scores?.qa ?? "-"}
-                              </span>
-                            </div>
+                            {(() => {
+                              const sc = item.scores?.qa;
+                              const pill = getScorePillStyle(sc, "qa");
+                              return (
+                                <div style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...pill.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0
+                                }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
+                                    {sc ?? "-"}
+                                  </span>
+                                </div>
+                              );
+                            })()}
 
                             {/* Score 3: จิ๊กซอว์ (Red Border) */}
-                            <div style={{
-                              width: "74px",
-                              height: "48px",
-                              borderRadius: "8px",
-                              transform: "skewX(-16deg)",
-                              background: "linear-gradient(180deg, #2d0e12 0%, #150507 100%)",
-                              border: "2.5px solid #ff4d4f",
-                              boxShadow: "0 0 10px rgba(255, 77, 79, 0.35)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0
-                            }}>
-                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
-                                {item.scores?.jigsaw ?? "-"}
-                              </span>
-                            </div>
+                            {(() => {
+                              const sc = item.scores?.jigsaw;
+                              const pill = getScorePillStyle(sc, "jigsaw");
+                              return (
+                                <div style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...pill.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0
+                                }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
+                                    {sc ?? "-"}
+                                  </span>
+                                </div>
+                              );
+                            })()}
 
                             {/* Score 4: คุณสมบัติ (Cyan Border) */}
-                            <div style={{
-                              width: "74px",
-                              height: "48px",
-                              borderRadius: "8px",
-                              transform: "skewX(-16deg)",
-                              background: "linear-gradient(180deg, #092436 0%, #031018 100%)",
-                              border: "2.5px solid #00e5ff",
-                              boxShadow: "0 0 10px rgba(0, 229, 255, 0.35)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0
-                            }}>
-                              <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", color: "#ffffff" }}>
-                                {item.scores?.attribute ?? "-"}
-                              </span>
-                            </div>
+                            {(() => {
+                              const sc = item.scores?.attribute;
+                              const pill = getScorePillStyle(sc, "attribute");
+                              return (
+                                <div style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...pill.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0
+                                }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
+                                    {sc ?? "-"}
+                                  </span>
+                                </div>
+                              );
+                            })()}
 
                             {/* Score 5: คะแนนรวม (Gold Border with Glow) */}
                             <div style={{
