@@ -1695,7 +1695,7 @@ export default function MainPage() {
                         const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
                         const pollRank = getContestantPollRank(item, pollList);
                         const isEliminated = evalStatus.isEliminated;
-                        const isTopSafe = (item.rank || 99) <= 4;
+                        const isTopSafe = (Number(item.rank) || 99) <= 5;
                         const borderColor = isTopSafe ? "#ffd700" : isEliminated ? "#ff4d4f" : "#ffd700";
                         const glowShadow = isTopSafe ? "0 0 14px rgba(255, 215, 0, 0.45)" : isEliminated ? "0 0 14px rgba(255, 77, 79, 0.45)" : "0 0 12px rgba(255, 215, 0, 0.35)";
 
@@ -1740,8 +1740,8 @@ export default function MainPage() {
                                 fontStyle: "italic",
                                 fontWeight: "900",
                                 fontSize: "26px",
-                                color: item.rank === 1 ? "#ffd700" : "#ffffff",
-                                textShadow: item.rank === 1 ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)"
+                                color: isTopSafe ? "#ffd700" : "#ffffff",
+                                textShadow: isTopSafe ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)"
                               }}>
                                 {item.rank}
                               </span>
@@ -1777,7 +1777,7 @@ export default function MainPage() {
                                     borderRadius: "50%",
                                     overflow: "hidden",
                                     background: "rgba(0, 229, 255, 0.1)",
-                                    border: "1.5px solid #00e5ff",
+                                    border: isTopSafe ? "1.5px solid #ffd700" : "1.5px solid #00e5ff",
                                     flexShrink: 0,
                                     display: "flex",
                                     alignItems: "center",
@@ -1805,7 +1805,7 @@ export default function MainPage() {
                                       fontStyle: "italic",
                                       fontWeight: "700",
                                       fontSize: "15px",
-                                      color: "rgba(255, 255, 255, 0.85)"
+                                      color: isTopSafe ? "#ffe885" : "rgba(255, 255, 255, 0.85)"
                                     }}>
                                       {item.name}
                                     </span>
@@ -1821,8 +1821,23 @@ export default function MainPage() {
                                   </div>
                                 </div>
 
-                                {/* Poll Rank Badge & Status Chip */}
+                                {/* Play Order, Poll Rank Badge & Status Chip */}
                                 <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+                                  {item.playOrder && (
+                                    <span style={{
+                                      fontSize: "11px",
+                                      padding: "2px 7px",
+                                      borderRadius: "6px",
+                                      background: "rgba(255, 255, 255, 0.08)",
+                                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                                      color: "rgba(255, 255, 255, 0.75)",
+                                      fontWeight: "700",
+                                      letterSpacing: "0.3px",
+                                      flexShrink: 0
+                                    }}>
+                                      ลำดับแข่ง #{item.playOrder}
+                                    </span>
+                                  )}
                                   {pollRank !== null && (
                                     <span style={{
                                       fontSize: "11px",
@@ -2494,6 +2509,20 @@ export default function MainPage() {
                   }}>
                     หัวข้อ: {selectedSpotlight.topic}
                   </div>
+                  {selectedSpotlight.playOrder && (
+                    <div style={{
+                      display: "inline-block",
+                      padding: "4px 14px",
+                      borderRadius: "20px",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.25)",
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "13px",
+                      fontWeight: "700"
+                    }}>
+                      🎲 ลำดับแข่ง: #{selectedSpotlight.playOrder}
+                    </div>
+                  )}
                   {(() => {
                     const spPoll = getContestantPollRank(selectedSpotlight, pollList);
                     if (spPoll === null) return null;
