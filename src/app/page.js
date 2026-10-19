@@ -85,6 +85,29 @@ function getScorePillStyle(score, categoryKey) {
   return defaultStyles[categoryKey] || defaultStyles.qa;
 }
 
+// Helper to look up contestant poll rank from pollList
+function getContestantPollRank(item, pollList) {
+  if (!item) return null;
+  if (item.pollRank !== undefined && item.pollRank !== null && item.pollRank !== "") {
+    return Number(item.pollRank);
+  }
+  if (!Array.isArray(pollList)) return null;
+  const found = pollList.find((p) => {
+    const pName = (p.name || "").trim().toLowerCase();
+    const iName = (item.name || "").trim().toLowerCase();
+    const pNick = (p.nickname || "").trim().toLowerCase();
+    const iNick = (item.nickname || "").trim().toLowerCase();
+    const pTopic = (p.topic || "").trim().toLowerCase();
+    const iTopic = (item.topic || "").trim().toLowerCase();
+
+    if (pName && iName && (pName === iName || pName.includes(iName) || iName.includes(pName))) return true;
+    if (pNick && iNick && pNick === iNick) return true;
+    if (pTopic && iTopic && (pTopic === iTopic || pTopic.includes(iTopic) || iTopic.includes(pTopic))) return true;
+    return false;
+  });
+  return found ? Number(found.pollRank) : null;
+}
+
 // Dense Ranking Calculation - Only contestants with recorded scores appear in standings
 function calculateDenseRanks(items) {
   if (!Array.isArray(items)) return [];
@@ -565,6 +588,12 @@ export default function MainPage() {
     .sort((a, b) => {
       if (sortBy === "order") {
         return (Number(a.playOrder) || 999) - (Number(b.playOrder) || 999);
+      }
+      if (sortBy === "poll") {
+        const prA = getContestantPollRank(a, pollList) ?? 999;
+        const prB = getContestantPollRank(b, pollList) ?? 999;
+        if (prA !== prB) return prA - prB;
+        return (Number(a.rank) || 999) - (Number(b.rank) || 999);
       }
       return (Number(a.rank) || 999) - (Number(b.rank) || 999);
     });
@@ -1400,6 +1429,24 @@ export default function MainPage() {
                         >
                           🎲 ตามลำดับแข่ง
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => setSortBy("poll")}
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            background: sortBy === "poll" ? "linear-gradient(90deg, #00e5ff 0%, #3b82f6 100%)" : "transparent",
+                            color: sortBy === "poll" ? "#030814" : "rgba(255,255,255,0.7)",
+                            boxShadow: sortBy === "poll" ? "0 0 10px rgba(0, 229, 255, 0.4)" : "none",
+                            transition: "all 0.2s ease"
+                          }}
+                        >
+                          📊 ตามโพลล์
+                        </button>
                       </div>
                     </div>
 
@@ -1616,6 +1663,7 @@ export default function MainPage() {
                     ) : (
                       filteredStandings.map((item) => {
                         const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+                        const pollRank = getContestantPollRank(item, pollList);
                         const isEliminated = evalStatus.isEliminated;
                         const isTopSafe = (item.rank || 99) <= 4;
                         const borderColor = isTopSafe ? "#ffd700" : isEliminated ? "#ff4d4f" : "#ffd700";
@@ -1743,8 +1791,23 @@ export default function MainPage() {
                                   </div>
                                 </div>
 
-                                {/* Status Chip */}
-                                <div style={{ flexShrink: 0 }}>
+                                {/* Poll Rank Badge & Status Chip */}
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+                                  {pollRank !== null && (
+                                    <span style={{
+                                      fontSize: "11px",
+                                      padding: "2px 7px",
+                                      borderRadius: "6px",
+                                      background: "rgba(0, 229, 255, 0.15)",
+                                      border: "1px solid rgba(0, 229, 255, 0.4)",
+                                      color: "#00e5ff",
+                                      fontWeight: "800",
+                                      letterSpacing: "0.3px",
+                                      flexShrink: 0
+                                    }}>
+                                      โพล: #{pollRank}
+                                    </span>
+                                  )}
                                   <span style={{
                                     fontSize: "11px",
                                     fontWeight: "800",
@@ -2382,16 +2445,43 @@ export default function MainPage() {
                   {selectedSpotlight.name} {selectedSpotlight.nickname ? `(${selectedSpotlight.nickname})` : ""}
                 </h3>
                 <div style={{
-                  display: "inline-block",
-                  padding: "4px 14px",
-                  borderRadius: "20px",
-                  background: "rgba(0, 229, 255, 0.15)",
-                  border: "1px solid #00e5ff",
-                  color: "#00e5ff",
-                  fontSize: "13px",
-                  fontWeight: "700"
+                  display: "flex",
+                  gap: "8px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  marginTop: "6px"
                 }}>
-                  หัวข้อ: {selectedSpotlight.topic}
+                  <div style={{
+                    display: "inline-block",
+                    padding: "4px 14px",
+                    borderRadius: "20px",
+                    background: "rgba(0, 229, 255, 0.15)",
+                    border: "1px solid #00e5ff",
+                    color: "#00e5ff",
+                    fontSize: "13px",
+                    fontWeight: "700"
+                  }}>
+                    หัวข้อ: {selectedSpotlight.topic}
+                  </div>
+                  {(() => {
+                    const spPoll = getContestantPollRank(selectedSpotlight, pollList);
+                    if (spPoll === null) return null;
+                    return (
+                      <div style={{
+                        display: "inline-block",
+                        padding: "4px 14px",
+                        borderRadius: "20px",
+                        background: "rgba(255, 215, 0, 0.15)",
+                        border: "1px solid #ffd700",
+                        color: "#ffd700",
+                        fontSize: "13px",
+                        fontWeight: "800"
+                      }}>
+                        📊 อันดับโพลล์: #{spPoll}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
