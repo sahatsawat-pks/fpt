@@ -1363,10 +1363,11 @@ export default function MainPage() {
                             <div style={{
                               fontSize: "24px",
                               fontWeight: "900",
+                              fontFamily: "var(--font-num)",
                               color: isRank1 ? "#ffd700" : "#00e5ff",
                               textShadow: "0 0 12px currentColor"
                             }}>
-                              {c.totalScore ?? 0} <span style={{ fontSize: "12px", fontWeight: "600", color: "rgba(255,255,255,0.6)" }}>แต้ม</span>
+                              {c.totalScore ?? 0} <span style={{ fontSize: "12px", fontWeight: "600", fontFamily: "var(--font-th)", color: "rgba(255,255,255,0.6)" }}>คะแนน</span>
                             </div>
 
                             <div style={{ marginTop: "8px" }}>

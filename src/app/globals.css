@@ -45,7 +45,7 @@ button, input, select, textarea, optgroup {
     --radius: 12px;
     --radius-lg: 20px;
     --font-th: var(--font-kanit), var(--font-prompt), 'Sukhumvit Set', 'Kanit', 'Prompt', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-num: var(--font-orbitron), 'Orbitron', 'Roboto Mono', monospace, sans-serif;
+    --font-num: var(--font-lexend), 'Lexend', var(--font-orbitron), 'Orbitron', 'Roboto Mono', monospace, sans-serif;
 }
 
 html, body {
