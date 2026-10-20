@@ -634,6 +634,42 @@ export default function AdminPage() {
     }
   };
 
+  // Toggle currently playing status on stage
+  const handleToggleActivePlaying = async () => {
+    if (!activeContestant) return;
+    const nextState = !activeContestant.isPlaying;
+    setScoringNotice(nextState ? "⏳ กำลังตั้งเป็นผู้เล่นปัจจุบันบนเวที..." : "⏳ กำลังปลดสถานะกำลังเล่น...");
+    try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "toggle_playing",
+          id: activeContestant.id,
+          isPlaying: nextState,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        const updated = data.data.find((c) => String(c.id) === String(activeContestant.id));
+        if (updated) {
+          setActiveContestant(updated);
+        }
+        const msg = nextState
+          ? `🎮 ตั้งให้ "${activeContestant.nickname || activeContestant.name}" กำลังเล่นบนเวทีเรียบร้อยแล้ว!`
+          : `✅ ปลดสถานะกำลังเล่นของ "${activeContestant.nickname || activeContestant.name}" เรียบร้อยแล้ว!`;
+        setScoringNotice(msg);
+        showToast(msg, "success");
+        setTimeout(() => setScoringNotice(""), 3500);
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
   // Update specific category or all scores for active contestant
   const handleSaveActiveScore = async (category = null) => {
     if (!activeContestant) {
@@ -1497,7 +1533,8 @@ export default function AdminPage() {
             {activeContestant ? (
               <div style={{
                 background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
-                border: "1px solid rgba(0, 229, 255, 0.35)",
+                border: activeContestant.isPlaying ? "2px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.35)",
+                boxShadow: activeContestant.isPlaying ? "0 0 25px rgba(0, 229, 255, 0.3)" : "none",
                 borderRadius: "16px",
                 padding: "24px"
               }}>
@@ -1543,19 +1580,66 @@ export default function AdminPage() {
 
                   <div style={{
                     display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    gap: "6px"
+                    alignItems: "center",
+                    gap: "12px",
+                    flexWrap: "wrap"
                   }}>
+                    {/* Toggle Playing Button */}
+                    <button
+                      type="button"
+                      onClick={handleToggleActivePlaying}
+                      style={{
+                        padding: "10px 18px",
+                        borderRadius: "12px",
+                        background: activeContestant.isPlaying
+                          ? "linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)"
+                          : "rgba(0, 229, 255, 0.12)",
+                        border: activeContestant.isPlaying ? "1.5px solid #ef4444" : "1.5px solid rgba(0, 229, 255, 0.4)",
+                        color: "#ffffff",
+                        fontSize: "14px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        boxShadow: activeContestant.isPlaying ? "0 0 16px rgba(239, 68, 68, 0.6)" : "none",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {activeContestant.isPlaying ? (
+                        <>
+                          <span style={{
+                            display: "inline-block",
+                            width: "10px",
+                            height: "10px",
+                            borderRadius: "50%",
+                            background: "#fff",
+                            boxShadow: "0 0 8px #fff"
+                          }} />
+                          <span>🔴 กำลังแข่งขันอยู่บนเวที (คลิกเพื่อจบการแข่ง)</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>🎮 ตั้งเป็นคนกำลังแข่ง (ขึ้นเวที)</span>
+                        </>
+                      )}
+                    </button>
+
                     <div style={{
                       display: "flex",
-                      alignItems: "center",
-                      gap: "16px",
-                      background: "rgba(0, 229, 255, 0.08)",
-                      border: "1px solid rgba(0, 229, 255, 0.3)",
-                      padding: "8px 20px",
-                      borderRadius: "12px"
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      gap: "6px"
                     }}>
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        background: "rgba(0, 229, 255, 0.08)",
+                        border: "1px solid rgba(0, 229, 255, 0.3)",
+                        padding: "8px 20px",
+                        borderRadius: "12px"
+                      }}>
                       <div style={{ textAlign: "right" }}>
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", display: "block" }}>คะแนนรวมคำนวณ</span>
                         <strong style={{ fontSize: "28px", color: activeCalculatedTotal === 100 ? "#52c41a" : "#ffd700", fontFamily: "monospace", textShadow: activeCalculatedTotal === 100 ? "0 0 12px rgba(82,196,26,0.8)" : "none" }}>{activeCalculatedTotal}</strong>
@@ -1581,6 +1665,7 @@ export default function AdminPage() {
                     )}
                   </div>
                 </div>
+              </div>
 
                 {/* 4 Category Scoring Grid */}
                 <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#80d0ff", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>

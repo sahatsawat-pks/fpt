@@ -132,6 +132,43 @@ export async function POST(request) {
       return NextResponse.json({ success: true, data: INITIAL_DATA });
     }
 
+    // Toggle or set "isPlaying" status for a contestant
+    if (body.action === "toggle_playing" && body.id) {
+      const isPlaying = Boolean(body.isPlaying);
+      const existingIdx = currentData.findIndex((item) => String(item.id) === String(body.id));
+      if (existingIdx === -1) {
+        return NextResponse.json({ success: false, error: "Contestant not found" }, { status: 404 });
+      }
+
+      // If turning on isPlaying, unset isPlaying for all others (only 1 active player on stage)
+      currentData = currentData.map((item, idx) => {
+        if (idx === existingIdx) {
+          let orderVal = item.order;
+          if (isPlaying && !orderVal) {
+            const maxOrder = currentData.reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
+            orderVal = maxOrder + 1;
+          }
+          return {
+            ...item,
+            isPlaying,
+            order: orderVal !== undefined ? orderVal : item.order,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return {
+          ...item,
+          isPlaying: isPlaying ? false : Boolean(item.isPlaying),
+        };
+      });
+
+      await saveKVData("fpt_leaderboard", currentData, writeData);
+      return NextResponse.json({
+        success: true,
+        data: currentData,
+        record: currentData[existingIdx],
+      });
+    }
+
     const { id, name, nickname = "", topic, scores, totalScore, image, photo } = body;
     if (!name && !topic && !id) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
@@ -181,6 +218,7 @@ export async function POST(request) {
         scores: formattedScores,
         totalScore: targetTotal,
         order: existingOrder !== undefined ? existingOrder : currentData[existingIdx].order,
+        isPlaying: body.isPlaying !== undefined ? Boolean(body.isPlaying) : Boolean(currentData[existingIdx].isPlaying),
         image: contestantPhoto !== undefined ? contestantPhoto : (currentData[existingIdx].image || ""),
         updatedAt: new Date().toISOString(),
       };

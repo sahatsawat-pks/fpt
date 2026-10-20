@@ -118,7 +118,7 @@ function calculateDenseRanks(items) {
     const s = item.scores || {};
     const hasAnyScore = ["3sec", "qa", "jigsaw", "attribute"].some(
       (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
-    ) || (Number(item.totalScore) || 0) > 0;
+    ) || (Number(item.totalScore) || 0) > 0 || Boolean(item.isPlaying);
     if (hasAnyScore) {
       played.push(item);
     }
@@ -232,6 +232,7 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
 
   // Check for in-progress player
   const inProgressPlayer = (allRankedPlayers || []).find((p) => {
+    if (Boolean(p.isPlaying)) return true;
     const pScores = p.scores || {};
     const pPlayed = ["3sec", "qa", "jigsaw", "attribute"].filter(
       (k) => pScores[k] !== null && pScores[k] !== undefined && pScores[k] !== ""
@@ -326,7 +327,11 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
   let statusClass = "status-pending";
   let reason = "";
 
-  if (currentTotal >= 100) {
+  if (Boolean(item.isPlaying) && !isCompleted) {
+    statusText = "🔴 กำลังแข่ง";
+    statusClass = "status-playing";
+    reason = "กำลังแข่งขันอยู่บนเวทีในขณะนี้";
+  } else if (currentTotal >= 100) {
     isGuaranteedQualified = true;
     statusText = "🟢 เข้ารอบ";
     statusClass = "status-qualified";
@@ -592,8 +597,9 @@ export default function MainPage() {
 
       if (statusFilter === "all") return true;
       const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+      if (statusFilter === "playing") return evalStatus.statusClass === "status-playing";
       if (statusFilter === "qualified") return evalStatus.isGuaranteedQualified;
-      if (statusFilter === "pending") return !evalStatus.isGuaranteedQualified && !evalStatus.isEliminated;
+      if (statusFilter === "pending") return !evalStatus.isGuaranteedQualified && !evalStatus.isEliminated && evalStatus.statusClass !== "status-playing";
       if (statusFilter === "eliminated") return evalStatus.isEliminated;
       return true;
     })
@@ -1467,6 +1473,7 @@ export default function MainPage() {
                       <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>กรองสถานะ:</span>
                       {[
                         { key: "all", label: "ทั้งหมด" },
+                        { key: "playing", label: "🔴 กำลังแข่ง" },
                         { key: "qualified", label: "🟢 เข้ารอบ" },
                         { key: "pending", label: "⏳ รอผล" },
                         { key: "eliminated", label: "🔴 ตกรอบ" },
@@ -1737,10 +1744,17 @@ export default function MainPage() {
                       filteredStandings.map((item) => {
                         const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
                         const pollRank = getContestantPollRank(item, pollList);
-                        const isEliminated = evalStatus.isEliminated;
-                        const isTopSafe = (Number(item.rank) || 99) <= 5;
-                        const borderColor = isTopSafe ? "#ffd700" : isEliminated ? "#ff4d4f" : "#ffd700";
-                        const glowShadow = isTopSafe ? "0 0 14px rgba(255, 215, 0, 0.45)" : isEliminated ? "0 0 14px rgba(255, 77, 79, 0.45)" : "0 0 12px rgba(255, 215, 0, 0.35)";
+                        const isPlaying = evalStatus.statusClass === "status-playing";
+                        const isEliminated = !isPlaying && evalStatus.isEliminated;
+                        const isTopSafe = !isPlaying && (Number(item.rank) || 99) <= 5;
+                        const borderColor = isPlaying ? "#00e5ff" : isTopSafe ? "#ffd700" : isEliminated ? "#ff4d4f" : "#ffd700";
+                        const glowShadow = isPlaying
+                          ? "0 0 16px rgba(0, 229, 255, 0.7)"
+                          : isTopSafe
+                          ? "0 0 14px rgba(255, 215, 0, 0.45)"
+                          : isEliminated
+                          ? "0 0 14px rgba(255, 77, 79, 0.45)"
+                          : "0 0 12px rgba(255, 215, 0, 0.35)";
 
                         return (
                           <div
@@ -1767,8 +1781,8 @@ export default function MainPage() {
                             {/* 1. Dynamic Leftmost Slanted Box (matching sortBy) */}
                             {(() => {
                               let displayNum = item.rank;
-                              let numColor = isTopSafe ? "#ffd700" : "#ffffff";
-                              let numShadow = isTopSafe ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)";
+                              let numColor = isPlaying ? "#00e5ff" : isTopSafe ? "#ffd700" : "#ffffff";
+                              let numShadow = isPlaying ? "0 0 14px rgba(0, 229, 255, 0.85)" : isTopSafe ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)";
 
                               if (sortBy === "order") {
                                 displayNum = item.playOrder ?? "-";
@@ -1934,23 +1948,30 @@ export default function MainPage() {
                                     fontWeight: "800",
                                     padding: "3px 8px",
                                     borderRadius: "12px",
-                                    background: evalStatus.statusClass === "status-qualified"
+                                    background: evalStatus.statusClass === "status-playing"
+                                      ? "rgba(0, 229, 255, 0.16)"
+                                      : evalStatus.statusClass === "status-qualified"
                                       ? "rgba(34, 197, 94, 0.25)"
                                       : evalStatus.statusClass === "status-eliminated"
                                       ? "rgba(239, 68, 68, 0.25)"
                                       : "rgba(234, 179, 8, 0.25)",
-                                    color: evalStatus.statusClass === "status-qualified"
+                                    color: evalStatus.statusClass === "status-playing"
+                                      ? "#00e5ff"
+                                      : evalStatus.statusClass === "status-qualified"
                                       ? "#86efac"
                                       : evalStatus.statusClass === "status-eliminated"
                                       ? "#fca5a5"
                                       : "#fde047",
                                     border: `1px solid ${
-                                      evalStatus.statusClass === "status-qualified"
+                                      evalStatus.statusClass === "status-playing"
+                                        ? "#00e5ff"
+                                        : evalStatus.statusClass === "status-qualified"
                                         ? "#22c55e"
                                         : evalStatus.statusClass === "status-eliminated"
                                         ? "#ef4444"
                                         : "#eab308"
-                                    }`
+                                    }`,
+                                    boxShadow: evalStatus.statusClass === "status-playing" ? "0 0 10px rgba(0, 229, 255, 0.5)" : "none"
                                   }}>
                                     {evalStatus.statusText}
                                   </span>
@@ -2665,17 +2686,29 @@ export default function MainPage() {
               {/* Evaluation Analysis */}
               {(() => {
                 const st = evaluatePlayerStatus(selectedSpotlight, denseRankedLeaderboard, targetN);
+                const isPlaying = st.statusClass === "status-playing";
                 return (
                   <div style={{
                     padding: "12px 16px",
                     borderRadius: "12px",
-                    background: st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.15)" : st.isEliminated ? "rgba(239, 68, 68, 0.15)" : "rgba(234, 179, 8, 0.15)",
-                    border: `1px solid ${st.isGuaranteedQualified ? "#22c55e" : st.isEliminated ? "#ef4444" : "#eab308"}`,
+                    background: isPlaying
+                      ? "rgba(0, 229, 255, 0.12)"
+                      : st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.15)" : st.isEliminated ? "rgba(239, 68, 68, 0.15)" : "rgba(234, 179, 8, 0.15)",
+                    border: `1px solid ${
+                      isPlaying
+                        ? "#00e5ff"
+                        : st.isGuaranteedQualified ? "#22c55e" : st.isEliminated ? "#ef4444" : "#eab308"
+                    }`,
+                    boxShadow: isPlaying ? "0 0 16px rgba(0, 229, 255, 0.45)" : "none",
                     fontSize: "13px",
                     color: "#fff"
                   }}>
-                    <div style={{ fontWeight: "800", marginBottom: "4px", color: st.isGuaranteedQualified ? "#86efac" : st.isEliminated ? "#fca5a5" : "#fde047" }}>
-                      สถานะการันตี: {st.statusText}
+                    <div style={{
+                      fontWeight: "800",
+                      marginBottom: "4px",
+                      color: isPlaying ? "#00e5ff" : st.isGuaranteedQualified ? "#86efac" : st.isEliminated ? "#fca5a5" : "#fde047"
+                    }}>
+                      สถานะ: {st.statusText}
                     </div>
                     <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.85)", lineHeight: "1.4" }}>
                       {st.reason || "รอคะแนนการแข่งขันหมวดถัดไป"}
