@@ -152,16 +152,17 @@ export async function POST(request) {
           let orderVal = item.order;
           if (isPlaying && !orderVal) {
             const maxOrder = currentData
-              .filter((p, pIdx) => pIdx !== existingIdx && (Boolean(p.isPlaying) || hasAnyScore(p.scores, p.totalScore)))
+              .filter((p, pIdx) => pIdx !== existingIdx && (Boolean(p.isPlaying) || Boolean(p.waitingNextMatch) || hasAnyScore(p.scores, p.totalScore)))
               .reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
             orderVal = maxOrder + 1;
-          } else if (!isPlaying && !hasScores) {
+          } else if (!isPlaying && !hasScores && !item.waitingNextMatch) {
             // Cancelled playing without any scores recorded -> clear order so no ghost gap
             orderVal = null;
           }
           return {
             ...item,
             isPlaying,
+            waitingNextMatch: isPlaying ? false : Boolean(item.waitingNextMatch),
             order: orderVal !== undefined ? orderVal : null,
             updatedAt: new Date().toISOString(),
           };
@@ -171,6 +172,47 @@ export async function POST(request) {
           isPlaying: isPlaying ? false : Boolean(item.isPlaying),
         };
       });
+
+      await saveKVData("fpt_leaderboard", currentData, writeData);
+      return NextResponse.json({
+        success: true,
+        data: currentData,
+        record: currentData[existingIdx],
+      });
+    }
+
+    // Toggle or set "waitingNextMatch" slot in leaderboard table
+    if (body.action === "toggle_waiting_slot" && body.id) {
+      const waitingNextMatch = Boolean(body.waitingNextMatch);
+      const existingIdx = currentData.findIndex((item) => String(item.id) === String(body.id));
+      if (existingIdx === -1) {
+        return NextResponse.json({ success: false, error: "Contestant not found" }, { status: 404 });
+      }
+
+      const hasAnyScore = (scores, total) => {
+        return (scores && Object.values(scores).some((v) => v !== null && v !== "")) || (Number(total) || 0) > 0;
+      };
+
+      const item = currentData[existingIdx];
+      const hasScores = hasAnyScore(item.scores, item.totalScore);
+      let orderVal = item.order;
+
+      if (waitingNextMatch && !orderVal) {
+        const maxOrder = currentData
+          .filter((p, pIdx) => pIdx !== existingIdx && (Boolean(p.isPlaying) || Boolean(p.waitingNextMatch) || hasAnyScore(p.scores, p.totalScore)))
+          .reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
+        orderVal = maxOrder + 1;
+      } else if (!waitingNextMatch && !hasScores && !item.isPlaying) {
+        orderVal = null;
+      }
+
+      currentData[existingIdx] = {
+        ...item,
+        waitingNextMatch,
+        isPlaying: waitingNextMatch ? false : Boolean(item.isPlaying),
+        order: orderVal !== undefined ? orderVal : null,
+        updatedAt: new Date().toISOString(),
+      };
 
       await saveKVData("fpt_leaderboard", currentData, writeData);
       return NextResponse.json({
@@ -216,9 +258,9 @@ export async function POST(request) {
     if (existingIdx !== -1) {
       const hasScores = Object.values(formattedScores).some((v) => v !== null && v !== "");
       let existingOrder = body.order !== undefined ? (Number(body.order) || null) : currentData[existingIdx].order;
-      if (!existingOrder && (hasScores || Boolean(body.isPlaying))) {
+      if (!existingOrder && (hasScores || Boolean(body.isPlaying) || Boolean(body.waitingNextMatch))) {
         const maxOrder = currentData
-          .filter((p, pIdx) => pIdx !== existingIdx && (Boolean(p.isPlaying) || (p.scores && Object.values(p.scores).some((v) => v !== null && v !== "")) || (Number(p.totalScore) || 0) > 0))
+          .filter((p, pIdx) => pIdx !== existingIdx && (Boolean(p.isPlaying) || Boolean(p.waitingNextMatch) || (p.scores && Object.values(p.scores).some((v) => v !== null && v !== "")) || (Number(p.totalScore) || 0) > 0))
           .reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
         existingOrder = maxOrder + 1;
       }
@@ -232,6 +274,7 @@ export async function POST(request) {
         totalScore: targetTotal,
         order: existingOrder !== undefined ? existingOrder : currentData[existingIdx].order,
         isPlaying: body.isPlaying !== undefined ? Boolean(body.isPlaying) : Boolean(currentData[existingIdx].isPlaying),
+        waitingNextMatch: body.waitingNextMatch !== undefined ? Boolean(body.waitingNextMatch) : (hasScores ? false : Boolean(currentData[existingIdx].waitingNextMatch)),
         image: contestantPhoto !== undefined ? contestantPhoto : (currentData[existingIdx].image || ""),
         updatedAt: new Date().toISOString(),
       };

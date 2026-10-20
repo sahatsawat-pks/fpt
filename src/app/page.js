@@ -118,7 +118,7 @@ function calculateDenseRanks(items) {
     const s = item.scores || {};
     const hasAnyScore = ["3sec", "qa", "jigsaw", "attribute"].some(
       (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
-    ) || (Number(item.totalScore) || 0) > 0 || Boolean(item.isPlaying);
+    ) || (Number(item.totalScore) || 0) > 0 || Boolean(item.isPlaying) || Boolean(item.waitingNextMatch);
     if (hasAnyScore) {
       played.push(item);
     }
@@ -146,6 +146,12 @@ function calculateDenseRanks(items) {
   let currentRank = 0;
   let lastScore = null;
   const rankedPlayed = sortedPlayed.map((item) => {
+    if (item.waitingNextMatch) {
+      return {
+        ...item,
+        rank: null,
+      };
+    }
     const scoreVal = Number(item.totalScore) || 0;
     if (lastScore === null || scoreVal !== lastScore) {
       currentRank += 1;
@@ -215,6 +221,20 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
   const cutoff5 = rank5Info?.score ?? null;
 
   if (isUnplayed) {
+    if (Boolean(item.waitingNextMatch)) {
+      return {
+        isCompleted: false,
+        unplayedCount: 4,
+        maxPossibleScore: 100,
+        cutoff5,
+        rank5Info,
+        isEliminated: false,
+        isGuaranteedQualified: false,
+        statusText: "⏳ รอลุ้นผลในวันแข่งขันถัดไป",
+        statusClass: "status-pending",
+        reason: "รอลุ้นผลการแข่งขันในวันแข่งขันถัดไป",
+      };
+    }
     return {
       isCompleted: false,
       unplayedCount: 4,
@@ -330,7 +350,11 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
   let statusClass = "status-pending";
   let reason = "";
 
-  if (Boolean(item.isPlaying) && !isCompleted) {
+  if (Boolean(item.waitingNextMatch)) {
+    statusText = "⏳ รอลุ้นผลในวันแข่งขันถัดไป";
+    statusClass = "status-pending";
+    reason = "รอลุ้นผลการแข่งขันในวันแข่งขันถัดไป";
+  } else if (Boolean(item.isPlaying) && !isCompleted) {
     statusText = "🔴 กำลังแข่ง";
     statusClass = "status-playing";
     reason = "กำลังแข่งขันอยู่บนเวทีในขณะนี้";
@@ -1326,7 +1350,7 @@ export default function MainPage() {
                               {c.nickname ? `${c.nickname} (${c.name})` : c.name}
                             </h4>
                             <p style={{ fontSize: "12px", color: "#80d0ff", margin: "0 0 10px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                              {c.topic}
+                              {c.waitingNextMatch ? "รอลุ้นผลในวันแข่งขันถัดไป" : c.topic}
                             </p>
 
                             <div style={{
@@ -1786,7 +1810,7 @@ export default function MainPage() {
                           >
                             {/* 1. Dynamic Leftmost Slanted Box (matching sortBy) */}
                             {(() => {
-                              let displayNum = item.rank;
+                              let displayNum = item.waitingNextMatch ? "-" : item.rank;
                               let numColor = isPlaying ? "#00e5ff" : isTopSafe ? "#ffd700" : "#ffffff";
                               let numShadow = isPlaying ? "0 0 14px rgba(0, 229, 255, 0.85)" : isTopSafe ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)";
 
@@ -1890,21 +1914,38 @@ export default function MainPage() {
                                     }}>
                                       {item.name}
                                     </span>
-                                    <span style={{
-                                      fontSize: "12px",
-                                      color: "#80d0ff",
-                                      fontStyle: "normal",
-                                      marginLeft: "6px",
-                                      opacity: 0.85
-                                    }}>
-                                      • {item.topic}
-                                    </span>
+                                    {item.waitingNextMatch ? (
+                                      <span style={{
+                                        fontSize: "12px",
+                                        color: "#a5b4fc",
+                                        fontStyle: "italic",
+                                        marginLeft: "6px",
+                                        fontWeight: "700",
+                                        letterSpacing: "0.2px",
+                                        background: "rgba(99, 102, 241, 0.15)",
+                                        padding: "2px 8px",
+                                        borderRadius: "6px",
+                                        border: "1px solid rgba(129, 140, 248, 0.35)"
+                                      }}>
+                                        • รอลุ้นผลในวันแข่งขันถัดไป
+                                      </span>
+                                    ) : (
+                                      <span style={{
+                                        fontSize: "12px",
+                                        color: "#80d0ff",
+                                        fontStyle: "normal",
+                                        marginLeft: "6px",
+                                        opacity: 0.85
+                                      }}>
+                                        • {item.topic}
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
 
                                 {/* Dynamic Badges & Status Chip */}
                                 <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-                                  {sortBy !== "rank" && item.rank && (
+                                  {sortBy !== "rank" && item.rank && !item.waitingNextMatch && (
                                     <span style={{
                                       fontSize: "11px",
                                       padding: "2px 7px",
@@ -2097,10 +2138,10 @@ export default function MainPage() {
                                 fontStyle: "italic",
                                 fontWeight: "900",
                                 fontSize: "26px",
-                                color: item.totalScore === 100 ? "#52c41a" : "#ffd700",
-                                textShadow: item.totalScore === 100 ? "0 0 14px rgba(82, 196, 26, 0.9)" : "0 0 12px rgba(255, 215, 0, 0.8)"
+                                color: item.totalScore === 100 ? "#52c41a" : item.waitingNextMatch ? "rgba(255,255,255,0.4)" : "#ffd700",
+                                textShadow: item.totalScore === 100 ? "0 0 14px rgba(82, 196, 26, 0.9)" : item.waitingNextMatch ? "none" : "0 0 12px rgba(255, 215, 0, 0.8)"
                               }}>
-                                {item.totalScore ?? 0}
+                                {item.waitingNextMatch ? "-" : (item.totalScore ?? 0)}
                               </span>
                             </div>
                           </div>
@@ -2610,7 +2651,7 @@ export default function MainPage() {
                     fontSize: "13px",
                     fontWeight: "700"
                   }}>
-                    หัวข้อ: {selectedSpotlight.topic}
+                    หัวข้อ: {selectedSpotlight.waitingNextMatch ? "รอลุ้นผลในวันแข่งขันถัดไป" : selectedSpotlight.topic}
                   </div>
                   {selectedSpotlight.playOrder && (
                     <div style={{
@@ -2658,7 +2699,7 @@ export default function MainPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                   <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>คะแนนรวมสะสม</span>
                   <span style={{ fontSize: "28px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 14px rgba(255,215,0,0.6)" }}>
-                    {selectedSpotlight.totalScore ?? 0} <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>/ 100</span>
+                    {selectedSpotlight.waitingNextMatch ? "-" : (selectedSpotlight.totalScore ?? 0)} <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>/ 100</span>
                   </span>
                 </div>
 

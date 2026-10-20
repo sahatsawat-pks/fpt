@@ -55,6 +55,10 @@ export default function AdminPage() {
   const [dropdownSearch, setDropdownSearch] = useState("");
   const dropdownRef = useRef(null);
 
+  // Add Scoreboard Slot Modal State
+  const [showAddSlotModal, setShowAddSlotModal] = useState(false);
+  const [slotModalSearch, setSlotModalSearch] = useState("");
+
   // Contestant Edit / Modal State
   const [showContestantModal, setShowContestantModal] = useState(false);
   const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
@@ -659,6 +663,63 @@ export default function AdminPage() {
         const msg = nextState
           ? `🎮 ตั้งให้ "${activeContestant.nickname || activeContestant.name}" กำลังเล่นบนเวทีเรียบร้อยแล้ว!`
           : `✅ ปลดสถานะกำลังเล่นของ "${activeContestant.nickname || activeContestant.name}" เรียบร้อยแล้ว!`;
+        setScoringNotice(msg);
+        showToast(msg, "success");
+        setTimeout(() => setScoringNotice(""), 3500);
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  // Toggle "waitingNextMatch" slot in competition table
+  const handleToggleWaitingNextMatch = async (target = null) => {
+    let contestantToUpdate = null;
+    if (target && typeof target === "object" && target.id) {
+      contestantToUpdate = target;
+    } else if (target && typeof target === "string") {
+      contestantToUpdate = contestants.find((c) => String(c.id) === String(target));
+    } else if (activeContestant) {
+      contestantToUpdate = activeContestant;
+    } else if (selectedContestantId) {
+      contestantToUpdate = contestants.find((c) => String(c.id) === String(selectedContestantId));
+    }
+
+    if (!contestantToUpdate) {
+      setShowAddSlotModal(true);
+      return;
+    }
+
+    const nextState = !Boolean(contestantToUpdate.waitingNextMatch);
+    setScoringNotice(
+      nextState
+        ? `⏳ กำลังเพิ่ม "${contestantToUpdate.nickname || contestantToUpdate.name}" ในตารางคะแนน (รอลุ้นผล)...`
+        : `⏳ กำลังนำ "${contestantToUpdate.nickname || contestantToUpdate.name}" ออกจากช่องตารางคะแนน...`
+    );
+
+    try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "toggle_waiting_slot",
+          id: contestantToUpdate.id,
+          waitingNextMatch: nextState,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        if (activeContestant && String(activeContestant.id) === String(contestantToUpdate.id)) {
+          const updated = data.data.find((c) => String(c.id) === String(activeContestant.id));
+          if (updated) setActiveContestant(updated);
+        }
+        const displayName = contestantToUpdate.nickname || contestantToUpdate.name;
+        const msg = nextState
+          ? `📋 เพิ่ม "${displayName}" เข้าตารางคะแนนแล้ว (แสดง: "รอลุ้นผลในวันแข่งขันถัดไป" แทนหัวข้อ)`
+          : `✅ นำ "${displayName}" ออกจากตารางคะแนนเรียบร้อยแล้ว`;
         setScoringNotice(msg);
         showToast(msg, "success");
         setTimeout(() => setScoringNotice(""), 3500);
@@ -1512,6 +1573,44 @@ export default function AdminPage() {
                 >
                   ✅ ยืนยันเลือกคนนี้
                 </button>
+
+                {(() => {
+                  const sel = contestants.find((c) => String(c.id) === String(selectedContestantId));
+                  const isWaiting = sel && Boolean(sel.waitingNextMatch);
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (sel) {
+                          handleToggleWaitingNextMatch(sel);
+                        } else {
+                          setShowAddSlotModal(true);
+                        }
+                      }}
+                      style={{
+                        padding: "12px 20px",
+                        borderRadius: "10px",
+                        background: isWaiting
+                          ? "linear-gradient(90deg, #4f46e5 0%, #3730a3 100%)"
+                          : "rgba(99, 102, 241, 0.18)",
+                        border: isWaiting ? "1.5px solid #818cf8" : "1.5px solid rgba(129, 140, 248, 0.5)",
+                        color: isWaiting ? "#ffffff" : "#c7d2fe",
+                        fontSize: "15px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                        boxShadow: isWaiting ? "0 0 15px rgba(99, 102, 241, 0.5)" : "none",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        transition: "all 0.2s ease"
+                      }}
+                      title="เพิ่มช่องผู้เข้าแข่งขันนี้ลงในตารางคะแนนหน้าแรก โดยระบบจะซ่อนหัวข้อและแสดงเป็น 'รอลุ้นผลในวันแข่งขันถัดไป' แทน"
+                    >
+                      <span>{isWaiting ? "📋 อยู่ในตารางแล้ว (คลิกเพื่อนำออก)" : "➕ เพิ่มช่องในตารางคะแนน"}</span>
+                    </button>
+                  );
+                })()}
               </div>
 
               {scoringNotice && (
@@ -1572,11 +1671,24 @@ export default function AdminPage() {
                       <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#ffffff", margin: "0 0 4px 0" }}>
                         {activeContestant.name} {activeContestant.nickname && <span style={{ color: "#ffd700" }}>({activeContestant.nickname})</span>}
                       </h3>
-                      <p style={{ fontSize: "14px", color: "var(--gold-light, #ffd700)", margin: 0 }}>
-                        📌 หัวข้อ: <strong>{activeContestant.topic}</strong>
+                      <p style={{ fontSize: "14px", color: "var(--gold-light, #ffd700)", margin: 0, display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                        <span>📌 หัวข้อ: <strong>{activeContestant.topic}</strong></span>
                         {activeContestant.order && (
-                          <span style={{ marginLeft: "12px", color: "#00e5ff", fontWeight: "700" }}>
+                          <span style={{ color: "#00e5ff", fontWeight: "700" }}>
                             • 🎲 ลำดับแข่ง #{activeContestant.order}
+                          </span>
+                        )}
+                        {activeContestant.waitingNextMatch && (
+                          <span style={{
+                            padding: "2px 10px",
+                            borderRadius: "12px",
+                            background: "rgba(99, 102, 241, 0.25)",
+                            border: "1px solid #818cf8",
+                            color: "#c7d2fe",
+                            fontSize: "12px",
+                            fontWeight: "700"
+                          }}>
+                            ⏳ ในตาราง: รอลุ้นผลในวันแข่งขันถัดไป
                           </span>
                         )}
                       </p>
@@ -1626,6 +1738,48 @@ export default function AdminPage() {
                       ) : (
                         <>
                           <span>🎮 ตั้งเป็นคนกำลังแข่ง (ขึ้นเวที)</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Toggle Waiting Next Match Slot Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleWaitingNextMatch(activeContestant)}
+                      style={{
+                        padding: "10px 18px",
+                        borderRadius: "12px",
+                        background: activeContestant.waitingNextMatch
+                          ? "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)"
+                          : "rgba(99, 102, 241, 0.15)",
+                        border: activeContestant.waitingNextMatch ? "1.5px solid #818cf8" : "1.5px solid rgba(129, 140, 248, 0.4)",
+                        color: "#ffffff",
+                        fontSize: "14px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        boxShadow: activeContestant.waitingNextMatch ? "0 0 16px rgba(99, 102, 241, 0.5)" : "none",
+                        transition: "all 0.2s ease"
+                      }}
+                      title="เพิ่มช่องคนนี้ลงในตารางคะแนนหน้าแรก โดยซ่อนหัวข้อและแสดงเป็น 'รอลุ้นผลในวันแข่งขันถัดไป'"
+                    >
+                      {activeContestant.waitingNextMatch ? (
+                        <>
+                          <span style={{
+                            display: "inline-block",
+                            width: "8px",
+                            height: "8px",
+                            borderRadius: "50%",
+                            background: "#a5b4fc",
+                            boxShadow: "0 0 8px #818cf8"
+                          }} />
+                          <span>📋 ในตาราง: รอลุ้นผลวันถัดไป (คลิกเพื่อนำออก)</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>➕ เพิ่มช่องในตารางคะแนน</span>
                         </>
                       )}
                     </button>
@@ -2429,7 +2583,23 @@ export default function AdminPage() {
                             )}
                           </div>
                         </td>
-                        <td style={{ padding: "12px 14px", fontWeight: "700" }}>{c.name}</td>
+                        <td style={{ padding: "12px 14px", fontWeight: "700" }}>
+                          {c.name}
+                          {c.waitingNextMatch && (
+                            <span style={{
+                              marginLeft: "6px",
+                              fontSize: "11px",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              background: "rgba(99, 102, 241, 0.25)",
+                              border: "1px solid #818cf8",
+                              color: "#c7d2fe",
+                              fontWeight: "600"
+                            }}>
+                              รอลุ้นผล
+                            </span>
+                          )}
+                        </td>
                         <td style={{ padding: "12px 14px", color: "var(--gold-light, #ffd700)" }}>{c.nickname || "-"}</td>
                         <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.85)" }}>{c.topic}</td>
                         <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "monospace" }}>{c.scores?.["3sec"] ?? "-"}</td>
@@ -2441,6 +2611,23 @@ export default function AdminPage() {
                         </td>
                         <td style={{ padding: "12px 14px", textAlign: "center" }}>
                           <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                            <button
+                              type="button"
+                              onClick={() => handleToggleWaitingNextMatch(c)}
+                              style={{
+                                padding: "4px 8px",
+                                borderRadius: "6px",
+                                background: c.waitingNextMatch ? "rgba(99, 102, 241, 0.25)" : "rgba(255, 255, 255, 0.06)",
+                                border: c.waitingNextMatch ? "1px solid #818cf8" : "1px solid rgba(255, 255, 255, 0.2)",
+                                color: c.waitingNextMatch ? "#c7d2fe" : "rgba(255, 255, 255, 0.75)",
+                                fontSize: "12px",
+                                cursor: "pointer",
+                                whiteSpace: "nowrap"
+                              }}
+                              title={c.waitingNextMatch ? "นำออกจากตารางคะแนน" : "เพิ่มช่องในตารางคะแนน (รอลุ้นผลวันถัดไป)"}
+                            >
+                              {c.waitingNextMatch ? "📋 อยู่ในตาราง" : "➕ เพิ่มช่อง"}
+                            </button>
                             <button
                               type="button"
                               onClick={() => openEditModal(c)}
@@ -4332,6 +4519,208 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          MODAL: ADD SLOT TO SCOREBOARD (เพิ่มช่องในตารางคะแนน)
+         ======================================================== */}
+      {showAddSlotModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0, 0, 0, 0.82)",
+          backdropFilter: "blur(6px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          padding: "20px"
+        }}>
+          <div style={{
+            maxWidth: "600px",
+            width: "100%",
+            maxHeight: "85vh",
+            background: "linear-gradient(150deg, #101c36 0%, #080f1d 100%)",
+            border: "1.5px solid #818cf8",
+            borderRadius: "20px",
+            padding: "24px",
+            boxShadow: "0 0 40px rgba(99, 102, 241, 0.35)",
+            display: "flex",
+            flexDirection: "column"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
+              <div>
+                <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#c7d2fe", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span>➕</span> เพิ่มช่องในตารางคะแนน
+                </h3>
+                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: 0, lineHeight: 1.4 }}>
+                  เลือกผู้เข้าแข่งขันเพื่อนำชื่อเข้าสู่ตารางคะแนนหน้าแรก โดยระบบจะ<strong>ซ่อนหัวข้อ</strong>และแสดงเป็น <strong>"รอลุ้นผลในวันแข่งขันถัดไป"</strong> แทนโดยอัตโนมัติ
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddSlotModal(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "rgba(255,255,255,0.6)",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                  padding: "4px"
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Search filter inside modal */}
+            <input
+              type="text"
+              placeholder="🔍 ค้นหาชื่อ หรือชื่อเล่น..."
+              value={slotModalSearch}
+              onChange={(e) => setSlotModalSearch(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                background: "rgba(0, 10, 25, 0.8)",
+                border: "1px solid rgba(129, 140, 248, 0.4)",
+                color: "#fff",
+                fontSize: "14px",
+                marginBottom: "14px",
+                outline: "none"
+              }}
+            />
+
+            {/* Contestants List */}
+            <div style={{
+              flex: 1,
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              paddingRight: "4px"
+            }}>
+              {contestants
+                .filter((c) => {
+                  const q = slotModalSearch.trim().toLowerCase();
+                  if (!q) return true;
+                  return (
+                    (c.name || "").toLowerCase().includes(q) ||
+                    (c.nickname || "").toLowerCase().includes(q) ||
+                    (c.topic || "").toLowerCase().includes(q)
+                  );
+                })
+                .sort((a, b) => {
+                  const aWaiting = Boolean(a.waitingNextMatch);
+                  const bWaiting = Boolean(b.waitingNextMatch);
+                  if (aWaiting !== bWaiting) return aWaiting ? -1 : 1;
+                  return (getContestantPollRank(a) || 999) - (getContestantPollRank(b) || 999);
+                })
+                .map((c) => {
+                  const isWaiting = Boolean(c.waitingNextMatch);
+                  const pRank = getContestantPollRank(c);
+                  return (
+                    <div
+                      key={c.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "10px 14px",
+                        borderRadius: "10px",
+                        background: isWaiting ? "rgba(99, 102, 241, 0.15)" : "rgba(255, 255, 255, 0.04)",
+                        border: isWaiting ? "1px solid #818cf8" : "1px solid rgba(255, 255, 255, 0.08)",
+                        gap: "12px"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                        <div style={{
+                          width: "36px",
+                          height: "36px",
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                          background: "#081020",
+                          border: isWaiting ? "1.5px solid #818cf8" : "1px solid rgba(255,255,255,0.2)",
+                          flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}>
+                          {c.image ? (
+                            <img src={c.image} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ) : (
+                            <span style={{ fontSize: "16px" }}>👤</span>
+                          )}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontWeight: "700", color: "#fff", fontSize: "14px" }}>
+                              {c.name} {c.nickname && <span style={{ color: "#ffd700" }}>({c.nickname})</span>}
+                            </span>
+                            {pRank && (
+                              <span style={{
+                                fontSize: "10px",
+                                padding: "1px 6px",
+                                borderRadius: "4px",
+                                background: "rgba(0, 229, 255, 0.15)",
+                                color: "#67e8f9",
+                                border: "1px solid rgba(0, 229, 255, 0.3)"
+                              }}>
+                                #{pRank}
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontSize: "12px", color: isWaiting ? "#a5b4fc" : "rgba(255,255,255,0.5)", display: "block", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                            {isWaiting ? "⏳ อยู่ในตาราง: รอลุ้นผลในวันแข่งขันถัดไป" : `หัวข้อจริง: ${c.topic}`}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleWaitingNextMatch(c)}
+                        style={{
+                          padding: "6px 14px",
+                          borderRadius: "8px",
+                          background: isWaiting
+                            ? "linear-gradient(90deg, #dc2626 0%, #b91c1c 100%)"
+                            : "linear-gradient(90deg, #6366f1 0%, #4338ca 100%)",
+                          border: isWaiting ? "1px solid #ef4444" : "1px solid #818cf8",
+                          color: "#fff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                          boxShadow: isWaiting ? "0 0 10px rgba(239, 68, 68, 0.4)" : "0 0 10px rgba(99, 102, 241, 0.4)",
+                          flexShrink: 0
+                        }}
+                      >
+                        {isWaiting ? "🗑️ นำออก" : "➕ เพิ่มลงตาราง"}
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <div style={{ textAlign: "right", marginTop: "16px" }}>
+              <button
+                type="button"
+                onClick={() => setShowAddSlotModal(false)}
+                style={{
+                  padding: "8px 20px",
+                  borderRadius: "8px",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: "13px",
+                  cursor: "pointer"
+                }}
+              >
+                ปิดหน้าต่าง
+              </button>
+            </div>
           </div>
         </div>
       )}
