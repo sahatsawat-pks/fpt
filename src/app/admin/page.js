@@ -1801,7 +1801,7 @@ export default function AdminPage() {
                       }}>
                       <div style={{ textAlign: "right" }}>
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", display: "block" }}>คะแนนรวมคำนวณ</span>
-                        <strong style={{ fontSize: "28px", color: activeCalculatedTotal === 100 ? "#52c41a" : "#ffd700", fontFamily: "monospace", textShadow: activeCalculatedTotal === 100 ? "0 0 12px rgba(82,196,26,0.8)" : "none" }}>{activeCalculatedTotal}</strong>
+                        <strong style={{ fontSize: "28px", color: activeCalculatedTotal === 100 ? "#52c41a" : "#ffd700", fontFamily: "var(--font-num, monospace)", textShadow: activeCalculatedTotal === 100 ? "0 0 12px rgba(82,196,26,0.8)" : "none" }}>{activeCalculatedTotal}</strong>
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}> / 100</span>
                       </div>
                     </div>
@@ -2602,11 +2602,11 @@ export default function AdminPage() {
                         </td>
                         <td style={{ padding: "12px 14px", color: "var(--gold-light, #ffd700)" }}>{c.nickname || "-"}</td>
                         <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.85)" }}>{c.topic}</td>
-                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "monospace" }}>{c.scores?.["3sec"] ?? "-"}</td>
-                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "monospace" }}>{c.scores?.qa ?? "-"}</td>
-                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "monospace" }}>{c.scores?.jigsaw ?? "-"}</td>
-                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "monospace" }}>{c.scores?.attribute ?? "-"}</td>
-                        <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: "800", color: "#ffd700", fontFamily: "monospace" }}>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "var(--font-num, monospace)" }}>{c.scores?.["3sec"] ?? "-"}</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "var(--font-num, monospace)" }}>{c.scores?.qa ?? "-"}</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "var(--font-num, monospace)" }}>{c.scores?.jigsaw ?? "-"}</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontFamily: "var(--font-num, monospace)" }}>{c.scores?.attribute ?? "-"}</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: "800", color: "#ffd700", fontFamily: "var(--font-num, monospace)" }}>
                           {c.totalScore ?? 0}
                         </td>
                         <td style={{ padding: "12px 14px", textAlign: "center" }}>

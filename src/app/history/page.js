@@ -2166,8 +2166,8 @@ export default function HistoryPage() {
               <span style={{ fontSize: "15px", fontWeight: "800", color: "#ffd700" }}>
                 คะแนนรวมรอบคัดเลือก
               </span>
-              <span style={{ fontSize: "28px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 14px rgba(255, 215, 0, 0.7)" }}>
-                {selectedSpotlight.totalScore ?? 0} แต้ม
+              <span style={{ fontSize: "28px", fontWeight: "900", fontFamily: "var(--font-num)", color: "#ffd700", textShadow: "0 0 14px rgba(255, 215, 0, 0.7)" }}>
+                {selectedSpotlight.totalScore ?? 0} คะแนน
               </span>
             </div>
 
