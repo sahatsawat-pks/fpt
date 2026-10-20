@@ -1574,6 +1574,11 @@ export default function AdminPage() {
                       </h3>
                       <p style={{ fontSize: "14px", color: "var(--gold-light, #ffd700)", margin: 0 }}>
                         📌 หัวข้อ: <strong>{activeContestant.topic}</strong>
+                        {activeContestant.order && (
+                          <span style={{ marginLeft: "12px", color: "#00e5ff", fontWeight: "700" }}>
+                            • 🎲 ลำดับแข่ง #{activeContestant.order}
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>

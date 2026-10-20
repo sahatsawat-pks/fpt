@@ -151,7 +151,7 @@
     "createdAt": "2026-09-11T16:47:06.621Z",
     "updatedAt": "2026-10-19T19:45:55.225Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm?authuser=0",
-    "order": 6,
+    "order": null,
     "isPlaying": false
   },
   {
@@ -160,16 +160,17 @@
     "nickname": "ตฤณ",
     "topic": "Tattoo Colour",
     "scores": {
-      "3sec": null,
+      "3sec": 2,
       "qa": null,
       "jigsaw": null,
       "attribute": null
     },
-    "totalScore": 0,
+    "totalScore": 2,
     "createdAt": "2026-09-12T16:35:23.279Z",
-    "updatedAt": "2026-10-19T01:48:56.618Z",
+    "updatedAt": "2026-10-20T14:35:31.288Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm?authuser=0",
-    "isPlaying": false
+    "isPlaying": true,
+    "order": 6
   },
   {
     "id": "1789234970194",
@@ -367,16 +368,16 @@
     "nickname": "อินทร์",
     "topic": "วง Queen",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 21,
+      "qa": 0,
+      "jigsaw": 20,
+      "attribute": 20
     },
-    "totalScore": 0,
+    "totalScore": 61,
     "createdAt": "2026-10-10T05:19:26.839Z",
-    "updatedAt": "2026-10-19T19:26:19.166Z",
+    "updatedAt": "2026-10-20T14:12:26.849Z",
     "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0",
     "order": 5,
-    "isPlaying": true
+    "isPlaying": false
   }
 ]

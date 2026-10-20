@@ -140,18 +140,29 @@ export async function POST(request) {
         return NextResponse.json({ success: false, error: "Contestant not found" }, { status: 404 });
       }
 
+      // Helper to check if contestant has recorded scores
+      const hasAnyScore = (scores, total) => {
+        return (scores && Object.values(scores).some((v) => v !== null && v !== "")) || (Number(total) || 0) > 0;
+      };
+
       // If turning on isPlaying, unset isPlaying for all others (only 1 active player on stage)
       currentData = currentData.map((item, idx) => {
         if (idx === existingIdx) {
+          const hasScores = hasAnyScore(item.scores, item.totalScore);
           let orderVal = item.order;
           if (isPlaying && !orderVal) {
-            const maxOrder = currentData.reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
+            const maxOrder = currentData
+              .filter((p, pIdx) => pIdx !== existingIdx && (Boolean(p.isPlaying) || hasAnyScore(p.scores, p.totalScore)))
+              .reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
             orderVal = maxOrder + 1;
+          } else if (!isPlaying && !hasScores) {
+            // Cancelled playing without any scores recorded -> clear order so no ghost gap
+            orderVal = null;
           }
           return {
             ...item,
             isPlaying,
-            order: orderVal !== undefined ? orderVal : item.order,
+            order: orderVal !== undefined ? orderVal : null,
             updatedAt: new Date().toISOString(),
           };
         }
@@ -205,8 +216,10 @@ export async function POST(request) {
     if (existingIdx !== -1) {
       const hasScores = Object.values(formattedScores).some((v) => v !== null && v !== "");
       let existingOrder = body.order !== undefined ? (Number(body.order) || null) : currentData[existingIdx].order;
-      if (!existingOrder && hasScores) {
-        const maxOrder = currentData.reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
+      if (!existingOrder && (hasScores || Boolean(body.isPlaying))) {
+        const maxOrder = currentData
+          .filter((p, pIdx) => pIdx !== existingIdx && (Boolean(p.isPlaying) || (p.scores && Object.values(p.scores).some((v) => v !== null && v !== "")) || (Number(p.totalScore) || 0) > 0))
+          .reduce((max, p) => Math.max(max, Number(p.order) || 0), 0);
         existingOrder = maxOrder + 1;
       }
 
