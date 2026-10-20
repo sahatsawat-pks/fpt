@@ -230,9 +230,9 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
         rank5Info,
         isEliminated: false,
         isGuaranteedQualified: false,
-        statusText: "⏳ รอลุ้นผลในวันแข่งขันถัดไป",
+        statusText: "⏳ รอลุ้นผล",
         statusClass: "status-pending",
-        reason: "รอลุ้นผลการแข่งขันในวันแข่งขันถัดไป",
+        reason: "รอลุ้นผลการแข่งขันในวันแข่งขันถัดไป (ยังไม่เปิดเผยข้อมูล)",
       };
     }
     return {
@@ -351,9 +351,9 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
   let reason = "";
 
   if (Boolean(item.waitingNextMatch)) {
-    statusText = "⏳ รอลุ้นผลในวันแข่งขันถัดไป";
+    statusText = "⏳ รอลุ้นผล";
     statusClass = "status-pending";
-    reason = "รอลุ้นผลการแข่งขันในวันแข่งขันถัดไป";
+    reason = "รอลุ้นผลการแข่งขันในวันแข่งขันถัดไป (ยังไม่เปิดเผยข้อมูล)";
   } else if (Boolean(item.isPlaying) && !isCompleted) {
     statusText = "🔴 กำลังแข่ง";
     statusClass = "status-playing";
@@ -611,10 +611,17 @@ export default function MainPage() {
   const filteredStandings = denseRankedLeaderboard
     .filter((item) => {
       const q = searchQuery.trim().toLowerCase();
-      const matchesQuery = !q ||
-        item.name?.toLowerCase().includes(q) ||
-        item.nickname?.toLowerCase().includes(q) ||
-        item.topic?.toLowerCase().includes(q);
+      let matchesQuery = true;
+      if (q) {
+        if (item.waitingNextMatch) {
+          matchesQuery = "รอลุ้นผลในวันแข่งขันถัดไป".toLowerCase().includes(q) || "รอลุ้นผล".toLowerCase().includes(q);
+        } else {
+          matchesQuery =
+            item.name?.toLowerCase().includes(q) ||
+            item.nickname?.toLowerCase().includes(q) ||
+            item.topic?.toLowerCase().includes(q);
+        }
+      }
 
       if (!matchesQuery) return false;
 
@@ -1789,23 +1796,31 @@ export default function MainPage() {
                         return (
                           <div
                             key={item.id}
-                            onClick={() => setSelectedSpotlight(item)}
-                            title="คลิกเพื่อดูสถิติและคะแนนเจาะลึก"
+                            onClick={() => {
+                              if (!item.waitingNextMatch) {
+                                setSelectedSpotlight(item);
+                              }
+                            }}
+                            title={item.waitingNextMatch ? "รอลุ้นผลในวันแข่งขันถัดไป" : "คลิกเพื่อดูสถิติและคะแนนเจาะลึก"}
                             style={{
                               display: "flex",
                               alignItems: "center",
                               gap: "8px",
                               marginBottom: "8px",
-                              cursor: "pointer",
+                              cursor: item.waitingNextMatch ? "default" : "pointer",
                               transition: "transform 0.15s ease, filter 0.15s ease"
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
-                              e.currentTarget.style.filter = "brightness(1.15)";
+                              if (!item.waitingNextMatch) {
+                                e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
+                                e.currentTarget.style.filter = "brightness(1.15)";
+                              }
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = "scale(1) translateX(0)";
-                              e.currentTarget.style.filter = "brightness(1)";
+                              if (!item.waitingNextMatch) {
+                                e.currentTarget.style.transform = "scale(1) translateX(0)";
+                                e.currentTarget.style.filter = "brightness(1)";
+                              }
                             }}
                           >
                             {/* 1. Dynamic Leftmost Slanted Box (matching sortBy) */}
@@ -1819,7 +1834,7 @@ export default function MainPage() {
                                 numColor = "#00e5ff";
                                 numShadow = "0 0 12px rgba(0, 229, 255, 0.6)";
                               } else if (sortBy === "poll") {
-                                displayNum = pollRank ?? "-";
+                                displayNum = item.waitingNextMatch ? "-" : (pollRank ?? "-");
                                 numColor = pollRank && pollRank <= 5 ? "#ffd700" : "#38bdf8";
                                 numShadow = pollRank && pollRank <= 5 ? "0 0 12px rgba(255, 215, 0, 0.6)" : "0 0 10px rgba(56, 189, 248, 0.5)";
                               }
@@ -1881,55 +1896,55 @@ export default function MainPage() {
                                     height: "32px",
                                     borderRadius: "50%",
                                     overflow: "hidden",
-                                    background: "rgba(0, 229, 255, 0.1)",
-                                    border: isPlaying ? "2px solid #00e5ff" : isTopSafe ? "1.5px solid #ffd700" : "1.5px solid rgba(148, 163, 184, 0.5)",
+                                    background: item.waitingNextMatch ? "rgba(99, 102, 241, 0.2)" : "rgba(0, 229, 255, 0.1)",
+                                    border: item.waitingNextMatch ? "1.5px dashed #818cf8" : isPlaying ? "2px solid #00e5ff" : isTopSafe ? "1.5px solid #ffd700" : "1.5px solid rgba(148, 163, 184, 0.5)",
                                     flexShrink: 0,
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center"
                                   }}>
-                                    {item.image ? (
+                                    {item.waitingNextMatch ? (
+                                      <span style={{ fontSize: "14px", color: "#a5b4fc" }}>❓</span>
+                                    ) : item.image ? (
                                       <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                     ) : (
                                       <span style={{ fontSize: "15px" }}>👤</span>
                                     )}
                                   </div>
 
-                                  {/* Nickname & Full Name in True Tournament Typography */}
-                                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                    <span style={{
-                                      fontStyle: "italic",
-                                      fontWeight: "900",
-                                      fontSize: "20px",
-                                      color: isTopSafe ? "#ffd700" : "#ffffff",
-                                      letterSpacing: "0.5px"
-                                    }}>
-                                      {item.nickname || item.name.split(" ")[0]}
-                                    </span>
-                                    <span style={{
-                                      fontStyle: "italic",
-                                      fontWeight: "700",
-                                      fontSize: "15px",
-                                      color: isTopSafe ? "#ffe885" : "rgba(255, 255, 255, 0.85)"
-                                    }}>
-                                      {item.name}
-                                    </span>
-                                    {item.waitingNextMatch ? (
+                                  {/* Contestant Info Area: Mask entirely if waitingNextMatch */}
+                                  {item.waitingNextMatch ? (
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                       <span style={{
-                                        fontSize: "12px",
-                                        color: "#a5b4fc",
                                         fontStyle: "italic",
-                                        marginLeft: "6px",
-                                        fontWeight: "700",
-                                        letterSpacing: "0.2px",
-                                        background: "rgba(99, 102, 241, 0.15)",
-                                        padding: "2px 8px",
-                                        borderRadius: "6px",
-                                        border: "1px solid rgba(129, 140, 248, 0.35)"
+                                        fontWeight: "900",
+                                        fontSize: "17px",
+                                        color: "#c7d2fe",
+                                        letterSpacing: "0.5px"
                                       }}>
-                                        • รอลุ้นผลในวันแข่งขันถัดไป
+                                        รอลุ้นผลในวันแข่งขันถัดไป
                                       </span>
-                                    ) : (
+                                    </div>
+                                  ) : (
+                                    /* Nickname & Full Name in True Tournament Typography */
+                                    <div style={{ display: "flex", alignItems: "baseline", gap: "8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                      <span style={{
+                                        fontStyle: "italic",
+                                        fontWeight: "900",
+                                        fontSize: "20px",
+                                        color: isTopSafe ? "#ffd700" : "#ffffff",
+                                        letterSpacing: "0.5px"
+                                      }}>
+                                        {item.nickname || item.name.split(" ")[0]}
+                                      </span>
+                                      <span style={{
+                                        fontStyle: "italic",
+                                        fontWeight: "700",
+                                        fontSize: "15px",
+                                        color: isTopSafe ? "#ffe885" : "rgba(255, 255, 255, 0.85)"
+                                      }}>
+                                        {item.name}
+                                      </span>
                                       <span style={{
                                         fontSize: "12px",
                                         color: "#80d0ff",
@@ -1939,8 +1954,8 @@ export default function MainPage() {
                                       }}>
                                         • {item.topic}
                                       </span>
-                                    )}
-                                  </div>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Dynamic Badges & Status Chip */}
@@ -1975,7 +1990,7 @@ export default function MainPage() {
                                       ลำดับแข่ง #{item.playOrder}
                                     </span>
                                   )}
-                                  {sortBy !== "poll" && pollRank !== null && (
+                                  {sortBy !== "poll" && pollRank !== null && !item.waitingNextMatch && (
                                     <span style={{
                                       fontSize: "11px",
                                       padding: "2px 7px",
@@ -2623,7 +2638,9 @@ export default function MainPage() {
                   boxShadow: "0 0 25px rgba(0, 229, 255, 0.5)",
                   background: "#081020"
                 }}>
-                  {selectedSpotlight.image ? (
+                  {selectedSpotlight.waitingNextMatch ? (
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px", color: "#a5b4fc" }}>❓</div>
+                  ) : selectedSpotlight.image ? (
                     <img src={selectedSpotlight.image} alt={selectedSpotlight.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   ) : (
                     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px" }}>👤</div>
@@ -2631,7 +2648,7 @@ export default function MainPage() {
                 </div>
 
                 <h3 style={{ fontSize: "22px", fontWeight: "900", color: "#fff", margin: "0 0 4px" }}>
-                  {selectedSpotlight.name} {selectedSpotlight.nickname ? `(${selectedSpotlight.nickname})` : ""}
+                  {selectedSpotlight.waitingNextMatch ? "รอลุ้นผลในวันแข่งขันถัดไป" : `${selectedSpotlight.name} ${selectedSpotlight.nickname ? `(${selectedSpotlight.nickname})` : ""}`}
                 </h3>
                 <div style={{
                   display: "flex",
@@ -2668,6 +2685,7 @@ export default function MainPage() {
                     </div>
                   )}
                   {(() => {
+                    if (selectedSpotlight.waitingNextMatch) return null;
                     const spPoll = getContestantPollRank(selectedSpotlight, pollList);
                     if (spPoll === null) return null;
                     return (
