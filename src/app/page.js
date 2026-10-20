@@ -168,17 +168,20 @@ function getRank5Info(allRankedPlayers) {
       (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
     );
   });
-  if (completed.length >= 5) {
-    const sorted = [...completed].sort(
-      (a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0)
-    );
-    const score = Number(sorted[4].totalScore) || 0;
-    const tied = sorted.filter((p) => (Number(p.totalScore) || 0) === score);
+
+  // Extract distinct score levels of completed contestants sorted descending
+  const distinctScores = Array.from(
+    new Set(completed.map((p) => Number(p.totalScore) || 0))
+  ).sort((a, b) => b - a);
+
+  if (distinctScores.length >= 5) {
+    const score = distinctScores[4]; // 5th distinct score level (Dense Rank 5)
+    const tied = completed.filter((p) => (Number(p.totalScore) || 0) === score);
     const names = tied
       .map((p) => (p.nickname ? `${p.nickname} (${p.name})` : p.name))
       .join(", ");
     const shortNames = tied.map((p) => p.nickname || p.name).join(", ");
-    return { score, names, shortNames, players: tied };
+    return { score, names, shortNames, players: tied, distinctRankCount: distinctScores.length };
   }
   return null;
 }
@@ -564,22 +567,18 @@ export default function MainPage() {
     : 0;
 
   // 5th rank cutoff (ปากเหว)
-  const sortedCompleted = [...completedContestants].sort(
-    (a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0)
-  );
-
   let rank5Score = 0;
   let rank5Label = "";
 
-  if (sortedCompleted.length >= 5) {
-    rank5Score = Number(sortedCompleted[4].totalScore) || 0;
-    const tied = sortedCompleted.filter(
-      (p) => (Number(p.totalScore) || 0) === rank5Score
-    );
-    rank5Label = tied.map((p) => p.nickname || p.name).join(", ");
-  } else if (sortedCompleted.length > 0) {
+  if (rank5Info) {
+    rank5Score = rank5Info.score;
+    rank5Label = rank5Info.shortNames;
+  } else if (completedContestants.length > 0) {
+    const distinctCompletedRanks = new Set(
+      completedContestants.map((p) => Number(p.totalScore) || 0)
+    ).size;
     rank5Score = 0;
-    rank5Label = `รอแข่งครบ 5 คน (${currentN}/5)`;
+    rank5Label = `รอแข่งครบ 5 อันดับ (${distinctCompletedRanks}/5)`;
   } else {
     rank5Score = 0;
     rank5Label = "";

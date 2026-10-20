@@ -118,21 +118,24 @@ function calculateDenseRanks(items) {
 
 function getRank5Info(allRankedPlayers) {
   if (!Array.isArray(allRankedPlayers) || allRankedPlayers.length === 0) return null;
-  const rank5Players = allRankedPlayers.filter((p) => p.rank === 5);
-  if (rank5Players.length > 0) {
-    const score = Number(rank5Players[0].totalScore) || 0;
-    const names = rank5Players
-      .map((p) => (p.nickname ? `${p.nickname} (${p.name})` : p.name))
-      .join(", ");
-    const shortNames = rank5Players.map((p) => p.nickname || p.name).join(", ");
-    return { score, names, shortNames, players: rank5Players };
-  }
+  const completed = allRankedPlayers.filter((p) => {
+    const s = p.scores || {};
+    return ["3sec", "qa", "jigsaw", "attribute"].every(
+      (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+    );
+  });
   const distinctScores = Array.from(
-    new Set(allRankedPlayers.map((p) => Number(p.totalScore) || 0))
+    new Set(completed.map((p) => Number(p.totalScore) || 0))
   ).sort((a, b) => b - a);
+
   if (distinctScores.length >= 5) {
     const score = distinctScores[4];
-    return { score, names: `${score} คะแนน`, shortNames: `${score} คะแนน`, players: [] };
+    const tied = completed.filter((p) => (Number(p.totalScore) || 0) === score);
+    const names = tied
+      .map((p) => (p.nickname ? `${p.nickname} (${p.name})` : p.name))
+      .join(", ");
+    const shortNames = tied.map((p) => p.nickname || p.name).join(", ");
+    return { score, names, shortNames, players: tied, distinctRankCount: distinctScores.length };
   }
   return null;
 }

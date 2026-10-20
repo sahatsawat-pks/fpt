@@ -23,16 +23,17 @@
     "nickname": "ก๊อง",
     "topic": "Workpoint",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 21,
+      "qa": 20,
+      "jigsaw": 15,
+      "attribute": 15
     },
-    "totalScore": 0,
+    "totalScore": 71,
     "createdAt": "2026-09-09T00:00:00.000Z",
-    "updatedAt": "2026-10-19T01:48:56.618Z",
+    "updatedAt": "2026-10-20T17:35:11.892Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0",
-    "isPlaying": false
+    "isPlaying": false,
+    "order": 7
   },
   {
     "id": "3",
@@ -160,16 +161,16 @@
     "nickname": "ตฤณ",
     "topic": "Tattoo Colour",
     "scores": {
-      "3sec": 2,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 16,
+      "qa": 15,
+      "jigsaw": 20,
+      "attribute": 20
     },
-    "totalScore": 2,
+    "totalScore": 71,
     "createdAt": "2026-09-12T16:35:23.279Z",
-    "updatedAt": "2026-10-20T14:35:31.288Z",
+    "updatedAt": "2026-10-20T15:59:16.934Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm?authuser=0",
-    "isPlaying": true,
+    "isPlaying": false,
     "order": 6
   },
   {
@@ -351,16 +352,17 @@
     "nickname": "ศีล",
     "topic": "บอร์ดเกม",
     "scores": {
-      "3sec": null,
-      "qa": null,
+      "3sec": 19,
+      "qa": 20,
       "jigsaw": null,
       "attribute": null
     },
-    "totalScore": 0,
+    "totalScore": 39,
     "createdAt": "2026-09-22T17:31:01.627Z",
-    "updatedAt": "2026-10-19T01:48:56.618Z",
+    "updatedAt": "2026-10-20T18:27:45.733Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm?authuser=0",
-    "isPlaying": false
+    "isPlaying": true,
+    "order": 8
   },
   {
     "id": "1791609566809",
