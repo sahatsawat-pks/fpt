@@ -256,6 +256,13 @@ export default function HistoryPage() {
 
     if (sortBy === "order") {
       list.sort((a, b) => (Number(a.order) || 999) - (Number(b.order) || 999));
+    } else if (sortBy === "poll") {
+      list.sort((a, b) => {
+        const pA = Number(a.pollRank) || 999;
+        const pB = Number(b.pollRank) || 999;
+        if (pA !== pB) return pA - pB;
+        return parseNumericRank(a.rank) - parseNumericRank(b.rank);
+      });
     } else {
       // Sort by rank, then tie-break by totalScore descending, then play order
       list.sort((a, b) => {
@@ -1027,6 +1034,24 @@ export default function HistoryPage() {
                     >
                       🎲 ตามลำดับการเล่น
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setSortBy("poll")}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "6px",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        background: sortBy === "poll" ? "linear-gradient(90deg, #38bdf8 0%, #0284c7 100%)" : "transparent",
+                        color: sortBy === "poll" ? "#030814" : "rgba(255,255,255,0.7)",
+                        boxShadow: sortBy === "poll" ? "0 0 10px rgba(56, 189, 248, 0.4)" : "none",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      📊 ตามอันดับโพล
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1076,24 +1101,55 @@ export default function HistoryPage() {
                     gap: "8px",
                     marginBottom: "10px"
                   }}>
-                    {/* Rank Header */}
-                    <div style={{
-                      width: "56px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #132238 0%, #060e18 100%)",
-                      border: "2px solid #ffd700",
-                      boxShadow: "0 0 10px rgba(255, 215, 0, 0.35)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0
-                    }}>
-                      <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                        อันดับ
-                      </span>
-                    </div>
+                    {/* Dynamic Leftmost Header (matching sortBy) */}
+                    {(() => {
+                      let title = "อันดับ";
+                      let border = "#ffd700";
+                      let color = "#ffd700";
+                      let bg = "linear-gradient(180deg, #132238 0%, #060e18 100%)";
+                      let shadow = "0 0 10px rgba(255, 215, 0, 0.35)";
+
+                      if (sortBy === "order") {
+                        title = "ลำดับแข่ง";
+                        border = "#00e5ff";
+                        color = "#00e5ff";
+                        bg = "linear-gradient(180deg, #092338 0%, #04101c 100%)";
+                        shadow = "0 0 10px rgba(0, 229, 255, 0.35)";
+                      } else if (sortBy === "poll") {
+                        title = "อันดับโพล";
+                        border = "#38bdf8";
+                        color = "#38bdf8";
+                        bg = "linear-gradient(180deg, #0c213b 0%, #051020 100%)";
+                        shadow = "0 0 10px rgba(56, 189, 248, 0.35)";
+                      }
+
+                      return (
+                        <div style={{
+                          width: "60px",
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: bg,
+                          border: `2px solid ${border}`,
+                          boxShadow: shadow,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0
+                        }}>
+                          <span style={{
+                            transform: "skewX(16deg)",
+                            fontStyle: "italic",
+                            fontWeight: "900",
+                            fontSize: title.length > 5 ? "10.5px" : "12px",
+                            color: color,
+                            whiteSpace: "nowrap"
+                          }}>
+                            {title}
+                          </span>
+                        </div>
+                      );
+                    })()}
 
                     {/* Contestant Name Header */}
                     <div style={{
@@ -1237,31 +1293,50 @@ export default function HistoryPage() {
                           e.currentTarget.style.filter = "brightness(1)";
                         }}
                       >
-                        {/* 1. Slanted Rank Box */}
-                        <div style={{
-                          width: "56px",
-                          height: "48px",
-                          borderRadius: "8px",
-                          transform: "skewX(-16deg)",
-                          background: "linear-gradient(180deg, #132238 0%, #060e18 100%)",
-                          border: `2.5px solid ${borderColor}`,
-                          boxShadow: glowShadow,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0
-                        }}>
-                          <span style={{
-                            transform: "skewX(16deg)",
-                            fontStyle: "italic",
-                            fontWeight: "900",
-                            fontSize: cleanRank(item.rank).length > 2 ? "16px" : "24px",
-                            color: isTop5 ? "#ffd700" : "#ffffff",
-                            textShadow: isTop5 ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)"
-                          }}>
-                            {cleanRank(item.rank)}
-                          </span>
-                        </div>
+                        {/* 1. Dynamic Leftmost Slanted Box (matching sortBy) */}
+                        {(() => {
+                          let displayNum = cleanRank(item.rank);
+                          let numColor = isTop5 ? "#ffd700" : "#ffffff";
+                          let numShadow = isTop5 ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)";
+
+                          if (sortBy === "order") {
+                            displayNum = item.order ?? "-";
+                            numColor = "#00e5ff";
+                            numShadow = "0 0 12px rgba(0, 229, 255, 0.6)";
+                          } else if (sortBy === "poll") {
+                            displayNum = item.pollRank ?? "-";
+                            const pR = Number(item.pollRank);
+                            numColor = pR && pR <= 5 ? "#ffd700" : "#38bdf8";
+                            numShadow = pR && pR <= 5 ? "0 0 12px rgba(255, 215, 0, 0.6)" : "0 0 10px rgba(56, 189, 248, 0.5)";
+                          }
+
+                          return (
+                            <div style={{
+                              width: "60px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                              border: `2.5px solid ${borderColor}`,
+                              boxShadow: glowShadow,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0
+                            }}>
+                              <span style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: String(displayNum).length > 2 ? "18px" : "24px",
+                                color: numColor,
+                                textShadow: numShadow
+                              }}>
+                                {displayNum}
+                              </span>
+                            </div>
+                          );
+                        })()}
 
                         {/* 2. Slanted Contestant Info Pill */}
                         <div style={{
@@ -1316,10 +1391,10 @@ export default function HistoryPage() {
                                   {item.nickname ? (
                                     <>
                                       <span style={{ color: isTop5 ? "#ffd700" : "#00e5ff" }}>({item.nickname})</span>{" "}
-                                      {item.name}
+                                      <span style={{ color: isTop5 ? "#ffe885" : "#ffffff" }}>{item.name}</span>
                                     </>
                                   ) : (
-                                    item.name
+                                    <span style={{ color: isTop5 ? "#ffd700" : "#ffffff" }}>{item.name}</span>
                                   )}
                                 </div>
                                 <div style={{
@@ -1334,30 +1409,51 @@ export default function HistoryPage() {
                               </div>
                             </div>
 
-                            {/* Badges: Poll Rank & Air date */}
+                            {/* Badges: Rank, Order & Poll */}
                             <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-                              {item.pollRank && (
+                              {sortBy !== "rank" && item.rank && (
                                 <span style={{
-                                  fontSize: "10px",
-                                  padding: "2px 6px",
+                                  fontSize: "11px",
+                                  padding: "2px 7px",
+                                  borderRadius: "6px",
+                                  background: isTop5 ? "rgba(255, 215, 0, 0.15)" : "rgba(255, 255, 255, 0.08)",
+                                  border: isTop5 ? "1px solid rgba(255, 215, 0, 0.5)" : "1px solid rgba(255, 255, 255, 0.2)",
+                                  color: isTop5 ? "#ffd700" : "rgba(255, 255, 255, 0.8)",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.3px",
+                                  flexShrink: 0
+                                }}>
+                                  อันดับ #{cleanRank(item.rank)}
+                                </span>
+                              )}
+                              {sortBy !== "order" && item.order && (
+                                <span style={{
+                                  fontSize: "11px",
+                                  padding: "2px 7px",
+                                  borderRadius: "6px",
+                                  background: "rgba(0, 229, 255, 0.1)",
+                                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                                  color: "#67e8f9",
+                                  fontWeight: "700",
+                                  letterSpacing: "0.3px",
+                                  flexShrink: 0
+                                }}>
+                                  ลำดับแข่ง #{item.order}
+                                </span>
+                              )}
+                              {sortBy !== "poll" && item.pollRank && (
+                                <span style={{
+                                  fontSize: "11px",
+                                  padding: "2px 7px",
                                   borderRadius: "6px",
                                   background: "rgba(0, 229, 255, 0.15)",
                                   border: "1px solid rgba(0, 229, 255, 0.4)",
                                   color: "#00e5ff",
-                                  fontWeight: "700"
+                                  fontWeight: "800",
+                                  letterSpacing: "0.3px",
+                                  flexShrink: 0
                                 }}>
                                   โพล: #{item.pollRank}
-                                </span>
-                              )}
-                              {item.order && (
-                                <span style={{
-                                  fontSize: "10px",
-                                  padding: "2px 6px",
-                                  borderRadius: "6px",
-                                  background: "rgba(255, 255, 255, 0.08)",
-                                  color: "rgba(255,255,255,0.6)"
-                                }}>
-                                  ลำดับแข่ง #{item.order}
                                 </span>
                               )}
                             </div>
