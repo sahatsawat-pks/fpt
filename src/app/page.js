@@ -2059,7 +2059,7 @@ export default function MainPage() {
                                   justifyContent: "center",
                                   flexShrink: 0
                                 }}>
-                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", fontFamily: "var(--font-num)", ...pill.text }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
                                     {sc ?? "-"}
                                   </span>
                                 </div>
@@ -2082,7 +2082,7 @@ export default function MainPage() {
                                   justifyContent: "center",
                                   flexShrink: 0
                                 }}>
-                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", fontFamily: "var(--font-num)", ...pill.text }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
                                     {sc ?? "-"}
                                   </span>
                                 </div>
@@ -2105,7 +2105,7 @@ export default function MainPage() {
                                   justifyContent: "center",
                                   flexShrink: 0
                                 }}>
-                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", fontFamily: "var(--font-num)", ...pill.text }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
                                     {sc ?? "-"}
                                   </span>
                                 </div>
@@ -2128,7 +2128,7 @@ export default function MainPage() {
                                   justifyContent: "center",
                                   flexShrink: 0
                                 }}>
-                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", fontFamily: "var(--font-num)", ...pill.text }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
                                     {sc ?? "-"}
                                   </span>
                                 </div>
@@ -2154,7 +2154,6 @@ export default function MainPage() {
                                 fontStyle: "italic",
                                 fontWeight: "900",
                                 fontSize: "26px",
-                                fontFamily: "var(--font-num)",
                                 color: item.totalScore === 100 ? "#52c41a" : item.waitingNextMatch ? "rgba(255,255,255,0.4)" : "#ffd700",
                                 textShadow: item.totalScore === 100 ? "0 0 14px rgba(82, 196, 26, 0.9)" : item.waitingNextMatch ? "none" : "0 0 12px rgba(255, 215, 0, 0.8)"
                               }}>
@@ -2718,8 +2717,8 @@ export default function MainPage() {
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                   <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>คะแนนรวมสะสม</span>
-                  <span style={{ fontSize: "28px", fontWeight: "900", fontFamily: "var(--font-num)", color: "#ffd700", textShadow: "0 0 14px rgba(255,215,0,0.6)" }}>
-                    {selectedSpotlight.waitingNextMatch ? "-" : (selectedSpotlight.totalScore ?? 0)} <span style={{ fontSize: "14px", fontFamily: "var(--font-th)", color: "rgba(255,255,255,0.6)" }}>/ 100</span>
+                  <span style={{ fontSize: "28px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 14px rgba(255,215,0,0.6)" }}>
+                    {selectedSpotlight.waitingNextMatch ? "-" : (selectedSpotlight.totalScore ?? 0)} <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>/ 100</span>
                   </span>
                 </div>
 
@@ -2737,7 +2736,7 @@ export default function MainPage() {
                       <div key={cat.label}>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
                           <span style={{ color: "#dbeafe" }}>{cat.label}</span>
-                          <strong style={{ fontFamily: "var(--font-num)", color: val !== null ? "#00e5ff" : "rgba(255,255,255,0.4)" }}>
+                          <strong style={{ color: val !== null ? "#00e5ff" : "rgba(255,255,255,0.4)" }}>
                             {val !== null ? `${val} / 25` : "ยังไม่แข่ง"}
                           </strong>
                         </div>
