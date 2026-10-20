@@ -552,9 +552,9 @@ export default function MainPage() {
     );
   });
 
-  const top5Contestants = denseRankedLeaderboard
-    .filter((p) => typeof p.rank === "number" && p.rank <= 5)
-    .slice(0, 5);
+  const top5Contestants = denseRankedLeaderboard.filter(
+    (p) => typeof p.rank === "number" && p.rank <= 5
+  );
 
   const scoredPlayers = leaderboard.filter((p) => {
     const s = p.scores || {};
@@ -1344,8 +1344,9 @@ export default function MainPage() {
                                 padding: "3px 8px",
                                 borderRadius: "12px",
                                 fontWeight: "700",
-                                background: st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.2)" : "rgba(234, 179, 8, 0.2)",
-                                color: st.isGuaranteedQualified ? "#86efac" : "#fde047"
+                                background: st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.2)" : "rgba(99, 102, 241, 0.2)",
+                                color: st.isGuaranteedQualified ? "#86efac" : "#a5b4fc",
+                                border: st.isGuaranteedQualified ? "1px solid #22c55e" : "1px solid rgba(129, 140, 248, 0.4)"
                               }}>
                                 {st.statusText}
                               </span>
@@ -1517,9 +1518,9 @@ export default function MainPage() {
                     <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }}></span>
                     🟢 เข้ารอบ: การันตี 5 คนสุดท้ายแน่นอนแล้ว (หรือได้ 100 คะแนนเต็ม)
                   </span>
-                  <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#fde047", fontWeight: "600" }}>
-                    <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#eab308", display: "inline-block" }}></span>
-                    ⏳ รอผล: ยังมีสิทธิ์ลุ้นติด 5 อันดับแรก
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#a5b4fc", fontWeight: "600" }}>
+                    <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#6366f1", display: "inline-block" }}></span>
+                    ⏳ รอผล / รอแข่ง: ยังมีสิทธิ์ลุ้นติด 5 อันดับแรก
                   </span>
                   <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#fca5a5", fontWeight: "600" }}>
                     <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ef4444", display: "inline-block" }}></span>
@@ -1746,14 +1747,20 @@ export default function MainPage() {
                         const isPlaying = evalStatus.statusClass === "status-playing";
                         const isEliminated = !isPlaying && evalStatus.isEliminated;
                         const isTopSafe = !isPlaying && (Number(item.rank) || 99) <= 5;
-                        const borderColor = isPlaying ? "#00e5ff" : isTopSafe ? "#ffd700" : isEliminated ? "#ff4d4f" : "#ffd700";
+                        const borderColor = isPlaying
+                          ? "#00e5ff"
+                          : isTopSafe
+                          ? "#ffd700"
+                          : isEliminated
+                          ? "#ff4d4f"
+                          : "rgba(148, 163, 184, 0.4)";
                         const glowShadow = isPlaying
                           ? "0 0 16px rgba(0, 229, 255, 0.7)"
                           : isTopSafe
                           ? "0 0 14px rgba(255, 215, 0, 0.45)"
                           : isEliminated
                           ? "0 0 14px rgba(255, 77, 79, 0.45)"
-                          : "0 0 12px rgba(255, 215, 0, 0.35)";
+                          : "0 0 8px rgba(0, 0, 0, 0.5)";
 
                         return (
                           <div
@@ -1851,7 +1858,7 @@ export default function MainPage() {
                                     borderRadius: "50%",
                                     overflow: "hidden",
                                     background: "rgba(0, 229, 255, 0.1)",
-                                    border: isTopSafe ? "1.5px solid #ffd700" : "1.5px solid #00e5ff",
+                                    border: isPlaying ? "2px solid #00e5ff" : isTopSafe ? "1.5px solid #ffd700" : "1.5px solid rgba(148, 163, 184, 0.5)",
                                     flexShrink: 0,
                                     display: "flex",
                                     alignItems: "center",
@@ -1953,14 +1960,14 @@ export default function MainPage() {
                                       ? "rgba(34, 197, 94, 0.25)"
                                       : evalStatus.statusClass === "status-eliminated"
                                       ? "rgba(239, 68, 68, 0.25)"
-                                      : "rgba(234, 179, 8, 0.25)",
+                                      : "rgba(99, 102, 241, 0.22)",
                                     color: evalStatus.statusClass === "status-playing"
                                       ? "#00e5ff"
                                       : evalStatus.statusClass === "status-qualified"
                                       ? "#86efac"
                                       : evalStatus.statusClass === "status-eliminated"
                                       ? "#fca5a5"
-                                      : "#fde047",
+                                      : "#a5b4fc",
                                     border: `1px solid ${
                                       evalStatus.statusClass === "status-playing"
                                         ? "#00e5ff"
@@ -1968,7 +1975,7 @@ export default function MainPage() {
                                         ? "#22c55e"
                                         : evalStatus.statusClass === "status-eliminated"
                                         ? "#ef4444"
-                                        : "#eab308"
+                                        : "#818cf8"
                                     }`,
                                     boxShadow: evalStatus.statusClass === "status-playing" ? "0 0 10px rgba(0, 229, 255, 0.5)" : "none"
                                   }}>
@@ -2692,11 +2699,11 @@ export default function MainPage() {
                     borderRadius: "12px",
                     background: isPlaying
                       ? "rgba(0, 229, 255, 0.12)"
-                      : st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.15)" : st.isEliminated ? "rgba(239, 68, 68, 0.15)" : "rgba(234, 179, 8, 0.15)",
+                      : st.isGuaranteedQualified ? "rgba(34, 197, 94, 0.15)" : st.isEliminated ? "rgba(239, 68, 68, 0.15)" : "rgba(99, 102, 241, 0.18)",
                     border: `1px solid ${
                       isPlaying
                         ? "#00e5ff"
-                        : st.isGuaranteedQualified ? "#22c55e" : st.isEliminated ? "#ef4444" : "#eab308"
+                        : st.isGuaranteedQualified ? "#22c55e" : st.isEliminated ? "#ef4444" : "#818cf8"
                     }`,
                     boxShadow: isPlaying ? "0 0 16px rgba(0, 229, 255, 0.45)" : "none",
                     fontSize: "13px",
@@ -2705,7 +2712,7 @@ export default function MainPage() {
                     <div style={{
                       fontWeight: "800",
                       marginBottom: "4px",
-                      color: isPlaying ? "#00e5ff" : st.isGuaranteedQualified ? "#86efac" : st.isEliminated ? "#fca5a5" : "#fde047"
+                      color: isPlaying ? "#00e5ff" : st.isGuaranteedQualified ? "#86efac" : st.isEliminated ? "#fca5a5" : "#a5b4fc"
                     }}>
                       สถานะ: {st.statusText}
                     </div>
