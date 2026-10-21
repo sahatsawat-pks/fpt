@@ -3336,14 +3336,10 @@ export default function HistoryPage() {
 
         const perfect25Count = [s2Action, s2Jigsaw, s2Props].filter((v) => v === 25).length;
 
-        // Stage 2 evaluation
-        const s2Status = !s1Pass
-          ? "not_reached"
-          : s2Total >= 30
-          ? "pass_to_stage4"
-          : s2Total >= 15
-          ? "go_to_stage3"
-          : "eliminated";
+        // Combined Stage 1 + Stage 2 score evaluation for 2026
+        const combinedScore = (selectedSpotlight.totalScore !== undefined && selectedSpotlight.totalScore !== null)
+          ? Number(selectedSpotlight.totalScore)
+          : (s1Total + s2Total);
 
         let s2BonusDesc = null;
         let totalBonusWon2026 = 0;
@@ -3360,9 +3356,9 @@ export default function HistoryPage() {
           totalBonusWon2026 += 10;
         }
 
-        // Stage 3 evaluation
-        const s3Skipped = s2Status === "pass_to_stage4" || selectedSpotlight.evaluating?.q1 === "SKIP";
-        const s3Played = s2Status === "go_to_stage3";
+        // Stage 3 evaluation (รวมถึง 40 = ข้ามไปรอบ 4, เกิน 25 แต่ไม่ถึง 40 = เล่นคำถามชี้ชะตา, <= 25 = ตกรอบ)
+        const s3Skipped = combinedScore >= 40 || selectedSpotlight.evaluating?.q1 === "SKIP";
+        const s3Played = combinedScore > 25 && combinedScore < 40;
         const s3CorrectCount = [
           selectedSpotlight.evaluating?.q1,
           selectedSpotlight.evaluating?.q2,
@@ -3625,29 +3621,29 @@ export default function HistoryPage() {
                       fontSize: "11px",
                       padding: "6px 10px",
                       borderRadius: "8px",
-                      background: !s1Pass
-                        ? "rgba(255,255,255,0.05)"
-                        : s2Total >= 30
+                      background: !s1Pass || combinedScore <= 25
+                        ? "rgba(255, 77, 79, 0.15)"
+                        : combinedScore >= 40
                         ? "rgba(82, 196, 26, 0.15)"
-                        : s2Total >= 15
-                        ? "rgba(250, 173, 20, 0.15)"
-                        : "rgba(255, 77, 79, 0.15)",
-                      border: !s1Pass
-                        ? "1px solid rgba(255,255,255,0.1)"
-                        : s2Total >= 30
+                        : "rgba(250, 173, 20, 0.15)",
+                      border: !s1Pass || combinedScore <= 25
+                        ? "1px solid rgba(255, 77, 79, 0.4)"
+                        : combinedScore >= 40
                         ? "1px solid rgba(82, 196, 26, 0.4)"
-                        : s2Total >= 15
-                        ? "1px solid rgba(250, 173, 20, 0.4)"
-                        : "1px solid rgba(255, 77, 79, 0.4)",
-                      color: !s1Pass ? "rgba(255,255,255,0.5)" : s2Total >= 30 ? "#95de64" : s2Total >= 15 ? "#ffc069" : "#ff7875"
+                        : "1px solid rgba(250, 173, 20, 0.4)",
+                      color: !s1Pass || combinedScore <= 25
+                        ? "#ff7875"
+                        : combinedScore >= 40
+                        ? "#95de64"
+                        : "#ffc069"
                     }}>
                       {!s1Pass
                         ? "⏸️ ไม่ได้เข้าแข่งขัน (ตกรอบจากด่านที่ 1)"
-                        : s2Total >= 30
-                        ? "✅ ทำได้ 30 คะแนนขึ้นไป — ผ่านเข้าสู่รอบคำถามสุดท้าย (ด่านที่ 4) ทันที (ข้ามด่านที่ 3)"
-                        : s2Total >= 15
-                        ? "⚠️ ทำได้ 15-29 คะแนน — ต้องเข้าสู่ด่านที่ 3 (คำถามแก้ตัว เพื่อชิงสิทธิ์เข้าด่านที่ 4)"
-                        : "❌ ตกรอบทันที (คะแนนต่ำกว่า 15 คะแนน)"}
+                        : combinedScore >= 40
+                        ? `✅ คะแนนรวม Stage 1 + 2 ได้ ${combinedScore} คะแนน (ถึง 40 คะแนน) — ข้ามไปรอบคำถามสุดท้าย (ด่านที่ 4) ทันที`
+                        : combinedScore > 25
+                        ? `⚠️ คะแนนรวม Stage 1 + 2 ได้ ${combinedScore} คะแนน (เกิน 25 แต่ไม่ถึง 40) — ต้องไปเล่นคำถามชี้ชะตาในด่านที่ 3`
+                        : `❌ ตกรอบทันที (คะแนนรวม Stage 1 + 2 ได้เพียง ${combinedScore} คะแนน — ไม่เกิน 25 คะแนน)`}
                       {s2BonusDesc && (
                         <div style={{ color: "#ffd700", fontWeight: "800", marginTop: "4px" }}>
                           {s2BonusDesc}
@@ -3656,7 +3652,7 @@ export default function HistoryPage() {
                     </div>
                   </div>
 
-                  {/* ด่านที่ 3 : คำถามแก้ตัว */}
+                  {/* ด่านที่ 3 : คำถามชี้ชะตา */}
                   <div style={{
                     background: "rgba(0, 0, 0, 0.4)",
                     borderRadius: "14px",
@@ -3665,7 +3661,7 @@ export default function HistoryPage() {
                   }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                       <span style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff" }}>
-                        🎯 ด่านที่ 3 : แฟนพันธุ์แท้กับคำถามแก้ตัว (4 ข้อ ถูก 2 ใน 4)
+                        🎯 ด่านที่ 3 : แฟนพันธุ์แท้กับคำถามชี้ชะตา (4 ข้อ ถูก 2 ใน 4)
                       </span>
                       <span style={{
                         fontSize: "12px",
@@ -3760,7 +3756,7 @@ export default function HistoryPage() {
                       color: s3Skipped ? "#80d0ff" : s3Passed ? "#95de64" : s3Played ? "#ff7875" : "rgba(255,255,255,0.5)"
                     }}>
                       {s3Skipped ? (
-                        "⏩ ข้ามด่านนี้อัตโนมัติ เนื่องจากทำคะแนน Classic Game ได้ 30 คะแนนขึ้นไป"
+                        `⏩ ข้ามด่านนี้อัตโนมัติ เนื่องจากคะแนนรวม Stage 1 + 2 ได้ ${combinedScore} คะแนน (ถึง 40 คะแนนขึ้นไป)`
                       ) : s3Passed ? (
                         <div>
                           <span>✅ ตอบถูก {s3CorrectCount > 0 ? `${s3CorrectCount} จาก 4 ข้อ` : "2 จาก 4 ข้อ"} — ผ่านเข้าสู่ด่านที่ 4 สำเร็จ</span>
@@ -3771,7 +3767,7 @@ export default function HistoryPage() {
                       ) : s3Played ? (
                         `❌ ตกรอบ (ตอบถูก ${s3CorrectCount} จาก 4 ข้อ — ไม่ถึง 2 ข้อ)`
                       ) : (
-                        "⏸️ ไม่ได้เข้าแข่งขัน (ตกรอบก่อนหน้า)"
+                        `⏸️ ไม่ได้เข้าแข่งขัน (ตกรอบเนื่องจากคะแนนรวม Stage 1 + 2 ได้เพียง ${combinedScore} คะแนน — ไม่เกิน 25 คะแนน)`
                       )}
                     </div>
                   </div>
