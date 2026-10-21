@@ -5288,7 +5288,7 @@ export default function AdminPage() {
               </div>
               <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
                 <span>❓</span>
-                <div><strong>ขึ้นแชมป์ 2026 เป็น "ปริศนา":</strong> ในทำเนียบแชมป์จะขึ้นแชมป์เป็นปริศนารอลุ้นผล เพราะยังไม่ได้ตัดสินในรอบชิงชนะเลิศ</div>
+                <div><strong>ขึ้นแชมป์ 2026 เป็น "รอลุ้นแชมป์":</strong> ในทำเนียบแชมป์จะขึ้นสถานะรอลุ้นแชมป์ เพราะยังไม่ได้ตัดสินในรอบชิงชนะเลิศ</div>
               </div>
               <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
                 <span>👑</span>

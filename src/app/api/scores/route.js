@@ -199,15 +199,15 @@ export async function POST(request) {
       const mysteryChamp = {
         year: 2026,
         title: "สุดยอดแฟนพันธุ์แท้แห่งปี 2026",
-        name: "รอลุ้นแชมป์ประจำปี 2026",
-        nickname: "ปริศนา",
-        topic: "รอลุ้นผลในรอบชิงชนะเลิศ",
-        badge: "⏳ รอลุ้นผลรอบชิงชนะเลิศ",
-        description: "การแข่งขันสุดยอดแฟนพันธุ์แท้แห่งปี 2026 กำลังอยู่ในช่วงขับเคี่ยวรอบชิงชนะเลิศ ใครจะคว้าชัยเป็นสุดยอดแฟนพันธุ์แท้แห่งปี 2026 รอลุ้นกันเร็วๆ นี้!",
+        name: "รอการแข่งขันในรอบชิงชนะเลิศ",
+        nickname: "",
+        topic: "รอการแข่งขันในรอบชิงชนะเลิศ",
+        badge: "🏆 รอลุ้นแชมป์",
+        description: "รอลุ้นว่าใครจะได้เป็นสุดยอดแฟนพันธุ์แท้แห่งปี 2026",
         image: "",
       };
       if (existingChampIdx !== -1) {
-        if (historyData.champions[existingChampIdx].nickname === "ปริศนา" || !historyData.champions[existingChampIdx].name) {
+        if (!historyData.champions[existingChampIdx].image || historyData.champions[existingChampIdx].nickname === "ปริศนา" || historyData.champions[existingChampIdx].nickname === "ยังไม่ทราบ" || !historyData.champions[existingChampIdx].nickname) {
           historyData.champions[existingChampIdx] = {
             ...historyData.champions[existingChampIdx],
             ...mysteryChamp,
@@ -264,8 +264,8 @@ export async function POST(request) {
           firstAirDate: "จันทร์ 2 มีนาคม 2026",
           lastAirDate: "รอการแข่งขัน",
           episodes: "15 ตอน (และรอบแห่งปี)",
-          championName: "รอลุ้นแชมป์ประจำปี 2026 (ปริศนา)",
-          championTopic: "รอลุ้นผลในรอบชิงชนะเลิศ",
+          championName: "รอลุ้นแชมป์",
+          championTopic: "รอการแข่งขันในรอบชิงชนะเลิศ",
         },
         qualifying: qualifyingList,
         finals: [

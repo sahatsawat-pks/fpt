@@ -3,6 +3,19 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import historyData from "../data/history.json";
+import leaderboardData from "../data/leaderboard.json";
+
+// Contestant Google Photos lookup map from leaderboard data
+const CONTESTANT_GOOGLE_PHOTOS = new Map();
+if (Array.isArray(leaderboardData)) {
+  leaderboardData.forEach((c) => {
+    if (c?.image && (c.image.startsWith("http://") || c.image.startsWith("https://"))) {
+      const cleanImg = c.image.trim();
+      if (c.name) CONTESTANT_GOOGLE_PHOTOS.set(c.name.trim(), cleanImg);
+      if (c.nickname) CONTESTANT_GOOGLE_PHOTOS.set(c.nickname.trim(), cleanImg);
+    }
+  });
+}
 
 function ContestantAvatar({ src, fallbackText = "👤", size = 32 }) {
   const [hasError, setHasError] = useState(false);
@@ -31,10 +44,45 @@ function ContestantAvatar({ src, fallbackText = "👤", size = 32 }) {
 }
 
 function resolveContestantAvatar(item, year) {
-  if (item?.image) return item.image;
-  if (year && item?.order) {
-    return `/img/history/${year}/${item.order}.png`;
+  if (!item) return "";
+
+  // 1. If item has explicit Google Photos (or HTTP URL), use it directly
+  if (item.image && (item.image.startsWith("http://") || item.image.startsWith("https://"))) {
+    return item.image;
   }
+
+  // 2. Check contestant by full name or nickname in Google Photos map
+  const name = (item.name || item.player || "").trim();
+  const nickname = (item.nickname || "").trim();
+
+  if (name && CONTESTANT_GOOGLE_PHOTOS.has(name)) {
+    return CONTESTANT_GOOGLE_PHOTOS.get(name);
+  }
+  if (name && !name.includes(" ")) {
+    for (const [key, url] of CONTESTANT_GOOGLE_PHOTOS.entries()) {
+      if (key.startsWith(name)) return url;
+    }
+  }
+  if (nickname && CONTESTANT_GOOGLE_PHOTOS.has(nickname)) {
+    return CONTESTANT_GOOGLE_PHOTOS.get(nickname);
+  }
+
+  // 3. In Season 2026, never use old local /img/history/ paths
+  if (String(year) === "2026") {
+    if (item.image && !item.image.startsWith("/img/history")) {
+      return item.image;
+    }
+    return "";
+  }
+
+  // 4. In Season 2021, valid local avatar images exist
+  if (String(year) === "2021" && item.image && item.image.startsWith("/img/history/2021/")) {
+    return item.image;
+  }
+
+  // 5. If item has an image property and not empty
+  if (item.image) return item.image;
+
   return "";
 }
 
@@ -744,7 +792,7 @@ export default function HistoryPage() {
             }}>
               {(data?.champions || []).filter((c) => enabledYears[String(c.year)] !== false).map((champ) => {
                 const isSelectedYear = String(champ.year) === String(activeYear);
-                const isMystery = Number(champ.year) === 2026 && (!champ.image || champ.nickname === "ยังไม่ทราบ" || (champ.name && champ.name.includes("รอลุ้น")));
+                const isMystery = Number(champ.year) === 2026 && (!champ.image || !champ.nickname || champ.nickname === "ยังไม่ทราบ" || champ.nickname === "ปริศนา" || (champ.name && (champ.name.includes("รอลุ้น") || champ.name.includes("รอการแข่งขัน"))));
                 return (
                   <div
                     key={champ.year}
@@ -844,7 +892,9 @@ export default function HistoryPage() {
                       color: "#ffffff",
                       margin: "0 0 4px"
                     }}>
-                      {champ.nickname ? `${champ.nickname} (${champ.name})` : champ.name}
+                      {champ.nickname && champ.nickname !== "ปริศนา" && champ.nickname !== "ยังไม่ทราบ"
+                        ? `${champ.nickname} (${champ.name})`
+                        : champ.name}
                     </h3>
 
                     {/* Topic */}
@@ -968,9 +1018,9 @@ export default function HistoryPage() {
             {/* Season Info Summary Badge */}
             {(() => {
               const activeChamp = (data?.champions || []).find((c) => String(c.year) === String(activeYear));
-              const isMystery = Number(activeYear) === 2026 && (!activeChamp?.image || activeChamp?.nickname === "ยังไม่ทราบ" || (activeChamp?.name && activeChamp?.name.includes("รอลุ้น")));
+              const isMystery = Number(activeYear) === 2026 && (!activeChamp?.image || !activeChamp?.nickname || activeChamp?.nickname === "ยังไม่ทราบ" || activeChamp?.nickname === "ปริศนา" || (activeChamp?.name && (activeChamp?.name.includes("รอลุ้น") || activeChamp?.name.includes("รอการแข่งขัน"))));
               const champTitle = isMystery
-                ? "⏳ รอลุ้นแชมป์ (ยังไม่ทราบ)"
+                ? (activeChamp?.name || "รอการแข่งขันในรอบชิงชนะเลิศ")
                 : activeChamp?.nickname
                 ? `${activeChamp.name} (${activeChamp.nickname})`
                 : activeChamp?.name || currentSeason?.info?.championName;
@@ -1370,7 +1420,7 @@ export default function HistoryPage() {
                                     flexShrink: 0
                                   }}>
                                     <ContestantAvatar
-                                      src={c.image}
+                                      src={resolveContestantAvatar(c, activeYear)}
                                       fallbackText="👤"
                                       size={32}
                                     />
@@ -1884,7 +1934,7 @@ export default function HistoryPage() {
                                 flexShrink: 0
                               }}>
                                 <ContestantAvatar
-                                  src={item.image}
+                                  src={resolveContestantAvatar(item, activeYear)}
                                   fallbackText="👤"
                                   size={32}
                                 />
@@ -2152,7 +2202,7 @@ export default function HistoryPage() {
                                     flexShrink: 0
                                   }}>
                                     <ContestantAvatar
-                                      src={item.image}
+                                      src={resolveContestantAvatar(item, activeYear)}
                                       fallbackText="👤"
                                       size={32}
                                     />
@@ -4148,9 +4198,9 @@ export default function HistoryPage() {
                         <div style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>
                           {is15 ? (
                             isQualified ? (
-                              <span>ทำคะแนนได้ 15 คะแนนเสมอกลุ่มนำ และ<strong>ตอบคำถามชิงสิทธิ์ถูก</strong> คว้าสิทธิ์เข้าสู่รอบต่อไปสำเร็จ 🎉</span>
+                              <span>ทำคะแนนได้ 15 คะแนน และ<strong>ตอบคำถามชิงสิทธิ์ถูก</strong> คว้าสิทธิ์เข้าสู่รอบต่อไปได้สำเร็จ 🎉</span>
                             ) : (
-                              <span>ทำคะแนนได้ 15 คะแนนเสมอกลุ่มนำ แต่<strong>ตอบคำถามชิงสิทธิ์ผิด</strong> ไม่สามารถผ่านเข้ารอบได้</span>
+                              <span>ทำคะแนนได้ 15 คะแนน แต่<strong>ตอบคำถามชิงสิทธิ์ผิด</strong> ไม่สามารถผ่านเข้ารอบต่อไปได้</span>
                             )
                           ) : (
                             <span>ทำคะแนนได้ {brScore} คะแนน (คะแนนไม่ถึงเกณฑ์ชิงสิทธิ์เข้ารอบ)</span>
