@@ -15,6 +15,10 @@ const DEFAULT_SETTINGS = {
   drawPassword: "",
   protectHistory: false,
   historyPassword: "",
+  isArchived: false,
+  archivedAt: null,
+  currentPhase: "qualifying", // 'qualifying' | 'finals'
+  qualifyingLocked: false,
 };
 
 function readSettings() {
@@ -56,24 +60,32 @@ export async function GET(request) {
       success: true,
       gamePassword: settings.gamePassword || "fanpantae_2026",
       adminPassword: settings.adminPassword || "admin_fan_2026",
-      totalContestants: settings.totalContestants || 23,
+      totalContestants: settings.totalContestants || 22,
       protectHome: Boolean(settings.protectHome),
       homePassword: settings.homePassword || "",
       protectDraw: Boolean(settings.protectDraw),
       drawPassword: settings.drawPassword || "",
       protectHistory: Boolean(settings.protectHistory),
       historyPassword: settings.historyPassword || "",
+      isArchived: Boolean(settings.isArchived),
+      archivedAt: settings.archivedAt || null,
+      currentPhase: settings.currentPhase || "qualifying",
+      qualifyingLocked: Boolean(settings.qualifyingLocked),
     });
   }
 
   // Public view: NEVER expose password strings
   return NextResponse.json({
     success: true,
-    totalContestants: settings.totalContestants || 23,
+    totalContestants: settings.totalContestants || 22,
     requirePassword: Boolean(settings.gamePassword),
     protectHome: Boolean(settings.protectHome),
     protectDraw: Boolean(settings.protectDraw),
     protectHistory: Boolean(settings.protectHistory),
+    isArchived: Boolean(settings.isArchived),
+    archivedAt: settings.archivedAt || null,
+    currentPhase: settings.currentPhase || "qualifying",
+    qualifyingLocked: Boolean(settings.qualifyingLocked),
   });
 }
 
@@ -158,6 +170,19 @@ export async function POST(request) {
         newSettings.historyPassword = String(body.historyPassword || "").trim();
       }
 
+      if (body.currentPhase !== undefined) {
+        newSettings.currentPhase = body.currentPhase === "finals" ? "finals" : "qualifying";
+      }
+      if (body.qualifyingLocked !== undefined) {
+        newSettings.qualifyingLocked = Boolean(body.qualifyingLocked);
+      }
+      if (body.isArchived !== undefined) {
+        newSettings.isArchived = Boolean(body.isArchived);
+      }
+      if (body.archivedAt !== undefined) {
+        newSettings.archivedAt = body.archivedAt;
+      }
+
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
         success: true,
@@ -172,7 +197,23 @@ export async function POST(request) {
           drawPassword: newSettings.drawPassword,
           protectHistory: newSettings.protectHistory,
           historyPassword: newSettings.historyPassword,
+          isArchived: newSettings.isArchived,
+          archivedAt: newSettings.archivedAt,
+          currentPhase: newSettings.currentPhase,
+          qualifyingLocked: newSettings.qualifyingLocked,
         },
+      });
+    }
+
+    // Set phase action (e.g. start finals or switch back to qualifying)
+    if (body.action === "set_phase") {
+      const newPhase = body.phase === "finals" ? "finals" : "qualifying";
+      const newSettings = { ...current, currentPhase: newPhase };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        message: newPhase === "finals" ? "เริ่มต้นรอบชิงชนะเลิศเรียบร้อยแล้ว" : "เปลี่ยนเป็นรอบคัดเลือกเรียบร้อยแล้ว",
+        currentPhase: newPhase,
       });
     }
 

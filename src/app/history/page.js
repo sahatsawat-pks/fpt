@@ -212,7 +212,20 @@ export default function HistoryPage() {
     "2024": true,
   };
 
-  const availableYears = ["2021", "2022", "2023", "2024"].filter(
+  const allYearKeys = useMemo(() => {
+    const yearsSet = new Set(["2021", "2022", "2023", "2024"]);
+    if (data?.seasons) {
+      Object.keys(data.seasons).forEach((y) => yearsSet.add(String(y)));
+    }
+    if (data?.champions && Array.isArray(data.champions)) {
+      data.champions.forEach((c) => {
+        if (c.year) yearsSet.add(String(c.year));
+      });
+    }
+    return Array.from(yearsSet).sort((a, b) => Number(a) - Number(b));
+  }, [data]);
+
+  const availableYears = allYearKeys.filter(
     (yr) => enabledYears[yr] !== false
   );
 
@@ -605,7 +618,7 @@ export default function HistoryPage() {
             marginRight: "auto",
             lineHeight: "1.6"
           }}>
-            บันทึกประวัติศาสตร์การแข่งขันสุดยอดแฟนพันธุ์แท้แห่งปี ย้อนหลังปี 2021 - 2024 สถิติผลคะแนนทุกรอบการแข่งขัน และทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปีเวอร์ชัน Fanmade
+            บันทึกประวัติศาสตร์การแข่งขันสุดยอดแฟนพันธุ์แท้แห่งปี ย้อนหลังปี {availableYears.length > 0 ? `${availableYears[0]} - ${availableYears[availableYears.length - 1]}` : "2021 - 2026"} สถิติผลคะแนนทุกรอบการแข่งขัน และทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปีเวอร์ชัน Fanmade
           </p>
         </div>
 
@@ -634,7 +647,7 @@ export default function HistoryPage() {
               ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (Hall of Fame)
             </h2>
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>
-              4 ซีซั่นประวัติศาสตร์ (2021 - 2024)
+              {availableYears.length} ซีซั่นประวัติศาสตร์ ({availableYears.length > 0 ? `${availableYears[0]} - ${availableYears[availableYears.length - 1]}` : "2021 - 2026"})
             </span>
           </div>
 
@@ -645,6 +658,7 @@ export default function HistoryPage() {
           }}>
             {(data?.champions || []).filter((c) => enabledYears[String(c.year)] !== false).map((champ) => {
               const isSelectedYear = String(champ.year) === String(activeYear);
+              const isMystery = Number(champ.year) === 2026 && (!champ.image || champ.nickname === "ปริศนา" || (champ.name && champ.name.includes("รอลุ้น")));
               return (
                 <div
                   key={champ.year}
@@ -657,7 +671,7 @@ export default function HistoryPage() {
                     background: isSelectedYear
                       ? "linear-gradient(150deg, rgba(255, 215, 0, 0.22) 0%, rgba(18, 30, 56, 0.96) 100%)"
                       : "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
-                    border: isSelectedYear ? "2.5px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.35)",
+                    border: isSelectedYear ? "2.5px solid #ffd700" : isMystery ? "1.5px dashed rgba(255, 215, 0, 0.6)" : "1px solid rgba(255, 215, 0, 0.35)",
                     borderRadius: "18px",
                     padding: "24px 20px",
                     textAlign: "center",
@@ -666,6 +680,8 @@ export default function HistoryPage() {
                     transition: "all 0.25s ease",
                     boxShadow: isSelectedYear
                       ? "0 10px 35px rgba(255, 215, 0, 0.35)"
+                      : isMystery
+                      ? "0 6px 25px rgba(255, 215, 0, 0.2)"
                       : "0 6px 20px rgba(0,0,0,0.4)"
                   }}
                   onMouseEnter={(e) => {
@@ -688,7 +704,7 @@ export default function HistoryPage() {
                     borderRadius: "12px",
                     fontSize: "12px",
                     fontWeight: "900",
-                    background: "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                    background: isMystery ? "linear-gradient(90deg, #ffd700 0%, #eab308 100%)" : "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
                     color: "#030814",
                     boxShadow: "0 2px 8px rgba(255, 215, 0, 0.4)"
                   }}>
@@ -702,18 +718,22 @@ export default function HistoryPage() {
                     borderRadius: "50%",
                     margin: "10px auto 14px",
                     overflow: "hidden",
-                    border: "3px solid #ffd700",
-                    boxShadow: "0 0 20px rgba(255, 215, 0, 0.6)",
-                    background: "#081020",
+                    border: isMystery ? "3px dashed #ffd700" : "3px solid #ffd700",
+                    boxShadow: isMystery ? "0 0 25px rgba(255, 215, 0, 0.6)" : "0 0 20px rgba(255, 215, 0, 0.6)",
+                    background: isMystery ? "radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, #081020 100%)" : "#081020",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center"
                   }}>
-                    <ContestantAvatar
-                      src={champ.image || `/img/champions/${champ.year}.png`}
-                      fallbackText="👑"
-                      size={88}
-                    />
+                    {isMystery ? (
+                      <span style={{ fontSize: "40px", filter: "drop-shadow(0 0 8px #ffd700)" }}>❓</span>
+                    ) : (
+                      <ContestantAvatar
+                        src={champ.image || `/img/champions/${champ.year}.png`}
+                        fallbackText="👑"
+                        size={88}
+                      />
+                    )}
                   </div>
 
                   {/* Badge */}
@@ -853,13 +873,18 @@ export default function HistoryPage() {
             {/* Season Info Summary Badge */}
             {(() => {
               const activeChamp = (data?.champions || []).find((c) => String(c.year) === String(activeYear));
-              const champTitle = activeChamp?.nickname ? `${activeChamp.name} (${activeChamp.nickname})` : activeChamp?.name || currentSeason?.info?.championName;
-              const champTopic = activeChamp?.topic || currentSeason?.info?.championTopic;
+              const isMystery = Number(activeYear) === 2026 && (!activeChamp?.image || activeChamp?.nickname === "ปริศนา" || (activeChamp?.name && activeChamp?.name.includes("รอลุ้น")));
+              const champTitle = isMystery
+                ? "⏳ รอลุ้นแชมป์ (ปริศนา)"
+                : activeChamp?.nickname
+                ? `${activeChamp.name} (${activeChamp.nickname})`
+                : activeChamp?.name || currentSeason?.info?.championName;
+              const champTopic = isMystery ? "รอตัดสินในรอบชิงชนะเลิศ" : (activeChamp?.topic || currentSeason?.info?.championTopic);
 
               return (
                 <div style={{
-                  background: "rgba(0, 229, 255, 0.08)",
-                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                  background: isMystery ? "rgba(255, 215, 0, 0.12)" : "rgba(0, 229, 255, 0.08)",
+                  border: isMystery ? "1px dashed rgba(255, 215, 0, 0.5)" : "1px solid rgba(0, 229, 255, 0.3)",
                   borderRadius: "12px",
                   padding: "8px 16px",
                   textAlign: "right"
@@ -870,7 +895,7 @@ export default function HistoryPage() {
                   <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffd700" }}>
                     👑 {champTitle}
                   </div>
-                  <div style={{ fontSize: "12px", color: "#80d0ff" }}>
+                  <div style={{ fontSize: "12px", color: isMystery ? "#ffd700" : "#80d0ff" }}>
                     หัวข้อ: {champTopic}
                   </div>
                 </div>

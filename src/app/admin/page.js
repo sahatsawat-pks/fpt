@@ -22,6 +22,15 @@ export default function AdminPage() {
   const [historyPassword, setHistoryPassword] = useState("");
   const [settingsNotice, setSettingsNotice] = useState("");
 
+  // Archive & Tournament Phase States
+  const [isArchived, setIsArchived] = useState(false);
+  const [archivedAt, setArchivedAt] = useState(null);
+  const [currentPhase, setCurrentPhase] = useState("qualifying"); // 'qualifying' | 'finals'
+  const [qualifyingLocked, setQualifyingLocked] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+
   // Tab State: 'scoring', 'contestants', 'settings'
   const [activeTab, setActiveTab] = useState("scoring");
 
@@ -303,6 +312,10 @@ export default function AdminPage() {
         setDrawPassword(data.drawPassword || "");
         setProtectHistory(Boolean(data.protectHistory));
         setHistoryPassword(data.historyPassword || "");
+        setIsArchived(Boolean(data.isArchived));
+        setArchivedAt(data.archivedAt || null);
+        setCurrentPhase(data.currentPhase || "qualifying");
+        setQualifyingLocked(Boolean(data.qualifyingLocked));
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -627,11 +640,12 @@ export default function AdminPage() {
     const found = contestants.find((c) => String(c.id) === String(selectedContestantId));
     if (found) {
       setActiveContestant(found);
+      const sc = isArchived ? (found.finalScores || {}) : (found.scores || {});
       setActiveScores({
-        "3sec": found.scores?.["3sec"] !== null && found.scores?.["3sec"] !== undefined ? String(found.scores["3sec"]) : "",
-        qa: found.scores?.qa !== null && found.scores?.qa !== undefined ? String(found.scores.qa) : "",
-        jigsaw: found.scores?.jigsaw !== null && found.scores?.jigsaw !== undefined ? String(found.scores.jigsaw) : "",
-        attribute: found.scores?.attribute !== null && found.scores?.attribute !== undefined ? String(found.scores.attribute) : "",
+        "3sec": sc?.["3sec"] !== null && sc?.["3sec"] !== undefined ? String(sc["3sec"]) : "",
+        qa: sc?.qa !== null && sc?.qa !== undefined ? String(sc.qa) : "",
+        jigsaw: sc?.jigsaw !== null && sc?.jigsaw !== undefined ? String(sc.jigsaw) : "",
+        attribute: sc?.attribute !== null && sc?.attribute !== undefined ? String(sc.attribute) : "",
       });
       setScoringNotice(`✅ ยืนยันเลือก: ${found.name} (${found.nickname || "ไม่มีชื่อเล่น"}) เรียบร้อยแล้ว`);
       setTimeout(() => setScoringNotice(""), 3000);
@@ -751,40 +765,154 @@ export default function AdminPage() {
     }
 
     try {
-      const res = await fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: activeContestant.id,
-          name: activeContestant.name,
-          nickname: activeContestant.nickname,
-          topic: activeContestant.topic,
-          scores: payloadScores,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setContestants(data.data);
-        const updated = data.data.find((c) => String(c.id) === String(activeContestant.id));
-        if (updated) {
-          setActiveContestant(updated);
-          setActiveScores({
-            "3sec": updated.scores?.["3sec"] !== null && updated.scores?.["3sec"] !== undefined ? String(updated.scores["3sec"]) : "",
-            qa: updated.scores?.qa !== null && updated.scores?.qa !== undefined ? String(updated.scores.qa) : "",
-            jigsaw: updated.scores?.jigsaw !== null && updated.scores?.jigsaw !== undefined ? String(updated.scores.jigsaw) : "",
-            attribute: updated.scores?.attribute !== null && updated.scores?.attribute !== undefined ? String(updated.scores.attribute) : "",
-          });
+      if (isArchived) {
+        // Save Final Round score
+        const res = await fetch("/api/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "update_final_scores",
+            id: activeContestant.id,
+            finalScores: payloadScores,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setContestants(data.data);
+          const updated = data.data.find((c) => String(c.id) === String(activeContestant.id));
+          if (updated) {
+            setActiveContestant(updated);
+            const sc = updated.finalScores || {};
+            setActiveScores({
+              "3sec": sc?.["3sec"] !== null && sc?.["3sec"] !== undefined ? String(sc["3sec"]) : "",
+              qa: sc?.qa !== null && sc?.qa !== undefined ? String(sc.qa) : "",
+              jigsaw: sc?.jigsaw !== null && sc?.jigsaw !== undefined ? String(sc.jigsaw) : "",
+              attribute: sc?.attribute !== null && sc?.attribute !== undefined ? String(sc.attribute) : "",
+            });
+          }
+          const msg = category ? `บันทึกคะแนนรอบชิง หมวด "${category}" สำเร็จ!` : "บันทึกคะแนนรอบชิงชนะเลิศทั้งหมดสำเร็จ!";
+          setScoringNotice(`✅ ${msg}`);
+          showToast(msg, "success");
+          setTimeout(() => setScoringNotice(""), 3500);
+        } else {
+          setScoringNotice("❌ " + (data.error || "เกิดข้อผิดพลาด"));
+          showToast(data.error || "เกิดข้อผิดพลาดในการบันทึก", "error");
         }
-        const msg = category ? `บันทึกคะแนนหมวด "${category}" สำเร็จ!` : "บันทึกคะแนนทั้งหมดสำเร็จ!";
-        setScoringNotice(`✅ ${msg}`);
-        showToast(msg, "success");
-        setTimeout(() => setScoringNotice(""), 3500);
       } else {
-        setScoringNotice("❌ " + (data.error || "เกิดข้อผิดพลาด"));
-        showToast(data.error || "เกิดข้อผิดพลาดในการบันทึก", "error");
+        // Save Qualifying Round score
+        const res = await fetch("/api/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: activeContestant.id,
+            name: activeContestant.name,
+            nickname: activeContestant.nickname,
+            topic: activeContestant.topic,
+            scores: payloadScores,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setContestants(data.data);
+          const updated = data.data.find((c) => String(c.id) === String(activeContestant.id));
+          if (updated) {
+            setActiveContestant(updated);
+            setActiveScores({
+              "3sec": updated.scores?.["3sec"] !== null && updated.scores?.["3sec"] !== undefined ? String(updated.scores["3sec"]) : "",
+              qa: updated.scores?.qa !== null && updated.scores?.qa !== undefined ? String(updated.scores.qa) : "",
+              jigsaw: updated.scores?.jigsaw !== null && updated.scores?.jigsaw !== undefined ? String(updated.scores.jigsaw) : "",
+              attribute: updated.scores?.attribute !== null && updated.scores?.attribute !== undefined ? String(updated.scores.attribute) : "",
+            });
+          }
+          const msg = category ? `บันทึกคะแนนหมวด "${category}" สำเร็จ!` : "บันทึกคะแนนทั้งหมดสำเร็จ!";
+          setScoringNotice(`✅ ${msg}`);
+          showToast(msg, "success");
+          setTimeout(() => setScoringNotice(""), 3500);
+        } else {
+          setScoringNotice("❌ " + (data.error || "เกิดข้อผิดพลาด"));
+          showToast(data.error || "เกิดข้อผิดพลาดในการบันทึก", "error");
+        }
       }
     } catch (err) {
       setScoringNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  // Archive Season 2026 into History and lock qualifying
+  const handleArchiveSeason2026 = async () => {
+    setIsArchiving(true);
+    try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "archive_season_2026" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsArchived(true);
+        setQualifyingLocked(true);
+        setShowArchiveModal(false);
+        showToast("📦 บันทึกข้อมูลเข้า Archive และล็อกตารางคะแนนเรียบร้อยแล้ว!", "success");
+        await loadSettings();
+        await loadContestants();
+        await loadAdminHistory();
+        setActiveContestant(null);
+        setSelectedContestantId("");
+        setActiveScores({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการบันทึก Archive", "error");
+      }
+    } catch (err) {
+      console.error("Archive error:", err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
+  // Set phase (qualifying <-> finals)
+  const handleSetPhase = async (newPhase) => {
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "set_phase", phase: newPhase }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCurrentPhase(newPhase);
+        const msg = newPhase === "finals"
+          ? "🚀 เริ่มต้นรอบชิงชนะเลิศแล้ว! หน้าแรกจะแสดงตารางรอบชิงชนะเลิศเป็นหลัก"
+          : "📋 สลับกลับเป็นรอบคัดเลือกแล้ว! หน้าแรกจะแสดงตารางรอบคัดเลือกเป็นหลัก";
+        showToast(msg, "success");
+        await loadSettings();
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  // Unlock qualifying if needed
+  const handleUnlockQualifying = async () => {
+    try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "unlock_qualifying" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setQualifyingLocked(false);
+        setShowUnlockModal(false);
+        showToast("🔓 ปลดล็อกตารางรอบคัดเลือกแล้ว สามารถแก้ไขคะแนนได้", "success");
+        await loadSettings();
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch (err) {
       showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
     }
   };
@@ -1246,19 +1374,194 @@ export default function AdminPage() {
         {/* ========================================================
             TAB 1: LIVE SCORING
            ======================================================== */}
-        {activeTab === "scoring" && (
+        {activeTab === "scoring" && (() => {
+          const completedContestants = contestants.filter((p) => {
+            const s = p.scores || {};
+            return ["3sec", "qa", "jigsaw", "attribute"].every(
+              (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+            );
+          });
+          const allCompleted = completedContestants.length >= totalContestants && totalContestants > 0;
+
+          return (
           <div>
+            {/* Archive / Final Round Transition Banner */}
+            {allCompleted && !isArchived && (
+              <div style={{
+                background: "linear-gradient(135deg, rgba(255, 215, 0, 0.18) 0%, rgba(18, 30, 56, 0.95) 100%)",
+                border: "2px solid #ffd700",
+                borderRadius: "16px",
+                padding: "20px 24px",
+                marginBottom: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "16px",
+                boxShadow: "0 0 30px rgba(255, 215, 0, 0.25)"
+              }}>
+                <div>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "3px 10px", borderRadius: "12px", background: "rgba(255, 215, 0, 0.25)", color: "#ffd700", fontWeight: "900", fontSize: "12px", marginBottom: "6px" }}>
+                    <span>🏆</span> ครบ 22 คนแล้ว
+                  </div>
+                  <h3 style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff", margin: "0 0 4px" }}>
+                    การแข่งขันรอบคัดเลือกเสร็จสิ้นสมบูรณ์!
+                  </h3>
+                  <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.8)", margin: 0 }}>
+                    ผู้เข้าแข่งขันกรอกคะแนนครบทั้ง {completedContestants.length} คน พร้อมบันทึกเข้าสู่ Archive และเตรียมตัวสำหรับรอบชิงชนะเลิศ
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowArchiveModal(true)}
+                  style={{
+                    padding: "12px 24px",
+                    borderRadius: "12px",
+                    background: "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                    color: "#030814",
+                    fontSize: "15px",
+                    fontWeight: "900",
+                    border: "none",
+                    cursor: "pointer",
+                    boxShadow: "0 0 20px rgba(255, 215, 0, 0.5)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    transition: "transform 0.15s ease"
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                >
+                  <span>📦</span> บันทึกข้อมูลทั้งหมดเข้า Archive
+                </button>
+              </div>
+            )}
+
+            {/* Archived Status & Phase Control Card */}
+            {isArchived && (
+              <div style={{
+                background: "linear-gradient(135deg, rgba(16, 32, 60, 0.9) 0%, rgba(8, 16, 32, 0.95) 100%)",
+                border: "1.5px solid rgba(255, 215, 0, 0.4)",
+                borderRadius: "16px",
+                padding: "18px 24px",
+                marginBottom: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "16px"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
+                  <div style={{
+                    padding: "6px 12px",
+                    borderRadius: "10px",
+                    background: "rgba(255, 215, 0, 0.18)",
+                    border: "1px solid #ffd700",
+                    color: "#ffd700",
+                    fontWeight: "900",
+                    fontSize: "13px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}>
+                    <span>🔒</span> ล็อกรอบคัดเลือกแล้ว (Archived)
+                  </div>
+                  <div>
+                    <span style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>
+                      สถานะหน้าแรก:{" "}
+                      <span style={{ color: currentPhase === "finals" ? "#ffd700" : "#00e5ff" }}>
+                        {currentPhase === "finals" ? "🏆 กำลังแสดงตารางรอบชิงชนะเลิศ" : "📋 กำลังแสดงตารางรอบคัดเลือก"}
+                      </span>
+                    </span>
+                    <span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.55)", display: "block" }}>
+                      ตารางคะแนนในหน้านี้ถูกปรับให้แสดงเฉพาะผู้เข้ารอบ 5 อันดับแรกเพื่อเตรียมกรอกคะแนนรอบชิง
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                  {currentPhase === "qualifying" ? (
+                    <button
+                      type="button"
+                      onClick={() => handleSetPhase("finals")}
+                      style={{
+                        padding: "10px 20px",
+                        borderRadius: "10px",
+                        background: "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                        color: "#030814",
+                        fontSize: "14px",
+                        fontWeight: "900",
+                        border: "none",
+                        cursor: "pointer",
+                        boxShadow: "0 0 15px rgba(255, 215, 0, 0.4)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                    >
+                      <span>🚀</span> เริ่มรอบชิงชนะเลิศ
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleSetPhase("qualifying")}
+                      style={{
+                        padding: "10px 18px",
+                        borderRadius: "10px",
+                        background: "rgba(0, 229, 255, 0.18)",
+                        color: "#00e5ff",
+                        border: "1px solid #00e5ff",
+                        fontSize: "13px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                    >
+                      <span>📋</span> สลับหน้าแรกกลับไปรอบคัดเลือก
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowUnlockModal(true)}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: "10px",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      color: "rgba(255, 255, 255, 0.7)",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      cursor: "pointer"
+                    }}
+                    title="ปลดล็อกหากจำเป็นต้องแก้ไขคะแนนรอบคัดเลือก"
+                  >
+                    🔓 ปลดล็อกรอบคัดเลือก
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Step 1: Select Contestant */}
             <div style={{
               background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
-              border: "1px solid rgba(0, 229, 255, 0.25)",
+              border: isArchived ? "1.5px solid rgba(255, 215, 0, 0.4)" : "1px solid rgba(0, 229, 255, 0.25)",
               borderRadius: "16px",
               padding: "24px",
               marginBottom: "24px"
             }}>
-              <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#80d0ff", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>1️⃣</span> เลือกผู้เข้าแข่งขันที่กำลังแข่งขัน (เรียงตามอันดับโพลล์)
-              </h2>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: "700", color: isArchived ? "#ffd700" : "#80d0ff", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span>1️⃣</span> {isArchived ? "เลือกผู้เข้ารอบชิงชนะเลิศ (Top 5 Finalists)" : "เลือกผู้เข้าแข่งขันที่กำลังแข่งขัน (เรียงตามอันดับโพลล์)"}
+                </h2>
+                {isArchived && (
+                  <span style={{ fontSize: "12px", color: "#ffd700", background: "rgba(255, 215, 0, 0.15)", padding: "3px 10px", borderRadius: "12px", border: "1px solid rgba(255, 215, 0, 0.4)", fontWeight: "700" }}>
+                    👑 โหมดกรอกคะแนนรอบชิงชนะเลิศ (เหลือเฉพาะผู้เข้ารอบ 5 อันดับแรก)
+                  </span>
+                )}
+              </div>
 
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "stretch" }}>
                 {/* Custom Rich Contestant Dropdown */}
@@ -1290,7 +1593,7 @@ export default function AdminPage() {
                       if (!selected) {
                         return (
                           <span style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "15px" }}>
-                            -- กรุณาเลือกผู้เข้าแข่งขัน (เรียงตามอันดับโพลล์) --
+                            {isArchived ? "-- กรุณาเลือกผู้เข้ารอบชิงชนะเลิศ (Top 5 Finalists) --" : "-- กรุณาเลือกผู้เข้าแข่งขัน (เรียงตามอันดับโพลล์) --"}
                           </span>
                         );
                       }
@@ -1298,22 +1601,20 @@ export default function AdminPage() {
                       const isTop5 = pRank <= 5;
                       return (
                         <div style={{ display: "flex", alignItems: "center", gap: "12px", overflow: "hidden", flex: 1 }}>
-                          {/* Poll Rank Badge */}
-                          {pRank !== 999 && (
-                            <span style={{
-                              display: "inline-block",
-                              padding: "3px 8px",
-                              borderRadius: "6px",
-                              fontWeight: "900",
-                              fontSize: "12px",
-                              background: isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.15)",
-                              color: isTop5 ? "#ffd700" : "#67e8f9",
-                              border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
-                              flexShrink: 0
-                            }}>
-                              โพลล์ #{pRank}
-                            </span>
-                          )}
+                          {/* Rank Badge */}
+                          <span style={{
+                            display: "inline-block",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            fontWeight: "900",
+                            fontSize: "12px",
+                            background: isArchived ? "rgba(255, 215, 0, 0.25)" : isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.15)",
+                            color: isArchived ? "#ffd700" : isTop5 ? "#ffd700" : "#67e8f9",
+                            border: isArchived ? "1px solid #ffd700" : isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
+                            flexShrink: 0
+                          }}>
+                            {isArchived ? `อันดับ #${selected.qualifyingRank || "-"}` : pRank !== 999 ? `โพลล์ #${pRank}` : "-"}
+                          </span>
 
                           {/* Contestant Photo */}
                           <div style={{
@@ -1432,7 +1733,11 @@ export default function AdminPage() {
 
                       {/* Items */}
                       {(() => {
-                        const sorted = [...contestants].sort((a, b) => getContestantPollRank(a) - getContestantPollRank(b));
+                        const sorted = isArchived
+                          ? [...contestants]
+                              .filter((c) => c.isFinalist || (c.qualifyingRank && c.qualifyingRank <= 5))
+                              .sort((a, b) => (a.qualifyingRank || 99) - (b.qualifyingRank || 99))
+                          : [...contestants].sort((a, b) => getContestantPollRank(a) - getContestantPollRank(b));
                         const q = dropdownSearch.trim().toLowerCase();
                         const filtered = sorted.filter((c) => {
                           if (!q) return true;
@@ -1461,6 +1766,14 @@ export default function AdminPage() {
                               onClick={() => {
                                 setSelectedContestantId(c.id);
                                 setIsDropdownOpen(false);
+                                setActiveContestant(c);
+                                const sc = isArchived ? (c.finalScores || {}) : (c.scores || {});
+                                setActiveScores({
+                                  "3sec": sc?.["3sec"] !== null && sc?.["3sec"] !== undefined ? String(sc["3sec"]) : "",
+                                  qa: sc?.qa !== null && sc?.qa !== undefined ? String(sc.qa) : "",
+                                  jigsaw: sc?.jigsaw !== null && sc?.jigsaw !== undefined ? String(sc.jigsaw) : "",
+                                  attribute: sc?.attribute !== null && sc?.attribute !== undefined ? String(sc.attribute) : "",
+                                });
                               }}
                               style={{
                                 display: "flex",
@@ -1479,21 +1792,21 @@ export default function AdminPage() {
                                 if (!isSelected) e.currentTarget.style.background = "transparent";
                               }}
                             >
-                              {/* Poll Rank Badge */}
+                              {/* Rank Badge */}
                               <span style={{
                                 display: "inline-block",
-                                minWidth: "40px",
+                                minWidth: "46px",
                                 textAlign: "center",
                                 padding: "3px 6px",
                                 borderRadius: "6px",
                                 fontWeight: "900",
                                 fontSize: "11px",
-                                background: isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)",
-                                color: isTop5 ? "#ffd700" : "#67e8f9",
-                                border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)",
+                                background: isArchived ? "rgba(255, 215, 0, 0.25)" : isTop5 ? "rgba(255, 215, 0, 0.2)" : "rgba(0, 229, 255, 0.12)",
+                                color: isArchived ? "#ffd700" : isTop5 ? "#ffd700" : "#67e8f9",
+                                border: isArchived ? "1px solid #ffd700" : isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.3)",
                                 flexShrink: 0
                               }}>
-                                {pRank !== 999 ? `#${pRank}` : "-"}
+                                {isArchived ? `อันดับ #${c.qualifyingRank || "-"}` : pRank !== 999 ? `#${pRank}` : "-"}
                               </span>
 
                               {/* Photo Avatar */}
@@ -1673,6 +1986,19 @@ export default function AdminPage() {
                       </h3>
                       <p style={{ fontSize: "14px", color: "var(--gold-light, #ffd700)", margin: 0, display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                         <span>📌 หัวข้อ: <strong>{activeContestant.topic}</strong></span>
+                        {isArchived && (
+                          <span style={{
+                            padding: "2px 10px",
+                            borderRadius: "12px",
+                            background: "rgba(255, 215, 0, 0.2)",
+                            border: "1px solid #ffd700",
+                            color: "#ffd700",
+                            fontSize: "12px",
+                            fontWeight: "800"
+                          }}>
+                            👑 รอบคัดเลือก: {activeContestant.totalScore} คะแนน (อันดับ #{activeContestant.qualifyingRank || "-"})
+                          </span>
+                        )}
                         {activeContestant.order && (
                           <span style={{ color: "#00e5ff", fontWeight: "700" }}>
                             • 🎲 ลำดับแข่ง #{activeContestant.order}
@@ -1827,10 +2153,10 @@ export default function AdminPage() {
               </div>
 
                 {/* 4 Category Scoring Grid */}
-                <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#80d0ff", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span>2️⃣ อัปเดตคะแนนทีละหมวด (0 - 25 คะแนนต่อหมวด)</span>
+                <h2 style={{ fontSize: "16px", fontWeight: "700", color: isArchived ? "#ffd700" : "#80d0ff", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span>2️⃣ {isArchived ? "กรอกคะแนนรอบชิงชนะเลิศ (0 - 25 คะแนนต่อหมวด)" : "อัปเดตคะแนนทีละหมวด (0 - 25 คะแนนต่อหมวด)"}</span>
                   <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "normal" }}>
-                    กดปุ่มด่วนหรือกรอกตัวเลขแล้วกดบันทึก
+                    {isArchived ? "บันทึกคะแนนรอบชิงชนะเลิศ (ไม่ทับคะแนนรอบคัดเลือก)" : "กดปุ่มด่วนหรือกรอกตัวเลขแล้วกดบันทึก"}
                   </span>
                 </h2>
 
@@ -2370,7 +2696,8 @@ export default function AdminPage() {
               </div>
             )}
           </div>
-        )}
+          );
+        })()}
 
         {/* ========================================================
             TAB 2: CONTESTANTS & PHOTOS
@@ -4883,6 +5210,196 @@ export default function AdminPage() {
                 }}
               >
                 ปิดหน้าต่าง
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          MODAL: ARCHIVE SEASON 2026 QUALIFYING
+         ======================================================== */}
+      {showArchiveModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.85)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          padding: "20px"
+        }}>
+          <div style={{
+            maxWidth: "560px",
+            width: "100%",
+            background: "linear-gradient(150deg, #182038 0%, #0a0f1d 100%)",
+            border: "2px solid #ffd700",
+            borderRadius: "20px",
+            padding: "30px",
+            boxShadow: "0 0 60px rgba(255, 215, 0, 0.4)"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "32px" }}>📦</span>
+                <div>
+                  <h3 style={{ fontSize: "20px", fontWeight: "900", color: "#ffd700", margin: 0 }}>
+                    บันทึกข้อมูลทั้งหมดเข้า Archive
+                  </h3>
+                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                    แฟนพันธุ์แท้แห่งปี 2026 (รอบคัดเลือก)
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowArchiveModal(false)}
+                style={{ background: "transparent", border: "none", color: "#fff", fontSize: "20px", cursor: "pointer" }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.85)", marginBottom: "18px", lineHeight: "1.6" }}>
+              การยืนยันบันทึกเข้าสู่ Archive จะดำเนินการดังนี้:
+            </p>
+
+            <div style={{
+              background: "rgba(0, 0, 0, 0.35)",
+              border: "1px solid rgba(255, 215, 0, 0.3)",
+              borderRadius: "14px",
+              padding: "16px",
+              marginBottom: "24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              fontSize: "13px",
+              color: "rgba(255,255,255,0.9)",
+              lineHeight: "1.5"
+            }}>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span>🔒</span>
+                <div><strong>ล็อกตารางคะแนนรอบคัดเลือก:</strong> ผลคะแนนทั้ง 22 คนจะถูกตรึงไว้เพื่อความโปร่งใสและถูกต้อง</div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span>📜</span>
+                <div><strong>บันทึกเข้าสู่ทำเนียบแชมป์ (History):</strong> เพิ่มซีซั่น 2026 พร้อมตารางคะแนนรอบคัดเลือกทั้งหมดลงในหน้าประวัติศาสตร์</div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span>❓</span>
+                <div><strong>ขึ้นแชมป์ 2026 เป็น "ปริศนา":</strong> ในทำเนียบแชมป์จะขึ้นแชมป์เป็นปริศนารอลุ้นผล เพราะยังไม่ได้ตัดสินในรอบชิงชนะเลิศ</div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span>👑</span>
+                <div><strong>เตรียมกรอกรอบชิงชนะเลิศ:</strong> ช่องเลือกผู้เข้าแข่งขันในหน้านี้จะถูกปรับให้เหลือเฉพาะผู้เข้ารอบ 5 อันดับแรก</div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                disabled={isArchiving}
+                onClick={() => setShowArchiveModal(false)}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: "14px",
+                  cursor: isArchiving ? "not-allowed" : "pointer"
+                }}
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                disabled={isArchiving}
+                onClick={handleArchiveSeason2026}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                  color: "#030814",
+                  fontSize: "15px",
+                  fontWeight: "900",
+                  border: "none",
+                  cursor: isArchiving ? "wait" : "pointer",
+                  boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)"
+                }}
+              >
+                {isArchiving ? "กำลังบันทึกเข้า Archive..." : "📦 ยืนยันบันทึกเข้า Archive"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          MODAL: UNLOCK QUALIFYING ROUND
+         ======================================================== */}
+      {showUnlockModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.85)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          padding: "20px"
+        }}>
+          <div style={{
+            maxWidth: "480px",
+            width: "100%",
+            background: "linear-gradient(150deg, #241416 0%, #0d0607 100%)",
+            border: "2px solid #f59e0b",
+            borderRadius: "20px",
+            padding: "26px",
+            boxShadow: "0 0 40px rgba(245, 158, 11, 0.35)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+              <span style={{ fontSize: "28px" }}>🔓</span>
+              <h3 style={{ fontSize: "19px", fontWeight: "900", color: "#fcd34d", margin: 0 }}>
+                ยืนยันการปลดล็อกตารางคะแนนรอบคัดเลือก
+              </h3>
+            </div>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)", marginBottom: "20px", lineHeight: "1.5" }}>
+              เมื่อปลดล็อก คุณจะสามารถเลือกและแก้ไขคะแนนของผู้เข้าแข่งขันรอบคัดเลือกทั้ง 22 คนได้อีกครั้ง หากแก้ไขเสร็จแล้วสามารถกดบันทึก Archive เพื่อล็อกอีกครั้งได้
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={() => setShowUnlockModal(false)}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: "8px",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: "14px",
+                  cursor: "pointer"
+                }}
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleUnlockQualifying}
+                style={{
+                  padding: "8px 20px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(90deg, #f59e0b 0%, #d97706 100%)",
+                  color: "#030814",
+                  fontSize: "14px",
+                  fontWeight: "800",
+                  border: "none",
+                  cursor: "pointer"
+                }}
+              >
+                🔓 ยืนยันปลดล็อก
               </button>
             </div>
           </div>

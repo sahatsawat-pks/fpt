@@ -4,6 +4,63 @@ import path from "path";
 import { getKVData, saveKVData } from "@/lib/kv";
 
 const DATA_FILE = path.join(process.cwd(), "src/app/data/leaderboard.json");
+const HISTORY_FILE = path.join(process.cwd(), "src/app/data/history.json");
+const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
+
+function readHistoryData() {
+  try {
+    if (!fs.existsSync(HISTORY_FILE)) return null;
+    return JSON.parse(fs.readFileSync(HISTORY_FILE, "utf-8"));
+  } catch (err) {
+    console.error("Error reading history in scores API:", err);
+    return null;
+  }
+}
+
+function writeHistoryData(data) {
+  try {
+    fs.mkdirSync(path.dirname(HISTORY_FILE), { recursive: true });
+    fs.writeFileSync(HISTORY_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err) {
+    if (err.code !== "EROFS") console.error("Error writing history in scores API:", err);
+  }
+}
+
+function readSettingsData() {
+  try {
+    if (!fs.existsSync(SETTINGS_FILE)) return null;
+    return JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf-8"));
+  } catch (err) {
+    console.error("Error reading settings in scores API:", err);
+    return null;
+  }
+}
+
+function writeSettingsData(data) {
+  try {
+    fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err) {
+    if (err.code !== "EROFS") console.error("Error writing settings in scores API:", err);
+  }
+}
+
+function computeDenseRanks(contestants) {
+  const sorted = [...contestants].sort((a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0));
+  let rank = 0;
+  let lastScore = null;
+  return sorted.map((item) => {
+    const sc = Number(item.totalScore) || 0;
+    if (lastScore === null || sc !== lastScore) {
+      rank += 1;
+      lastScore = sc;
+    }
+    return {
+      ...item,
+      calculatedRank: rank,
+    };
+  });
+}
 
 const INITIAL_DATA = [
   {
@@ -93,6 +150,241 @@ export async function POST(request) {
       currentData = currentData.filter((item) => item.id !== body.id);
       await saveKVData("fpt_leaderboard", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
+    }
+
+    // Archive Season 2026 Qualifying Data into History and Lock Qualifying Round
+    if (body.action === "archive_season_2026") {
+      // 1. Calculate dense ranks for all current contestants
+      const rankedList = computeDenseRanks(currentData);
+      const finalistsMap = new Set();
+      rankedList.forEach((c) => {
+        if (c.calculatedRank <= 5) {
+          finalistsMap.add(String(c.id));
+        }
+      });
+
+      // 2. Mark isFinalist in currentData and preserve or initialize finalScores
+      currentData = currentData.map((item) => {
+        const isFinalist = finalistsMap.has(String(item.id));
+        const rankedItem = rankedList.find((r) => String(r.id) === String(item.id));
+        return {
+          ...item,
+          qualifyingRank: rankedItem ? rankedItem.calculatedRank : null,
+          isFinalist,
+          finalScores: item.finalScores || {
+            "3sec": null,
+            qa: null,
+            jigsaw: null,
+            attribute: null,
+          },
+          finalTotalScore: item.finalTotalScore || 0,
+          updatedAt: new Date().toISOString(),
+        };
+      });
+      await saveKVData("fpt_leaderboard", currentData, writeData);
+
+      // 3. Update History JSON & KV fpt_history
+      let historyData = await getKVData("fpt_history", readHistoryData);
+      if (!historyData) {
+        historyData = readHistoryData() || { enabledYears: {}, champions: [], seasons: {} };
+      }
+      if (!historyData.enabledYears) historyData.enabledYears = {};
+      if (!historyData.champions) historyData.champions = [];
+      if (!historyData.seasons) historyData.seasons = {};
+
+      historyData.enabledYears["2026"] = true;
+
+      // Ensure 2026 Mystery Champion in champions array
+      const existingChampIdx = historyData.champions.findIndex((c) => Number(c.year) === 2026);
+      const mysteryChamp = {
+        year: 2026,
+        title: "สุดยอดแฟนพันธุ์แท้แห่งปี 2026",
+        name: "รอลุ้นแชมป์ประจำปี 2026",
+        nickname: "ปริศนา",
+        topic: "รอลุ้นผลในรอบชิงชนะเลิศ",
+        badge: "⏳ รอลุ้นผลรอบชิงชนะเลิศ",
+        description: "การแข่งขันสุดยอดแฟนพันธุ์แท้แห่งปี 2026 กำลังอยู่ในช่วงขับเคี่ยวรอบชิงชนะเลิศ ใครจะคว้าชัยเป็นสุดยอดแฟนพันธุ์แท้แห่งปี 2026 รอลุ้นกันเร็วๆ นี้!",
+        image: "",
+      };
+      if (existingChampIdx !== -1) {
+        if (historyData.champions[existingChampIdx].nickname === "ปริศนา" || !historyData.champions[existingChampIdx].name) {
+          historyData.champions[existingChampIdx] = {
+            ...historyData.champions[existingChampIdx],
+            ...mysteryChamp,
+          };
+        }
+      } else {
+        historyData.champions.push(mysteryChamp);
+      }
+
+      // Build Qualifying round list for season 2026
+      const qualifyingList = rankedList.map((item, idx) => ({
+        date: "2026",
+        rank: String(item.calculatedRank),
+        order: Number(item.order) || (idx + 1),
+        pollRank: item.pollRank ? Number(item.pollRank) : null,
+        nickname: item.nickname || "",
+        name: item.name,
+        topic: item.topic,
+        scores: {
+          "3sec": item.scores?.["3sec"] !== null && item.scores?.["3sec"] !== undefined ? Number(item.scores["3sec"]) : 0,
+          qa: item.scores?.qa !== null && item.scores?.qa !== undefined ? Number(item.scores.qa) : 0,
+          jigsaw: item.scores?.jigsaw !== null && item.scores?.jigsaw !== undefined ? Number(item.scores.jigsaw) : 0,
+          attribute: item.scores?.attribute !== null && item.scores?.attribute !== undefined ? Number(item.scores.attribute) : 0,
+        },
+        totalScore: Number(item.totalScore) || 0,
+        image: item.image || "",
+      }));
+
+      // Build Finals round list for season 2026
+      const finalistsList = rankedList
+        .filter((c) => c.calculatedRank <= 5)
+        .map((f, fIdx) => ({
+          date: "2026",
+          rank: "-",
+          order: fIdx + 1,
+          pollRank: f.pollRank ? Number(f.pollRank) : null,
+          nickname: f.nickname || "",
+          name: f.name,
+          topic: f.topic,
+          scores: f.finalScores || { "3sec": null, qa: null, jigsaw: null, attribute: null },
+          totalScore: f.finalTotalScore || 0,
+          result: "รอลุ้นผลรอบชิงชนะเลิศ",
+          image: f.image || "",
+        }));
+
+      historyData.seasons["2026"] = {
+        info: {
+          year: 2026,
+          title: "แฟนพันธุ์แท้แห่งปี 2026",
+          host: "เปเล่ ณัฐวัฒน์ วุฒิช่วย",
+          executiveProducer: "ศุภวิชญ์ งามสม",
+          firstAirDate: "2026",
+          episodes: "22 ตอน",
+          championName: "รอลุ้นแชมป์ประจำปี 2026 (ปริศนา)",
+          championTopic: "รอลุ้นผลในรอบชิงชนะเลิศ",
+        },
+        qualifying: qualifyingList,
+        finals: [
+          {
+            roundName: "รอบชิงชนะเลิศ 2026 (Finals)",
+            players: finalistsList,
+          },
+        ],
+      };
+
+      await saveKVData("fpt_history", historyData, writeHistoryData);
+
+      // 4. Update Settings: lock qualifying and mark isArchived
+      let settings = await getKVData("fpt_settings", readSettingsData);
+      if (!settings) settings = readSettingsData() || {};
+      const newSettings = {
+        ...settings,
+        isArchived: true,
+        archivedAt: new Date().toISOString(),
+        qualifyingLocked: true,
+      };
+      await saveKVData("fpt_settings", newSettings, writeSettingsData);
+
+      return NextResponse.json({
+        success: true,
+        message: "บันทึกข้อมูลเข้าสู่ Archive และล็อกตารางคะแนนเรียบร้อยแล้ว",
+        data: currentData,
+        settings: newSettings,
+      });
+    }
+
+    // Update Final Round scores for a finalist
+    if (body.action === "update_final_scores" && body.id) {
+      const existingIdx = currentData.findIndex((item) => String(item.id) === String(body.id));
+      if (existingIdx === -1) {
+        return NextResponse.json({ success: false, error: "Finalist not found" }, { status: 404 });
+      }
+
+      const contestant = currentData[existingIdx];
+      const existingFinalScores = contestant.finalScores || {};
+
+      const formatField = (val, fallback) => {
+        if (val === undefined) return fallback !== undefined ? fallback : null;
+        if (val === null || val === "") return null;
+        const n = Number(val);
+        return isNaN(n) ? null : n;
+      };
+
+      const finalScores = {
+        "3sec": formatField(body.finalScores?.["3sec"], existingFinalScores["3sec"]),
+        qa: formatField(body.finalScores?.qa, existingFinalScores.qa),
+        jigsaw: formatField(body.finalScores?.jigsaw, existingFinalScores.jigsaw),
+        attribute: formatField(body.finalScores?.attribute, existingFinalScores.attribute),
+      };
+
+      const calculatedFinalTotal = [
+        finalScores["3sec"],
+        finalScores.qa,
+        finalScores.jigsaw,
+        finalScores.attribute,
+      ].reduce((acc, v) => acc + (typeof v === "number" ? v : 0), 0);
+
+      const targetFinalTotal = typeof body.finalTotalScore === "number" ? body.finalTotalScore : calculatedFinalTotal;
+
+      currentData[existingIdx] = {
+        ...contestant,
+        finalScores,
+        finalTotalScore: targetFinalTotal,
+        finalResult: body.finalResult !== undefined ? body.finalResult : contestant.finalResult,
+        finalRank: body.finalRank !== undefined ? body.finalRank : contestant.finalRank,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await saveKVData("fpt_leaderboard", currentData, writeData);
+
+      // Sync to history if 2026 season exists
+      try {
+        let historyData = await getKVData("fpt_history", readHistoryData);
+        if (historyData && historyData.seasons && historyData.seasons["2026"] && historyData.seasons["2026"].finals) {
+          const finalsRound = historyData.seasons["2026"].finals[0];
+          if (finalsRound && Array.isArray(finalsRound.players)) {
+            const pIdx = finalsRound.players.findIndex(
+              (p) => p.name === contestant.name || (p.nickname && p.nickname === contestant.nickname)
+            );
+            if (pIdx !== -1) {
+              finalsRound.players[pIdx] = {
+                ...finalsRound.players[pIdx],
+                scores: finalScores,
+                totalScore: targetFinalTotal,
+                result: body.finalResult || finalsRound.players[pIdx].result || "รอลุ้นผลรอบชิงชนะเลิศ",
+                rank: body.finalRank ? String(body.finalRank) : finalsRound.players[pIdx].rank,
+              };
+              await saveKVData("fpt_history", historyData, writeHistoryData);
+            }
+          }
+        }
+      } catch (syncErr) {
+        console.error("Failed syncing final scores to history:", syncErr);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "บันทึกคะแนนรอบชิงชนะเลิศเรียบร้อยแล้ว",
+        data: currentData,
+        record: currentData[existingIdx],
+      });
+    }
+
+    // Unlock or unarchive qualifying round if admin needs to make adjustments
+    if (body.action === "unlock_qualifying") {
+      let settings = await getKVData("fpt_settings", readSettingsData);
+      if (!settings) settings = readSettingsData() || {};
+      const newSettings = {
+        ...settings,
+        qualifyingLocked: false,
+      };
+      await saveKVData("fpt_settings", newSettings, writeSettingsData);
+      return NextResponse.json({
+        success: true,
+        message: "ปลดล็อกตารางคะแนนรอบคัดเลือกแล้ว",
+        settings: newSettings,
+      });
     }
 
     // Reset all scores to null / 0, keeping contestants, nicknames, topics, and images
