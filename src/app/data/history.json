@@ -3,7 +3,8 @@
     "2021": true,
     "2022": true,
     "2023": true,
-    "2024": false
+    "2024": true,
+    "2026": true
   },
   "champions": [
     {
@@ -45,6 +46,16 @@
       "badge": "🏆 แชมป์คนล่าสุด",
       "description": "ฟอร์มร้อนแรงตั้งแต่รอบคัดเลือกจนถึงนัดชิง ปิดเกมใน 'หมวด 3 วินาที' ไปได้ถึง 11 คะแนน ผงาดคว้าแชมป์สุดยอดแฟนพันธุ์แท้แห่งปี 2024 ได้สำเร็จ",
       "image": "/img/champions/2024.png"
+    },
+    {
+      "year": 2026,
+      "title": "สุดยอดแฟนพันธุ์แท้แห่งปี 2026",
+      "name": "รอการแข่งขันในรอบชิงชนะเลิศ",
+      "nickname": "ปริศนา",
+      "topic": "รอการแข่งขันในรอบชิงชนะเลิศ",
+      "badge": "🏆 รอลุ้นแชมป์",
+      "description": "กำลังแข่งขันในซีซั่น 2026 รอลุ้นว่าใครจะได้เป็นสุดยอดแฟนพันธุ์แท้แห่งปี 2026",
+      "image": ""
     }
   ],
   "seasons": {
@@ -1284,6 +1295,773 @@
             }
           ]
         }
+      ],
+      "audition": [
+        {
+          "episode": 1,
+          "date": "7 กุมภาพันธ์ 2022",
+          "name": "นันทวัฒน์ สาริกา",
+          "nickname": "นัท",
+          "topic": "The Mask Singer Thailand ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 60,
+          "final": "ถูก",
+          "image": "/img/history/2022/The Mask Singer Thailand.png"
+        },
+        {
+          "episode": 1,
+          "date": "7 กุมภาพันธ์ 2022",
+          "name": "รัฐศาสตร์ สายโท",
+          "nickname": "เติ๊ด",
+          "topic": "บอร์ดเกม ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 12,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 52,
+          "final": "ถูก",
+          "image": "/img/history/2022/Board Game.png"
+        },
+        {
+          "episode": 1,
+          "date": "7 กุมภาพันธ์ 2022",
+          "name": "เชาว์วรรธน์ จันทร์สุข",
+          "nickname": "ก๊อง",
+          "topic": "ค่ายหนัง GTH/GDH",
+          "quota": false,
+          "scores": {
+            "3sec": 1,
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 1,
+          "final": "-",
+          "image": "/img/history/2022/GTH GDH.png"
+        },
+        {
+          "episode": 2,
+          "date": "28 กุมภาพันธ์ 2022",
+          "name": "เชาว์วรรธน์ จันทร์สุข",
+          "nickname": "ก๊อง",
+          "topic": "ค่ายหนัง GTH/GDH",
+          "quota": true,
+          "scores": {
+            "3sec": 10,
+            "action": 15,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 45,
+          "final": "ถูก",
+          "image": "/img/history/2022/GTH GDH.png"
+        },
+        {
+          "episode": 2,
+          "date": "28 กุมภาพันธ์ 2022",
+          "name": "นวพล พรหล่อ",
+          "nickname": "โอ๊ค",
+          "topic": "Workpoint ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 5,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 50,
+          "final": "ถูก",
+          "image": "/img/history/2022/Workpoint.png"
+        },
+        {
+          "episode": 2,
+          "date": "28 กุมภาพันธ์ 2022",
+          "name": "วันเฉลิม กองเงิน",
+          "nickname": "มอส",
+          "topic": "เกมโชว์สหรัฐอเมริกา",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 23,
+          "final": "-",
+          "image": ""
+        },
+        {
+          "episode": 2,
+          "date": "28 กุมภาพันธ์ 2022",
+          "name": "กิตติพงษ์ หนองมีทรัพย์",
+          "nickname": "เก่ง",
+          "topic": "ซีรีส์เกม Resident Evil ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 9,
+            "action": 20,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 44,
+          "final": "ถูก",
+          "image": "/img/history/2022/Resident Evil.png"
+        },
+        {
+          "episode": 3,
+          "date": "4 เมษายน 2022",
+          "name": "พัชธรสิษฐ์ นามเมือง",
+          "nickname": "ต้นน้ำ",
+          "topic": "เกมโชว์สหราชอาณาจักร",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": "-",
+            "jigsaw": 25,
+            "properties": 5
+          },
+          "totalScore": 40,
+          "final": "ถูก",
+          "image": "/img/history/2022/UK Gameshow.png"
+        },
+        {
+          "episode": 3,
+          "date": "4 เมษายน 2022",
+          "name": "ถิรวัฒน์ ทองพิระ",
+          "nickname": "เมฆ",
+          "topic": "Tilly Bird",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 56,
+          "final": "ถูก",
+          "image": "/img/history/2022/Tilly Birds.png"
+        },
+        {
+          "episode": 3,
+          "date": "4 เมษายน 2022",
+          "name": "กวิน โฆษิตตานนท์",
+          "nickname": "นุ๊ก",
+          "topic": "Hyperdimension Neptunia",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": 5,
+            "jigsaw": "-",
+            "properties": 25
+          },
+          "totalScore": 43,
+          "final": "ถูก",
+          "image": "/img/history/2022/Neptunia.png"
+        },
+        {
+          "episode": 3,
+          "date": "4 เมษายน 2022",
+          "name": "สหัสวรรษ นิจพันธ์",
+          "nickname": "พีท",
+          "topic": "Dead by Daylight",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 5
+          },
+          "totalScore": 40,
+          "final": "ถูก",
+          "image": "/img/history/2022/Dead By Daylight.png"
+        },
+        {
+          "episode": 4,
+          "date": "18 เมษายน 2022",
+          "name": "ธนพัฒน์ สง่าแสง",
+          "nickname": "แบงค์",
+          "topic": "48Group Thailand",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 18,
+          "final": "-",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 4,
+          "date": "18 เมษายน 2022",
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "nickname": "ริท",
+          "topic": "รถเมล์ ขสมก.",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 49,
+          "final": "ถูก",
+          "image": "/img/history/2022/ขสมก..png"
+        },
+        {
+          "episode": 4,
+          "date": "18 เมษายน 2022",
+          "name": "ณัฐดนัย วงศ์ปัญญา",
+          "nickname": "แฟรงค์",
+          "topic": "วงไอดอลหญิงไทย",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": 15,
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "totalScore": 28,
+          "final": "-",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 4,
+          "date": "18 เมษายน 2022",
+          "name": "อภิวัฒน์ ช่วยแสง",
+          "nickname": "ฟลุ๊ค",
+          "topic": "Horimiya",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 15
+          },
+          "totalScore": 49,
+          "final": "ถูก",
+          "image": "/img/history/2022/Horimiya.png"
+        },
+        {
+          "episode": 5,
+          "date": "2 พฤษภาคม 2022",
+          "name": "พศวัต พุ่มเงิน",
+          "nickname": "ปาร์ค",
+          "topic": "VTuber",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": 5,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 40,
+          "final": "ถูก",
+          "image": "/img/history/2022/VTuber.png"
+        },
+        {
+          "episode": 5,
+          "date": "2 พฤษภาคม 2022",
+          "name": "อันวา หวันตันหยง",
+          "nickname": "วา",
+          "topic": "The Wall Song ร้องข้ามกำแพง",
+          "quota": false,
+          "scores": {
+            "3sec": 2,
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 2,
+          "final": "-",
+          "image": "/img/history/2021/วา.png"
+        },
+        {
+          "episode": 5,
+          "date": "2 พฤษภาคม 2022",
+          "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+          "nickname": "แมน",
+          "topic": "เกมโชว์ไทย ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 38,
+          "final": "ผิด",
+          "image": "/img/history/2021/แมน.png"
+        },
+        {
+          "episode": 5,
+          "date": "2 พฤษภาคม 2022",
+          "name": "ธนกฤต บุญพงษา",
+          "nickname": "ไอซ์",
+          "topic": "ประเทศสมาชิกสหประชาชาติ",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 60,
+          "final": "ถูก",
+          "image": "/img/history/2023/Saint Seiya.png"
+        },
+        {
+          "episode": 6,
+          "date": "30 พฤษภาคม 2022",
+          "name": "สรศักดิ์ ชัยเจริญ",
+          "nickname": "สร",
+          "topic": "มวยปล้ำ WWE",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 10,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 45,
+          "final": "ถูก",
+          "image": "/img/history/2022/WWE.png"
+        },
+        {
+          "episode": 6,
+          "date": "30 พฤษภาคม 2022",
+          "name": "นัทธสม บุญมา",
+          "nickname": "ซ่า",
+          "topic": "วง Cocktail",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 5
+          },
+          "totalScore": 44,
+          "final": "ถูก",
+          "image": "/img/history/2022/Cocktail.png"
+        },
+        {
+          "episode": 6,
+          "date": "30 พฤษภาคม 2022",
+          "name": "พีรภัทร หมื่นหาญ",
+          "nickname": "พีม",
+          "topic": "ฟุตบอลไทยลีก",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": "-",
+            "jigsaw": 0,
+            "properties": 15
+          },
+          "totalScore": 28,
+          "final": "-",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 6,
+          "date": "30 พฤษภาคม 2022",
+          "name": "สุกฤษฎิ์ ไชยชนะ",
+          "nickname": "ซิมส์",
+          "topic": "T-POP",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 20,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 31,
+          "final": "-",
+          "image": "/img/history/2021/ซิมส์.png"
+        },
+        {
+          "episode": 7,
+          "date": "20 มิถุนายน 2022",
+          "name": "ณัฐกมล มานะดี",
+          "nickname": "นัท",
+          "topic": "Cookie Run Kingdom",
+          "quota": false,
+          "scores": {
+            "3sec": 12,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 47,
+          "final": "ถูก",
+          "image": "/img/history/2022/Cookie Run Kingdom.png"
+        },
+        {
+          "episode": 7,
+          "date": "20 มิถุนายน 2022",
+          "name": "ปฏิปัน อัศวภูไชย",
+          "nickname": "ปัน",
+          "topic": "สุนทราภรณ์",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 40,
+          "final": "ผิด",
+          "image": "/img/history/2022/สุนทราภรณ์.png"
+        },
+        {
+          "episode": 7,
+          "date": "20 มิถุนายน 2022",
+          "name": "ธนะวิทย์ ฤทธิรัตน์",
+          "nickname": "โอ๋",
+          "topic": "Last Idol Thailand",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 60,
+          "final": "ถูก",
+          "image": "/img/history/2022/Last Idol TH.png"
+        },
+        {
+          "episode": 7,
+          "date": "20 มิถุนายน 2022",
+          "name": "คุณอินทร์ บุญสิน",
+          "nickname": "อินทร์",
+          "topic": "A Series of Unfortunate Events",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": 5,
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "totalScore": 15,
+          "final": "-",
+          "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 8,
+          "date": "4 กรกฎาคม 2022",
+          "name": "อดิเทพ พฤกธารา",
+          "nickname": "โอเว่น",
+          "topic": "Cookie run",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 5,
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "totalScore": 16,
+          "final": "-",
+          "image": "/img/history/2022/Cookie Run Kingdom.png"
+        },
+        {
+          "episode": 8,
+          "date": "4 กรกฎาคม 2022",
+          "name": "ศักรินทร์ เสนีวงษ์",
+          "nickname": "คิว",
+          "topic": "Marvel Cinematic Universe",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": 20,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 50,
+          "final": "ถูก",
+          "image": "/img/history/2022/MCU.png"
+        },
+        {
+          "episode": 8,
+          "date": "4 กรกฎาคม 2022",
+          "name": "ธีรวีร์ จรูญศรีโชติ",
+          "nickname": "ชีส",
+          "topic": "Mario Party",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 5,
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "totalScore": 20,
+          "final": "-",
+          "image": "/img/history/2023/Mario Party.png"
+        },
+        {
+          "episode": 8,
+          "date": "4 กรกฎาคม 2022",
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "nickname": "นนท์",
+          "topic": "ยอดนักสืบจิ๋วโคนัน",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 10,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 45,
+          "final": "ถูก",
+          "image": "/img/history/2022/ยอดนักสืบจิ๋วโคนัน.png"
+        },
+        {
+          "episode": 9,
+          "date": "18 กรกฎาคม 2022",
+          "name": "ภควัต เลี้ยงอยู่",
+          "nickname": "ไผ่",
+          "topic": "ภาพยนตร์ไทยในรัชสมัย ร.9",
+          "quota": false,
+          "scores": {
+            "3sec": 7,
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 10
+          },
+          "totalScore": 37,
+          "final": "ผิด",
+          "image": ""
+        },
+        {
+          "episode": 9,
+          "date": "18 กรกฎาคม 2022",
+          "name": "กานต์ สุยะดิษฐ",
+          "nickname": "แบด",
+          "topic": "มวยปล้ำ WWE คนที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 10
+          },
+          "totalScore": 41,
+          "final": "ผิด",
+          "image": "/img/history/2022/WWE.png"
+        },
+        {
+          "episode": 9,
+          "date": "18 กรกฎาคม 2022",
+          "name": "มาลัภร์ชัย ไชสีฮาด",
+          "nickname": "หนึ่ง",
+          "topic": "Ragnarok Online",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": "-",
+            "jigsaw": 15,
+            "properties": 15
+          },
+          "totalScore": 40,
+          "final": "ถูก",
+          "image": "/img/history/2022/Ragnarok.png"
+        },
+        {
+          "episode": 9,
+          "date": "18 กรกฎาคม 2022",
+          "name": "วงศธร นิธิวัฒนา",
+          "nickname": "เอิร์ธ",
+          "topic": "Dragon Ball",
+          "quota": false,
+          "scores": {
+            "3sec": 12,
+            "action": 5,
+            "jigsaw": "-",
+            "properties": 25
+          },
+          "totalScore": 42,
+          "final": "ถูก",
+          "image": "/img/history/2022/Dragonballs.png"
+        }
+      ],
+      "battleRoyale": [
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "วันเฉลิม กองเงิน",
+          "nickname": "มอส",
+          "topic": "เกมโชว์สหรัฐอเมริกา",
+          "quota": false,
+          "scores": {
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "result": "ตกรอบ",
+          "image": ""
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "ธนพัฒน์ สง่าแสง",
+          "nickname": "แบงค์",
+          "topic": "48Group Thailand",
+          "quota": false,
+          "scores": {
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "result": "ตกรอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "ณัฐดนัย วงศ์ปัญญา",
+          "nickname": "แฟรงค์",
+          "topic": "วงไอดอลหญิงไทย",
+          "quota": false,
+          "scores": {
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+          "nickname": "แมน",
+          "topic": "เกมโชว์ไทย ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": "/img/history/2021/แมน.png"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "พีรภัทร หมื่นหาญ",
+          "nickname": "พีม",
+          "topic": "ฟุตบอลไทยลีก",
+          "quota": false,
+          "scores": {
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "สุกฤษฎิ์ ไชยชนะ",
+          "nickname": "ซิมส์",
+          "topic": "T-POP",
+          "quota": false,
+          "scores": {
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "result": "ตกรอบ",
+          "image": "/img/history/2021/ซิมส์.png"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "คุณอินทร์ บุญสิน",
+          "nickname": "อินทร์",
+          "topic": "A Series of Unfortunate Events",
+          "quota": false,
+          "scores": {
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "ปฏิปัน อัศวภูไชย",
+          "nickname": "ปัน",
+          "topic": "สุนทราภรณ์",
+          "quota": false,
+          "scores": {
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "result": "เข้ารอบ",
+          "image": "/img/history/2022/สุนทราภรณ์.png"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "ธีรวีร์ จรูญศรีโชติ",
+          "nickname": "ชีส",
+          "topic": "Mario Party",
+          "quota": false,
+          "scores": {
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": "/img/history/2023/Mario Party.png"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "อดิเทพ พฤกธารา",
+          "nickname": "โอเว่น",
+          "topic": "Cookie run",
+          "quota": false,
+          "scores": {
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": "/img/history/2022/Cookie Run Kingdom.png"
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "ภควัต เลี้ยงอยู่",
+          "nickname": "ไผ่",
+          "topic": "ภาพยนตร์ไทยในรัชสมัย ร.9",
+          "quota": false,
+          "scores": {
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "result": "ตกรอบ",
+          "image": ""
+        },
+        {
+          "episode": 10,
+          "date": "1 สิงหาคม 2022",
+          "name": "กานต์ สุยะดิษฐ",
+          "nickname": "แบด",
+          "topic": "มวยปล้ำ WWE คนที่ 2",
+          "quota": false,
+          "scores": {
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "result": "ตกรอบ",
+          "image": "/img/history/2022/WWE.png"
+        }
       ]
     },
     "2023": {
@@ -1922,6 +2700,722 @@
             }
           ]
         }
+      ],
+      "audition": [
+        {
+          "episode": 1,
+          "date": "12 เมษายน 2023",
+          "name": "รัฐศาสตร์ สายโท",
+          "nickname": "เติ๊ด",
+          "topic": "บอร์ดเกม ครั้งที่ 3",
+          "quota": false,
+          "scores": {
+            "3sec": 5,
+            "action": 15,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 35,
+          "final": "ถูก",
+          "image": "/img/history/2023/Board Game (1).png"
+        },
+        {
+          "episode": 1,
+          "date": "12 เมษายน 2023",
+          "name": "นัทธสม บุญมา",
+          "nickname": "ซ่า",
+          "topic": "มวยปล้ำ WWE",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 20,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 41,
+          "final": "ถูก",
+          "image": "/img/history/2023/WWE.png"
+        },
+        {
+          "episode": 1,
+          "date": "12 เมษายน 2023",
+          "name": "พศวัต พุ่มเงิน",
+          "nickname": "ปาร์ค",
+          "topic": "VTuber ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 61,
+          "final": "ถูก",
+          "image": "/img/history/2023/VTuber.png"
+        },
+        {
+          "episode": 2,
+          "date": "17 เมษายน 2023",
+          "name": "เชาว์วรรธน์ จันทร์สุข",
+          "nickname": "ก๊อง",
+          "topic": "ค่ายหนัง GTH/GDH ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 10,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 43,
+          "final": "ผิด",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 2,
+          "date": "17 เมษายน 2023",
+          "name": "กวิน โฆษิตานนท์",
+          "nickname": "นุ๊ก",
+          "topic": "Hyperdimension Neptunia ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": 20,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 59,
+          "final": "ถูก",
+          "image": "/img/history/2023/Hyperdimension Neptunia.png"
+        },
+        {
+          "episode": 2,
+          "date": "17 เมษายน 2023",
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "nickname": "นนท์",
+          "topic": "ยอดนักสืบจิ๋วโคนัน ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": "-",
+            "jigsaw": 25,
+            "properties": 5
+          },
+          "totalScore": 44,
+          "final": "ถูก",
+          "image": "/img/history/2023/ยอดนักสืบจิ๋วโคนัน.png"
+        },
+        {
+          "episode": 3,
+          "date": "1 พฤษภาคม 2023",
+          "name": "ธนะวิทย์ ฤทธิรัตน์",
+          "nickname": "โอ๋",
+          "topic": "48Group Thailand",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 65,
+          "final": "ถูก",
+          "image": "/img/history/2023/48Group Thailand.png"
+        },
+        {
+          "episode": 3,
+          "date": "1 พฤษภาคม 2023",
+          "name": "อดิเทพ พฤกธารา",
+          "nickname": "โอเว่น",
+          "topic": "Cookie Run Ovenbreak",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 20,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 48,
+          "final": "ผิด",
+          "image": "/img/history/2023/Cookie Run Ovenbreak.png"
+        },
+        {
+          "episode": 3,
+          "date": "1 พฤษภาคม 2023",
+          "name": "ณัฐดนัย วงศ์ปัญญา",
+          "nickname": "แฟรงค์",
+          "topic": "ไอดอลหญิงไทย ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 5
+          },
+          "totalScore": 38,
+          "final": "ถูก",
+          "image": "/img/history/2023/ไอดอลหญิงไทย.png"
+        },
+        {
+          "episode": 4,
+          "date": "29 พฤษภาคม 2023",
+          "name": "วงศธร นิธิวัฒนา",
+          "nickname": "เอิร์ธ",
+          "topic": "Cardfight Vanguard",
+          "quota": false,
+          "scores": {
+            "3sec": 7,
+            "action": 25,
+            "jigsaw": 5,
+            "properties": "-"
+          },
+          "totalScore": 37,
+          "final": "ถูก",
+          "image": "/img/history/2023/Cardfight Vanguard.png"
+        },
+        {
+          "episode": 4,
+          "date": "29 พฤษภาคม 2023",
+          "name": "สหัสวรรษ นิจพันธ์",
+          "nickname": "พีท",
+          "topic": "Genshin Impact",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": 20,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 54,
+          "final": "ถูก",
+          "image": "/img/history/2023/Genshin Impact (1).png"
+        },
+        {
+          "episode": 4,
+          "date": "29 พฤษภาคม 2023",
+          "name": "ศักรินทร์ เสนีวงษ์",
+          "nickname": "คิว",
+          "topic": "Marvel Cinematic Universe ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 9,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 39,
+          "final": "ถูก",
+          "image": "/img/history/2023/MCU.png"
+        },
+        {
+          "episode": 5,
+          "date": "12 มิถุนายน 2023",
+          "name": "ศุภกร นิลสุวรรณ",
+          "nickname": "หมี",
+          "topic": "The Mask Singer Thailand",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 40,
+          "final": "-",
+          "image": "/img/history/2023/The Mask Singer Thailand.png"
+        },
+        {
+          "episode": 5,
+          "date": "12 มิถุนายน 2023",
+          "name": "ภควัฒน์ ฉิมทิน",
+          "nickname": "พงเพียว",
+          "topic": "บอร์ดเกม",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 15,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 43,
+          "final": "ถูก",
+          "image": "/img/history/2023/Board Game (1).png"
+        },
+        {
+          "episode": 5,
+          "date": "12 มิถุนายน 2023",
+          "name": "อภิวัฒน์ ช่วยแสง",
+          "nickname": "ฟลุ๊ค",
+          "topic": "Masayuki Suzuki",
+          "quota": false,
+          "scores": {
+            "3sec": 7,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 42,
+          "final": "ถูก",
+          "image": "/img/history/2023/Masayuki Suzuki.png"
+        },
+        {
+          "episode": 6,
+          "date": "19 มิถุนายน 2023",
+          "name": "กันตชาติ ศรีเพ็ชร",
+          "nickname": "กัปตัน",
+          "topic": "เครื่องบินพาณิชย์",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 61,
+          "final": "ถูก",
+          "image": "/img/history/2023/เครื่องบินพาณิชย์.png"
+        },
+        {
+          "episode": 6,
+          "date": "19 มิถุนายน 2023",
+          "name": "นวพล พรหล่อ",
+          "nickname": "โอ๊ค",
+          "topic": "เบิร์ด ธงไชย",
+          "quota": false,
+          "scores": {
+            "3sec": 6,
+            "action": 5,
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "totalScore": 11,
+          "final": "-",
+          "image": "/img/history/2023/เบิร์ด ธงไชย.png"
+        },
+        {
+          "episode": 6,
+          "date": "19 มิถุนายน 2023",
+          "name": "พีรภัทร หมื่นหาญ",
+          "nickname": "พีม",
+          "topic": "ฟุตบอลไทยลีก 1",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 46,
+          "final": "ถูก",
+          "image": "/img/history/2023/ฟุตบอลไทยลีก 1.png"
+        },
+        {
+          "episode": 7,
+          "date": "3 กรกฎาคม 2023",
+          "name": "กิตติธัช มีภู่",
+          "nickname": "ปอนด์",
+          "topic": "Plants vs. Zombies",
+          "quota": false,
+          "scores": {
+            "3sec": 12,
+            "action": 25,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 57,
+          "final": "ถูก",
+          "image": "/img/history/2023/Plants VS Zombies.png"
+        },
+        {
+          "episode": 7,
+          "date": "3 กรกฎาคม 2023",
+          "name": "วชิรวิทย์ ชุมทอง",
+          "nickname": "ร็อค",
+          "topic": "Miss Universe",
+          "quota": false,
+          "scores": {
+            "3sec": 4,
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 4,
+          "final": "-",
+          "image": "/img/history/2023/Miss Universe.png"
+        },
+        {
+          "episode": 7,
+          "date": "3 กรกฎาคม 2023",
+          "name": "ปฏิปัน อัศวภูไชย",
+          "nickname": "ปัน",
+          "topic": "สุนทราภรณ์",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": "-",
+            "jigsaw": 25,
+            "properties": 5
+          },
+          "totalScore": 41,
+          "final": "ถูก",
+          "image": "/img/history/2023/สุนทราภรณ์.png"
+        },
+        {
+          "episode": 8,
+          "date": "17 กรกฎาคม 2023",
+          "name": "กิตติพงษ์ หนองมีทรัพย์",
+          "nickname": "เก่ง",
+          "topic": "เกมซีรีส์ Yakuza",
+          "quota": false,
+          "scores": {
+            "3sec": 5,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 5
+          },
+          "totalScore": 35,
+          "final": "ถูก",
+          "image": "/img/history/2023/เกมซีรีส์ Yakuza.png"
+        },
+        {
+          "episode": 8,
+          "date": "17 กรกฎาคม 2023",
+          "name": "ถิรวัฒน์ ทองพิระ",
+          "nickname": "เมฆ",
+          "topic": "Tilly Birds ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 7,
+            "action": 20,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 37,
+          "final": "ผิด",
+          "image": "/img/history/2023/Tilly Birds.png"
+        },
+        {
+          "episode": 8,
+          "date": "17 กรกฎาคม 2023",
+          "name": "ภัคธร ดวงใหญ่",
+          "nickname": "ภัค",
+          "topic": "วง Cocktail",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 50,
+          "final": "ถูก",
+          "image": "/img/history/2023/Cocktail.png"
+        },
+        {
+          "episode": 9,
+          "date": "7 สิงหาคม 2023",
+          "name": "นันทวัฒน์ สาริกา",
+          "nickname": "นัท",
+          "topic": "Tattoo Colour",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 20,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 60,
+          "final": "ถูก",
+          "image": "/img/history/2023/Tattoo Colour.png"
+        },
+        {
+          "episode": 9,
+          "date": "7 สิงหาคม 2023",
+          "name": "ณัฐพงษ์ อ่ำกลาง",
+          "nickname": "อั้ม",
+          "topic": "วง Queen",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 65,
+          "final": "ถูก",
+          "image": "/img/history/2023/วง Queen (1).png"
+        },
+        {
+          "episode": 9,
+          "date": "7 สิงหาคม 2023",
+          "name": "วินทกร คำภีระ",
+          "nickname": "ต้า",
+          "topic": "Genshin Impact",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 20,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 55,
+          "final": "ถูก",
+          "image": "/img/history/2023/Genshin Impact (1).png"
+        },
+        {
+          "episode": 10,
+          "date": "14 สิงหาคม 2023",
+          "name": "ณัฐพัชร์ หฤษฎ์จิรสิน",
+          "nickname": "ณัฐ",
+          "topic": "เหรียญกษาปณ์ไทย",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 10,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 38,
+          "final": "ถูก",
+          "image": "/img/history/2023/เหรียญกษาปณ์ไทย.png"
+        },
+        {
+          "episode": 10,
+          "date": "14 สิงหาคม 2023",
+          "name": "นิธิกร วิชัยวงศ์",
+          "nickname": "ก็อปปี้",
+          "topic": "Disney",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 20,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 55,
+          "final": "ผิด",
+          "image": "/img/history/2023/Disney.png"
+        },
+        {
+          "episode": 10,
+          "date": "14 สิงหาคม 2023",
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "nickname": "ริท",
+          "topic": "ลาบานูน",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": 20,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 34,
+          "final": "-",
+          "image": "/img/history/2023/ลาบานูน.png"
+        },
+        {
+          "episode": 11,
+          "date": "21 สิงหาคม 2023",
+          "name": "ธีรวีร์ จรูญศรีโชติ",
+          "nickname": "ชีส",
+          "topic": "Mario Party ครั้งที่ 2",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": 20,
+            "jigsaw": 10,
+            "properties": "-"
+          },
+          "totalScore": 43,
+          "final": "ถูก",
+          "image": "/img/history/2023/Mario Party.png"
+        },
+        {
+          "episode": 11,
+          "date": "21 สิงหาคม 2023",
+          "name": "คุณอินทร์ บุญสิน",
+          "nickname": "อินทร์",
+          "topic": "วง Queen",
+          "quota": false,
+          "scores": {
+            "3sec": 9,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 39,
+          "final": "ผิด",
+          "image": "/img/history/2023/วง Queen (1).png"
+        },
+        {
+          "episode": 11,
+          "date": "21 สิงหาคม 2023",
+          "name": "พัทธ์ศีล ปุญศิริ",
+          "nickname": "ศีล",
+          "topic": "D4DJ",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": "-",
+            "jigsaw": 25,
+            "properties": 5
+          },
+          "totalScore": 43,
+          "final": "ถูก",
+          "image": "/img/history/2023/D4DJ.png"
+        },
+        {
+          "episode": 12,
+          "date": "28 สิงหาคม 2023",
+          "name": "ธนกฤต บุญพงษา",
+          "nickname": "ไอซ์",
+          "topic": "Saint Seiya",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 55,
+          "final": "ถูก",
+          "image": "/img/history/2023/Saint Seiya.png"
+        },
+        {
+          "episode": 12,
+          "date": "28 สิงหาคม 2023",
+          "name": "อิทธิกร ใจมั่น",
+          "nickname": "ม่อน",
+          "topic": "Genshin Impact",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 15,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 45,
+          "final": "ถูก",
+          "image": "/img/history/2023/Genshin Impact (1).png"
+        },
+        {
+          "episode": 12,
+          "date": "28 สิงหาคม 2023",
+          "name": "พลากร ผ่านสำแดง",
+          "nickname": "การ์ด",
+          "topic": "Death Note",
+          "quota": false,
+          "scores": {
+            "3sec": 7,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 32,
+          "final": "-",
+          "image": "/img/history/2023/Death Note.png"
+        },
+        {
+          "episode": 13,
+          "date": "25 กันยายน 2023",
+          "name": "ณัฐ จิรา",
+          "nickname": "ณัฐ",
+          "topic": "บาสเกตบอล NBA",
+          "quota": false,
+          "scores": {
+            "3sec": "-",
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "final": "-",
+          "image": "/img/history/2023/เหรียญกษาปณ์ไทย.png"
+        },
+        {
+          "episode": 13,
+          "date": "25 กันยายน 2023",
+          "name": "นภพล สุวรรณชีพ",
+          "nickname": "ฟินเลย์",
+          "topic": "คนรักแอร์",
+          "quota": false,
+          "scores": {
+            "3sec": "-",
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "final": "-",
+          "image": "/img/history/2023/คนรักแอร์.png"
+        },
+        {
+          "episode": 13,
+          "date": "25 กันยายน 2023",
+          "name": "ธนภัทร กอบโพธิ์",
+          "nickname": "เซฟ",
+          "topic": "Love Live",
+          "quota": false,
+          "scores": {
+            "3sec": "-",
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "final": "-",
+          "image": "/img/history/2024/Love Live.png"
+        },
+        {
+          "episode": 14,
+          "date": "2 ตุลาคม 2023",
+          "name": "ปรมัย สัมเภาว์มาลย์",
+          "nickname": "ทาโร่",
+          "topic": "ไอ้มดแดง",
+          "quota": false,
+          "scores": {
+            "3sec": "-",
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "final": "-",
+          "image": "/img/history/2023/ไอ้มดแดง (2).png"
+        },
+        {
+          "episode": 14,
+          "date": "2 ตุลาคม 2023",
+          "name": "ธวัชชัย แสงสว่าง",
+          "nickname": "ปืน",
+          "topic": "ไอ้มดแดง",
+          "quota": false,
+          "scores": {
+            "3sec": "-",
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "final": "-",
+          "image": "/img/history/2023/ไอ้มดแดง (2).png"
+        },
+        {
+          "episode": 14,
+          "date": "2 ตุลาคม 2023",
+          "name": "มีคณา สมใจเพ็ง",
+          "nickname": "อ๋อมแอ๋ม",
+          "topic": "Workpoint",
+          "quota": false,
+          "scores": {
+            "3sec": "-",
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "final": "-",
+          "image": "/img/history/2024/Workpoint.png"
+        }
       ]
     },
     "2024": {
@@ -2503,7 +3997,1934 @@
             }
           ]
         }
+      ],
+      "audition": [
+        {
+          "episode": 1,
+          "date": "5 เมษายน 2024",
+          "name": "นภพล สุวรรณชีพ",
+          "nickname": "ฟินเลย์",
+          "topic": "คนรักแอร์",
+          "quota": false,
+          "scores": {
+            "3sec": 1,
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 1,
+          "final": "-",
+          "image": "/img/history/2024/คนรักแอร์.png"
+        },
+        {
+          "episode": 1,
+          "date": "5 เมษายน 2024",
+          "name": "ธวัชชัย แสงสว่าง",
+          "nickname": "ปืน",
+          "topic": "ไอ้มดแดง",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 45,
+          "final": "ถูก",
+          "image": "/img/history/2024/ไอ้มดแดง (2).png"
+        },
+        {
+          "episode": 1,
+          "date": "5 เมษายน 2024",
+          "name": "นิธิกร วิชัยวงค์",
+          "nickname": "ก๊อปปี้",
+          "topic": "ขบวนการ 5 สี",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": "-",
+            "jigsaw": 25,
+            "properties": 15
+          },
+          "totalScore": 53,
+          "final": "ถูก",
+          "image": "/img/history/2024/ขบวนการ 5 สี.png"
+        },
+        {
+          "episode": 2,
+          "date": "19 เมษายน 2024",
+          "name": "อดิเทพ พฤกธารา",
+          "nickname": "โอเว่น",
+          "topic": "Cookie Run Ovenbreak",
+          "quota": false,
+          "scores": {
+            "3sec": 8,
+            "action": 20,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 53,
+          "final": "ถูก",
+          "image": "/img/history/2024/Cookie Run Ovenbreak.png"
+        },
+        {
+          "episode": 2,
+          "date": "19 เมษายน 2024",
+          "name": "ณัฐวุฒิ โนรี",
+          "nickname": "แสตมป์",
+          "topic": "Thai Boy Love Series",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 41,
+          "final": "ผิด",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPioiz5362-yx4IyFh5ujVIiP8u9T9HO9Szx73eo7RNgAv1vpU_NXF4AhPHts5qXPf0-Tc-FDkoC--krXYTr5CpHbd2alN0a3Mvv0qG_WLVqHKcs79yVOctUXLqdqw1J-1Yv1hIYaMBr61YOXK2oRaJ=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 2,
+          "date": "19 เมษายน 2024",
+          "name": "กวิน โฆษิตตานนท์",
+          "nickname": "นุ๊ก",
+          "topic": "Mario Kart Series",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 64,
+          "final": "ถูก",
+          "image": "/img/history/2024/Mario Kart Series.png"
+        },
+        {
+          "episode": 3,
+          "date": "3 พฤษภาคม 2024",
+          "name": "ปรมัย สัมเภาว์มาลย์",
+          "nickname": "ทาโร่",
+          "topic": "ไอ้มดแดง",
+          "quota": false,
+          "scores": {
+            "3sec": 12,
+            "action": 20,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 42,
+          "final": "ถูก",
+          "image": "/img/history/2024/ไอ้มดแดง (2).png"
+        },
+        {
+          "episode": 3,
+          "date": "3 พฤษภาคม 2024",
+          "name": "ศุภกร นิลสุวรรณ",
+          "nickname": "หมี",
+          "topic": "วง Coldplay",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 15,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 55,
+          "final": "ถูก",
+          "image": "/img/history/2024/Coldplay.png"
+        },
+        {
+          "episode": 3,
+          "date": "3 พฤษภาคม 2024",
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "nickname": "นนท์",
+          "topic": "Battle Spirits",
+          "quota": false,
+          "scores": {
+            "3sec": 12,
+            "action": 5,
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "totalScore": 17,
+          "final": "-",
+          "image": "/img/history/2024/Battle Spirits.png"
+        },
+        {
+          "episode": 4,
+          "date": "17 พฤษภาคม 2024",
+          "name": "ธนภัทร เกาะโพธิ์",
+          "nickname": "เซฟ",
+          "topic": "Love Live",
+          "quota": false,
+          "scores": {
+            "3sec": 9,
+            "action": 20,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 54,
+          "final": "ผิด",
+          "image": "/img/history/2024/Love Live.png"
+        },
+        {
+          "episode": 4,
+          "date": "17 พฤษภาคม 2024",
+          "name": "นราวิชญ์ จิระศิริวัฒน์",
+          "nickname": "นัท",
+          "topic": "กรุงเทพมหานคร",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 28,
+          "final": "-",
+          "image": "/img/history/2024/กรุงเทพมหานคร.png"
+        },
+        {
+          "episode": 4,
+          "date": "17 พฤษภาคม 2024",
+          "name": "มีคณา สมใจเพ็ง",
+          "nickname": "อ๋อมแอ๋ม",
+          "topic": "Workpoint",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": 15,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 43,
+          "final": "ถูก",
+          "image": "/img/history/2024/Workpoint.png"
+        },
+        {
+          "episode": 5,
+          "date": "7 มิถุนายน 2024",
+          "name": "พศวัต พุ่มเงิน",
+          "nickname": "ปาร์ค",
+          "topic": "hololive",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 65,
+          "final": "ถูก",
+          "image": "/img/history/2024/hololive.png"
+        },
+        {
+          "episode": 5,
+          "date": "7 มิถุนายน 2024",
+          "name": "สหัสวรรษ นิจพันธ์",
+          "nickname": "พีท",
+          "topic": "ภาพยนตร์ชุด SAW",
+          "quota": false,
+          "scores": {
+            "3sec": 9,
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 10
+          },
+          "totalScore": 39,
+          "final": "ถูก",
+          "image": "/img/history/2024/SAW.png"
+        },
+        {
+          "episode": 5,
+          "date": "7 มิถุนายน 2024",
+          "name": "ธีรวีร์ จรูญศรีโชติ",
+          "nickname": "ชีส",
+          "topic": "Tales Of The Series",
+          "quota": false,
+          "scores": {
+            "3sec": 9,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 39,
+          "final": "ผิด",
+          "image": "/img/history/2024/Tales Of The Series.png"
+        },
+        {
+          "episode": 6,
+          "date": "21 มิถุนายน 2024",
+          "name": "กิตติธัช มีภู่",
+          "nickname": "ปอนด์",
+          "topic": "Plants vs. Zombies",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 60,
+          "final": "ถูก",
+          "image": "/img/history/2024/Plants VS. Zombies.png"
+        },
+        {
+          "episode": 6,
+          "date": "21 มิถุนายน 2024",
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "nickname": "ริท",
+          "topic": "รถเมล์ ขสมก.",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 5
+          },
+          "totalScore": 43,
+          "final": "ถูก",
+          "image": "/img/history/2024/ขสมก..png"
+        },
+        {
+          "episode": 6,
+          "date": "21 มิถุนายน 2024",
+          "name": "กันตชาติ ศรีเพ็ชร",
+          "nickname": "กัปตัน",
+          "topic": "Valorant",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 60,
+          "final": "ถูก",
+          "image": "/img/history/2024/Valorant.png"
+        },
+        {
+          "episode": 7,
+          "date": "5 กรกฎาคม 2024",
+          "name": "พีรภัทร หมื่นหาญ",
+          "nickname": "พีม",
+          "topic": "ฟุตบอลพรีเมียร์ลีก",
+          "quota": false,
+          "scores": {
+            "3sec": 14,
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 44,
+          "final": "ถูก",
+          "image": "/img/history/2024/พรีเมียร์ลีก.png"
+        },
+        {
+          "episode": 7,
+          "date": "5 กรกฎาคม 2024",
+          "name": "พัทธ์ศีล ปุญศิริ",
+          "nickname": "ศีล",
+          "topic": "Inori Minase",
+          "quota": false,
+          "scores": {
+            "3sec": 5,
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 35,
+          "final": "ถูก",
+          "image": "/img/history/2024/Inori Minase.png"
+        },
+        {
+          "episode": 7,
+          "date": "5 กรกฎาคม 2024",
+          "name": "นัทธสม บุญมา",
+          "nickname": "ซ่า",
+          "topic": "มวยปล้ำ AEW",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 10,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 41,
+          "final": "ถูก",
+          "image": "/img/history/2024/AEW.png"
+        },
+        {
+          "episode": 8,
+          "date": "19 กรกฎาคม 2024",
+          "name": "วินทกร คำภีระ",
+          "nickname": "ต้า",
+          "topic": "Genshin Impact",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 15,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 45,
+          "final": "ถูก",
+          "image": "/img/history/2024/Genshin Impact.png"
+        },
+        {
+          "episode": 8,
+          "date": "19 กรกฎาคม 2024",
+          "name": "นฤกร วงศบูรณะ",
+          "nickname": "ตฤณ",
+          "topic": "Tattoo Colour",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 25,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 55,
+          "final": "ถูก",
+          "image": "/img/history/2024/Tattoo Colour.png"
+        },
+        {
+          "episode": 8,
+          "date": "19 กรกฎาคม 2024",
+          "name": "ณัฐภัทร แก้วสินธุ์",
+          "nickname": "นที",
+          "topic": "Masterchef Thailand",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 25,
+          "final": "-",
+          "image": "/img/history/2024/Masterchef Thailand.png"
+        },
+        {
+          "episode": 9,
+          "date": "2 สิงหาคม 2024",
+          "name": "พัชราภรณ์ ขวัญพรมสี",
+          "nickname": "เอิร์น",
+          "topic": "Honkai Impact 3rd",
+          "quota": false,
+          "scores": {
+            "3sec": 13,
+            "action": "-",
+            "jigsaw": 15,
+            "properties": 15
+          },
+          "totalScore": 43,
+          "final": "ถูก",
+          "image": "/img/history/2024/Honkai Impact 3rd.png"
+        },
+        {
+          "episode": 9,
+          "date": "2 สิงหาคม 2024",
+          "name": "ณภัทร ปราศจาก",
+          "nickname": "เปา",
+          "topic": "Yu-Gi-Oh!",
+          "quota": false,
+          "scores": {
+            "3sec": 10,
+            "action": "-",
+            "jigsaw": 0,
+            "properties": 10
+          },
+          "totalScore": 20,
+          "final": "-",
+          "image": "/img/history/2024/Yu-Gi-Oh!.png"
+        },
+        {
+          "episode": 9,
+          "date": "2 สิงหาคม 2024",
+          "name": "รัชชานนท์ พ่อค้า",
+          "nickname": "ซาก้า",
+          "topic": "Cardfight Vanguard",
+          "quota": false,
+          "scores": {
+            "3sec": 7,
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 15
+          },
+          "totalScore": 42,
+          "final": "ผิด",
+          "image": "/img/history/2024/Cardfight Vanguard.png"
+        },
+        {
+          "episode": 10,
+          "date": "16 สิงหาคม 2024",
+          "name": "พลากร ผ่านสำแดง",
+          "nickname": "การ์ด",
+          "topic": "Death Note",
+          "quota": false,
+          "scores": {
+            "3sec": 15,
+            "action": 10,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 45,
+          "final": "ถูก",
+          "image": "/img/history/2024/Death Note.png"
+        },
+        {
+          "episode": 10,
+          "date": "16 สิงหาคม 2024",
+          "name": "กฤตมุข สามารถ",
+          "nickname": "เสี่ยวจี",
+          "topic": "บาสเกตบอล NBA",
+          "quota": false,
+          "scores": {
+            "3sec": 11,
+            "action": 5,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 41,
+          "final": "ถูก",
+          "image": "/img/history/2024/บาสเก็ตบอล NBA.png"
+        },
+        {
+          "episode": 10,
+          "date": "16 สิงหาคม 2024",
+          "name": "วงศธร นิธิวัฒนา",
+          "nickname": "เอิร์ธ",
+          "topic": "Identity V",
+          "quota": false,
+          "scores": {
+            "3sec": 2,
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 2,
+          "final": "-",
+          "image": "/img/history/2024/Identity V.png"
+        }
       ]
+    },
+    "2026": {
+      "info": {
+        "year": 2026,
+        "title": "แฟนพันธุ์แท้แห่งปี 2026",
+        "host": "เปเล่ ณัฐวัฒน์ วุฒิช่วย",
+        "producers": [
+          "ณัฐวัฒน์ วุฒิช่วย",
+          "สหัสวรรษ นิจพันธ์",
+          "ชัยนันท์ วรรณสมพร"
+        ],
+        "executiveProducer": "ศุภวิชญ์ งามสม",
+        "firstAirDate": "จันทร์ 2 มีนาคม 2026",
+        "lastAirDate": "รอการแข่งขัน",
+        "episodes": "15 ตอน (และรอบแห่งปี)",
+        "championName": "รอลุ้นแชมป์ (ปริศนา)",
+        "championTopic": "รอการแข่งขันในรอบชิงชนะเลิศ"
+      },
+      "audition": [
+        {
+          "episode": 1,
+          "date": "2 March 2026",
+          "name": "สหัสวรรษ นิจพันธ์",
+          "nickname": "พีท",
+          "topic": "รถไฟฟ้าไทย",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 3,
+            "set3": 3,
+            "total": 11
+          },
+          "stage2": {
+            "action": 0,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 31,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 1,
+          "date": "2 March 2026",
+          "name": "แก้วกษิรา",
+          "nickname": "KAEWKASIRA",
+          "topic": "Harry Potter",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 2,
+            "set3": 4,
+            "total": 11
+          },
+          "stage2": {
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 36,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": ""
+        },
+        {
+          "episode": 2,
+          "date": "9 March 2026",
+          "name": "กันตชาติ ศรีเพ็ขร์",
+          "nickname": "กัปตัน",
+          "topic": "Liverpool F.C.",
+          "quota": false,
+          "stage1": {
+            "set1": 4,
+            "set2": 4,
+            "set3": 4,
+            "total": 12
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 47,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 2,
+          "date": "9 March 2026",
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "nickname": "นนท์",
+          "topic": "Battle Spirits",
+          "quota": false,
+          "stage1": {
+            "set1": 3,
+            "set2": 4,
+            "set3": 4,
+            "total": 11
+          },
+          "stage2": {
+            "action": 20,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 56,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 3,
+          "date": "16 March 2026",
+          "name": "ณัฐดนัย วงศ์ปัญญา",
+          "nickname": "แฟรงค์",
+          "topic": "Honkai: Star Rail",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 4,
+            "set3": 4,
+            "total": 13
+          },
+          "stage2": {
+            "action": 0,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 28,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 3,
+          "date": "16 March 2026",
+          "name": "รติพงษ์ กมลเกียรติพัฒน์",
+          "nickname": "นิว",
+          "topic": "ไพ่ทาโร่ต์",
+          "quota": false,
+          "stage1": {
+            "set1": 3,
+            "set2": 2,
+            "set3": 1,
+            "total": 6
+          },
+          "stage2": {
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 20
+          },
+          "totalScore": 36,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPalqWB79ObwsPqJVjlBoLGr-31QtzntceySm9B0TC7LItpwpfkpXmrZNUof2TKuOv2dBhk1KbQAGS_TBEt-AwfqtpiPmaoN_DURhOEGoA3R4T7NHbgYP_4-B69D2xS01de-BWLa3YFQo5QtBiLpQgC=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 4,
+          "date": "23 March 2026",
+          "name": "ณฤกร วงศบูรณะ",
+          "nickname": "ตฤณ",
+          "topic": "Tattoo Colour",
+          "quota": false,
+          "stage1": {
+            "set1": 4,
+            "set2": 3,
+            "set3": 3,
+            "total": 10
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 45,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ผิด",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 4,
+          "date": "23 March 2026",
+          "name": "ธนพัฒน์ สง่าแสง",
+          "nickname": "แบงค์",
+          "topic": "48 Group Thailand",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 3,
+            "set3": 2,
+            "total": 10
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 0
+          },
+          "totalScore": 30,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 5,
+          "date": "30 March 2026",
+          "name": "วชิรวิทย์ ชุมทอง",
+          "nickname": "ร๊อค",
+          "topic": "ชิงช้าสวรรค์",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 4,
+            "set3": 4,
+            "total": 13
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 15
+          },
+          "totalScore": 48,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": ""
+        },
+        {
+          "episode": 5,
+          "date": "30 March 2026",
+          "name": "ณัฐภัทร แก้วสินธุ์",
+          "nickname": "นที",
+          "topic": "MasterChef Thailand",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 4,
+            "set3": 3,
+            "total": 12
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 15,
+            "properties": 15
+          },
+          "totalScore": 42,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN8o5FXqfPvxqOJs1do7f6f9mxT29Uah3nW-H2erXV1B5DsWhlnT2Acsq2rLJsMW-7g61ODyOzeSNohiJcv7AcIr-bM0JJPltRCNxrKU_qX_fqhdFIvEGOb-jJfe3CUI_FByhfFMQ9Dr7cPChdMDL4-=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 6,
+          "date": "6 April 2026",
+          "name": "ภควัต ศรสุกลรัตน์",
+          "nickname": "อาร์ม",
+          "topic": "การเมืองไทย",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 3,
+            "set3": 5,
+            "total": 13
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 38,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ผิด",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOXZ7x2lelKztH88AKbMMCOY3kEca65A0ke-9gVHZ3bjA-US37R2F-PQKOztqpRzHcmQaRfen2rY6jE26F4GPby3gG8o1ZdVfsxbzB6g0N6Cz6epHSO57s17ofVHCodPHJfdyQdTt-mjTc_M9i6bKKq=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 6,
+          "date": "6 April 2026",
+          "name": "วรพัชร์ พงษ์ประเสริฐ",
+          "nickname": "ไอซ์วอ",
+          "topic": "รัฐสมาชิกสหประชาชาติ",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 4,
+            "set3": 3,
+            "total": 12
+          },
+          "stage2": {
+            "action": 5,
+            "jigsaw": 20,
+            "properties": "-"
+          },
+          "totalScore": 37,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": ""
+        },
+        {
+          "episode": 7,
+          "date": "20 April 2026",
+          "name": "ธวัชชัย แสงสว่าง",
+          "nickname": "ปืน",
+          "topic": "ไอ้มดแดง",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 5,
+            "set3": 5,
+            "total": 15
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 55,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOBBW412A6o3q8m8jpCV4GQGf950z__lIFfIeCe5C2S5Czet7-xK5sxHDzR_tHJ-gulxlBel1bbfc-MCgUpVz8EfOUE1j357cl5GRj0DwjOvhTDG__oQdipozW_e8qklM9jgx_jHXZW72kVH0AVya_1=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 7,
+          "date": "20 April 2026",
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "nickname": "ริท",
+          "topic": "Serious Bacon",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 4,
+            "set3": 0,
+            "total": 9
+          },
+          "stage2": {
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "totalScore": 34,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 8,
+          "date": "27 April 2026",
+          "name": "ณัฐวุฒิ โนรี",
+          "nickname": "แสตมป์",
+          "topic": "Thai Boy Love Series",
+          "quota": false,
+          "stage1": {
+            "set1": 4,
+            "set2": 4,
+            "set3": 5,
+            "total": 13
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 15,
+            "properties": 15
+          },
+          "totalScore": 43,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPioiz5362-yx4IyFh5ujVIiP8u9T9HO9Szx73eo7RNgAv1vpU_NXF4AhPHts5qXPf0-Tc-FDkoC--krXYTr5CpHbd2alN0a3Mvv0qG_WLVqHKcs79yVOctUXLqdqw1J-1Yv1hIYaMBr61YOXK2oRaJ=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 8,
+          "date": "27 April 2026",
+          "name": "พีรภัทร หมื่นหาญ",
+          "nickname": "พีม",
+          "topic": "Club Friday The Series",
+          "quota": false,
+          "stage1": {
+            "set1": 4,
+            "set2": 1,
+            "set3": 2,
+            "total": 7
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 0
+          },
+          "totalScore": 27,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 9,
+          "date": "4 May 2026",
+          "name": "ศุภกร นิลสุวรรณ",
+          "nickname": "หมี",
+          "topic": "Coldplay",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 5,
+            "set3": 5,
+            "total": 15
+          },
+          "stage2": {
+            "action": 15,
+            "jigsaw": 5,
+            "properties": "-"
+          },
+          "totalScore": 35,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 9,
+          "date": "4 May 2026",
+          "name": "ปวัน ธนพรพันธ์",
+          "nickname": "ป๊ะ",
+          "topic": "Taskmaster",
+          "quota": false,
+          "stage1": {
+            "set1": 1,
+            "set2": 0,
+            "set3": 2,
+            "total": 3
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "totalScore": 43,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ผิด",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO-YpFN5q79SsyFUxl5MQ3agmPlDe6UWUcCwudDt4eidO1Z1-o9Acx5WZpy5T6KURHpit0PdLvVpIT09QiDHNoYHmHUIYgoIrHlLfA_dxi3pXbx0AjAzSunbslVKnc6B6526DOPP0XwwFmb7SHmNjES=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 10,
+          "date": "11 May 2026",
+          "name": "พัทธ์ศีล ปุญศิริ",
+          "nickname": "ศีล",
+          "topic": "บอร์ดเกม",
+          "quota": false,
+          "stage1": {
+            "set1": 4,
+            "set2": 5,
+            "set3": 2,
+            "total": 11
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 61,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 10,
+          "date": "11 May 2026",
+          "name": "นิธิกร วิชัยวงศ์",
+          "nickname": "ก๊อปปี้",
+          "topic": "ขบวนการ 5 สี",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 5,
+            "set3": 4,
+            "total": 14
+          },
+          "stage2": {
+            "action": 15,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 29,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNGXiRybdHr50jnZ5cSGVWylSyacpr0_lKea-J997YP8DTnyd2LSErW43LVIV1jv05TzvFz9X3BwyMZ1NDAk0AFH9d5tlu-9ZBq54sW8LK3wfGKAH6cdN-Y2BS3jHh4jxLuJIsoSxuhPwbvBALA7kO_=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 11,
+          "date": "18 May 2026",
+          "name": "สิปโปทัย ศรีบุญเรือง",
+          "nickname": "กัส",
+          "topic": "ประวัติศาสตร์กรุงรัตนโกสินทร์",
+          "quota": false,
+          "stage1": {
+            "set1": 4,
+            "set2": 5,
+            "set3": 4,
+            "total": 13
+          },
+          "stage2": {
+            "action": 10,
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "totalScore": 33,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ผิด",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMpg3NPj_C_0lXZ55wQnYy3uBdKxWYsCYSfNyh4TC5T802iCIilGvzTZVtTYlKpVFkdWWLlSt8RBq0gHtckzQclQUElkO3nXjkdK5DiMl1uuIvbX6cmoWVgZwoCDs0MhqBpyEULkO1DERQqMl5I6lxJ=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 11,
+          "date": "18 May 2026",
+          "name": "ธนพร สุขปาน",
+          "nickname": "ออม",
+          "topic": "เพลงลูกทุ่ง",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 3,
+            "set3": 4,
+            "total": 12
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 15,
+            "properties": 20
+          },
+          "totalScore": 47,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPP8nZ07EZHdzSIrVCyY_JJVLoAVFwc5nWH4E4FzJRHd5UckRRz9r4TGQSJQTK4G0Rff5XYSUMNfr4hsnds_foBX_6RMxRhCfoHUKdVPhK7MqOh9VpytXXVd-pLYaFTHr9xw0QM5q7T2VZahmTWhEtl=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 12,
+          "date": "25 May 2026",
+          "name": "คุณอินทร์ บุญสิน",
+          "nickname": "อินทร์",
+          "topic": "Queen",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 5,
+            "set3": 3,
+            "total": 13
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 63,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 12,
+          "date": "25 May 2026",
+          "name": "นัทธสม บุญมา",
+          "nickname": "ซ่า",
+          "topic": "FC Barcelona",
+          "quota": false,
+          "stage1": {
+            "set1": 3,
+            "set2": 4,
+            "set3": 1,
+            "total": 8
+          },
+          "stage2": {
+            "action": 0,
+            "jigsaw": "-",
+            "properties": 0
+          },
+          "totalScore": 8,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": "/img/history/2024/AEW.png"
+        },
+        {
+          "episode": 13,
+          "date": "1 June 2026",
+          "name": "ธีรวีร์ จรูญศรีโชติ",
+          "nickname": "ชีส",
+          "topic": "Tales of The Series",
+          "quota": false,
+          "stage1": {
+            "set1": 3,
+            "set2": 3,
+            "set3": 1,
+            "total": 7
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 0
+          },
+          "totalScore": 27,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": "/img/history/2023/Mario Party.png"
+        },
+        {
+          "episode": 13,
+          "date": "1 June 2026",
+          "name": "ภควัต เลี้ยงอยู่",
+          "nickname": "ไผ่",
+          "topic": "วรรณคดีไทย",
+          "quota": false,
+          "stage1": {
+            "set1": 3,
+            "set2": 4,
+            "set3": 3,
+            "total": 10
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 20,
+            "properties": 0
+          },
+          "totalScore": 30,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": ""
+        },
+        {
+          "episode": 14,
+          "date": "8 June 2026",
+          "name": "อดิเทพ พฤกธารา",
+          "nickname": "โอเว่น",
+          "topic": "Cookie Run: Ovenbreak",
+          "quota": false,
+          "stage1": {
+            "set1": "-",
+            "set2": "-",
+            "set3": "-",
+            "total": 0
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": "/img/history/2024/Cookie Run Ovenbreak.png"
+        },
+        {
+          "episode": 14,
+          "date": "8 June 2026",
+          "name": "เจษฎาพร ศรีมาตย์",
+          "nickname": "ออมสิน",
+          "topic": "Mortal Kombat",
+          "quota": false,
+          "stage1": {
+            "set1": "-",
+            "set2": "-",
+            "set3": "-",
+            "total": 0
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "totalScore": 0,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "-",
+          "image": ""
+        },
+        {
+          "episode": 14,
+          "date": "15 June 2026",
+          "name": "เชาว์วรรธน์ จันทร์สุข",
+          "nickname": "ก๊อง",
+          "topic": "Workpoint",
+          "quota": false,
+          "stage1": {
+            "set1": 5,
+            "set2": 5,
+            "set3": 4,
+            "total": 14
+          },
+          "stage2": {
+            "action": 25,
+            "jigsaw": 25,
+            "properties": "-"
+          },
+          "totalScore": 64,
+          "evaluating": {
+            "q1": "SKIP",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 14,
+          "date": "15 June 2026",
+          "name": "พัชราภรณ์ ขวัญพรหมสี",
+          "nickname": "เอิร์น",
+          "topic": "Honkai Impact 3rd",
+          "quota": false,
+          "stage1": {
+            "set1": 4,
+            "set2": 2,
+            "set3": 1,
+            "total": 7
+          },
+          "stage2": {
+            "action": "-",
+            "jigsaw": 15,
+            "properties": 15
+          },
+          "totalScore": 37,
+          "evaluating": {
+            "q1": "",
+            "q2": "",
+            "q3": "",
+            "q4": ""
+          },
+          "final": "ถูก",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOkN98O0LDhBcQhE4X4iE67B322lQ1L3iZKvqZyP5LXaH37LibFcH26AbonLsUzAkxKXARjmy2s0hT7n83PQ0_hiVbM8TUigd-_RRr_9wH5bI8GUXg93DH5tmYRC7yNHrzFxoPMhtp7n7WE7JzTSgk9=w1125-h1125-s-no-gm?authuser=0"
+        }
+      ],
+      "consolation": [
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 1,
+          "name": "ปวัน ธนพรพันธ์",
+          "nickname": "ป๊ะ",
+          "topic": "Taskmaster",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": 15,
+            "properties": "-"
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO-YpFN5q79SsyFUxl5MQ3agmPlDe6UWUcCwudDt4eidO1Z1-o9Acx5WZpy5T6KURHpit0PdLvVpIT09QiDHNoYHmHUIYgoIrHlLfA_dxi3pXbx0AjAzSunbslVKnc6B6526DOPP0XwwFmb7SHmNjES=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 1,
+          "name": "วรพัชร์ พงษ์ประเสริฐ",
+          "nickname": "ไอซ์วอ",
+          "topic": "รัฐสมาชิกสหประชาชาติ",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": ""
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 2,
+          "name": "ณฤกร วงศบูรณะ",
+          "nickname": "ตฤณ",
+          "topic": "Tattoo Colour",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 2,
+          "name": "รติพงษ์ กมลเกียรติพัฒน์",
+          "nickname": "นิว",
+          "topic": "ไพ่ทาโร่ต์",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": "-",
+            "properties": 15
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPalqWB79ObwsPqJVjlBoLGr-31QtzntceySm9B0TC7LItpwpfkpXmrZNUof2TKuOv2dBhk1KbQAGS_TBEt-AwfqtpiPmaoN_DURhOEGoA3R4T7NHbgYP_4-B69D2xS01de-BWLa3YFQo5QtBiLpQgC=w1125-h1125-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 3,
+          "name": "ภควัต ศรสุกลรัตน์",
+          "nickname": "อาร์ม",
+          "topic": "การเมืองไทย",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOXZ7x2lelKztH88AKbMMCOY3kEca65A0ke-9gVHZ3bjA-US37R2F-PQKOztqpRzHcmQaRfen2rY6jE26F4GPby3gG8o1ZdVfsxbzB6g0N6Cz6epHSO57s17ofVHCodPHJfdyQdTt-mjTc_M9i6bKKq=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 3,
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "nickname": "ริท",
+          "topic": "Serious Bacon",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": "-",
+            "properties": 10
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 4,
+          "name": "สิปโปทัย ศรีบุญเรือง",
+          "nickname": "กัส",
+          "topic": "ประวัติศาสตร์กรุงรัตนโกสินทร์",
+          "quota": false,
+          "scores": {
+            "qa": 20,
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMpg3NPj_C_0lXZ55wQnYy3uBdKxWYsCYSfNyh4TC5T802iCIilGvzTZVtTYlKpVFkdWWLlSt8RBq0gHtckzQclQUElkO3nXjkdK5DiMl1uuIvbX6cmoWVgZwoCDs0MhqBpyEULkO1DERQqMl5I6lxJ=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 4,
+          "name": "ธีรวีร์ จรูญศรีโชติ",
+          "nickname": "ชีส",
+          "topic": "Tales of The Series",
+          "quota": false,
+          "scores": {
+            "qa": 0,
+            "jigsaw": "-",
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": "/img/history/2023/Mario Party.png"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 5,
+          "name": "ศุภกร นิลสุวรรณ",
+          "nickname": "หมี",
+          "topic": "Coldplay",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": 5,
+            "properties": "-"
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 5,
+          "name": "ธนพัฒน์ สง่าแสง",
+          "nickname": "แบงค์",
+          "topic": "48 Group Thailand",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": 5,
+            "properties": "-"
+          },
+          "result": "เข้ารอบ",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0"
+        },
+        {
+          "episode": 15,
+          "date": "13 July 2026",
+          "matchNo": 5,
+          "name": "ภควัต เลี้ยงอยู่",
+          "nickname": "ไผ่",
+          "topic": "วรรณคดีไทย",
+          "quota": false,
+          "scores": {
+            "qa": "-",
+            "jigsaw": 0,
+            "properties": "-"
+          },
+          "result": "ตกรอบ",
+          "image": ""
+        }
+      ],
+      "qualifying": [
+        {
+          "order": 4,
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "nickname": "นนท์",
+          "topic": "Battle Spirits",
+          "rank": 1,
+          "scores": {
+            "3sec": 17,
+            "qa": 25,
+            "jigsaw": 25,
+            "attribute": 5,
+            "final": "-"
+          },
+          "totalScore": 72,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0",
+          "status": "รอแข่งรอบชิง"
+        },
+        {
+          "order": 7,
+          "name": "เชาว์วรรธน์ จันทร์สุข",
+          "nickname": "ก๊อง",
+          "topic": "Workpoint",
+          "rank": 2,
+          "scores": {
+            "3sec": 21,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 15,
+            "final": "-"
+          },
+          "totalScore": 71,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0",
+          "status": "รอแข่งรอบชิง"
+        },
+        {
+          "order": 3,
+          "name": "สิปโปทัย ศรีบุญเรือง",
+          "nickname": "กัส",
+          "topic": "ประวัติศาสตร์กรุงรัตนโกสินทร์",
+          "rank": 3,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMpg3NPj_C_0lXZ55wQnYy3uBdKxWYsCYSfNyh4TC5T802iCIilGvzTZVtTYlKpVFkdWWLlSt8RBq0gHtckzQclQUElkO3nXjkdK5DiMl1uuIvbX6cmoWVgZwoCDs0MhqBpyEULkO1DERQqMl5I6lxJ=w1117-h1117-s-no-gm?authuser=0",
+          "status": "รอแข่งรอบชิง"
+        },
+        {
+          "order": 4,
+          "name": "ณัฐวุฒิ โนรี",
+          "nickname": "แสตมป์",
+          "topic": "Thai BL Series",
+          "rank": 4,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPioiz5362-yx4IyFh5ujVIiP8u9T9HO9Szx73eo7RNgAv1vpU_NXF4AhPHts5qXPf0-Tc-FDkoC--krXYTr5CpHbd2alN0a3Mvv0qG_WLVqHKcs79yVOctUXLqdqw1J-1Yv1hIYaMBr61YOXK2oRaJ=w1117-h1117-s-no-gm?authuser=0",
+          "status": "รอแข่งรอบชิง"
+        },
+        {
+          "order": 5,
+          "name": "นิธิกร วิชัยวงศ์",
+          "nickname": "ก๊อปปี้",
+          "topic": "ขบวนการ 5 สี",
+          "rank": 5,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNGXiRybdHr50jnZ5cSGVWylSyacpr0_lKea-J997YP8DTnyd2LSErW43LVIV1jv05TzvFz9X3BwyMZ1NDAk0AFH9d5tlu-9ZBq54sW8LK3wfGKAH6cdN-Y2BS3jHh4jxLuJIsoSxuhPwbvBALA7kO_=w1125-h1125-s-no-gm?authuser=0",
+          "status": "รอแข่งรอบชิง"
+        },
+        {
+          "order": 6,
+          "name": "ธนกร สุขปาน",
+          "nickname": "ออม",
+          "topic": "เพลงลูกทุ่ง",
+          "rank": 6,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPP8nZ07EZHdzSIrVCyY_JJVLoAVFwc5nWH4E4FzJRHd5UckRRz9r4TGQSJQTK4G0Rff5XYSUMNfr4hsnds_foBX_6RMxRhCfoHUKdVPhK7MqOh9VpytXXVd-pLYaFTHr9xw0QM5q7T2VZahmTWhEtl=w1117-h1117-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 7,
+          "name": "ณัฐภัทร แก้วสินธุ์",
+          "nickname": "นที",
+          "topic": "Masterchef Thailand",
+          "rank": 7,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN8o5FXqfPvxqOJs1do7f6f9mxT29Uah3nW-H2erXV1B5DsWhlnT2Acsq2rLJsMW-7g61ODyOzeSNohiJcv7AcIr-bM0JJPltRCNxrKU_qX_fqhdFIvEGOb-jJfe3CUI_FByhfFMQ9Dr7cPChdMDL4-=w1117-h1117-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 8,
+          "name": "ศุภกร นิลสุวรรณ",
+          "nickname": "หมี",
+          "topic": "Coldplay",
+          "rank": 8,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 9,
+          "name": "สหัสวรรษ นิจพันธ์",
+          "nickname": "พีท",
+          "topic": "รถไฟฟ้าไทย",
+          "rank": 9,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 6,
+          "name": "ณฤกร วงศบูรณะ",
+          "nickname": "ตฤณ",
+          "topic": "Tattoo Colour",
+          "rank": 10,
+          "scores": {
+            "3sec": 16,
+            "qa": 15,
+            "jigsaw": 20,
+            "attribute": 20,
+            "final": "-"
+          },
+          "totalScore": 71,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 11,
+          "name": "กันตชาติ ศรีเพ็ชร",
+          "nickname": "กัปตัน",
+          "topic": "Liverpool FC",
+          "rank": 11,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 12,
+          "name": "ณัฐดนัย วงศ์ปัญญา",
+          "nickname": "แฟรงค์",
+          "topic": "Honkai: Star Rail",
+          "rank": 12,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 13,
+          "name": "พีรภัทร หมื่นหาญ",
+          "nickname": "พีม",
+          "topic": "Club Friday the Series",
+          "rank": 13,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 14,
+          "name": "รติพงษ์ กมลเกียรติพัฒน์",
+          "nickname": "นิว",
+          "topic": "ไพ่ทาโร่ต์",
+          "rank": 14,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPalqWB79ObwsPqJVjlBoLGr-31QtzntceySm9B0TC7LItpwpfkpXmrZNUof2TKuOv2dBhk1KbQAGS_TBEt-AwfqtpiPmaoN_DURhOEGoA3R4T7NHbgYP_4-B69D2xS01de-BWLa3YFQo5QtBiLpQgC=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 2,
+          "name": "ธนพัฒน์ สง่าแสง",
+          "nickname": "แบงค์",
+          "topic": "48Group Thailand",
+          "rank": 15,
+          "scores": {
+            "3sec": 13,
+            "qa": 10,
+            "jigsaw": 25,
+            "attribute": 10,
+            "final": "-"
+          },
+          "totalScore": 58,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 3,
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "nickname": "ริท",
+          "topic": "Serious Bacon",
+          "rank": 16,
+          "scores": {
+            "3sec": 13,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 15,
+            "final": "-"
+          },
+          "totalScore": 48,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 17,
+          "name": "พัชราภรณ์ ขวัญพรมสี",
+          "nickname": "เอิร์น",
+          "topic": "Honkai Impact 3rd",
+          "rank": 17,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOkN98O0LDhBcQhE4X4iE67B322lQ1L3iZKvqZyP5LXaH37LibFcH26AbonLsUzAkxKXARjmy2s0hT7n83PQ0_hiVbM8TUigd-_RRr_9wH5bI8GUXg93DH5tmYRC7yNHrzFxoPMhtp7n7WE7JzTSgk9=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 18,
+          "name": "ปวัน ธนพรพันธ์",
+          "nickname": "ป๊ะ",
+          "topic": "Taskmaster",
+          "rank": 18,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO-YpFN5q79SsyFUxl5MQ3agmPlDe6UWUcCwudDt4eidO1Z1-o9Acx5WZpy5T6KURHpit0PdLvVpIT09QiDHNoYHmHUIYgoIrHlLfA_dxi3pXbx0AjAzSunbslVKnc6B6526DOPP0XwwFmb7SHmNjES=w1117-h1117-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 19,
+          "name": "ภควัต ศรสุกลรัตน์",
+          "nickname": "อาร์ม",
+          "topic": "การเมืองไทย",
+          "rank": 19,
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOXZ7x2lelKztH88AKbMMCOY3kEca65A0ke-9gVHZ3bjA-US37R2F-PQKOztqpRzHcmQaRfen2rY6jE26F4GPby3gG8o1ZdVfsxbzB6g0N6Cz6epHSO57s17ofVHCodPHJfdyQdTt-mjTc_M9i6bKKq=w1117-h1117-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 1,
+          "name": "ธวัชชัย แสงสว่าง",
+          "nickname": "ปืน",
+          "topic": "ไอ้มดแดง (Kamen Rider)",
+          "rank": 20,
+          "scores": {
+            "3sec": 15,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 10,
+            "final": "-"
+          },
+          "totalScore": 60,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOBBW412A6o3q8m8jpCV4GQGf950z__lIFfIeCe5C2S5Czet7-xK5sxHDzR_tHJ-gulxlBel1bbfc-MCgUpVz8EfOUE1j357cl5GRj0DwjOvhTDG__oQdipozW_e8qklM9jgx_jHXZW72kVH0AVya_1=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 8,
+          "name": "พัทธ์ศีล ปุญศิริ",
+          "nickname": "ศีล",
+          "topic": "บอร์ดเกม",
+          "rank": 21,
+          "scores": {
+            "3sec": 19,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 0,
+            "final": "-"
+          },
+          "totalScore": 39,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        },
+        {
+          "order": 5,
+          "name": "คุณอินทร์ บุญสิน",
+          "nickname": "อินทร์",
+          "topic": "วง Queen",
+          "rank": 22,
+          "scores": {
+            "3sec": 21,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 20,
+            "final": "-"
+          },
+          "totalScore": 61,
+          "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0",
+          "status": "ตกรอบ"
+        }
+      ],
+      "finals": []
     }
   }
 }
