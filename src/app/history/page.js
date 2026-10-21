@@ -1829,7 +1829,7 @@ export default function HistoryPage() {
                     <div style={{ width: "90px", height: "30px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #0a2538 0%, #03101a 100%)", border: "1.5px solid #00e5ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#67e8f9" }}>คุณสมบัติ</span>
                     </div>
-                    <div style={{ width: "120px", height: "30px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #1c2636 0%, #0c121c 100%)", border: "1.5px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: "135px", height: "30px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #1c2636 0%, #0c121c 100%)", border: "1.5px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#ffffff" }}>ผลการแข่งขัน</span>
                     </div>
                   </div>
@@ -1939,30 +1939,53 @@ export default function HistoryPage() {
                         })()}
 
                         {/* Result Badge */}
-                        <div style={{
-                          width: "120px",
-                          height: "48px",
-                          borderRadius: "8px",
-                          transform: "skewX(-16deg)",
-                          background: isQualified
-                            ? "linear-gradient(180deg, #132b1b 0%, #06150a 100%)"
-                            : "linear-gradient(180deg, #300f13 0%, #150507 100%)",
-                          border: isQualified ? "2px solid #52c41a" : "1.5px solid #ff4d4f",
-                          boxShadow: isQualified ? "0 0 12px rgba(82, 196, 26, 0.4)" : "none",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}>
-                          <span style={{
-                            transform: "skewX(16deg)",
-                            fontStyle: "italic",
-                            fontWeight: "900",
-                            fontSize: "13px",
-                            color: isQualified ? "#86efac" : "#fca5a5"
-                          }}>
-                            {isQualified ? "🏆 เข้ารอบ" : "ตกรอบ"}
-                          </span>
-                        </div>
+                        {(() => {
+                          const itemScore = (item.scores?.jigsaw !== "-" && item.scores?.jigsaw !== undefined && item.scores?.jigsaw !== null)
+                            ? Number(item.scores?.jigsaw)
+                            : (item.scores?.properties !== "-" && item.scores?.properties !== undefined && item.scores?.properties !== null)
+                            ? Number(item.scores?.properties)
+                            : 0;
+                          return (
+                            <div style={{
+                              width: "135px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: isQualified
+                                ? "linear-gradient(180deg, #132b1b 0%, #06150a 100%)"
+                                : "linear-gradient(180deg, #300f13 0%, #150507 100%)",
+                              border: isQualified ? "2px solid #52c41a" : "1.5px solid #ff4d4f",
+                              boxShadow: isQualified ? "0 0 12px rgba(82, 196, 26, 0.4)" : "none",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: "0 6px"
+                            }}>
+                              <div style={{
+                                transform: "skewX(16deg)",
+                                textAlign: "center"
+                              }}>
+                                <div style={{
+                                  fontStyle: "italic",
+                                  fontWeight: "900",
+                                  fontSize: "12px",
+                                  color: isQualified ? "#86efac" : "#fca5a5"
+                                }}>
+                                  {isQualified ? "🏆 เข้ารอบ" : "ตกรอบ"}
+                                </div>
+                                {itemScore === 15 && (
+                                  <div style={{
+                                    fontSize: "10px",
+                                    fontWeight: "800",
+                                    color: isQualified ? "#ffd700" : "#ff7875"
+                                  }}>
+                                    {isQualified ? "(ชิงสิทธิ์ถูก)" : "(ชิงสิทธิ์ผิด)"}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })}
@@ -4092,28 +4115,50 @@ export default function HistoryPage() {
                   </div>
 
                   {/* Battle Royale Result */}
-                  <div style={{
-                    background: selectedSpotlight.result === "เข้ารอบ"
-                      ? "rgba(82, 196, 26, 0.15)"
-                      : "rgba(255, 77, 79, 0.12)",
-                    borderRadius: "14px",
-                    border: selectedSpotlight.result === "เข้ารอบ"
-                      ? "2px solid #52c41a"
-                      : "1.5px solid #ff4d4f",
-                    padding: "14px 16px",
-                    textAlign: "center",
-                    boxShadow: selectedSpotlight.result === "เข้ารอบ" ? "0 0 16px rgba(82, 196, 26, 0.3)" : "none"
-                  }}>
-                    <div style={{
-                      fontSize: "16px",
-                      fontWeight: "900",
-                      color: selectedSpotlight.result === "เข้ารอบ" ? "#95de64" : "#ff7875"
-                    }}>
-                      {selectedSpotlight.result === "เข้ารอบ"
-                        ? "🏆 เข้ารอบ (คว้าสิทธิ์เข้าสู่รอบต่อไป)"
-                        : "❌ ตกรอบ"}
-                    </div>
-                  </div>
+                  {(() => {
+                    const brScore = (selectedSpotlight.scores?.jigsaw !== "-" && selectedSpotlight.scores?.jigsaw !== undefined && selectedSpotlight.scores?.jigsaw !== null)
+                      ? Number(selectedSpotlight.scores?.jigsaw)
+                      : (selectedSpotlight.scores?.properties !== "-" && selectedSpotlight.scores?.properties !== undefined && selectedSpotlight.scores?.properties !== null)
+                      ? Number(selectedSpotlight.scores?.properties)
+                      : 0;
+                    const is15 = brScore === 15;
+                    const isQualified = selectedSpotlight.result === "เข้ารอบ";
+
+                    return (
+                      <div style={{
+                        background: isQualified
+                          ? "rgba(82, 196, 26, 0.15)"
+                          : "rgba(255, 77, 79, 0.12)",
+                        borderRadius: "14px",
+                        border: isQualified
+                          ? "2px solid #52c41a"
+                          : "1.5px solid #ff4d4f",
+                        padding: "16px 18px",
+                        textAlign: "center",
+                        boxShadow: isQualified ? "0 0 16px rgba(82, 196, 26, 0.3)" : "none"
+                      }}>
+                        <div style={{
+                          fontSize: "17px",
+                          fontWeight: "900",
+                          color: isQualified ? "#95de64" : "#ff7875",
+                          marginBottom: "4px"
+                        }}>
+                          {isQualified ? "🏆 เข้ารอบ (คว้าสิทธิ์เข้าสู่รอบต่อไป)" : "❌ ตกรอบ"}
+                        </div>
+                        <div style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>
+                          {is15 ? (
+                            isQualified ? (
+                              <span>ทำคะแนนได้ 15 คะแนนเสมอกลุ่มนำ และ<strong>ตอบคำถามชิงสิทธิ์ถูก</strong> คว้าสิทธิ์เข้าสู่รอบต่อไปสำเร็จ 🎉</span>
+                            ) : (
+                              <span>ทำคะแนนได้ 15 คะแนนเสมอกลุ่มนำ แต่<strong>ตอบคำถามชิงสิทธิ์ผิด</strong> ไม่สามารถผ่านเข้ารอบได้</span>
+                            )
+                          ) : (
+                            <span>ทำคะแนนได้ {brScore} คะแนน (คะแนนไม่ถึงเกณฑ์ชิงสิทธิ์เข้ารอบ)</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
