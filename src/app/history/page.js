@@ -2067,6 +2067,29 @@ export default function HistoryPage() {
                       </div>
                     );
                   })}
+
+                  {/* Season / Qualifying Notes */}
+                  {currentSeason?.notes && currentSeason.notes.length > 0 && (
+                    <div style={{
+                      marginTop: "18px",
+                      padding: "12px 18px",
+                      borderRadius: "10px",
+                      background: "rgba(239, 68, 68, 0.12)",
+                      border: "1px solid rgba(239, 68, 68, 0.35)",
+                      color: "#fca5a5",
+                      fontSize: "13px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px"
+                    }}>
+                      <span style={{ fontSize: "16px" }}>ℹ️</span>
+                      <div>
+                        {currentSeason.notes.map((note, idx) => (
+                          <div key={idx}><strong>หมายเหตุ:</strong> {note}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -3001,6 +3024,29 @@ export default function HistoryPage() {
                       </div>
                     );
                   })}
+
+                  {/* Season / Qualifying Notes */}
+                  {currentSeason?.notes && currentSeason.notes.length > 0 && (
+                    <div style={{
+                      marginTop: "18px",
+                      padding: "12px 18px",
+                      borderRadius: "10px",
+                      background: "rgba(239, 68, 68, 0.12)",
+                      border: "1px solid rgba(239, 68, 68, 0.35)",
+                      color: "#fca5a5",
+                      fontSize: "13px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px"
+                    }}>
+                      <span style={{ fontSize: "16px" }}>ℹ️</span>
+                      <div>
+                        {currentSeason.notes.map((note, idx) => (
+                          <div key={idx}><strong>หมายเหตุ:</strong> {note}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -3157,6 +3203,29 @@ export default function HistoryPage() {
                       </div>
                     );
                   })}
+
+                  {/* Season / Qualifying Notes */}
+                  {currentSeason?.notes && currentSeason.notes.length > 0 && (
+                    <div style={{
+                      marginTop: "18px",
+                      padding: "12px 18px",
+                      borderRadius: "10px",
+                      background: "rgba(239, 68, 68, 0.12)",
+                      border: "1px solid rgba(239, 68, 68, 0.35)",
+                      color: "#fca5a5",
+                      fontSize: "13px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px"
+                    }}>
+                      <span style={{ fontSize: "16px" }}>ℹ️</span>
+                      <div>
+                        {currentSeason.notes.map((note, idx) => (
+                          <div key={idx}><strong>หมายเหตุ:</strong> {note}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -4085,6 +4154,15 @@ export default function HistoryPage() {
                         <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
                           🏆 ตอบถูก — เป็นสุดยอดแฟนพันธุ์แท้!
                         </div>
+                        {selectedSpotlight.note ? (
+                          <div style={{ fontSize: "12px", color: "#fca5a5", marginTop: "6px", fontWeight: "700" }}>
+                            ⚠️ {selectedSpotlight.note}
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: "12px", color: "#fff", marginTop: "4px", opacity: 0.85 }}>
+                            คว้าตำแหน่งสุดยอดแฟนพันธุ์แท้ในหัวข้อนี้ และได้รับสิทธิ์ไปแข่งขันต่อในรอบชิงชัย
+                          </div>
+                        )}
                       </div>
                     )}
                     {selectedSpotlight.final === "ผิด" && (
