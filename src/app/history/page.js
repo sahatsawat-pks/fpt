@@ -954,9 +954,9 @@ export default function HistoryPage() {
             {/* Season Info Summary Badge */}
             {(() => {
               const activeChamp = (data?.champions || []).find((c) => String(c.year) === String(activeYear));
-              const isMystery = Number(activeYear) === 2026 && (!activeChamp?.image || activeChamp?.nickname === "ปริศนา" || (activeChamp?.name && activeChamp?.name.includes("รอลุ้น")));
+              const isMystery = Number(activeYear) === 2026 && (!activeChamp?.image || activeChamp?.nickname === "ยังไม่ทราบ" || (activeChamp?.name && activeChamp?.name.includes("รอลุ้น")));
               const champTitle = isMystery
-                ? "⏳ รอลุ้นแชมป์ (ปริศนา)"
+                ? "⏳ รอลุ้นแชมป์ (ยังไม่ทราบ)"
                 : activeChamp?.nickname
                 ? `${activeChamp.name} (${activeChamp.nickname})`
                 : activeChamp?.name || currentSeason?.info?.championName;
