@@ -85,6 +85,24 @@ function getScorePillStyle(score, categoryKey) {
   return defaultStyles[categoryKey] || defaultStyles.qa;
 }
 
+// Dynamic size and protocol optimization for Google Photos / external images
+function getOptimizedImageUrl(src, targetSize = 120) {
+  if (!src || typeof src !== "string") return "";
+  let s = src.trim();
+  if (s.startsWith("http://")) {
+    s = s.replace("http://", "https://");
+  }
+  if (s.includes("?authuser=")) {
+    s = s.split("?authuser=")[0];
+  }
+  if (s.includes("googleusercontent.com") && s.includes("=")) {
+    const base = s.split("=")[0];
+    const sz = Math.min(Math.max(targetSize, 80), 600);
+    return `${base}=s${sz}-c`;
+  }
+  return s;
+}
+
 // Helper to look up contestant poll rank from pollList
 function getContestantPollRank(item, pollList) {
   if (!item) return null;
@@ -1477,7 +1495,14 @@ export default function MainPage() {
                               background: "#081020"
                             }}>
                               {c.image ? (
-                                <img src={c.image} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                <img
+                                  src={getOptimizedImageUrl(c.image, 160)}
+                                  alt={c.name}
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                  decoding="async"
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
                               ) : (
                                 <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px" }}>👤</div>
                               )}
@@ -1856,7 +1881,14 @@ export default function MainPage() {
                                       justifyContent: "center"
                                     }}>
                                       {item.image ? (
-                                        <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                        <img
+                                          src={getOptimizedImageUrl(item.image, 96)}
+                                          alt={item.name}
+                                          referrerPolicy="no-referrer"
+                                          loading="lazy"
+                                          decoding="async"
+                                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                        />
                                       ) : (
                                         <span style={{ fontSize: "16px" }}>👤</span>
                                       )}
@@ -2354,7 +2386,14 @@ export default function MainPage() {
                                     {item.waitingNextMatch ? (
                                       <span style={{ fontSize: "14px", color: "#a5b4fc" }}>❓</span>
                                     ) : item.image ? (
-                                      <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                      <img
+                                        src={getOptimizedImageUrl(item.image, 96)}
+                                        alt={item.name}
+                                        referrerPolicy="no-referrer"
+                                        loading="lazy"
+                                        decoding="async"
+                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                      />
                                     ) : (
                                       <span style={{ fontSize: "15px" }}>👤</span>
                                     )}
@@ -2902,7 +2941,14 @@ export default function MainPage() {
                               justifyContent: "center"
                             }}>
                               {photo ? (
-                                <img src={photo} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                <img
+                                  src={getOptimizedImageUrl(photo, 96)}
+                                  alt={item.name}
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                  decoding="async"
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
                               ) : (
                                 <span style={{ fontSize: "15px" }}>👤</span>
                               )}
@@ -3091,7 +3137,14 @@ export default function MainPage() {
                   {selectedSpotlight.waitingNextMatch ? (
                     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px", color: "#a5b4fc" }}>❓</div>
                   ) : selectedSpotlight.image ? (
-                    <img src={selectedSpotlight.image} alt={selectedSpotlight.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <img
+                      src={getOptimizedImageUrl(selectedSpotlight.image, 400)}
+                      alt={selectedSpotlight.name}
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
                   ) : (
                     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px" }}>👤</div>
                   )}

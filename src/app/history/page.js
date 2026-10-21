@@ -41,6 +41,9 @@ function ContestantAvatar({ src, fallbackText = "👤", size = 32 }) {
   const cleanSrc = useMemo(() => {
     if (!src || typeof src !== "string") return "";
     let s = src.trim();
+    if (s.startsWith("http://")) {
+      s = s.replace("http://", "https://");
+    }
     if (s.includes("?authuser=")) {
       s = s.split("?authuser=")[0];
     }

@@ -8,7 +8,13 @@ function AdminPhotoPreview({ src, name, size = 36 }) {
   useEffect(() => {
     setErr(false);
   }, [src]);
-  const clean = (src || "").split("?authuser=")[0];
+  let clean = (src || "").trim().split("?authuser=")[0];
+  if (clean.startsWith("http://")) {
+    clean = clean.replace("http://", "https://");
+  }
+  if (clean.includes("googleusercontent.com") && clean.includes("=")) {
+    clean = `${clean.split("=")[0]}=s${Math.min(Math.max(size * 2, 72), 300)}-c`;
+  }
   if (!clean || err) {
     return <span style={{ fontSize: `${Math.round(size * 0.42)}px`, opacity: 0.6 }}>👤</span>;
   }
@@ -4892,7 +4898,7 @@ export default function AdminPage() {
                         transition: "all 0.15s ease"
                       }}
                     >
-                      🔘 ทั้งหมด ({totalAudCount})
+                      🔘 ทั้งหมด ({audList.length})
                     </button>
                     <button
                       type="button"
