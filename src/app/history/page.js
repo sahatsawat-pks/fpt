@@ -33,7 +33,27 @@ if (historyData?.seasons) {
 
 function ContestantAvatar({ src, fallbackText = "👤", size = 32 }) {
   const [hasError, setHasError] = useState(false);
-  if (!src || hasError) {
+
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  const cleanSrc = useMemo(() => {
+    if (!src || typeof src !== "string") return "";
+    let s = src.trim();
+    if (s.includes("?authuser=")) {
+      s = s.split("?authuser=")[0];
+    }
+    // Dynamic size optimization for Google Photos (loads 20-30x lighter images)
+    if (s.includes("googleusercontent.com") && s.includes("=")) {
+      const base = s.split("=")[0];
+      const targetSize = Math.min(Math.max(size * 2, 96), 400);
+      return `${base}=s${targetSize}-c`;
+    }
+    return s;
+  }, [src, size]);
+
+  if (!cleanSrc || hasError) {
     return (
       <div style={{
         width: "100%",
@@ -49,8 +69,11 @@ function ContestantAvatar({ src, fallbackText = "👤", size = 32 }) {
   }
   return (
     <img
-      src={src}
+      src={cleanSrc}
       alt=""
+      loading="lazy"
+      decoding="async"
+      referrerPolicy="no-referrer"
       onError={() => setHasError(true)}
       style={{ width: "100%", height: "100%", objectFit: "cover" }}
     />

@@ -3,6 +3,28 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
+function AdminPhotoPreview({ src, name, size = 36 }) {
+  const [err, setErr] = useState(false);
+  useEffect(() => {
+    setErr(false);
+  }, [src]);
+  const clean = (src || "").split("?authuser=")[0];
+  if (!clean || err) {
+    return <span style={{ fontSize: `${Math.round(size * 0.42)}px`, opacity: 0.6 }}>👤</span>;
+  }
+  return (
+    <img
+      src={clean}
+      alt={name || ""}
+      loading="lazy"
+      decoding="async"
+      referrerPolicy="no-referrer"
+      onError={() => setErr(true)}
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+    />
+  );
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
@@ -4474,11 +4496,7 @@ export default function AdminPage() {
                                   justifyContent: "center",
                                   flexShrink: 0
                                 }}>
-                                  {player.image ? (
-                                    <img src={player.image} alt={player.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                  ) : (
-                                    <span style={{ fontSize: "14px" }}>👤</span>
-                                  )}
+                                  <AdminPhotoPreview src={player.image} name={player.name} size={32} />
                                 </div>
                                 <div>
                                   <div style={{ fontWeight: "700", color: "#fff", fontSize: "13px" }}>
@@ -4780,7 +4798,7 @@ export default function AdminPage() {
                                 border: "2px solid #52c41a",
                                 flexShrink: 0
                               }}>
-                                <img src={auditionFormData.image} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                <AdminPhotoPreview src={auditionFormData.image} name="preview" size={40} />
                               </div>
                             )}
                           </div>
@@ -5007,11 +5025,7 @@ export default function AdminPage() {
                                   alignItems: "center",
                                   justifyContent: "center"
                                 }}>
-                                  {player.image ? (
-                                    <img src={player.image} alt={player.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                  ) : (
-                                    <span style={{ fontSize: "15px", opacity: 0.6 }}>👤</span>
-                                  )}
+                                  <AdminPhotoPreview src={player.image} name={player.name} size={36} />
                                 </div>
                               </td>
 
