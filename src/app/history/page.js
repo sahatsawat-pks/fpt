@@ -740,7 +740,7 @@ export default function HistoryPage() {
           }}>
             {(data?.champions || []).filter((c) => enabledYears[String(c.year)] !== false).map((champ) => {
               const isSelectedYear = String(champ.year) === String(activeYear);
-              const isMystery = Number(champ.year) === 2026 && (!champ.image || champ.nickname === "ปริศนา" || (champ.name && champ.name.includes("รอลุ้น")));
+              const isMystery = Number(champ.year) === 2026 && (!champ.image || champ.nickname === "ยังไม่ทราบ" || (champ.name && champ.name.includes("รอลุ้น")));
               return (
                 <div
                   key={champ.year}
