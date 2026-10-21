@@ -150,19 +150,29 @@ export async function POST(request) {
 
     // 4. Update an audition contestant or photo (specifically for weekly audition / eliminated contestants)
     if (body.action === "update_audition_contestant" || body.action === "update_audition_photo") {
-      const { year, contestantIndex, contestant, image } = body;
+      const { year, contestantIndex, contestant, image, playerName } = body;
       const yrStr = String(year);
       if (currentData.seasons && currentData.seasons[yrStr] && currentData.seasons[yrStr].audition) {
         const audList = currentData.seasons[yrStr].audition;
-        const targetIdx = Number(contestantIndex);
+        let targetIdx = Number(contestantIndex);
+        if ((isNaN(targetIdx) || targetIdx < 0 || targetIdx >= audList.length) && playerName) {
+          targetIdx = audList.findIndex((c) => c.name === playerName);
+        }
+
         if (!isNaN(targetIdx) && targetIdx >= 0 && targetIdx < audList.length) {
           if (body.action === "update_audition_photo") {
-            audList[targetIdx].image = (image || "").trim();
+            let cleanImg = (image || "").trim();
+            if (cleanImg.startsWith("http://")) cleanImg = cleanImg.replace("http://", "https://");
+            if (cleanImg.includes("?authuser=")) cleanImg = cleanImg.split("?authuser=")[0];
+            audList[targetIdx].image = cleanImg;
           } else if (contestant) {
+            let cleanImg = contestant.image !== undefined ? (contestant.image || "").trim() : audList[targetIdx].image;
+            if (cleanImg.startsWith("http://")) cleanImg = cleanImg.replace("http://", "https://");
+            if (cleanImg.includes("?authuser=")) cleanImg = cleanImg.split("?authuser=")[0];
             audList[targetIdx] = {
               ...audList[targetIdx],
               ...contestant,
-              image: contestant.image !== undefined ? (contestant.image || "").trim() : audList[targetIdx].image,
+              image: cleanImg,
             };
           }
           await saveKVData("fpt_history", currentData, writeLocalHistory);

@@ -20,6 +20,7 @@ function AdminPhotoPreview({ src, name, size = 36 }) {
   }
   return (
     <img
+      key={clean}
       src={clean}
       alt={name || ""}
       loading="lazy"
@@ -370,6 +371,7 @@ export default function AdminPage() {
           action: "update_audition_contestant",
           year: selectedAdminYear,
           contestantIndex: editingAuditionIdx,
+          playerName: auditionFormData.name,
           contestant: auditionFormData,
         }),
       });
@@ -391,7 +393,11 @@ export default function AdminPage() {
   };
 
   const handleQuickSaveAuditionPhoto = async (idx, player, photoUrl) => {
-    const url = photoUrl !== undefined ? photoUrl : (quickAuditionPhotos[idx] ?? player.image ?? "");
+    let url = photoUrl !== undefined ? photoUrl : (quickAuditionPhotos[idx] ?? player.image ?? "");
+    url = (url || "").trim();
+    if (url.startsWith("http://")) url = url.replace("http://", "https://");
+    if (url.includes("?authuser=")) url = url.split("?authuser=")[0];
+
     setSavingAuditionIdx(idx);
     try {
       const res = await fetch("/api/history", {
@@ -401,12 +407,18 @@ export default function AdminPage() {
           action: "update_audition_photo",
           year: selectedAdminYear,
           contestantIndex: idx,
+          playerName: player.name,
           image: url,
         }),
       });
       const json = await res.json();
       if (json.success && json.data) {
         setAdminHistoryData(json.data);
+        setQuickAuditionPhotos((prev) => {
+          const next = { ...prev };
+          delete next[idx];
+          return next;
+        });
         showToast(`บันทึกรูปของ ${player.nickname || player.name} เรียบร้อย!`);
         setHistoryAdminNotice(`✅ บันทึกรูปของ ${player.nickname || player.name} สำเร็จ!`);
         setTimeout(() => setHistoryAdminNotice(""), 3500);
@@ -5154,7 +5166,7 @@ export default function AdminPage() {
                                     value={currentInputUrl}
                                     onChange={(e) => {
                                       const val = e.target.value;
-                                      setQuickPhotoInputs((prev) => ({ ...prev, [origIdx]: val }));
+                                      setQuickAuditionPhotos((prev) => ({ ...prev, [origIdx]: val }));
                                     }}
                                     style={{
                                       flex: 1,
