@@ -131,6 +131,24 @@ export default function AdminPage() {
     image: "",
   });
 
+  // Audition Admin States (specifically for weekly audition & eliminated contestants)
+  const [historySubTab, setHistorySubTab] = useState("qualifying"); // "qualifying" | "audition"
+  const [auditionFilter, setAuditionFilter] = useState("eliminated"); // "eliminated" | "all" | "noPhoto" | "hasPhoto"
+  const [auditionSearch, setAuditionSearch] = useState("");
+  const [editingAuditionIdx, setEditingAuditionIdx] = useState(null);
+  const [auditionFormData, setAuditionFormData] = useState({
+    name: "",
+    nickname: "",
+    topic: "",
+    episode: "",
+    date: "",
+    final: "",
+    note: "",
+    image: "",
+  });
+  const [quickAuditionPhotos, setQuickAuditionPhotos] = useState({});
+  const [savingAuditionIdx, setSavingAuditionIdx] = useState(null);
+
   // 2. Fetch Settings, Contestants, Poll, and History when authenticated
   useEffect(() => {
     if (isAuthenticated) {
@@ -295,6 +313,82 @@ export default function AdminPage() {
       alert("เกิดข้อผิดพลาดในการบันทึก");
     } finally {
       setSavingHistoryAdmin(false);
+    }
+  };
+
+  const handleSelectAuditionForEdit = (idx, player) => {
+    setEditingAuditionIdx(idx);
+    setAuditionFormData({
+      name: player.name || "",
+      nickname: player.nickname || "",
+      topic: player.topic || "",
+      episode: player.episode || "",
+      date: player.date || "",
+      final: player.final || "",
+      note: player.note || "",
+      image: player.image || "",
+    });
+  };
+
+  const handleSaveAuditionContestant = async (e) => {
+    if (e) e.preventDefault();
+    if (editingAuditionIdx === null) return;
+    setSavingHistoryAdmin(true);
+    try {
+      const res = await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_audition_contestant",
+          year: selectedAdminYear,
+          contestantIndex: editingAuditionIdx,
+          contestant: auditionFormData,
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setAdminHistoryData(json.data);
+        setHistoryAdminNotice(`✅ บันทึกข้อมูลของ ${auditionFormData.nickname || auditionFormData.name} สำเร็จ!`);
+        showToast(`บันทึกข้อมูลเรียบร้อย`);
+        setEditingAuditionIdx(null);
+        setTimeout(() => setHistoryAdminNotice(""), 3500);
+      } else {
+        alert(json.error || "บันทึกไม่สำเร็จ");
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการบันทึก");
+    } finally {
+      setSavingHistoryAdmin(false);
+    }
+  };
+
+  const handleQuickSaveAuditionPhoto = async (idx, player, photoUrl) => {
+    const url = photoUrl !== undefined ? photoUrl : (quickAuditionPhotos[idx] ?? player.image ?? "");
+    setSavingAuditionIdx(idx);
+    try {
+      const res = await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_audition_photo",
+          year: selectedAdminYear,
+          contestantIndex: idx,
+          image: url,
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setAdminHistoryData(json.data);
+        showToast(`บันทึกรูปของ ${player.nickname || player.name} เรียบร้อย!`);
+        setHistoryAdminNotice(`✅ บันทึกรูปของ ${player.nickname || player.name} สำเร็จ!`);
+        setTimeout(() => setHistoryAdminNotice(""), 3500);
+      } else {
+        alert(json.error || "บันทึกรูปไม่สำเร็จ");
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการบันทึกรูป");
+    } finally {
+      setSavingAuditionIdx(null);
     }
   };
 
@@ -3812,7 +3906,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* CARD 2: แก้ไขตารางคะแนนย้อนหลัง */}
+            {/* CARD 2: แก้ไขตารางคะแนนย้อนหลัง & รอบประจำสัปดาห์ */}
             <div style={{
               background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
               border: "1px solid rgba(0, 229, 255, 0.25)",
@@ -3820,25 +3914,80 @@ export default function AdminPage() {
               padding: "24px",
               marginBottom: "24px"
             }}>
+              {/* Sub-tab selection between Qualifying and Audition */}
+              <div style={{ display: "flex", gap: "10px", marginBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.12)", paddingBottom: "14px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHistorySubTab("qualifying");
+                    setEditingAuditionIdx(null);
+                  }}
+                  style={{
+                    padding: "9px 20px",
+                    borderRadius: "10px",
+                    fontSize: "13.5px",
+                    fontWeight: "800",
+                    border: "none",
+                    cursor: "pointer",
+                    background: historySubTab === "qualifying" ? "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)" : "rgba(255,255,255,0.06)",
+                    color: historySubTab === "qualifying" ? "#030814" : "rgba(255,255,255,0.7)",
+                    boxShadow: historySubTab === "qualifying" ? "0 0 15px rgba(0, 229, 255, 0.4)" : "none",
+                    transition: "all 0.15s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px"
+                  }}
+                >
+                  <span>🏆</span> รอบคัดเลือกแห่งปี (Qualifying)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHistorySubTab("audition");
+                    setEditingContestantIdx(null);
+                  }}
+                  style={{
+                    padding: "9px 20px",
+                    borderRadius: "10px",
+                    fontSize: "13.5px",
+                    fontWeight: "800",
+                    border: "none",
+                    cursor: "pointer",
+                    background: historySubTab === "audition" ? "linear-gradient(135deg, #52c41a 0%, #237804 100%)" : "rgba(255,255,255,0.06)",
+                    color: historySubTab === "audition" ? "#ffffff" : "rgba(255,255,255,0.7)",
+                    boxShadow: historySubTab === "audition" ? "0 0 15px rgba(82, 196, 26, 0.45)" : "none",
+                    transition: "all 0.15s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px"
+                  }}
+                >
+                  <span>📺</span> รอบประจำสัปดาห์ (Audition) — ใส่รูปผู้ตกรอบ & ผู้เข้าแข่งขัน
+                </button>
+              </div>
+
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", flexWrap: "wrap", gap: "12px" }}>
                 <div>
-                  <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#80d0ff", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span>📊</span> แก้ไขตารางคะแนนย้อนหลัง
+                  <h3 style={{ fontSize: "17px", fontWeight: "800", color: historySubTab === "audition" ? "#86efac" : "#80d0ff", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>{historySubTab === "audition" ? "📺" : "📊"}</span> {historySubTab === "audition" ? `จัดการรูปภาพ & ผู้เข้าแข่งขันรอบประจำสัปดาห์ (ปี ${selectedAdminYear})` : `แก้ไขตารางคะแนนย้อนหลัง (ปี ${selectedAdminYear})`}
                   </h3>
                   <p style={{ margin: 0, fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
-                    เลือกปีการแข่งขันที่ต้องการแก้ไขคะแนน หรือปรับปรุงรายละเอียดผู้เข้าแข่งขัน
+                    {historySubTab === "audition"
+                      ? "ใส่ URL รูปภาพ (Google Photos) ให้ผู้เข้าแข่งขัน โดยเฉพาะคนที่ตกรอบประจำสัปดาห์ เพื่อให้มีรูปโชว์ในสถิติและหน้าประวัติศาสตร์"
+                      : "เลือกปีการแข่งขันที่ต้องการแก้ไขคะแนน หรือปรับปรุงรายละเอียดผู้เข้าแข่งขันในรอบคัดเลือก"}
                   </p>
                 </div>
 
                 {/* Year Selection Pills */}
                 <div style={{ display: "flex", gap: "8px", background: "rgba(3, 8, 20, 0.8)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(0, 229, 255, 0.2)" }}>
-                  {["2024", "2023", "2022", "2021"].map((yr) => (
+                  {(historySubTab === "audition" ? ["2026", "2024", "2023", "2022"] : ["2024", "2023", "2022", "2021"]).map((yr) => (
                     <button
                       key={yr}
                       type="button"
                       onClick={() => {
                         setSelectedAdminYear(yr);
                         setEditingContestantIdx(null);
+                        setEditingAuditionIdx(null);
                       }}
                       style={{
                         padding: "7px 16px",
@@ -3847,9 +3996,13 @@ export default function AdminPage() {
                         fontWeight: "700",
                         border: "none",
                         cursor: "pointer",
-                        background: selectedAdminYear === yr ? "linear-gradient(135deg, #00e5ff 0%, #0088cc 100%)" : "transparent",
-                        color: selectedAdminYear === yr ? "#030814" : "rgba(255,255,255,0.7)",
-                        boxShadow: selectedAdminYear === yr ? "0 0 10px rgba(0, 229, 255, 0.4)" : "none",
+                        background: selectedAdminYear === yr
+                          ? historySubTab === "audition" ? "linear-gradient(135deg, #52c41a 0%, #237804 100%)" : "linear-gradient(135deg, #00e5ff 0%, #0088cc 100%)"
+                          : "transparent",
+                        color: selectedAdminYear === yr ? "#ffffff" : "rgba(255,255,255,0.7)",
+                        boxShadow: selectedAdminYear === yr
+                          ? historySubTab === "audition" ? "0 0 10px rgba(82, 196, 26, 0.4)" : "0 0 10px rgba(0, 229, 255, 0.4)"
+                          : "none",
                         transition: "all 0.15s ease"
                       }}
                     >
@@ -3859,8 +4012,11 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Contestant Edit Form Drawer / Box (when editing) */}
-              {editingContestantIdx !== null && (
+              {/* SUB-TAB 1: QUALIFYING ROUND */}
+              {historySubTab === "qualifying" && (
+                <div>
+                  {/* Contestant Edit Form Drawer / Box (when editing) */}
+                  {editingContestantIdx !== null && (
                 <div style={{
                   background: "linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(255, 215, 0, 0.06) 100%)",
                   border: "2px solid #00e5ff",
@@ -4368,6 +4524,639 @@ export default function AdminPage() {
                 </table>
               </div>
             </div>
+          )}
+
+          {/* SUB-TAB 2: AUDITION ROUND (รอบประจำสัปดาห์ & จัดการรูปผู้ตกรอบ) */}
+          {historySubTab === "audition" && (() => {
+            const season = adminHistoryData?.seasons?.[selectedAdminYear];
+            const audList = season?.audition || [];
+
+            const isContestantEliminated = (c) => {
+              if (c.final === "ผิด" || c.final === "-") return true;
+              if (c.note && c.note.includes("สละสิทธิ์")) return true;
+              const inQual = season?.qualifying?.some((q) => q.name === c.name);
+              if (!inQual && c.final !== "ถูก") return true;
+              return false;
+            };
+
+            const eliminatedList = audList.filter(isContestantEliminated);
+            const noPhotoList = audList.filter((c) => !c.image || !c.image.startsWith("http"));
+            const hasPhotoList = audList.filter((c) => c.image && c.image.startsWith("http"));
+
+            const filteredAudList = audList.filter((c) => {
+              if (auditionFilter === "eliminated" && !isContestantEliminated(c)) return false;
+              if (auditionFilter === "noPhoto" && c.image && c.image.startsWith("http")) return false;
+              if (auditionFilter === "hasPhoto" && (!c.image || !c.image.startsWith("http"))) return false;
+
+              if (auditionSearch.trim()) {
+                const q = auditionSearch.trim().toLowerCase();
+                const matchName = (c.name || "").toLowerCase().includes(q);
+                const matchNick = (c.nickname || "").toLowerCase().includes(q);
+                const matchTopic = (c.topic || "").toLowerCase().includes(q);
+                const matchEp = String(c.episode || "").includes(q);
+                if (!matchName && !matchNick && !matchTopic && !matchEp) return false;
+              }
+              return true;
+            });
+
+            return (
+              <div>
+                {/* Audition Edit Drawer / Box (when editing) */}
+                {editingAuditionIdx !== null && (
+                  <div style={{
+                    background: "linear-gradient(135deg, rgba(82, 196, 26, 0.1) 0%, rgba(0, 229, 255, 0.08) 100%)",
+                    border: "2px solid #52c41a",
+                    borderRadius: "14px",
+                    padding: "20px",
+                    marginBottom: "24px",
+                    boxShadow: "0 0 25px rgba(82, 196, 26, 0.3)"
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span style={{ fontSize: "20px" }}>✏️</span>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: "16px", fontWeight: "800", color: "#86efac" }}>
+                            แก้ไขข้อมูลรอบประจำสัปดาห์: {auditionFormData.nickname ? `${auditionFormData.name} (${auditionFormData.nickname})` : auditionFormData.name}
+                          </h4>
+                          <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                            EP.{auditionFormData.episode} | หัวข้อ: {auditionFormData.topic} | ปี {selectedAdminYear}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditingAuditionIdx(null)}
+                        style={{
+                          background: "rgba(255,255,255,0.1)",
+                          border: "none",
+                          color: "#fff",
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          cursor: "pointer",
+                          fontSize: "12px"
+                        }}
+                      >
+                        ✕ ยกเลิก
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSaveAuditionContestant}>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                        gap: "14px",
+                        marginBottom: "16px"
+                      }}>
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#86efac", fontWeight: "700", marginBottom: "4px" }}>
+                            ชื่อจริง
+                          </label>
+                          <input
+                            type="text"
+                            value={auditionFormData.name}
+                            onChange={(e) => setAuditionFormData({ ...auditionFormData, name: e.target.value })}
+                            style={{
+                              width: "100%",
+                              padding: "9px 12px",
+                              borderRadius: "8px",
+                              background: "#050b14",
+                              border: "1px solid rgba(82, 196, 26, 0.4)",
+                              color: "#fff",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#86efac", fontWeight: "700", marginBottom: "4px" }}>
+                            ชื่อเล่น
+                          </label>
+                          <input
+                            type="text"
+                            value={auditionFormData.nickname}
+                            onChange={(e) => setAuditionFormData({ ...auditionFormData, nickname: e.target.value })}
+                            style={{
+                              width: "100%",
+                              padding: "9px 12px",
+                              borderRadius: "8px",
+                              background: "#050b14",
+                              border: "1px solid rgba(82, 196, 26, 0.4)",
+                              color: "#fff",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#86efac", fontWeight: "700", marginBottom: "4px" }}>
+                            หัวข้อแฟนพันธุ์แท้
+                          </label>
+                          <input
+                            type="text"
+                            value={auditionFormData.topic}
+                            onChange={(e) => setAuditionFormData({ ...auditionFormData, topic: e.target.value })}
+                            style={{
+                              width: "100%",
+                              padding: "9px 12px",
+                              borderRadius: "8px",
+                              background: "#050b14",
+                              border: "1px solid rgba(82, 196, 26, 0.4)",
+                              color: "#ffd700",
+                              fontSize: "13px",
+                              fontWeight: "600"
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#86efac", fontWeight: "700", marginBottom: "4px" }}>
+                            ตอนที่ (EP) & วันที่
+                          </label>
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            <input
+                              type="number"
+                              value={auditionFormData.episode}
+                              onChange={(e) => setAuditionFormData({ ...auditionFormData, episode: Number(e.target.value) })}
+                              placeholder="EP"
+                              style={{
+                                width: "70px",
+                                padding: "9px 10px",
+                                borderRadius: "8px",
+                                background: "#050b14",
+                                border: "1px solid rgba(82, 196, 26, 0.4)",
+                                color: "#fff",
+                                fontSize: "13px"
+                              }}
+                            />
+                            <input
+                              type="text"
+                              value={auditionFormData.date}
+                              onChange={(e) => setAuditionFormData({ ...auditionFormData, date: e.target.value })}
+                              placeholder="เช่น 29 พฤษภาคม 2023"
+                              style={{
+                                flex: 1,
+                                padding: "9px 12px",
+                                borderRadius: "8px",
+                                background: "#050b14",
+                                border: "1px solid rgba(82, 196, 26, 0.4)",
+                                color: "#fff",
+                                fontSize: "13px"
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#86efac", fontWeight: "700", marginBottom: "4px" }}>
+                            ผลคำถามสุดท้าย (Final)
+                          </label>
+                          <select
+                            value={auditionFormData.final}
+                            onChange={(e) => setAuditionFormData({ ...auditionFormData, final: e.target.value })}
+                            style={{
+                              width: "100%",
+                              padding: "9px 12px",
+                              borderRadius: "8px",
+                              background: "#050b14",
+                              border: "1px solid rgba(82, 196, 26, 0.4)",
+                              color: auditionFormData.final === "ถูก" ? "#86efac" : auditionFormData.final === "ผิด" ? "#ff7875" : "#fff",
+                              fontSize: "13px",
+                              fontWeight: "700"
+                            }}
+                          >
+                            <option value="ถูก">✅ ถูก (สุดยอดแฟนพันธุ์แท้)</option>
+                            <option value="ผิด">❌ ผิด (ตกรอบ)</option>
+                            <option value="-">- ตกรอบก่อนถึงคำถามสุดท้าย</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", color: "#86efac", fontWeight: "700", marginBottom: "4px" }}>
+                            หมายเหตุกำกับ (Note)
+                          </label>
+                          <input
+                            type="text"
+                            value={auditionFormData.note}
+                            onChange={(e) => setAuditionFormData({ ...auditionFormData, note: e.target.value })}
+                            placeholder="เช่น สละสิทธิ์การแข่งขันแห่งปี"
+                            style={{
+                              width: "100%",
+                              padding: "9px 12px",
+                              borderRadius: "8px",
+                              background: "#050b14",
+                              border: "1px solid rgba(82, 196, 26, 0.4)",
+                              color: "#fca5a5",
+                              fontSize: "13px"
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ gridColumn: "span 2" }}>
+                          <label style={{ display: "block", fontSize: "12px", color: "#86efac", fontWeight: "700", marginBottom: "4px" }}>
+                            📸 URL รูปภาพผู้เข้าแข่งขัน (Google Photos)
+                          </label>
+                          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                            <input
+                              type="text"
+                              value={auditionFormData.image || ""}
+                              onChange={(e) => setAuditionFormData({ ...auditionFormData, image: e.target.value })}
+                              placeholder="https://lh3.googleusercontent.com/..."
+                              style={{
+                                flex: 1,
+                                padding: "9px 12px",
+                                borderRadius: "8px",
+                                background: "#050b14",
+                                border: "1px solid rgba(82, 196, 26, 0.4)",
+                                color: "#fff",
+                                fontSize: "13px"
+                              }}
+                            />
+                            {auditionFormData.image && (
+                              <div style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                overflow: "hidden",
+                                border: "2px solid #52c41a",
+                                flexShrink: 0
+                              }}>
+                                <img src={auditionFormData.image} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <button
+                          type="submit"
+                          disabled={savingHistoryAdmin}
+                          style={{
+                            padding: "10px 22px",
+                            borderRadius: "8px",
+                            background: "linear-gradient(135deg, #52c41a 0%, #237804 100%)",
+                            color: "#ffffff",
+                            fontSize: "14px",
+                            fontWeight: "800",
+                            border: "none",
+                            cursor: savingHistoryAdmin ? "not-allowed" : "pointer",
+                            boxShadow: "0 0 15px rgba(82, 196, 26, 0.4)"
+                          }}
+                        >
+                          {savingHistoryAdmin ? "⏳ กำลังบันทึก..." : "💾 บันทึกข้อมูลรอบประจำสัปดาห์"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingAuditionIdx(null)}
+                          style={{
+                            padding: "10px 18px",
+                            borderRadius: "8px",
+                            background: "rgba(255,255,255,0.08)",
+                            color: "#fff",
+                            fontSize: "14px",
+                            border: "1px solid rgba(255,255,255,0.2)",
+                            cursor: "pointer"
+                          }}
+                        >
+                          ยกเลิก
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* Filter and Search Bar for Audition */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  background: "rgba(3, 8, 20, 0.6)",
+                  border: "1px solid rgba(82, 196, 26, 0.25)",
+                  borderRadius: "12px",
+                  padding: "12px 16px",
+                  marginBottom: "16px"
+                }}>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", fontWeight: "700" }}>กรองรายชื่อ:</span>
+                    <button
+                      type="button"
+                      onClick={() => setAuditionFilter("eliminated")}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        border: auditionFilter === "eliminated" ? "1.5px solid #ff4d4f" : "1px solid rgba(255,255,255,0.15)",
+                        background: auditionFilter === "eliminated" ? "rgba(255, 77, 79, 0.25)" : "rgba(255,255,255,0.05)",
+                        color: auditionFilter === "eliminated" ? "#ff7875" : "rgba(255,255,255,0.7)",
+                        boxShadow: auditionFilter === "eliminated" ? "0 0 10px rgba(255, 77, 79, 0.3)" : "none",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      ❌ เฉพาะคนที่ตกรอบประจำสัปดาห์ ({eliminatedList.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuditionFilter("all")}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        border: auditionFilter === "all" ? "1.5px solid #52c41a" : "1px solid rgba(255,255,255,0.15)",
+                        background: auditionFilter === "all" ? "rgba(82, 196, 26, 0.25)" : "rgba(255,255,255,0.05)",
+                        color: auditionFilter === "all" ? "#86efac" : "rgba(255,255,255,0.7)",
+                        boxShadow: auditionFilter === "all" ? "0 0 10px rgba(82, 196, 26, 0.3)" : "none",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      🔘 ทั้งหมด ({totalAudCount})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuditionFilter("noPhoto")}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        border: auditionFilter === "noPhoto" ? "1.5px solid #faad14" : "1px solid rgba(255,255,255,0.15)",
+                        background: auditionFilter === "noPhoto" ? "rgba(250, 173, 20, 0.25)" : "rgba(255,255,255,0.05)",
+                        color: auditionFilter === "noPhoto" ? "#ffc069" : "rgba(255,255,255,0.7)",
+                        boxShadow: auditionFilter === "noPhoto" ? "0 0 10px rgba(250, 173, 20, 0.3)" : "none",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      📷 ยังไม่มีรูป ({noPhotoList.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuditionFilter("hasPhoto")}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        border: auditionFilter === "hasPhoto" ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                        background: auditionFilter === "hasPhoto" ? "rgba(0, 229, 255, 0.25)" : "rgba(255,255,255,0.05)",
+                        color: auditionFilter === "hasPhoto" ? "#67e8f9" : "rgba(255,255,255,0.7)",
+                        boxShadow: auditionFilter === "hasPhoto" ? "0 0 10px rgba(0, 229, 255, 0.3)" : "none",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      ✅ มีรูปภาพแล้ว ({hasPhotoList.length})
+                    </button>
+                  </div>
+
+                  <div style={{ minWidth: "240px", flex: "1", maxWidth: "340px" }}>
+                    <input
+                      type="text"
+                      placeholder="🔍 ค้นหาชื่อ, ชื่อเล่น, หัวข้อ หรือ EP..."
+                      value={auditionSearch}
+                      onChange={(e) => setAuditionSearch(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "8px 14px",
+                        borderRadius: "8px",
+                        background: "rgba(0,0,0,0.5)",
+                        border: "1px solid rgba(82, 196, 26, 0.4)",
+                        color: "#fff",
+                        fontSize: "13px"
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Audition Contestants Table */}
+                <div style={{ overflowX: "auto", borderRadius: "10px", border: "1px solid rgba(82, 196, 26, 0.3)" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                    <thead>
+                      <tr style={{ background: "rgba(82, 196, 26, 0.12)", color: "#86efac", borderBottom: "1px solid rgba(82, 196, 26, 0.3)" }}>
+                        <th style={{ padding: "10px 12px", textAlign: "center", width: "95px" }}>EP / วันที่</th>
+                        <th style={{ padding: "10px 10px", textAlign: "center", width: "50px" }}>รูปภาพ</th>
+                        <th style={{ padding: "10px 14px" }}>ผู้เข้าแข่งขัน & หัวข้อ</th>
+                        <th style={{ padding: "10px 12px", textAlign: "center", width: "140px" }}>ผลการแข่งขัน</th>
+                        <th style={{ padding: "10px 12px" }}>📸 ใส่ URL รูป Google Photos ด่วน</th>
+                        <th style={{ padding: "10px 12px", textAlign: "center", width: "85px" }}>จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredAudList.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" style={{ padding: "30px", textAlign: "center", color: "rgba(255,255,255,0.5)" }}>
+                            ไม่พบรายชื่อผู้เข้าแข่งขันตามเงื่อนไขที่เลือก
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredAudList.map((player) => {
+                          const origIdx = audList.indexOf(player);
+                          const isBeingEdited = editingAuditionIdx === origIdx;
+                          const isSavingPhoto = savingAuditionIdx === origIdx;
+                          const isElim = isContestantEliminated(player);
+                          const currentInputUrl = quickAuditionPhotos[origIdx] ?? player.image ?? "";
+
+                          return (
+                            <tr
+                              key={origIdx}
+                              style={{
+                                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                background: isBeingEdited
+                                  ? "rgba(82, 196, 26, 0.15)"
+                                  : isElim
+                                  ? "rgba(255, 77, 79, 0.04)"
+                                  : "rgba(3, 8, 20, 0.4)",
+                                transition: "all 0.15s ease"
+                              }}
+                            >
+                              {/* EP & Date */}
+                              <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                                <div style={{
+                                  display: "inline-block",
+                                  padding: "3px 8px",
+                                  borderRadius: "6px",
+                                  background: "linear-gradient(135deg, #52c41a 0%, #237804 100%)",
+                                  color: "#fff",
+                                  fontWeight: "800",
+                                  fontSize: "11.5px",
+                                  marginBottom: "3px"
+                                }}>
+                                  EP.{player.episode}
+                                </div>
+                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                                  {player.date || "-"}
+                                </div>
+                              </td>
+
+                              {/* Photo Preview */}
+                              <td style={{ padding: "10px 10px", textAlign: "center" }}>
+                                <div style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "50%",
+                                  overflow: "hidden",
+                                  margin: "0 auto",
+                                  background: "rgba(0, 229, 255, 0.1)",
+                                  border: player.image ? "1.5px solid #52c41a" : "1.5px dashed rgba(255,255,255,0.3)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center"
+                                }}>
+                                  {player.image ? (
+                                    <img src={player.image} alt={player.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                  ) : (
+                                    <span style={{ fontSize: "15px", opacity: 0.6 }}>👤</span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Contestant Name & Topic */}
+                              <td style={{ padding: "10px 14px" }}>
+                                <div style={{ fontWeight: "800", color: "#fff", fontSize: "13.5px" }}>
+                                  {player.nickname && <span style={{ color: "#00e5ff" }}>({player.nickname}) </span>}
+                                  <span>{player.name}</span>
+                                  {player.note && (
+                                    <span style={{
+                                      marginLeft: "8px",
+                                      padding: "1px 6px",
+                                      background: "rgba(239, 68, 68, 0.25)",
+                                      border: "1px solid #ef4444",
+                                      color: "#fca5a5",
+                                      fontSize: "10px",
+                                      fontWeight: "800",
+                                      borderRadius: "4px"
+                                    }}>
+                                      {player.note}
+                                    </span>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "2px" }}>
+                                  {player.topic}
+                                </div>
+                              </td>
+
+                              {/* Result / Status */}
+                              <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                                {player.final === "ถูก" ? (
+                                  <span style={{
+                                    display: "inline-block",
+                                    padding: "3px 8px",
+                                    borderRadius: "6px",
+                                    background: "rgba(255, 215, 0, 0.18)",
+                                    border: "1px solid #ffd700",
+                                    color: "#ffd700",
+                                    fontSize: "11px",
+                                    fontWeight: "800"
+                                  }}>
+                                    🏆 แชมป์ประจำสัปดาห์
+                                  </span>
+                                ) : player.final === "ผิด" ? (
+                                  <span style={{
+                                    display: "inline-block",
+                                    padding: "3px 8px",
+                                    borderRadius: "6px",
+                                    background: "rgba(255, 77, 79, 0.2)",
+                                    border: "1px solid #ff4d4f",
+                                    color: "#ff7875",
+                                    fontSize: "11px",
+                                    fontWeight: "800"
+                                  }}>
+                                    ❌ ตกรอบประจำสัปดาห์
+                                  </span>
+                                ) : (
+                                  <span style={{
+                                    display: "inline-block",
+                                    padding: "3px 8px",
+                                    borderRadius: "6px",
+                                    background: "rgba(255,255,255,0.06)",
+                                    border: "1px solid rgba(255,255,255,0.2)",
+                                    color: "rgba(255,255,255,0.6)",
+                                    fontSize: "11px"
+                                  }}>
+                                    ตกรอบก่อน Stage 3
+                                  </span>
+                                )}
+                              </td>
+
+                              {/* Quick Image URL Input */}
+                              <td style={{ padding: "10px 12px" }}>
+                                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                                  <input
+                                    type="text"
+                                    placeholder="วางลิงก์ Google Photos (https://lh3.googleusercontent.com/...)"
+                                    value={currentInputUrl}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setQuickPhotoInputs((prev) => ({ ...prev, [origIdx]: val }));
+                                    }}
+                                    style={{
+                                      flex: 1,
+                                      padding: "7px 10px",
+                                      borderRadius: "6px",
+                                      background: "rgba(0,0,0,0.5)",
+                                      border: currentInputUrl ? "1px solid #52c41a" : "1px solid rgba(255,255,255,0.2)",
+                                      color: "#fff",
+                                      fontSize: "12px"
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    disabled={isSavingPhoto}
+                                    onClick={() => handleQuickSaveAuditionPhoto(origIdx, player, currentInputUrl)}
+                                    style={{
+                                      padding: "7px 12px",
+                                      borderRadius: "6px",
+                                      background: "linear-gradient(135deg, #52c41a 0%, #237804 100%)",
+                                      color: "#fff",
+                                      fontWeight: "800",
+                                      fontSize: "12px",
+                                      border: "none",
+                                      cursor: isSavingPhoto ? "not-allowed" : "pointer",
+                                      whiteSpace: "nowrap",
+                                      boxShadow: "0 0 10px rgba(82, 196, 26, 0.3)"
+                                    }}
+                                  >
+                                    {isSavingPhoto ? "⏳" : "💾 บันทึกรูป"}
+                                  </button>
+                                </div>
+                              </td>
+
+                              {/* Actions */}
+                              <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleSelectAuditionForEdit(origIdx, player)}
+                                  style={{
+                                    padding: "5px 10px",
+                                    borderRadius: "6px",
+                                    fontSize: "12px",
+                                    fontWeight: "700",
+                                    background: isBeingEdited ? "rgba(82, 196, 26, 0.3)" : "rgba(82, 196, 26, 0.12)",
+                                    color: "#86efac",
+                                    border: "1px solid rgba(82, 196, 26, 0.4)",
+                                    cursor: "pointer",
+                                    transition: "all 0.15s ease"
+                                  }}
+                                >
+                                  {isBeingEdited ? "กำลังแก้ไข" : "✏️ แก้ไข"}
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
 
             {/* CARD 3: ข้อมูลสุดยอดแฟนพันธุ์แท้แห่งปี (ทำเนียบแชมป์) */}
             <div style={{

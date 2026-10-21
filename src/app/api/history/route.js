@@ -148,7 +148,34 @@ export async function POST(request) {
       }
     }
 
-    // 4. Save entire history object
+    // 4. Update an audition contestant or photo (specifically for weekly audition / eliminated contestants)
+    if (body.action === "update_audition_contestant" || body.action === "update_audition_photo") {
+      const { year, contestantIndex, contestant, image } = body;
+      const yrStr = String(year);
+      if (currentData.seasons && currentData.seasons[yrStr] && currentData.seasons[yrStr].audition) {
+        const audList = currentData.seasons[yrStr].audition;
+        const targetIdx = Number(contestantIndex);
+        if (!isNaN(targetIdx) && targetIdx >= 0 && targetIdx < audList.length) {
+          if (body.action === "update_audition_photo") {
+            audList[targetIdx].image = (image || "").trim();
+          } else if (contestant) {
+            audList[targetIdx] = {
+              ...audList[targetIdx],
+              ...contestant,
+              image: contestant.image !== undefined ? (contestant.image || "").trim() : audList[targetIdx].image,
+            };
+          }
+          await saveKVData("fpt_history", currentData, writeLocalHistory);
+          return NextResponse.json({
+            success: true,
+            data: currentData,
+            message: `บันทึกรูปภาพ/ข้อมูลรอบประจำสัปดาห์ของ ${audList[targetIdx].name} เรียบร้อยแล้ว`,
+          });
+        }
+      }
+    }
+
+    // 5. Save entire history object
     if (body.action === "save_full" && body.data) {
       currentData = body.data;
       await saveKVData("fpt_history", currentData, writeLocalHistory);
