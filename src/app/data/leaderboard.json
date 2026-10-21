@@ -133,9 +133,11 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-11T15:58:15.140Z",
-    "updatedAt": "2026-10-19T01:48:56.618Z",
+    "updatedAt": "2026-10-21T12:23:18.094Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm",
-    "isPlaying": false
+    "isPlaying": false,
+    "waitingNextMatch": false,
+    "order": null
   },
   {
     "id": "1789145226598",
@@ -186,9 +188,11 @@
     },
     "totalScore": 0,
     "createdAt": "2026-09-12T17:42:50.214Z",
-    "updatedAt": "2026-10-19T01:48:56.618Z",
+    "updatedAt": "2026-10-21T12:24:33.551Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm",
-    "isPlaying": false
+    "isPlaying": false,
+    "waitingNextMatch": true,
+    "order": 9
   },
   {
     "id": "1789401836614",
@@ -354,15 +358,16 @@
     "scores": {
       "3sec": 19,
       "qa": 20,
-      "jigsaw": null,
-      "attribute": null
+      "jigsaw": 15,
+      "attribute": 10
     },
-    "totalScore": 39,
+    "totalScore": 64,
     "createdAt": "2026-09-22T17:31:01.627Z",
-    "updatedAt": "2026-10-20T18:27:45.733Z",
+    "updatedAt": "2026-10-21T12:24:10.703Z",
     "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm",
     "isPlaying": true,
-    "order": 8
+    "order": 8,
+    "waitingNextMatch": false
   },
   {
     "id": "1791609566809",
