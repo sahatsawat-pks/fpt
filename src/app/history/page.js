@@ -301,8 +301,10 @@ export default function HistoryPage() {
         setActiveTab(currentSeason.audition ? "audition" : "qualifying");
       } else if (activeTab === "consolation" && (!currentSeason.consolation || currentSeason.consolation.length === 0)) {
         setActiveTab(currentSeason.audition ? "audition" : "qualifying");
+      } else if (activeTab === "qualifying" && (!currentSeason.qualifying || currentSeason.qualifying.length === 0)) {
+        setActiveTab(currentSeason.audition ? "audition" : currentSeason.consolation ? "consolation" : "finals");
       } else if (activeTab === "playoffs" && !currentSeason.playoffs) {
-        setActiveTab("qualifying");
+        setActiveTab(currentSeason.qualifying?.length > 0 ? "qualifying" : "audition");
       }
     }
   }, [currentSeason, activeTab]);
@@ -733,158 +735,161 @@ export default function HistoryPage() {
             </span>
           </div>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "20px"
-          }}>
-            {(data?.champions || []).filter((c) => enabledYears[String(c.year)] !== false).map((champ) => {
-              const isSelectedYear = String(champ.year) === String(activeYear);
-              const isMystery = Number(champ.year) === 2026 && (!champ.image || champ.nickname === "ยังไม่ทราบ" || (champ.name && champ.name.includes("รอลุ้น")));
-              return (
-                <div
-                  key={champ.year}
-                  onClick={() => {
-                    setActiveYear(String(champ.year));
-                    const el = document.getElementById("season-standings");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  style={{
-                    background: isSelectedYear
-                      ? "linear-gradient(150deg, rgba(255, 215, 0, 0.22) 0%, rgba(18, 30, 56, 0.96) 100%)"
-                      : "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
-                    border: isSelectedYear ? "2.5px solid #ffd700" : isMystery ? "1.5px dashed rgba(255, 215, 0, 0.6)" : "1px solid rgba(255, 215, 0, 0.35)",
-                    borderRadius: "18px",
-                    padding: "24px 20px",
-                    textAlign: "center",
-                    cursor: "pointer",
-                    position: "relative",
-                    transition: "all 0.25s ease",
-                    boxShadow: isSelectedYear
-                      ? "0 10px 35px rgba(255, 215, 0, 0.35)"
-                      : isMystery
-                      ? "0 6px 25px rgba(255, 215, 0, 0.2)"
-                      : "0 6px 20px rgba(0,0,0,0.4)"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-4px)";
-                    e.currentTarget.style.boxShadow = "0 12px 35px rgba(255, 215, 0, 0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = isSelectedYear
-                      ? "0 10px 35px rgba(255, 215, 0, 0.35)"
-                      : "0 6px 20px rgba(0,0,0,0.4)";
-                  }}
-                >
-                  {/* Year Tag */}
-                  <div style={{
-                    position: "absolute",
-                    top: "14px",
-                    right: "14px",
-                    padding: "4px 12px",
-                    borderRadius: "12px",
-                    fontSize: "12px",
-                    fontWeight: "900",
-                    background: isMystery ? "linear-gradient(90deg, #ffd700 0%, #eab308 100%)" : "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
-                    color: "#030814",
-                    boxShadow: "0 2px 8px rgba(255, 215, 0, 0.4)"
-                  }}>
-                    {champ.year}
-                  </div>
-
-                  {/* Champion Avatar */}
-                  <div style={{
-                    width: "88px",
-                    height: "88px",
-                    borderRadius: "50%",
-                    margin: "10px auto 14px",
-                    overflow: "hidden",
-                    border: isMystery ? "3px dashed #ffd700" : "3px solid #ffd700",
-                    boxShadow: isMystery ? "0 0 25px rgba(255, 215, 0, 0.6)" : "0 0 20px rgba(255, 215, 0, 0.6)",
-                    background: isMystery ? "radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, #081020 100%)" : "#081020",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
-                    {isMystery ? (
-                      <span style={{ fontSize: "40px", filter: "drop-shadow(0 0 8px #ffd700)" }}>❓</span>
-                    ) : (
-                      <ContestantAvatar
-                        src={champ.image || `/img/champions/${champ.year}.png`}
-                        fallbackText="👑"
-                        size={88}
-                      />
-                    )}
-                  </div>
-
-                  {/* Badge */}
-                  <div style={{ marginBottom: "8px" }}>
-                    <span style={{
-                      fontSize: "11px",
+          <div style={{ overflowX: "auto", paddingBottom: "12px" }}>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(5, minmax(200px, 1fr))",
+              gap: "16px",
+              minWidth: "1050px"
+            }}>
+              {(data?.champions || []).filter((c) => enabledYears[String(c.year)] !== false).map((champ) => {
+                const isSelectedYear = String(champ.year) === String(activeYear);
+                const isMystery = Number(champ.year) === 2026 && (!champ.image || champ.nickname === "ยังไม่ทราบ" || (champ.name && champ.name.includes("รอลุ้น")));
+                return (
+                  <div
+                    key={champ.year}
+                    onClick={() => {
+                      setActiveYear(String(champ.year));
+                      const el = document.getElementById("season-standings");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    style={{
+                      background: isSelectedYear
+                        ? "linear-gradient(150deg, rgba(255, 215, 0, 0.22) 0%, rgba(18, 30, 56, 0.96) 100%)"
+                        : "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
+                      border: isSelectedYear ? "2.5px solid #ffd700" : isMystery ? "1.5px dashed rgba(255, 215, 0, 0.6)" : "1px solid rgba(255, 215, 0, 0.35)",
+                      borderRadius: "18px",
+                      padding: "20px 14px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      position: "relative",
+                      transition: "all 0.25s ease",
+                      boxShadow: isSelectedYear
+                        ? "0 10px 35px rgba(255, 215, 0, 0.35)"
+                        : isMystery
+                        ? "0 6px 25px rgba(255, 215, 0, 0.2)"
+                        : "0 6px 20px rgba(0,0,0,0.4)"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow = "0 12px 35px rgba(255, 215, 0, 0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = isSelectedYear
+                        ? "0 10px 35px rgba(255, 215, 0, 0.35)"
+                        : "0 6px 20px rgba(0,0,0,0.4)";
+                    }}
+                  >
+                    {/* Year Tag */}
+                    <div style={{
+                      position: "absolute",
+                      top: "12px",
+                      right: "12px",
                       padding: "3px 10px",
                       borderRadius: "10px",
-                      background: "rgba(255, 215, 0, 0.15)",
-                      border: "1px solid rgba(255, 215, 0, 0.4)",
-                      color: "#ffd700",
-                      fontWeight: "700"
+                      fontSize: "11px",
+                      fontWeight: "900",
+                      background: isMystery ? "linear-gradient(90deg, #ffd700 0%, #eab308 100%)" : "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                      color: "#030814",
+                      boxShadow: "0 2px 8px rgba(255, 215, 0, 0.4)"
                     }}>
-                      {champ.badge}
-                    </span>
+                      {champ.year}
+                    </div>
+
+                    {/* Champion Avatar */}
+                    <div style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "50%",
+                      margin: "8px auto 12px",
+                      overflow: "hidden",
+                      border: isMystery ? "3px dashed #ffd700" : "3px solid #ffd700",
+                      boxShadow: isMystery ? "0 0 25px rgba(255, 215, 0, 0.6)" : "0 0 20px rgba(255, 215, 0, 0.6)",
+                      background: isMystery ? "radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, #081020 100%)" : "#081020",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}>
+                      {isMystery ? (
+                        <span style={{ fontSize: "36px", filter: "drop-shadow(0 0 8px #ffd700)" }}>❓</span>
+                      ) : (
+                        <ContestantAvatar
+                          src={champ.image || `/img/champions/${champ.year}.png`}
+                          fallbackText="👑"
+                          size={80}
+                        />
+                      )}
+                    </div>
+
+                    {/* Badge */}
+                    <div style={{ marginBottom: "6px" }}>
+                      <span style={{
+                        fontSize: "10.5px",
+                        padding: "2px 8px",
+                        borderRadius: "8px",
+                        background: "rgba(255, 215, 0, 0.15)",
+                        border: "1px solid rgba(255, 215, 0, 0.4)",
+                        color: "#ffd700",
+                        fontWeight: "700"
+                      }}>
+                        {champ.badge}
+                      </span>
+                    </div>
+
+                    {/* Champion Name */}
+                    <h3 style={{
+                      fontSize: "16px",
+                      fontWeight: "900",
+                      color: "#ffffff",
+                      margin: "0 0 4px"
+                    }}>
+                      {champ.nickname ? `${champ.nickname} (${champ.name})` : champ.name}
+                    </h3>
+
+                    {/* Topic */}
+                    <div style={{
+                      fontSize: "13px",
+                      color: "#00e5ff",
+                      fontWeight: "700",
+                      marginBottom: "10px",
+                      minHeight: "20px"
+                    }}>
+                      แฟนพันธุ์แท้: {champ.topic}
+                    </div>
+
+                    {/* Description */}
+                    <p style={{
+                      fontSize: "11.5px",
+                      color: "rgba(255, 255, 255, 0.85)",
+                      margin: 0,
+                      lineHeight: "1.5",
+                      textAlign: "center",
+                      fontStyle: "italic",
+                      background: "rgba(0, 0, 0, 0.28)",
+                      padding: "10px 10px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(255, 215, 0, 0.15)"
+                    }}>
+                      &ldquo;{champ.description}&rdquo;
+                    </p>
+
+                    <div style={{
+                      marginTop: "12px",
+                      fontSize: "11.5px",
+                      color: "#ffd700",
+                      fontWeight: "800",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "4px"
+                    }}>
+                      <span>คลิกเพื่อดูสถิติซีซั่นนี้ →</span>
+                    </div>
                   </div>
-
-                  {/* Champion Name */}
-                  <h3 style={{
-                    fontSize: "18px",
-                    fontWeight: "900",
-                    color: "#ffffff",
-                    margin: "0 0 4px"
-                  }}>
-                    {champ.nickname ? `${champ.nickname} (${champ.name})` : champ.name}
-                  </h3>
-
-                  {/* Topic */}
-                  <div style={{
-                    fontSize: "14px",
-                    color: "#00e5ff",
-                    fontWeight: "700",
-                    marginBottom: "12px",
-                    minHeight: "22px"
-                  }}>
-                    แฟนพันธุ์แท้: {champ.topic}
-                  </div>
-
-                  {/* Description */}
-                  <p style={{
-                    fontSize: "12.5px",
-                    color: "rgba(255, 255, 255, 0.85)",
-                    margin: 0,
-                    lineHeight: "1.6",
-                    textAlign: "center",
-                    fontStyle: "italic",
-                    background: "rgba(0, 0, 0, 0.28)",
-                    padding: "12px 14px",
-                    borderRadius: "10px",
-                    border: "1px solid rgba(255, 215, 0, 0.15)"
-                  }}>
-                    &ldquo;{champ.description}&rdquo;
-                  </p>
-
-                  <div style={{
-                    marginTop: "14px",
-                    fontSize: "12px",
-                    color: "#ffd700",
-                    fontWeight: "800",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "4px"
-                  }}>
-                    <span>คลิกเพื่อดูสถิติซีซั่นนี้ →</span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </section>
 
@@ -909,11 +914,19 @@ export default function HistoryPage() {
             borderBottom: "1px solid rgba(0, 229, 255, 0.2)",
             paddingBottom: "18px"
           }}>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "1px" }}>
                 เลือกซีซั่นที่ต้องการดู (Select Season)
               </span>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px", flexWrap: "wrap" }}>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginTop: "6px",
+                flexWrap: "nowrap",
+                overflowX: "auto",
+                paddingBottom: "4px"
+              }}>
                 {availableYears.length === 0 ? (
                   <span style={{ fontSize: "13px", color: "rgba(255, 77, 79, 0.8)", fontStyle: "italic" }}>
                     (ทุกปีถูกปิดการแสดงผลไว้ชั่วคราวโดยแอดมิน)
@@ -928,7 +941,8 @@ export default function HistoryPage() {
                           setActiveYear(yr);
                         }}
                         style={{
-                          padding: "8px 20px",
+                          flexShrink: 0,
+                          padding: "8px 18px",
                           borderRadius: "10px",
                           fontStyle: "italic",
                           fontWeight: "900",
@@ -1049,22 +1063,24 @@ export default function HistoryPage() {
               </button>
             )}
 
-            <button
-              onClick={() => setActiveTab("qualifying")}
-              style={{
-                padding: "8px 18px",
-                borderRadius: "8px",
-                fontWeight: "800",
-                fontSize: "14px",
-                cursor: "pointer",
-                border: activeTab === "qualifying" ? "2px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
-                background: activeTab === "qualifying" ? "rgba(0, 229, 255, 0.25)" : "rgba(0, 15, 30, 0.6)",
-                color: activeTab === "qualifying" ? "#00e5ff" : "rgba(255,255,255,0.7)",
-                boxShadow: activeTab === "qualifying" ? "0 0 12px rgba(0, 229, 255, 0.3)" : "none"
-              }}
-            >
-              📋 รอบคัดเลือกแห่งปี (Qualifying) • {currentSeason?.qualifying?.length || 0} คน
-            </button>
+            {currentSeason?.qualifying && currentSeason.qualifying.length > 0 && (
+              <button
+                onClick={() => setActiveTab("qualifying")}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: "8px",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  border: activeTab === "qualifying" ? "2px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                  background: activeTab === "qualifying" ? "rgba(0, 229, 255, 0.25)" : "rgba(0, 15, 30, 0.6)",
+                  color: activeTab === "qualifying" ? "#00e5ff" : "rgba(255,255,255,0.7)",
+                  boxShadow: activeTab === "qualifying" ? "0 0 12px rgba(0, 229, 255, 0.3)" : "none"
+                }}
+              >
+                📋 รอบคัดเลือกแห่งปี (Qualifying) • {currentSeason.qualifying.length} คน
+              </button>
+            )}
 
             {currentSeason?.playoffs && (
               <button
@@ -2182,7 +2198,7 @@ export default function HistoryPage() {
 {/* ========================================================
               TAB CONTENT 1: QUALIFYING ROUND
              ======================================================== */}
-          {activeTab === "qualifying" && (
+          {activeTab === "qualifying" && currentSeason?.qualifying && currentSeason.qualifying.length > 0 && (
             <div>
               {/* Search & Sort Controls Bar */}
               <div style={{

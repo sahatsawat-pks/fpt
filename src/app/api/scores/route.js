@@ -254,13 +254,16 @@ export async function POST(request) {
         }));
 
       historyData.seasons["2026"] = {
+        ...(historyData.seasons["2026"] || {}),
         info: {
           year: 2026,
           title: "แฟนพันธุ์แท้แห่งปี 2026",
           host: "เปเล่ ณัฐวัฒน์ วุฒิช่วย",
+          producers: ["ณัฐวัฒน์ วุฒิช่วย", "สหัสวรรษ นิจพันธ์", "ชัยนันท์ วรรณสมพร"],
           executiveProducer: "ศุภวิชญ์ งามสม",
-          firstAirDate: "2026",
-          episodes: "22 ตอน",
+          firstAirDate: "จันทร์ 2 มีนาคม 2026",
+          lastAirDate: "รอการแข่งขัน",
+          episodes: "15 ตอน (และรอบแห่งปี)",
           championName: "รอลุ้นแชมป์ประจำปี 2026 (ปริศนา)",
           championTopic: "รอลุ้นผลในรอบชิงชนะเลิศ",
         },
