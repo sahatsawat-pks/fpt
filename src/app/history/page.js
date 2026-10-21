@@ -2068,28 +2068,7 @@ export default function HistoryPage() {
                     );
                   })}
 
-                  {/* Season / Qualifying Notes */}
-                  {currentSeason?.notes && currentSeason.notes.length > 0 && (
-                    <div style={{
-                      marginTop: "18px",
-                      padding: "12px 18px",
-                      borderRadius: "10px",
-                      background: "rgba(239, 68, 68, 0.12)",
-                      border: "1px solid rgba(239, 68, 68, 0.35)",
-                      color: "#fca5a5",
-                      fontSize: "13px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px"
-                    }}>
-                      <span style={{ fontSize: "16px" }}>ℹ️</span>
-                      <div>
-                        {currentSeason.notes.map((note, idx) => (
-                          <div key={idx}><strong>หมายเหตุ:</strong> {note}</div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               </div>
             </div>
@@ -3025,6 +3004,7 @@ export default function HistoryPage() {
                     );
                   })}
 
+
                   {/* Season / Qualifying Notes */}
                   {currentSeason?.notes && currentSeason.notes.length > 0 && (
                     <div style={{
@@ -3204,28 +3184,7 @@ export default function HistoryPage() {
                     );
                   })}
 
-                  {/* Season / Qualifying Notes */}
-                  {currentSeason?.notes && currentSeason.notes.length > 0 && (
-                    <div style={{
-                      marginTop: "18px",
-                      padding: "12px 18px",
-                      borderRadius: "10px",
-                      background: "rgba(239, 68, 68, 0.12)",
-                      border: "1px solid rgba(239, 68, 68, 0.35)",
-                      color: "#fca5a5",
-                      fontSize: "13px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px"
-                    }}>
-                      <span style={{ fontSize: "16px" }}>ℹ️</span>
-                      <div>
-                        {currentSeason.notes.map((note, idx) => (
-                          <div key={idx}><strong>หมายเหตุ:</strong> {note}</div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               </div>
             </div>
