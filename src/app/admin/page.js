@@ -3973,6 +3973,9 @@ export default function AdminPage() {
                   onClick={() => {
                     setHistorySubTab("audition");
                     setEditingContestantIdx(null);
+                    if (selectedAdminYear === "2021") {
+                      setSelectedAdminYear("2024");
+                    }
                   }}
                   style={{
                     padding: "9px 20px",
@@ -4554,6 +4557,45 @@ export default function AdminPage() {
           {historySubTab === "audition" && (() => {
             const season = adminHistoryData?.seasons?.[selectedAdminYear];
             const audList = season?.audition || [];
+
+            if (selectedAdminYear === "2021" || audList.length === 0) {
+              return (
+                <div style={{
+                  padding: "40px 20px",
+                  textAlign: "center",
+                  background: "rgba(3, 8, 20, 0.5)",
+                  borderRadius: "14px",
+                  border: "1px dashed rgba(82, 196, 26, 0.4)",
+                  margin: "10px 0"
+                }}>
+                  <div style={{ fontSize: "36px", marginBottom: "10px" }}>ℹ️</div>
+                  <h4 style={{ fontSize: "16px", color: "#86efac", margin: "0 0 6px 0" }}>
+                    ปี {selectedAdminYear} ไม่มีการแข่งขันรอบประจำสัปดาห์ (Audition)
+                  </h4>
+                  <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: "0 0 16px 0" }}>
+                    {selectedAdminYear === "2021"
+                      ? "การแข่งขันปี 2021 เริ่มต้นที่รอบคัดเลือกแห่งปี (16 คน) ทันที ท่านสามารถแก้ไขรูปภาพและข้อมูลได้ที่แท็บ 'รอบคัดเลือกแห่งปี (Qualifying)'"
+                      : `ไม่พบข้อมูลรอบประจำสัปดาห์สำหรับปี ${selectedAdminYear}`}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setHistorySubTab("qualifying")}
+                    style={{
+                      padding: "8px 20px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, #00e5ff 0%, #0088cc 100%)",
+                      color: "#030814",
+                      fontWeight: "800",
+                      fontSize: "13px",
+                      border: "none",
+                      cursor: "pointer"
+                    }}
+                  >
+                    👉 ไปที่แท็บรอบคัดเลือกแห่งปี (Qualifying)
+                  </button>
+                </div>
+              );
+            }
 
             const isContestantEliminated = (c) => {
               if (c.final === "ผิด" || c.final === "-") return true;
