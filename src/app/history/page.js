@@ -5,16 +5,30 @@ import Link from "next/link";
 import historyData from "../data/history.json";
 import leaderboardData from "../data/leaderboard.json";
 
-// Contestant Google Photos lookup map from leaderboard data
+// Contestant Google Photos lookup map from leaderboard and history data
 const CONTESTANT_GOOGLE_PHOTOS = new Map();
+
+function registerPhoto(name, nickname, img) {
+  if (!img || (!img.startsWith("http://") && !img.startsWith("https://"))) return;
+  const clean = img.trim();
+  if (name) CONTESTANT_GOOGLE_PHOTOS.set(name.trim(), clean);
+  if (nickname) CONTESTANT_GOOGLE_PHOTOS.set(nickname.trim(), clean);
+}
+
 if (Array.isArray(leaderboardData)) {
-  leaderboardData.forEach((c) => {
-    if (c?.image && (c.image.startsWith("http://") || c.image.startsWith("https://"))) {
-      const cleanImg = c.image.trim();
-      if (c.name) CONTESTANT_GOOGLE_PHOTOS.set(c.name.trim(), cleanImg);
-      if (c.nickname) CONTESTANT_GOOGLE_PHOTOS.set(c.nickname.trim(), cleanImg);
+  leaderboardData.forEach((c) => registerPhoto(c?.name, c?.nickname, c?.image));
+}
+
+if (historyData?.seasons) {
+  for (const yr of Object.keys(historyData.seasons)) {
+    const s = historyData.seasons[yr];
+    if (!s) continue;
+    for (const key of Object.keys(s)) {
+      if (Array.isArray(s[key])) {
+        s[key].forEach((c) => registerPhoto(c?.name || c?.player, c?.nickname, c?.image));
+      }
     }
-  });
+  }
 }
 
 function ContestantAvatar({ src, fallbackText = "👤", size = 32 }) {
@@ -1440,6 +1454,20 @@ export default function HistoryPage() {
                                           borderRadius: "4px"
                                         }}>
                                           โควตา
+                                        </span>
+                                      )}
+                                      {c.note && (
+                                        <span style={{
+                                          marginLeft: "8px",
+                                          padding: "1px 7px",
+                                          background: "rgba(239, 68, 68, 0.25)",
+                                          border: "1px solid #ef4444",
+                                          color: "#fca5a5",
+                                          fontSize: "10px",
+                                          fontWeight: "800",
+                                          borderRadius: "4px"
+                                        }}>
+                                          {c.note}
                                         </span>
                                       )}
                                     </div>
@@ -3545,6 +3573,20 @@ export default function HistoryPage() {
                   {selectedSpotlight.nickname ? `(${selectedSpotlight.nickname}) ` : ""}{selectedSpotlight.name}
                   {selectedSpotlight.quota && (
                     <span style={{ fontSize: "12px", color: "#ffd700", marginLeft: "6px" }}>[โควตา]</span>
+                  )}
+                  {selectedSpotlight.note && (
+                    <span style={{
+                      fontSize: "11px",
+                      color: "#fca5a5",
+                      background: "rgba(239, 68, 68, 0.25)",
+                      border: "1px solid #ef4444",
+                      padding: "2px 8px",
+                      borderRadius: "6px",
+                      marginLeft: "8px",
+                      verticalAlign: "middle"
+                    }}>
+                      {selectedSpotlight.note}
+                    </span>
                   )}
                 </h2>
                 <p style={{ fontSize: "14px", color: "#80d0ff", margin: 0 }}>

@@ -15,7 +15,7 @@
       "topic": "BNK48",
       "badge": "🏆 ปฐมบทแชมป์คนแรก",
       "description": "จารึกประวัติศาสตร์หน้าแรกของฉบับ Fanmade คว้าชัยในรอบชิงชนะเลิศด้วย 'หมวดจิ๊กซอว์' ไปถึง 15 คะแนน ก้าวขึ้นเป็นสุดยอดแฟนพันธุ์แท้แห่งปีคนแรกอย่างสง่างาม",
-      "image": "/img/champions/2021.png"
+      "image": "https://lh3.googleusercontent.com/pw/AP1GczOR2DMpW0rcNP6Mj2f8Rdr4TofVvYeoT_jeXTGAyKwkcSA4197jW5D8sHGvdHHCh1ofN5mX0UopinOeDCHD7uoxg6QnsDqRElTTe1HaAlYIGIPGr2jtuCWF9PcpcqcZleqeeST-JxomVoKA89DFSAyt=w1002-h656-s-no-gm?authuser=0"
     },
     {
       "year": 2022,
@@ -25,7 +25,7 @@
       "topic": "Ragnarok Online",
       "badge": "🏆 ตำนานคะแนนเต็มรอบชิง",
       "description": "ระเบิดฟอร์มไร้เทียมทาน กวาด 25 คะแนนเต็มในรอบชิงชนะเลิศจาก 'หมวดคำถาม-คำตอบ' คว้าตำแหน่งสุดยอดแฟนพันธุ์แท้แห่งปี 2022 ไปครองอย่างยิ่งใหญ่",
-      "image": "/img/champions/2022.png"
+      "image": "https://lh3.googleusercontent.com/pw/AP1GczMk1MX-0R8fghXhPnQlVYKkD9rAaHgWUgN-j8nUdxpQTxEMnxKxOoEkbij-m3T5cGrLYK7QfsxQUCfXwrzt2-gng9-NArN13L65TgiYn7yaWYfM4lAUNHiCqtQY-dRMtQgVjHuvQxoEmco2sjnaheKM=w828-h828-s-no-gm?authuser=0"
     },
     {
       "year": 2023,
@@ -35,7 +35,7 @@
       "topic": "วง Queen",
       "badge": "🏆 เจ้าแห่งร็อกคลาสสิก",
       "description": "โชว์ความแม่นยำระดับเทพในรอบชิงชนะเลิศ เฉือนคว้าชัยจาก 'หมวดคำถาม-คำตอบ' ไปด้วย 20 คะแนน สถาปนาตนเองขึ้นเป็นสุดยอดแฟนพันธุ์แท้แห่งปี 2023",
-      "image": "/img/champions/2023.png"
+      "image": "https://lh3.googleusercontent.com/pw/AP1GczPmBKdFX9V0PJdW-jVqojBB4pnvBPV-pvBvqPBrIyEMXRTaEoB-YF2vDp2GxRRVmZXi-h0qY7N0wSjjusDjBVLy6fdPg2JLlmlX1crKNU96Ib9-u57YGwQcZgnz3gH6LbV4g5u3kyMZGYnIGZbHbeTb=w720-h720-s-no-gm?authuser=0"
     },
     {
       "year": 2024,
@@ -92,7 +92,7 @@
             "attribute": 20
           },
           "totalScore": 50,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP5jVOm1wys-QnFN602PAP2_XegIrPbHTRcvvVtH97igA3Bq6tBc1-V1nxP9PFFsN8BZykwoglQedde8t73EywzqynNIwJGkPNfAWKTqN2eTzYBvPrZMTj7_2N-J6eniPmf4qqUYSp7JZ6KRZC0XpAv=w1012-h660-s-no-gm?authuser=0"
         },
         {
           "date": "8 ตุลาคม 2021",
@@ -109,7 +109,7 @@
             "attribute": 0
           },
           "totalScore": 35,
-          "image": "/img/history/2021/นัท.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOI-ni3Fqq1_Z5Leec5JsRWDMfHfGFW5FVPf69AZtoCElvUe6ljP3YEpkojuNbIH6HWniZmTanzPYygQmvsRTIt2XStP3TqmT0LV69bPSA5F7khuQw0uOxZ4czq9VyL-VOjTESBIqT9Re0pGrcH8tna=w1002-h660-s-no-gm?authuser=0"
         },
         {
           "date": "8 ตุลาคม 2021\n16 ตุลาคม 2021",
@@ -126,7 +126,7 @@
             "attribute": 0
           },
           "totalScore": 22,
-          "image": "/img/history/2021/โอ๊ค.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNTIKKGDpNVX0V6b1I-TP4sNa9Shxox1XWubUGgiUCS5H6Fm9iw_SSNZgyL-LPSTHDbG1R2RXQeMRHOkP8tdUOrgE7c_VS9FPEum0LZiqFb9iaMqm5ezpvMfAXRW7SMbsQEV2u0iH9lR62fUcmFPpci=w1002-h660-s-no-gm?authuser=0"
         },
         {
           "date": "16 ตุลาคม 2021",
@@ -143,7 +143,7 @@
             "attribute": 15
           },
           "totalScore": 67,
-          "image": "/img/history/2021/เก่ง.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNOBCmQg5p19zXlSYYyqaH8b5yPRUNhTCSWmnxjO7l2HdA6blFGXf0-8UhbzXbO1VGNA-ZzeBYzk2JotPGQJk_slKNYW0wwIRUI6xXOu4DKek9ziXCqttJHTKGPwGJKRbwyhKWqzUmSsC9ZoZIMema7=w945-h611-s-no-gm?authuser=0"
         },
         {
           "date": "16 ตุลาคม 2021\n22 ตุลาคม 2021",
@@ -160,7 +160,7 @@
             "attribute": 15
           },
           "totalScore": 62,
-          "image": "/img/history/2021/ไอซ์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNgWlNOrAKaYXL6TA9GyuLuG9upjDh5vj7xWm2DNWlNsZLOASIkFSvQeb6YIVRO8GmBd09mImJeudtbFRW_oWTb54tjpGrErpk0J52TEdRd_dzcAlqZ4DP9W-NAMG9lbFAThBlpf5mhmBEBUN9ZQBuN=w1002-h650-s-no-gm?authuser=0"
         },
         {
           "date": "22 ตุลาคม 2021",
@@ -177,7 +177,7 @@
             "attribute": 10
           },
           "totalScore": 27,
-          "image": "/img/history/2021/โฟร์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPVnIi7tWULqRwuNdeEnzLWEyAnZmcRxwS_pI3zMdnOvPGaVAFhK0vxGdyPrXJJN4vnawhZuh6cokxOrSYb6-lGEBM2rjmCNdFRLLKHwjrJPzESeaZaA7m4RDf4bP62VRsgiEUR6vp4jbOljeWYWpXa=w1002-h650-s-no-gm?authuser=0"
         },
         {
           "date": "29 ตุลาคม 2021",
@@ -194,7 +194,7 @@
             "attribute": 15
           },
           "totalScore": 75,
-          "image": "/img/history/2021/กร.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMGovlRvJHW1RiQPmHKlyr3nawQsKYYFQT2kWEs2FTM42Zu6xncBx6PCvKd3vT-_cwpPvY8qh0qZjF8I1B-yzjQ6tTcETRRoD0xy7o_Oha_tbR5zdqdNsgrE0mWdyDG5W-LQVf5RO5uOFHa4fLB1M2Z=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "date": "29 ตุลาคม 2021\n5 พฤศจิกายน 2021",
@@ -211,7 +211,7 @@
             "attribute": 0
           },
           "totalScore": 29,
-          "image": "/img/history/2021/เมฆ.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOM2jjYHmTvOyNQaeW8B5AVpu9EQs972MVjLjq1kGDblfoMcOMWrYr1yjtO7CdkptV-xIhTmTRJFf-HZCChz2SubsiuyK4Bm638NFCgZkh9iDp--_eI-_e3QtY3MX9oB6sM83c9qo4s1C-BUsgOAWcG=w1012-h668-s-no-gm?authuser=0"
         },
         {
           "date": "5 พฤศจิกายน 2021",
@@ -228,7 +228,7 @@
             "attribute": 0
           },
           "totalScore": 1,
-          "image": "/img/history/2021/ชีส.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP-uvvQbghQwtK6o2TE-jnoAcZfOvsvyMSNSAjCJ1XhVZtUgCXpy3zujgClDjBOpfAy3sjCcL8C9BlKmJB2ltS7fdagwTq_hWgH0wCll_BnzPhxDwxwBUmfW-SI1CyVHhhrbOU6vavZB-Lynhpszpol=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "date": "5 พฤศจิกายน 2021\n12 พฤศจิกายน 2021",
@@ -245,7 +245,7 @@
             "attribute": 0
           },
           "totalScore": 44,
-          "image": "/img/history/2021/ยูโร.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOR2DMpW0rcNP6Mj2f8Rdr4TofVvYeoT_jeXTGAyKwkcSA4197jW5D8sHGvdHHCh1ofN5mX0UopinOeDCHD7uoxg6QnsDqRElTTe1HaAlYIGIPGr2jtuCWF9PcpcqcZleqeeST-JxomVoKA89DFSAyt=w1002-h656-s-no-gm?authuser=0"
         },
         {
           "date": "12 พฤศจิกายน 2021",
@@ -262,7 +262,7 @@
             "attribute": 0
           },
           "totalScore": 26,
-          "image": "/img/history/2021/วา.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNY6CIYG-YM2sTKMBvnVeYIViQYu5y2qxnddm3QVdj3_ubFbNhq7seKZ8XTDRU2xs9tfDwbDbR7gjP7sZUpfe5AOYTZoxqhNE4a1l_zCRJg62qKG8YD42oZU6YNdUapMikNAlc49xbvPhCBbmNGnKz3=w946-h613-s-no-gm?authuser=0"
         },
         {
           "date": "19 พฤศจิกายน 2021",
@@ -279,7 +279,7 @@
             "attribute": 0
           },
           "totalScore": 26,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczM6lct4KhbpE0Ji8m-HW3gZF65SQmS_rtfM_aG82d5kUrlI3J2OETJlapvL7BXmm2cD0Gi4LOLFwynYFwKDEDRvlVAGeKHmdqvEx-Gcnzc1Lp38wD655iyac5dsBhroRfj8MfQUtRx6Alc8DHsEtiWZ=w1002-h662-s-no-gm?authuser=0"
         },
         {
           "date": "19 พฤศจิกายน 2021",
@@ -296,7 +296,7 @@
             "attribute": 0
           },
           "totalScore": 25,
-          "image": "/img/history/2021/ท็อป.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMI5CWZ6Tg8aNcXpYMbMwnkz-xHw3mAw_rBaoMK6ud_nT-LljbAfqC-BCJNmeUFs0q0zewOcAW-M51F9fIQ_Hyf88kOh8Fhs7CLkR7HI6PuFv16hqp1Z8lxtlJGKC5ajpRVhWgElRKXWeLqmyGv59U7=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "date": "27 พฤศจิกายน 2021",
@@ -313,7 +313,7 @@
             "attribute": 0
           },
           "totalScore": 28,
-          "image": "/img/history/2021/แมน.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMk3CTy1ZloFcxPlA8aqKr2l07aOYESaJgVqM5PO3KTryeE-nPHLcLtxm6gBNzkx4iCUDRPw7IVIbcOw1q_bzd39k9mRrO5rfZ7HDAhhBFvhbbc_fpT7eXsjghVTDp0K-3x_E6ig5iMT8SItCWtpPot=w1002-h648-s-no-gm?authuser=0"
         },
         {
           "date": "27 พฤศจิกายน 2021\n3 ธันวาคม 2021",
@@ -330,7 +330,7 @@
             "attribute": 0
           },
           "totalScore": 19,
-          "image": "/img/history/2021/ซิมส์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOPkl0H7ewTK-h_WEaf8dEI4bean0xLOXuZ7onjGSMt27DEx5ThhnUJXtF2gK0qTSW64XwafiTfnIs2kxj94vFM5X62-2i-ylS2I-xqHZfNizN9cc0xRie6OyQGCqDBrLzA8mzk_EI5AGpDoeXHkMJw=w1002-h660-s-no-gm?authuser=0"
         },
         {
           "date": "3 ธันวาคม 2021",
@@ -347,7 +347,7 @@
             "attribute": 0
           },
           "totalScore": 4,
-          "image": "/img/history/2021/เติ๊ด.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMB5eOZnWJ-rFYGvNDHS1Z1wedD3Dm1bMOvhfCVvUZtYCtBdDwrhyJwjCfQMY5LCHRnmq8Z9rbM537uN9QuCEJDNv3xADUm1nPqZFxy8I1BMj-pMw7KElsNw4aa0JQaFnSFAYI43ViilycLSXSLoawL=w1002-h652-s-no-gm?authuser=0"
         }
       ],
       "playoffs": {
@@ -364,7 +364,7 @@
             "topic": "Minecraft Java Edition",
             "actionGameScore": 0,
             "result": "ตกรอบ",
-            "image": "/img/history/2021/เมฆ.png"
+            "image": "https://lh3.googleusercontent.com/pw/AP1GczOM2jjYHmTvOyNQaeW8B5AVpu9EQs972MVjLjq1kGDblfoMcOMWrYr1yjtO7CdkptV-xIhTmTRJFf-HZCChz2SubsiuyK4Bm638NFCgZkh9iDp--_eI-_e3QtY3MX9oB6sM83c9qo4s1C-BUsgOAWcG=w1012-h668-s-no-gm?authuser=0"
           },
           {
             "date": "",
@@ -376,7 +376,7 @@
             "topic": "Microsoft Windows",
             "actionGameScore": 20,
             "result": "เข้ารอบ",
-            "image": "/img/history/2021/โฟร์.png"
+            "image": "https://lh3.googleusercontent.com/pw/AP1GczPVnIi7tWULqRwuNdeEnzLWEyAnZmcRxwS_pI3zMdnOvPGaVAFhK0vxGdyPrXJJN4vnawhZuh6cokxOrSYb6-lGEBM2rjmCNdFRLLKHwjrJPzESeaZaA7m4RDf4bP62VRsgiEUR6vp4jbOljeWYWpXa=w1002-h650-s-no-gm?authuser=0"
           },
           {
             "date": "",
@@ -388,7 +388,7 @@
             "topic": "เกมโชว์ไทย",
             "actionGameScore": 10,
             "result": "ตกรอบ",
-            "image": "/img/history/2021/แมน.png"
+            "image": "https://lh3.googleusercontent.com/pw/AP1GczMk3CTy1ZloFcxPlA8aqKr2l07aOYESaJgVqM5PO3KTryeE-nPHLcLtxm6gBNzkx4iCUDRPw7IVIbcOw1q_bzd39k9mRrO5rfZ7HDAhhBFvhbbc_fpT7eXsjghVTDp0K-3x_E6ig5iMT8SItCWtpPot=w1002-h648-s-no-gm?authuser=0"
           },
           {
             "date": "",
@@ -400,7 +400,7 @@
             "topic": "The Mask Singer Thailand",
             "actionGameScore": 10,
             "result": "ตกรอบ",
-            "image": "/img/history/2021/นัท.png"
+            "image": "https://lh3.googleusercontent.com/pw/AP1GczOI-ni3Fqq1_Z5Leec5JsRWDMfHfGFW5FVPf69AZtoCElvUe6ljP3YEpkojuNbIH6HWniZmTanzPYygQmvsRTIt2XStP3TqmT0LV69bPSA5F7khuQw0uOxZ4czq9VyL-VOjTESBIqT9Re0pGrcH8tna=w1002-h660-s-no-gm?authuser=0"
           }
         ]
       },
@@ -423,7 +423,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/ยูโร.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczOR2DMpW0rcNP6Mj2f8Rdr4TofVvYeoT_jeXTGAyKwkcSA4197jW5D8sHGvdHHCh1ofN5mX0UopinOeDCHD7uoxg6QnsDqRElTTe1HaAlYIGIPGr2jtuCWF9PcpcqcZleqeeST-JxomVoKA89DFSAyt=w1002-h656-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -440,7 +440,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/แบงค์.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczP5jVOm1wys-QnFN602PAP2_XegIrPbHTRcvvVtH97igA3Bq6tBc1-V1nxP9PFFsN8BZykwoglQedde8t73EywzqynNIwJGkPNfAWKTqN2eTzYBvPrZMTj7_2N-J6eniPmf4qqUYSp7JZ6KRZC0XpAv=w1012-h660-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -457,7 +457,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/เก่ง.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczNOBCmQg5p19zXlSYYyqaH8b5yPRUNhTCSWmnxjO7l2HdA6blFGXf0-8UhbzXbO1VGNA-ZzeBYzk2JotPGQJk_slKNYW0wwIRUI6xXOu4DKek9ziXCqttJHTKGPwGJKRbwyhKWqzUmSsC9ZoZIMema7=w945-h611-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -474,7 +474,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2021/ไอซ์.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczNgWlNOrAKaYXL6TA9GyuLuG9upjDh5vj7xWm2DNWlNsZLOASIkFSvQeb6YIVRO8GmBd09mImJeudtbFRW_oWTb54tjpGrErpk0J52TEdRd_dzcAlqZ4DP9W-NAMG9lbFAThBlpf5mhmBEBUN9ZQBuN=w1002-h650-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -491,7 +491,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/โฟร์.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczPVnIi7tWULqRwuNdeEnzLWEyAnZmcRxwS_pI3zMdnOvPGaVAFhK0vxGdyPrXJJN4vnawhZuh6cokxOrSYb6-lGEBM2rjmCNdFRLLKHwjrJPzESeaZaA7m4RDf4bP62VRsgiEUR6vp4jbOljeWYWpXa=w1002-h650-s-no-gm?authuser=0"
             },
             {
               "date": "17 ธันวาคม 2021\n24 ธันวาคม 2021",
@@ -508,7 +508,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/กร.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczMGovlRvJHW1RiQPmHKlyr3nawQsKYYFQT2kWEs2FTM42Zu6xncBx6PCvKd3vT-_cwpPvY8qh0qZjF8I1B-yzjQ6tTcETRRoD0xy7o_Oha_tbR5zdqdNsgrE0mWdyDG5W-LQVf5RO5uOFHa4fLB1M2Z=w1002-h652-s-no-gm?authuser=0"
             }
           ]
         },
@@ -530,7 +530,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/กร.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczMGovlRvJHW1RiQPmHKlyr3nawQsKYYFQT2kWEs2FTM42Zu6xncBx6PCvKd3vT-_cwpPvY8qh0qZjF8I1B-yzjQ6tTcETRRoD0xy7o_Oha_tbR5zdqdNsgrE0mWdyDG5W-LQVf5RO5uOFHa4fLB1M2Z=w1002-h652-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -547,7 +547,7 @@
                 "attribute": 20
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/ยูโร.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczOR2DMpW0rcNP6Mj2f8Rdr4TofVvYeoT_jeXTGAyKwkcSA4197jW5D8sHGvdHHCh1ofN5mX0UopinOeDCHD7uoxg6QnsDqRElTTe1HaAlYIGIPGr2jtuCWF9PcpcqcZleqeeST-JxomVoKA89DFSAyt=w1002-h656-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -564,7 +564,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2021/เก่ง.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczNOBCmQg5p19zXlSYYyqaH8b5yPRUNhTCSWmnxjO7l2HdA6blFGXf0-8UhbzXbO1VGNA-ZzeBYzk2JotPGQJk_slKNYW0wwIRUI6xXOu4DKek9ziXCqttJHTKGPwGJKRbwyhKWqzUmSsC9ZoZIMema7=w945-h611-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -581,7 +581,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2021/แบงค์.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczP5jVOm1wys-QnFN602PAP2_XegIrPbHTRcvvVtH97igA3Bq6tBc1-V1nxP9PFFsN8BZykwoglQedde8t73EywzqynNIwJGkPNfAWKTqN2eTzYBvPrZMTj7_2N-J6eniPmf4qqUYSp7JZ6KRZC0XpAv=w1012-h660-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -598,7 +598,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2021/โฟร์.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczPVnIi7tWULqRwuNdeEnzLWEyAnZmcRxwS_pI3zMdnOvPGaVAFhK0vxGdyPrXJJN4vnawhZuh6cokxOrSYb6-lGEBM2rjmCNdFRLLKHwjrJPzESeaZaA7m4RDf4bP62VRsgiEUR6vp4jbOljeWYWpXa=w1002-h650-s-no-gm?authuser=0"
             }
           ]
         },
@@ -620,7 +620,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2021/เก่ง.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczNOBCmQg5p19zXlSYYyqaH8b5yPRUNhTCSWmnxjO7l2HdA6blFGXf0-8UhbzXbO1VGNA-ZzeBYzk2JotPGQJk_slKNYW0wwIRUI6xXOu4DKek9ziXCqttJHTKGPwGJKRbwyhKWqzUmSsC9ZoZIMema7=w945-h611-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -637,7 +637,7 @@
                 "attribute": "X"
               },
               "result": "FAN OF THE YEAR 2021",
-              "image": "/img/history/2021/ยูโร.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczOR2DMpW0rcNP6Mj2f8Rdr4TofVvYeoT_jeXTGAyKwkcSA4197jW5D8sHGvdHHCh1ofN5mX0UopinOeDCHD7uoxg6QnsDqRElTTe1HaAlYIGIPGr2jtuCWF9PcpcqcZleqeeST-JxomVoKA89DFSAyt=w1002-h656-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -654,7 +654,7 @@
                 "attribute": 0
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2021/กร.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczMGovlRvJHW1RiQPmHKlyr3nawQsKYYFQT2kWEs2FTM42Zu6xncBx6PCvKd3vT-_cwpPvY8qh0qZjF8I1B-yzjQ6tTcETRRoD0xy7o_Oha_tbR5zdqdNsgrE0mWdyDG5W-LQVf5RO5uOFHa4fLB1M2Z=w1002-h652-s-no-gm?authuser=0"
             }
           ]
         }
@@ -693,7 +693,7 @@
             "attribute": 25
           },
           "totalScore": 66,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMwaISzHOa9MvbTsl7YAD7s_DJ6baoEd3F8kxWhoRqeXLEX36RK5F-ESxcS6aX9IT5sENjEWKbd-L7NlDolfu1fGwzoEDle9V_zEtZtQMJd9WKRQ0ZXjF4Gix-YL-v3IltjvDtL6yAykQLKL2QbEUnu=w580-h580-s-no-gm?authuser=0"
         },
         {
           "date": "18 พฤศจิกายน 2022\n25 พฤศจิกายน 2022",
@@ -710,7 +710,7 @@
             "attribute": 0
           },
           "totalScore": 39,
-          "image": "/img/history/2022/The Mask Singer Thailand.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNm9_LsBVp5qXRvSxZ2wA4EJBKJOe_Zjthezu8UYOA8Flc3hv0qirkgtPMZgs3sxPb4iNzQohoLsc5C3WgNzd-NxCfwKjoc8vlWwXFYcf9xl58jEqPgWfHZApy9-Nde_8vz3zoN1LHBqlegTnIuQhk5=w579-h580-s-no-gm?authuser=0"
         },
         {
           "date": "25 พฤศจิกายน 2022",
@@ -727,7 +727,7 @@
             "attribute": 5
           },
           "totalScore": 32,
-          "image": "/img/history/2022/Horimiya.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPhDJI_WLsYSFgHCkUrfHnHFTUxlavcGDsRbOAmRn_OCck4b41ZO2gqK_0wegICAGcmIrlNHr26qjKkEI3E_Ndi1MPLs4qbiuyD2WIIcbubb2vQDxI9h5GId-XlpjK1QvzN9SsF_2zr259CXWZfa6PB=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "25 พฤศจิกายน 2022\n2 ธันวาคม 2022",
@@ -744,7 +744,7 @@
             "attribute": 0
           },
           "totalScore": 42,
-          "image": "/img/history/2022/Workpoint.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPwLLuLQRfFIrtjeYLFaI5zpqAfs-j1xnelOKlX-rGfy20hw0GoBs_SZmWUFDZSTPOdfyfOkeMuzte7Ju4HH7_wNhaipNchzof5NyTlaFFkd6M0AiU3JUerw9ifh5A2UhAuCe9NHV3Eo4RlWy4nRrrr=w580-h580-s-no-gm?authuser=0"
         },
         {
           "date": "2 ธันวาคม 2022",
@@ -761,7 +761,7 @@
             "attribute": 15
           },
           "totalScore": 71,
-          "image": "/img/history/2022/UK Gameshow.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPEjRNOxNdnPWvFm_9n7KIM_0xT7OMR65Z8M6EIU6MhkBe9H1kiAXdf44AW61J7AucPPb2gQZ9xXACL2lfX4SXdkDjxT0UQaTbipWJ4YlMWL-25RkZ9bO_xKYhIALaRVJr7e4b0JDne4LOKmyRwdJf5=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "2 ธันวาคม 2022",
@@ -778,7 +778,7 @@
             "attribute": 0
           },
           "totalScore": 17,
-          "image": "/img/history/2022/Haikyuu!.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPQO3pDHFn9Nq2p-pcuAdjR0tooI9kPMCEyi5fs0h-gMQtvGdBfDvXChpJQQfPf0yeYWu_pIy6IlZxhEFOabTJKsv3Z5wnrXRUaX80jWH0nouHZnHPrh0B4yfZ_PTcmJOaKT5wIzJY_t7bNkbKVQ8Qf=w762-h762-s-no-gm?authuser=0"
         },
         {
           "date": "2 ธันวาคม 2022\n9 ธันวาคม 2022",
@@ -795,7 +795,7 @@
             "attribute": 0
           },
           "totalScore": 1,
-          "image": "/img/history/2022/Tilly Birds.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOHrnG3pT53fhLd8_LSIuW0nyrO0mRgNVOkaGHhfqrj8BhcSck9zO2wbPcfvanvfRcqLU1TWCmjRv3wYAV0YsYytHeuoOLPd42kcSFu9Zk2jycJGwKS1J9JONQ41nSbXIVOmJVcVr8zrIOwgtU40ODu=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "9 ธันวาคม 2022",
@@ -812,7 +812,7 @@
             "attribute": 0
           },
           "totalScore": 31,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOHSuL8l-DtRDwghzg7Vye2EPSSEq5v1_4LX82Dd_dYiX7Scw7oIdGGXzJcEbpceUopgcsD-JpxJbki-LPSW7Py1GxFGtHLVvrG_hUPcqsFm8cbWhlm6W_tMv1c5MJO3aIU-GZywtOQT_4M6w5pCxnP=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "9 ธันวาคม 2022\n16 ธันวาคม 2022",
@@ -829,7 +829,7 @@
             "attribute": 5
           },
           "totalScore": 61,
-          "image": "/img/history/2022/VTuber.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO_B0kPaBzoUr1GyUyx0GhcjfUM52fy7QrGyv6SJZh7BjjCa5icAA2clE5IF0N58Hres48FSUCVnu4b7pBDCrYDkq00NWMXkX3zrVppujkMZS77I6B0uWZIl1aR0kD_tE6Y3eCI5WAbr5fb0OM4hHol=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "16 ธันวาคม 2022",
@@ -846,7 +846,7 @@
             "attribute": 0
           },
           "totalScore": 63,
-          "image": "/img/history/2022/สุนทราภรณ์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPgaw2QRoy7ByyNGztI1OI4z0AjuwnZmDUVSuUH8Zfbp2a9cR1ib9NKy0OEESAmu_DATeofVWn3NnC0f_lNBKeEdiGDd0aBAxs5GxCDkFSCSwAmWtZ_tqM4PjtUyRDv_p98zMJGd0Icpo6CAfotctJk=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "23 ธันวาคม 2022",
@@ -863,7 +863,7 @@
             "attribute": 0
           },
           "totalScore": 28,
-          "image": "/img/history/2022/Dragonballs.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMB1B6WHaxPmLSdUbCOYp9cLwmv7mwAFNuNCx91mceO4SYxns4qKmxf2Qpn3OOjcJFJhwyPOxqL1XaruhT6pFMIr85Qk1xsj2XnLTwFkA1OKwrHjw-nkJwCYo5zcP39cZRf3G7YQUOPfNxcvGZMQMgW=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "23 ธันวาคม 2022\n30 ธันวาคม 2022",
@@ -880,7 +880,7 @@
             "attribute": 20
           },
           "totalScore": 72,
-          "image": "/img/history/2022/Ragnarok.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMk1MX-0R8fghXhPnQlVYKkD9rAaHgWUgN-j8nUdxpQTxEMnxKxOoEkbij-m3T5cGrLYK7QfsxQUCfXwrzt2-gng9-NArN13L65TgiYn7yaWYfM4lAUNHiCqtQY-dRMtQgVjHuvQxoEmco2sjnaheKM=w828-h828-s-no-gm?authuser=0"
         },
         {
           "date": "30 ธันวาคม 2022",
@@ -897,7 +897,7 @@
             "attribute": 15
           },
           "totalScore": 59,
-          "image": "/img/history/2022/WWE.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNIsb1pW4VPrlbGgXticl3U_pn2guQFOfcC18jasMAUssWCVK68I_MfVHTurLFCTKfbwWtLGzieluMF5sLM-uqkwGGoIxFJQVgowhxhYl3gxSkHTA0fwF3P51iUbkEttK5tgL9uFYAYb2PFMYwrjyWo=w564-h564-s-no-gm?authuser=0"
         },
         {
           "date": "30 ธันวาคม 2022\n6 มกราคม 2023",
@@ -914,7 +914,7 @@
             "attribute": 25
           },
           "totalScore": 62,
-          "image": "/img/history/2022/Cocktail.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPH57c7ciz0kNV4aWpCFPzltRD8qZU7OX7A5KZ07LGfu7kw7KJo52cvW5GHPwgASRx2TnGxgvgJBzPDR9Lz93SXLNoQ75QqC9t1dS-OIXmwjSQRHfHTyfP16qt79olauygvba4s4y7iuILzTK9dBDah=w772-h772-s-no-gm?authuser=0"
         },
         {
           "date": "6 มกราคม 2023",
@@ -931,7 +931,7 @@
             "attribute": 10
           },
           "totalScore": 49,
-          "image": "/img/history/2022/Arknight.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNTOWqEj2GzoYyki6R_ts_AjUKkFMuah6o1GndRyOvPtFpPLp1wAP75LH8JObH367EtmI6iLURPKFHfwLf30UBXdbqCwi1KvmbYIsgzrmRhpto0q7fAoLm3x7w3sTlXim3REjtG2i-CDJl95hmXWTqZ=w624-h624-s-no-gm?authuser=0"
         },
         {
           "date": "6 มกราคม 2023\n13 มกราคม 2023",
@@ -948,7 +948,7 @@
             "attribute": 0
           },
           "totalScore": 52,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPmf9NmLJ5ZZRSMOrxYM0nHlc0vyNd-p9OOucF28QnV6byJCO6EWUsTxXiaGeEa__MXuxNQrGU6Qpo6fX3OIBFZLI3ODiuQQxJ7xC06Ltp0qyI_WhGjOpS9bRF5MOlruCYOXuC3sSrFa-HwPJ1akMpV=w969-h970-s-no-gm?authuser=0"
         },
         {
           "date": "13 มกราคม 2023",
@@ -965,7 +965,7 @@
             "attribute": 0
           },
           "totalScore": 7,
-          "image": "/img/history/2022/Cookie Run Kingdom.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNYx23q9juzy0bg6BG9hNphO5O3Rt0ZYVW6_klsjkYTX-gCZhkMG3WkgKCzSMkleBhcT0fZ3y0N5mZb8hFE1SngegMEf_l5Cu8Nwrks2574rc5LVTqnV4Uxyvc3ILHZbSGArUzR3b46mXxOPsAnIDNc=w966-h966-s-no-gm?authuser=0"
         },
         {
           "date": "13 มกราคม 2023\n20 มกราคม 2023",
@@ -982,7 +982,7 @@
             "attribute": 0
           },
           "totalScore": 21,
-          "image": "/img/history/2022/Neptunia.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNKXoc7Edom7Ar-PX_Z3SJC0U9J5ENNWzcy3a2AVWV7Ep-lFusdIn5dFhEGvW5mU3gdj5mlhBeA2IXjU8ayHJQd57ou09wGk1EKJD507IQG9OCnYsrBpxiuHmMM7Enm1oSyn-CMSjbe3GW4BrP1cwaX=w405-h405-s-no-gm?authuser=0"
         },
         {
           "date": "20 มกราคม 2023",
@@ -999,7 +999,7 @@
             "attribute": 20
           },
           "totalScore": 34,
-          "image": "/img/history/2022/Last Idol TH.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMH23g5P04JKoLVDedyMCMQEU_OlKc9FRjU9qB3QGoEqCsusPt4mvFtMkaH5gupVCuLa1udYMNkpICdkm2b8G7fOc529XJCA4re2_ld9xXBlnac9xykbJtrXWkfKy7CwEpgr0BIdpzK2D8DzSMxOltN=w838-h838-s-no-gm?authuser=0"
         },
         {
           "date": "20 มกราคม 2023\n27 มกราคม 2023",
@@ -1016,7 +1016,7 @@
             "attribute": 0
           },
           "totalScore": 6,
-          "image": "/img/history/2022/LoL.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMwK4VC8WvHulbg_CmB_GaTDTkyLbTjCO6G2sps3yUmIQZxVX6AuIP-d7XLaMS0Nq_gHa4sfBz3iB_-juodVtmJvURmBgbY500BlEq4o6MelS2n8uRRrUGfVbuMM_ZM2u0fWXwFAJv7F0Kcaf0tU4PR=w754-h754-s-no-gm?authuser=0"
         },
         {
           "date": "27 มกราคม 2023",
@@ -1033,7 +1033,7 @@
             "attribute": 0
           },
           "totalScore": 40,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMdt8evTiQti_fMcSnt82isi1P5S-q-04x6ss9nnjxgtQlVHNAajiABmBSdUiZkZqvh4F0dWHLIbqwHomzIXcXuuOIaTDF2ArNFsd3IK2Ie9L7s9TwE8PWbK7c0AWFrQqo581FeXUyHbOBAPpN1ULvs=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "3 กุมภาพันธ์ 2023",
@@ -1050,7 +1050,7 @@
             "attribute": 20
           },
           "totalScore": 64,
-          "image": "/img/history/2022/Resident Evil.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNMOtwh6XyHzLGn0-PCG88H_mfj0AZ6EO06l2OiwoEnPTdtR2xFT8wrBLLNnlyJEjhR8Z0KqLosn1VIQGHRf6I-ZGULRIBjV8t-4BoUCn0O23BModLkEyThIsNXxJq0c3qfcNc4D-hJgEz_Tdl6B_np=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "3 กุมภาพันธ์ 2023\n10 กุมภาพันธ์ 2023",
@@ -1067,7 +1067,7 @@
             "attribute": 0
           },
           "totalScore": 19,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNALqNeZwpBeZMvlVLyYXKcnd_rDFVkE84PMvGSlwLpGS4Z2PR8-m8FRv2NLAOOm9_4rDJwnIBHv65cGygogJ0sNBI00rQmwqz1SKZzHMJCGbWGmeL8YRYq-vBzqlXgA2N521IdEUTuhsKG0oStLE8s=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "10 กุมภาพันธ์ 2023",
@@ -1084,7 +1084,7 @@
             "attribute": 0
           },
           "totalScore": 44,
-          "image": "/img/history/2022/รัฐสมาชิก UN.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNa1GcIl-4dZ0zAzsTm7P1tAr2gWmohErFPFQyFVjqzE_no3WQbEatYd-UCPrVqJD1OzUePvXl4XpFc3KYFrDcWKuAi9meMGYkLbx7sJtKocTpkUtQ9vuYJNEQx0XbHJ-3-r5iRxAF4Hs7yAzv4TOQU=w564-h564-s-no-gm?authuser=0"
         },
         {
           "date": "10 กุมภาพันธ์ 2023\n17 กุมภาพันธ์ 2023",
@@ -1101,7 +1101,7 @@
             "attribute": 5
           },
           "totalScore": 67,
-          "image": "/img/history/2022/Board Game.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOSQOeohJqkmdB3JCc4c3qOi85ofF-jwf3edrBQy3MY--1qjoQqYyu4qfU17poyY5tXJvG5MZPK7wIkDND7XthTK-s-pKtB62cnrqkif2ZObHKTZFivh74Vb2v6GZXRH-rsGb6ZUDjTeNBMzrDu7OIs=w872-h872-s-no-gm?authuser=0"
         },
         {
           "date": "17 กุมภาพันธ์ 2023",
@@ -1118,7 +1118,7 @@
             "attribute": 25
           },
           "totalScore": 50,
-          "image": "/img/history/2022/MCU.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP0yH76KJYS-ZZ80MMk72hKT2nRskkE1oFmZyjYHZ7AU92UgGOStrWN_NYTc-YO5iVBxgBxi_3M_jhZfxK5uglyyIi17mDEMj6o22cmHTVbSHp5mqs_3BPUhqxsN6ECH69Rd56-EhPZng3Zgp8rD6X3=w852-h852-s-no-gm?authuser=0"
         }
       ],
       "playoffs": {
@@ -1312,7 +1312,7 @@
           },
           "totalScore": 60,
           "final": "ถูก",
-          "image": "/img/history/2022/The Mask Singer Thailand.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNm9_LsBVp5qXRvSxZ2wA4EJBKJOe_Zjthezu8UYOA8Flc3hv0qirkgtPMZgs3sxPb4iNzQohoLsc5C3WgNzd-NxCfwKjoc8vlWwXFYcf9xl58jEqPgWfHZApy9-Nde_8vz3zoN1LHBqlegTnIuQhk5=w579-h580-s-no-gm?authuser=0"
         },
         {
           "episode": 1,
@@ -1329,7 +1329,7 @@
           },
           "totalScore": 52,
           "final": "ถูก",
-          "image": "/img/history/2022/Board Game.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOSQOeohJqkmdB3JCc4c3qOi85ofF-jwf3edrBQy3MY--1qjoQqYyu4qfU17poyY5tXJvG5MZPK7wIkDND7XthTK-s-pKtB62cnrqkif2ZObHKTZFivh74Vb2v6GZXRH-rsGb6ZUDjTeNBMzrDu7OIs=w872-h872-s-no-gm?authuser=0"
         },
         {
           "episode": 1,
@@ -1346,7 +1346,7 @@
           },
           "totalScore": 1,
           "final": "-",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOHSuL8l-DtRDwghzg7Vye2EPSSEq5v1_4LX82Dd_dYiX7Scw7oIdGGXzJcEbpceUopgcsD-JpxJbki-LPSW7Py1GxFGtHLVvrG_hUPcqsFm8cbWhlm6W_tMv1c5MJO3aIU-GZywtOQT_4M6w5pCxnP=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 2,
@@ -1363,7 +1363,7 @@
           },
           "totalScore": 45,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOHSuL8l-DtRDwghzg7Vye2EPSSEq5v1_4LX82Dd_dYiX7Scw7oIdGGXzJcEbpceUopgcsD-JpxJbki-LPSW7Py1GxFGtHLVvrG_hUPcqsFm8cbWhlm6W_tMv1c5MJO3aIU-GZywtOQT_4M6w5pCxnP=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 2,
@@ -1380,7 +1380,7 @@
           },
           "totalScore": 50,
           "final": "ถูก",
-          "image": "/img/history/2022/Workpoint.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPwLLuLQRfFIrtjeYLFaI5zpqAfs-j1xnelOKlX-rGfy20hw0GoBs_SZmWUFDZSTPOdfyfOkeMuzte7Ju4HH7_wNhaipNchzof5NyTlaFFkd6M0AiU3JUerw9ifh5A2UhAuCe9NHV3Eo4RlWy4nRrrr=w580-h580-s-no-gm?authuser=0"
         },
         {
           "episode": 2,
@@ -1414,7 +1414,7 @@
           },
           "totalScore": 44,
           "final": "ถูก",
-          "image": "/img/history/2022/Resident Evil.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNMOtwh6XyHzLGn0-PCG88H_mfj0AZ6EO06l2OiwoEnPTdtR2xFT8wrBLLNnlyJEjhR8Z0KqLosn1VIQGHRf6I-ZGULRIBjV8t-4BoUCn0O23BModLkEyThIsNXxJq0c3qfcNc4D-hJgEz_Tdl6B_np=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -1431,7 +1431,7 @@
           },
           "totalScore": 40,
           "final": "ถูก",
-          "image": "/img/history/2022/UK Gameshow.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPEjRNOxNdnPWvFm_9n7KIM_0xT7OMR65Z8M6EIU6MhkBe9H1kiAXdf44AW61J7AucPPb2gQZ9xXACL2lfX4SXdkDjxT0UQaTbipWJ4YlMWL-25RkZ9bO_xKYhIALaRVJr7e4b0JDne4LOKmyRwdJf5=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -1448,7 +1448,7 @@
           },
           "totalScore": 56,
           "final": "ถูก",
-          "image": "/img/history/2022/Tilly Birds.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOHrnG3pT53fhLd8_LSIuW0nyrO0mRgNVOkaGHhfqrj8BhcSck9zO2wbPcfvanvfRcqLU1TWCmjRv3wYAV0YsYytHeuoOLPd42kcSFu9Zk2jycJGwKS1J9JONQ41nSbXIVOmJVcVr8zrIOwgtU40ODu=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -1465,7 +1465,7 @@
           },
           "totalScore": 43,
           "final": "ถูก",
-          "image": "/img/history/2022/Neptunia.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNKXoc7Edom7Ar-PX_Z3SJC0U9J5ENNWzcy3a2AVWV7Ep-lFusdIn5dFhEGvW5mU3gdj5mlhBeA2IXjU8ayHJQd57ou09wGk1EKJD507IQG9OCnYsrBpxiuHmMM7Enm1oSyn-CMSjbe3GW4BrP1cwaX=w405-h405-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -1482,7 +1482,7 @@
           },
           "totalScore": 40,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMwaISzHOa9MvbTsl7YAD7s_DJ6baoEd3F8kxWhoRqeXLEX36RK5F-ESxcS6aX9IT5sENjEWKbd-L7NlDolfu1fGwzoEDle9V_zEtZtQMJd9WKRQ0ZXjF4Gix-YL-v3IltjvDtL6yAykQLKL2QbEUnu=w580-h580-s-no-gm?authuser=0"
         },
         {
           "episode": 4,
@@ -1516,7 +1516,7 @@
           },
           "totalScore": 49,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMdt8evTiQti_fMcSnt82isi1P5S-q-04x6ss9nnjxgtQlVHNAajiABmBSdUiZkZqvh4F0dWHLIbqwHomzIXcXuuOIaTDF2ArNFsd3IK2Ie9L7s9TwE8PWbK7c0AWFrQqo581FeXUyHbOBAPpN1ULvs=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 4,
@@ -1550,7 +1550,7 @@
           },
           "totalScore": 49,
           "final": "ถูก",
-          "image": "/img/history/2022/Horimiya.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPhDJI_WLsYSFgHCkUrfHnHFTUxlavcGDsRbOAmRn_OCck4b41ZO2gqK_0wegICAGcmIrlNHr26qjKkEI3E_Ndi1MPLs4qbiuyD2WIIcbubb2vQDxI9h5GId-XlpjK1QvzN9SsF_2zr259CXWZfa6PB=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -1567,7 +1567,7 @@
           },
           "totalScore": 40,
           "final": "ถูก",
-          "image": "/img/history/2022/VTuber.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO_B0kPaBzoUr1GyUyx0GhcjfUM52fy7QrGyv6SJZh7BjjCa5icAA2clE5IF0N58Hres48FSUCVnu4b7pBDCrYDkq00NWMXkX3zrVppujkMZS77I6B0uWZIl1aR0kD_tE6Y3eCI5WAbr5fb0OM4hHol=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -1584,7 +1584,7 @@
           },
           "totalScore": 2,
           "final": "-",
-          "image": "/img/history/2021/วา.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNY6CIYG-YM2sTKMBvnVeYIViQYu5y2qxnddm3QVdj3_ubFbNhq7seKZ8XTDRU2xs9tfDwbDbR7gjP7sZUpfe5AOYTZoxqhNE4a1l_zCRJg62qKG8YD42oZU6YNdUapMikNAlc49xbvPhCBbmNGnKz3=w946-h613-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -1601,7 +1601,7 @@
           },
           "totalScore": 38,
           "final": "ผิด",
-          "image": "/img/history/2021/แมน.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMk3CTy1ZloFcxPlA8aqKr2l07aOYESaJgVqM5PO3KTryeE-nPHLcLtxm6gBNzkx4iCUDRPw7IVIbcOw1q_bzd39k9mRrO5rfZ7HDAhhBFvhbbc_fpT7eXsjghVTDp0K-3x_E6ig5iMT8SItCWtpPot=w1002-h648-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -1618,7 +1618,7 @@
           },
           "totalScore": 60,
           "final": "ถูก",
-          "image": "/img/history/2023/Saint Seiya.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNa1GcIl-4dZ0zAzsTm7P1tAr2gWmohErFPFQyFVjqzE_no3WQbEatYd-UCPrVqJD1OzUePvXl4XpFc3KYFrDcWKuAi9meMGYkLbx7sJtKocTpkUtQ9vuYJNEQx0XbHJ-3-r5iRxAF4Hs7yAzv4TOQU=w564-h564-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -1635,7 +1635,7 @@
           },
           "totalScore": 45,
           "final": "ถูก",
-          "image": "/img/history/2022/WWE.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNIsb1pW4VPrlbGgXticl3U_pn2guQFOfcC18jasMAUssWCVK68I_MfVHTurLFCTKfbwWtLGzieluMF5sLM-uqkwGGoIxFJQVgowhxhYl3gxSkHTA0fwF3P51iUbkEttK5tgL9uFYAYb2PFMYwrjyWo=w564-h564-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -1652,7 +1652,7 @@
           },
           "totalScore": 44,
           "final": "ถูก",
-          "image": "/img/history/2022/Cocktail.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPH57c7ciz0kNV4aWpCFPzltRD8qZU7OX7A5KZ07LGfu7kw7KJo52cvW5GHPwgASRx2TnGxgvgJBzPDR9Lz93SXLNoQ75QqC9t1dS-OIXmwjSQRHfHTyfP16qt79olauygvba4s4y7iuILzTK9dBDah=w772-h772-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -1686,7 +1686,7 @@
           },
           "totalScore": 31,
           "final": "-",
-          "image": "/img/history/2021/ซิมส์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOPkl0H7ewTK-h_WEaf8dEI4bean0xLOXuZ7onjGSMt27DEx5ThhnUJXtF2gK0qTSW64XwafiTfnIs2kxj94vFM5X62-2i-ylS2I-xqHZfNizN9cc0xRie6OyQGCqDBrLzA8mzk_EI5AGpDoeXHkMJw=w1002-h660-s-no-gm?authuser=0"
         },
         {
           "episode": 7,
@@ -1703,7 +1703,7 @@
           },
           "totalScore": 47,
           "final": "ถูก",
-          "image": "/img/history/2022/Cookie Run Kingdom.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNYx23q9juzy0bg6BG9hNphO5O3Rt0ZYVW6_klsjkYTX-gCZhkMG3WkgKCzSMkleBhcT0fZ3y0N5mZb8hFE1SngegMEf_l5Cu8Nwrks2574rc5LVTqnV4Uxyvc3ILHZbSGArUzR3b46mXxOPsAnIDNc=w966-h966-s-no-gm?authuser=0"
         },
         {
           "episode": 7,
@@ -1720,7 +1720,7 @@
           },
           "totalScore": 40,
           "final": "ผิด",
-          "image": "/img/history/2022/สุนทราภรณ์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPgaw2QRoy7ByyNGztI1OI4z0AjuwnZmDUVSuUH8Zfbp2a9cR1ib9NKy0OEESAmu_DATeofVWn3NnC0f_lNBKeEdiGDd0aBAxs5GxCDkFSCSwAmWtZ_tqM4PjtUyRDv_p98zMJGd0Icpo6CAfotctJk=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 7,
@@ -1737,7 +1737,7 @@
           },
           "totalScore": 60,
           "final": "ถูก",
-          "image": "/img/history/2022/Last Idol TH.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMH23g5P04JKoLVDedyMCMQEU_OlKc9FRjU9qB3QGoEqCsusPt4mvFtMkaH5gupVCuLa1udYMNkpICdkm2b8G7fOc529XJCA4re2_ld9xXBlnac9xykbJtrXWkfKy7CwEpgr0BIdpzK2D8DzSMxOltN=w838-h838-s-no-gm?authuser=0"
         },
         {
           "episode": 7,
@@ -1788,7 +1788,7 @@
           },
           "totalScore": 50,
           "final": "ถูก",
-          "image": "/img/history/2022/MCU.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP0yH76KJYS-ZZ80MMk72hKT2nRskkE1oFmZyjYHZ7AU92UgGOStrWN_NYTc-YO5iVBxgBxi_3M_jhZfxK5uglyyIi17mDEMj6o22cmHTVbSHp5mqs_3BPUhqxsN6ECH69Rd56-EhPZng3Zgp8rD6X3=w852-h852-s-no-gm?authuser=0"
         },
         {
           "episode": 8,
@@ -1805,7 +1805,7 @@
           },
           "totalScore": 20,
           "final": "-",
-          "image": "/img/history/2023/Mario Party.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP-uvvQbghQwtK6o2TE-jnoAcZfOvsvyMSNSAjCJ1XhVZtUgCXpy3zujgClDjBOpfAy3sjCcL8C9BlKmJB2ltS7fdagwTq_hWgH0wCll_BnzPhxDwxwBUmfW-SI1CyVHhhrbOU6vavZB-Lynhpszpol=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "episode": 8,
@@ -1822,7 +1822,7 @@
           },
           "totalScore": 45,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPmf9NmLJ5ZZRSMOrxYM0nHlc0vyNd-p9OOucF28QnV6byJCO6EWUsTxXiaGeEa__MXuxNQrGU6Qpo6fX3OIBFZLI3ODiuQQxJ7xC06Ltp0qyI_WhGjOpS9bRF5MOlruCYOXuC3sSrFa-HwPJ1akMpV=w969-h970-s-no-gm?authuser=0"
         },
         {
           "episode": 9,
@@ -1873,7 +1873,7 @@
           },
           "totalScore": 40,
           "final": "ถูก",
-          "image": "/img/history/2022/Ragnarok.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMk1MX-0R8fghXhPnQlVYKkD9rAaHgWUgN-j8nUdxpQTxEMnxKxOoEkbij-m3T5cGrLYK7QfsxQUCfXwrzt2-gng9-NArN13L65TgiYn7yaWYfM4lAUNHiCqtQY-dRMtQgVjHuvQxoEmco2sjnaheKM=w828-h828-s-no-gm?authuser=0"
         },
         {
           "episode": 9,
@@ -1890,7 +1890,7 @@
           },
           "totalScore": 42,
           "final": "ถูก",
-          "image": "/img/history/2022/Dragonballs.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMB1B6WHaxPmLSdUbCOYp9cLwmv7mwAFNuNCx91mceO4SYxns4qKmxf2Qpn3OOjcJFJhwyPOxqL1XaruhT6pFMIr85Qk1xsj2XnLTwFkA1OKwrHjw-nkJwCYo5zcP39cZRf3G7YQUOPfNxcvGZMQMgW=w1002-h1002-s-no-gm?authuser=0"
         }
       ],
       "battleRoyale": [
@@ -1948,7 +1948,7 @@
             "properties": "-"
           },
           "result": "ตกรอบ",
-          "image": "/img/history/2021/แมน.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMk3CTy1ZloFcxPlA8aqKr2l07aOYESaJgVqM5PO3KTryeE-nPHLcLtxm6gBNzkx4iCUDRPw7IVIbcOw1q_bzd39k9mRrO5rfZ7HDAhhBFvhbbc_fpT7eXsjghVTDp0K-3x_E6ig5iMT8SItCWtpPot=w1002-h648-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -1976,7 +1976,7 @@
             "properties": 15
           },
           "result": "ตกรอบ",
-          "image": "/img/history/2021/ซิมส์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOPkl0H7ewTK-h_WEaf8dEI4bean0xLOXuZ7onjGSMt27DEx5ThhnUJXtF2gK0qTSW64XwafiTfnIs2kxj94vFM5X62-2i-ylS2I-xqHZfNizN9cc0xRie6OyQGCqDBrLzA8mzk_EI5AGpDoeXHkMJw=w1002-h660-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -2004,7 +2004,7 @@
             "properties": 15
           },
           "result": "เข้ารอบ",
-          "image": "/img/history/2022/สุนทราภรณ์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPgaw2QRoy7ByyNGztI1OI4z0AjuwnZmDUVSuUH8Zfbp2a9cR1ib9NKy0OEESAmu_DATeofVWn3NnC0f_lNBKeEdiGDd0aBAxs5GxCDkFSCSwAmWtZ_tqM4PjtUyRDv_p98zMJGd0Icpo6CAfotctJk=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -2018,7 +2018,7 @@
             "properties": "-"
           },
           "result": "ตกรอบ",
-          "image": "/img/history/2023/Mario Party.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP-uvvQbghQwtK6o2TE-jnoAcZfOvsvyMSNSAjCJ1XhVZtUgCXpy3zujgClDjBOpfAy3sjCcL8C9BlKmJB2ltS7fdagwTq_hWgH0wCll_BnzPhxDwxwBUmfW-SI1CyVHhhrbOU6vavZB-Lynhpszpol=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -2083,6 +2083,9 @@
         "championName": "ณัฐพงษ์ อ่ำกลาง (อั้ม)",
         "championTopic": "วง Queen"
       },
+      "notes": [
+        "สหัสวรรษ นิจพันธ์ (พีท - Genshin Impact) สุดยอดแฟนพันธุ์แท้ประจำสัปดาห์ EP.4 สละสิทธิ์การแข่งขันแฟนพันธุ์แท้แห่งปี 2023"
+      ],
       "qualifying": [
         {
           "date": "20 ตุลาคม 2023",
@@ -2099,7 +2102,7 @@
             "attribute": 15
           },
           "totalScore": 51,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMMtOITwUPLxMExEUDMDXqJrUw8R3-LhADxW_L-X9U04wC1UFGKXjRumD5EETsMAtrJhC-x6QvB8c77XHBGvIfaw0vWhS7bN-jTYL8qmyDQbBE6-f6VrIyVdhL_QFdkW0S2meyXZLf4YCynlpRXAxFM=w720-h719-s-no-gm?authuser=0"
         },
         {
           "date": "20 ตุลาคม 2023\n27 ตุลาคม 2023",
@@ -2116,7 +2119,7 @@
             "attribute": 5
           },
           "totalScore": 52,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNR6WKIret_27SGn5Kn0xasMI6c-xWGR8vbwlLY2j7pMEqlz8k4Wt29Q0NQSq0eioYP1tGLaUKURbp3gtULo3nhGnk-3ECg9TZ-3__pj3nPb3vrGkiRxTSNlcCkqJi0T9kFB2vj9JoXmV2ya6YICjeJ=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "27 ตุลาคม 2023",
@@ -2133,7 +2136,7 @@
             "attribute": 25
           },
           "totalScore": 75,
-          "image": "/img/history/2023/วง Queen (1).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPmBKdFX9V0PJdW-jVqojBB4pnvBPV-pvBvqPBrIyEMXRTaEoB-YF2vDp2GxRRVmZXi-h0qY7N0wSjjusDjBVLy6fdPg2JLlmlX1crKNU96Ib9-u57YGwQcZgnz3gH6LbV4g5u3kyMZGYnIGZbHbeTb=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "27 ตุลาคม 2023\n3 พฤศจิกายน 2023",
@@ -2150,7 +2153,7 @@
             "attribute": 0
           },
           "totalScore": 43,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPBOnzn3urJWTplU6svoLYS55xXMwWr1OBCNTDopQrlHDKfI4bG6kXodlpxDtmnYKIOR18aWa2ltcgmNAVtO7IRMH08MQOz_ZZSK2NsEkpwDL9IMFJ7C4Iiyf_l8tS3uV0QNMmFqblUhkYfGG39VfgS=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "3 พฤศจิกายน 2023",
@@ -2167,7 +2170,7 @@
             "attribute": 15
           },
           "totalScore": 75,
-          "image": "/img/history/2023/Board Game (1).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN_adAqTuTDJxGXCaYVZpdUsuJKuCUjqKYhF-h1l1ZcnvW-ocuVjc3fPwd0H3kg-58iJJkSQ_JvoW8IhXfEutLE6QHfsUr0oF2iQuqMYBUcvnH8YFaafuqYeaovh7gdSkhTVkSO3q8MsPqnoX1hsN8p=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "3 พฤศจิกายน 2023\n10 พฤศจิกายน 2023",
@@ -2184,7 +2187,7 @@
             "attribute": 20
           },
           "totalScore": 54,
-          "image": "/img/history/2023/Plants VS Zombies.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPnFXous3tqzcK87xtmCjzsK6dRwnY6nkCXjmtoJGhofxwuwNceVjoeI3NbVKYZY_1xWKyHot359pGmVUwg05z-vCmeYjZjdRzqF1UyOzy_-gSFucO-18PQTI-YbQIgwWkee9ON31TDdFEAvzT9HYe3=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "10 พฤศจิกายน 2023",
@@ -2201,7 +2204,7 @@
             "attribute": 0
           },
           "totalScore": 45,
-          "image": "/img/history/2023/VTuber.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPgR9ZrtumbjAqO7stscpubcKOyimyuaWiqo0E6qAeJ22Em1cjQpZiky4VfiRfkP5slfoROBMsuXrymM0e6ftVKElwtfv_PxTDF5YlF5USM67gR1JPJs-6i-DPSSp0cK5utvDsV4pCEhQVnftPoifIY=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "10 พฤศจิกายน 2023",
@@ -2218,7 +2221,7 @@
             "attribute": 0
           },
           "totalScore": 30,
-          "image": "/img/history/2023/Mario Party.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN9-OIbsYW3zxqpURtMNPZnMJu2gUftk1s5cKt6z0ZMIGM1SjnbvLP-2H9WWeZet6lxVu0-0pGESM9VUPp6tL0Dbe5akhjP4krtRYz6DCw2VmcOzNjCtL_R2hF3ZrPUY_VuTHpJrRdIppyuDfXAQb0w=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "17 พฤศจิกายน 2023\n24 พฤศจิกายน 2023",
@@ -2235,7 +2238,7 @@
             "attribute": 10
           },
           "totalScore": 61,
-          "image": "/img/history/2023/Arcaea.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczM8rvbeJhokBhUOGK4-HWOOaTD5K6lGbOonzyVjpHccO7zJCVkAxbnKJjC9D_uaxEdWNIHKo4S1PaFbppMTt-FRs4zxLVxJ8_heijH71n8kQawYJY12jKQCjtxiJQCYzDsojPZMoTd9yjqIdcvSqRDh=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "24 พฤศจิกายน 2023",
@@ -2252,7 +2255,7 @@
             "attribute": 0
           },
           "totalScore": 43,
-          "image": "/img/history/2023/Cardfight Vanguard.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEu1wSfjggKRdycL9KfWJeN9PkCPSSzrYKyWGkth9N7bu44CvLsa3OYABuBj58-4kClfMeANaxbWr3AFqs4mS-w1d2Sux6oYl--LASP4x1pb-kDbnA3QdJtUwp0EB5JT00ev_Q1Eod1_KmYWPJg__d=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "24 พฤศจิกายน 2023\n1 ธันวาคม 2023",
@@ -2269,7 +2272,7 @@
             "attribute": 0
           },
           "totalScore": 21,
-          "image": "/img/history/2023/Genshin Impact (2).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMW7fl3735-kbspRpreFKZiU37faZqM0u-9JSSgp6pZQk6kmSiFLBUiDv_i6FEVfNj8wJ2FuI142Gk6HysNbWgaQNtTCnwDZWtphdnINxhPoOTT94zdWQkaCiHA0l-jusR7pn9bD37ym63gveKAz_09=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "1 ธันวาคม 2023\n8 ธันวาคม 2023",
@@ -2286,7 +2289,7 @@
             "attribute": 10
           },
           "totalScore": 78,
-          "image": "/img/history/2023/สุนทราภรณ์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMv2zaXW8fQdfjTXY8Gv1f0xJYWb1VIQkiMBenEAbsBnzxwGtFJ9lvEPLtJVSlpRAPk1svGjMrcpWUnLyaJAGhgvHa6nu6LA-d3jGdKY7gNa_Ynkqs1E0wPqBzSVzLrEheLEfWQtBy1z96au75YwPSM=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "8 ธันวาคม 2023",
@@ -2303,7 +2306,7 @@
             "attribute": 0
           },
           "totalScore": 47,
-          "image": "/img/history/2023/เกมซีรีส์ Yakuza.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN5kSODBi9E02XcBRaT7dEV6Z-3uF7c1zVmuDhJKg26_CsNLiJVfXPRzV96PLQz8ZLDjvUIqlN1aFvM3d6fnLoMuuaYQr7vsKZMs5Dfzy1Wp0AtsIeksvhjH7AfGAKZ9_goy7xGzt4KQy_nbn0-n3QC=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "8 ธันวาคม 2023\n15 ธันวาคม 2023",
@@ -2320,7 +2323,7 @@
             "attribute": 15
           },
           "totalScore": 70,
-          "image": "/img/history/2023/MCU.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOyKgkVR-Ph4DfCqVrBbnV81fh0vsfW8QOpAtjqqnsuKqzzl25kMD0jiEKFgAD41HPyaDugGNJ03KICiaOwnMFelVWzV36cwpgEyB3w14LMcJMCbiNKXwDrU4eYrJfvR-htRWW4Fxn96T0Iisn475JE=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "15 ธันวาคม 2023\n22 ธันวาคม 2023",
@@ -2337,7 +2340,7 @@
             "attribute": 25
           },
           "totalScore": 61,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNZYd7Ayx3DwzTRd3k30dTXbuzJ24eCgXcU83QSGI4wyewYoJRT8-3cdVPQVeGO2L7jMXGBLy5pv3pDry3BUbXA6LgQP6T5_JrlY30GzgRWksZsGyDrG4lVksP4ug8qB6nJDvWUfdU4JSIGTF1GFLpT=w720-h719-s-no-gm?authuser=0"
         },
         {
           "date": "22 ธันวาคม 2023",
@@ -2354,7 +2357,7 @@
             "attribute": 0
           },
           "totalScore": 55,
-          "image": "/img/history/2023/WWE.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczODkT_yTgrRJpuvR3KJYmepz8m9Jh1MOwxVCCl0QvYhSrOib-5Vc3wh5h3e-j9KnA5Tg3tFu3D__eXyhBdDY_TUMM87oKskG-vz0y6tQC3WLMFLxundzm2V1Oq5i77sF53B5N1Xtq8HNbo62Lv509y2=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "29 ธันวาคม 2023",
@@ -2371,7 +2374,7 @@
             "attribute": 15
           },
           "totalScore": 75,
-          "image": "/img/history/2023/Kobaryo.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN1lPr-9Yl392_iXgIRhCkuLXxCtl4OwMIH8cJwZLtMuVck6-XGzk6HAxeZE8kGI1b9AgCa4qSBK-IGQVqeYUPEyc59BIXqaSKwnDL_Gb_vJv97A5jzySEaS7GeY1u7YkjY0r_dyjFdnd8s0yDHh06X=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "29 ธันวาคม 2023\n5 มกราคม 2024",
@@ -2388,7 +2391,7 @@
             "attribute": 0
           },
           "totalScore": 39,
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPNuDqZIO0qGy9AgG5LQe6k-U2fON8GOgiBBdQaAAhyFikwMvQhi7FZ3H4p9yduv-eN3bX1bFNX5r0OaM9cc-nlJT9gZdmFhF1ZfSgIPJp3ttdkztbWumQQWLPyWcKYLbxB5zgY4ht6WZqidOsHr8hn=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "5 มกราคม 2024",
@@ -2405,7 +2408,7 @@
             "attribute": 0
           },
           "totalScore": 41,
-          "image": "/img/history/2023/Cocktail.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO7KzxrMqtMS5XAG8IN9EQyMfC5AYpZi0iiHEHPnnM3IrhbHfWQiW8houqOxkEEUQ7i3t3iyy3qI0HH6yl2HMNZqZbEJ_A_Q5jQTUDTjyPhWSqavi9X8vJnVsU5Oj6DeVKC0HovJ_h1w4bxTy1UX7CR=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "5 มกราคม 2024\n12 มกราคม 2024",
@@ -2422,7 +2425,7 @@
             "attribute": 0
           },
           "totalScore": 57,
-          "image": "/img/history/2023/Hyperdimension Neptunia.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN6zGY5kyrJGT9bQJe-4Wt3E46A61nq3lg4yl6sDitnwHWaXuq4lKi3IAoWR7Xt_TabP8EN-11ZQRblEX8oM6VHUsyh8l0gilIdMGiolBq8QGXsV-jRt2NoGEKyh-EzQMMNVpCpcIkZrObxjMbTBNs4=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "12 มกราคม 2024",
@@ -2439,7 +2442,7 @@
             "attribute": 0
           },
           "totalScore": 45,
-          "image": "/img/history/2023/Tattoo Colour.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMmPVjAWjJyJlMHz9Y40aZsdtXsMOSGccdGndc_8qfO9rLXjhv7yRZqodCo9dFLh2mNDCljgRBfDmq7zEcreErOJt9lg5PTko15FzQuO2HQx72CH26SXQhOIdbgIFB5Q2g7ZmfpVApe_EJqCYREGxmK=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "12 มกราคม 2024\n19 มกราคม 2024",
@@ -2456,7 +2459,7 @@
             "attribute": 10
           },
           "totalScore": 31,
-          "image": "/img/history/2023/เหรียญกษาปณ์ไทย.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP39ChfxvEPgEhjJvfiYsheAqqU1pLymRUyAaKzJuPSHpDrrIB3FAfQNE0DjdbH04Ox2KjOEm0RHS6heNseay3xuLK-N8Dkv3CaLTCq9uO48hS5pj5Nj0bbs-l0QMXzKhLd5wBMx9pErPvBgSXxkZ6d=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "19 มกราคม 2024",
@@ -2473,7 +2476,7 @@
             "attribute": 0
           },
           "totalScore": 52,
-          "image": "/img/history/2023/48Group Thailand.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN2rQLGFK9pu6-lNP3NXHvhcCfF_oJOQ-5yAR9TBILl7i0f91mH1hnGZWMZhCHkgnodD-3zZKxsLXvhKHk25-0YdBuxRX42muzdyC9qpp1YDyYbF3h1bIpqIl8vr2-3-5Quoz41zodfDucTlYWssXO9=w720-h719-s-no-gm?authuser=0"
         },
         {
           "date": "19 มกราคม 2024\n26 มกราคม 2024",
@@ -2490,7 +2493,7 @@
             "attribute": 25
           },
           "totalScore": 62,
-          "image": "/img/history/2023/Board Game (2).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOTDfGw7rcKjBPqfA-U4-WyFHqYUfGXB1sEIIcv1B78QRZoZJhiVJGW4FnYm5XUx2MjJPIrKg9ZsF4Q_dwhb_1IZ0zIspcugK0Xv5zUFTCW3zrWvMj_77nrQUmlvTdBtfs9DC-KS9_PUtlu_Wkx6BSb=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "26 มกราคม 2024",
@@ -2507,7 +2510,7 @@
             "attribute": 0
           },
           "totalScore": 22,
-          "image": "/img/history/2023/Genshin Impact (3).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNAfurg0FdjrgIhJ5ZRy-bioy_jGEGsG_yd7yb7qLsJT3BD2H5OpdQ02Z3bPX832u8IH1dXcY_-cVFALbpZ_J9TPJ5Q-Leh3diEWDglgufCXMvLQj1EWV4ib2llcGaUjS7UC9aSHfso4rqUA_uS_9EJ=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "26 มกราคม 2024\n2 กุมภาพันธ์ 2024",
@@ -2524,7 +2527,7 @@
             "attribute": 5
           },
           "totalScore": 40,
-          "image": "/img/history/2023/Masayuki Suzuki.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNrtfsCAfyQi7ppqo0xF7a_1M5gB1eBDs9Iabq-LIb1FQ40eVHpXIVyccFSGdqCc16vB45nHNRHbXMo-ewkOOAOVQf8JJqp7f5mpWHFc0dZ7RwZfGbZcCMBUwi_FuA8Y6elJvLgqu_Xe9MOkSwmsdG7=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "2 กุมภาพันธ์ 2024",
@@ -2541,7 +2544,7 @@
             "attribute": 0
           },
           "totalScore": 60,
-          "image": "/img/history/2023/Saint Seiya.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNXIfm8gnTWoCeFCkGqsvqN3oJgql0UQuXsGMBc0zdeBGZ17edSBaAvn9blHc9iikORrzfwx7y_OpWpcHmydMRXYAaaO3YagGPK0vglnCBIIkOaUs32y_gKYDuwFg49PT9swUL_uH80Ym5K9BB6PBIQ=w1002-h1002-s-no-gm?authuser=0"
         }
       ],
       "playoffs": null,
@@ -2565,7 +2568,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2023/สุนทราภรณ์.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczMv2zaXW8fQdfjTXY8Gv1f0xJYWb1VIQkiMBenEAbsBnzxwGtFJ9lvEPLtJVSlpRAPk1svGjMrcpWUnLyaJAGhgvHa6nu6LA-d3jGdKY7gNa_Ynkqs1E0wPqBzSVzLrEheLEfWQtBy1z96au75YwPSM=w720-h720-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -2583,7 +2586,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2023/Kobaryo.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczN1lPr-9Yl392_iXgIRhCkuLXxCtl4OwMIH8cJwZLtMuVck6-XGzk6HAxeZE8kGI1b9AgCa4qSBK-IGQVqeYUPEyc59BIXqaSKwnDL_Gb_vJv97A5jzySEaS7GeY1u7YkjY0r_dyjFdnd8s0yDHh06X=w720-h720-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -2601,7 +2604,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2023/Board Game (1).png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczN_adAqTuTDJxGXCaYVZpdUsuJKuCUjqKYhF-h1l1ZcnvW-ocuVjc3fPwd0H3kg-58iJJkSQ_JvoW8IhXfEutLE6QHfsUr0oF2iQuqMYBUcvnH8YFaafuqYeaovh7gdSkhTVkSO3q8MsPqnoX1hsN8p=w720-h720-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -2619,7 +2622,7 @@
                 "attribute": null
               },
               "result": "เข้ารอบ",
-              "image": "/img/history/2023/วง Queen (1).png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczPmBKdFX9V0PJdW-jVqojBB4pnvBPV-pvBvqPBrIyEMXRTaEoB-YF2vDp2GxRRVmZXi-h0qY7N0wSjjusDjBVLy6fdPg2JLlmlX1crKNU96Ib9-u57YGwQcZgnz3gH6LbV4g5u3kyMZGYnIGZbHbeTb=w720-h720-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -2637,7 +2640,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2023/MCU.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczOyKgkVR-Ph4DfCqVrBbnV81fh0vsfW8QOpAtjqqnsuKqzzl25kMD0jiEKFgAD41HPyaDugGNJ03KICiaOwnMFelVWzV36cwpgEyB3w14LMcJMCbiNKXwDrU4eYrJfvR-htRWW4Fxn96T0Iisn475JE=w720-h720-s-no-gm?authuser=0"
             }
           ]
         },
@@ -2660,7 +2663,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2023/สุนทราภรณ์.png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczMv2zaXW8fQdfjTXY8Gv1f0xJYWb1VIQkiMBenEAbsBnzxwGtFJ9lvEPLtJVSlpRAPk1svGjMrcpWUnLyaJAGhgvHa6nu6LA-d3jGdKY7gNa_Ynkqs1E0wPqBzSVzLrEheLEfWQtBy1z96au75YwPSM=w720-h720-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -2678,7 +2681,7 @@
                 "attribute": null
               },
               "result": "ตกรอบ",
-              "image": "/img/history/2023/Board Game (1).png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczN_adAqTuTDJxGXCaYVZpdUsuJKuCUjqKYhF-h1l1ZcnvW-ocuVjc3fPwd0H3kg-58iJJkSQ_JvoW8IhXfEutLE6QHfsUr0oF2iQuqMYBUcvnH8YFaafuqYeaovh7gdSkhTVkSO3q8MsPqnoX1hsN8p=w720-h720-s-no-gm?authuser=0"
             },
             {
               "date": "",
@@ -2696,7 +2699,7 @@
                 "attribute": null
               },
               "result": "FAN OF THE YEAR 2023",
-              "image": "/img/history/2023/วง Queen (1).png"
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczPmBKdFX9V0PJdW-jVqojBB4pnvBPV-pvBvqPBrIyEMXRTaEoB-YF2vDp2GxRRVmZXi-h0qY7N0wSjjusDjBVLy6fdPg2JLlmlX1crKNU96Ib9-u57YGwQcZgnz3gH6LbV4g5u3kyMZGYnIGZbHbeTb=w720-h720-s-no-gm?authuser=0"
             }
           ]
         }
@@ -2717,7 +2720,7 @@
           },
           "totalScore": 35,
           "final": "ถูก",
-          "image": "/img/history/2023/Board Game (1).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN_adAqTuTDJxGXCaYVZpdUsuJKuCUjqKYhF-h1l1ZcnvW-ocuVjc3fPwd0H3kg-58iJJkSQ_JvoW8IhXfEutLE6QHfsUr0oF2iQuqMYBUcvnH8YFaafuqYeaovh7gdSkhTVkSO3q8MsPqnoX1hsN8p=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 1,
@@ -2734,7 +2737,7 @@
           },
           "totalScore": 41,
           "final": "ถูก",
-          "image": "/img/history/2023/WWE.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczODkT_yTgrRJpuvR3KJYmepz8m9Jh1MOwxVCCl0QvYhSrOib-5Vc3wh5h3e-j9KnA5Tg3tFu3D__eXyhBdDY_TUMM87oKskG-vz0y6tQC3WLMFLxundzm2V1Oq5i77sF53B5N1Xtq8HNbo62Lv509y2=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 1,
@@ -2751,7 +2754,7 @@
           },
           "totalScore": 61,
           "final": "ถูก",
-          "image": "/img/history/2023/VTuber.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPgR9ZrtumbjAqO7stscpubcKOyimyuaWiqo0E6qAeJ22Em1cjQpZiky4VfiRfkP5slfoROBMsuXrymM0e6ftVKElwtfv_PxTDF5YlF5USM67gR1JPJs-6i-DPSSp0cK5utvDsV4pCEhQVnftPoifIY=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 2,
@@ -2768,7 +2771,7 @@
           },
           "totalScore": 43,
           "final": "ผิด",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOfS0QTZol2zo496uiiUK0d8XlMD-jyvRYK46PLVcOqGF4AudUzX3iIOPa4qPEZKfDD8Xkm_41evtS_89Y_IDPgAwb5qiHDQ6IvrTaVmOtZa7Cg5Jhjr2tVsCpYPZvoOMo5pjOcuNJdtUCTXHwdjxXC=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 2,
@@ -2785,7 +2788,7 @@
           },
           "totalScore": 59,
           "final": "ถูก",
-          "image": "/img/history/2023/Hyperdimension Neptunia.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN6zGY5kyrJGT9bQJe-4Wt3E46A61nq3lg4yl6sDitnwHWaXuq4lKi3IAoWR7Xt_TabP8EN-11ZQRblEX8oM6VHUsyh8l0gilIdMGiolBq8QGXsV-jRt2NoGEKyh-EzQMMNVpCpcIkZrObxjMbTBNs4=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 2,
@@ -2802,7 +2805,7 @@
           },
           "totalScore": 44,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPBOnzn3urJWTplU6svoLYS55xXMwWr1OBCNTDopQrlHDKfI4bG6kXodlpxDtmnYKIOR18aWa2ltcgmNAVtO7IRMH08MQOz_ZZSK2NsEkpwDL9IMFJ7C4Iiyf_l8tS3uV0QNMmFqblUhkYfGG39VfgS=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -2819,7 +2822,7 @@
           },
           "totalScore": 65,
           "final": "ถูก",
-          "image": "/img/history/2023/48Group Thailand.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN2rQLGFK9pu6-lNP3NXHvhcCfF_oJOQ-5yAR9TBILl7i0f91mH1hnGZWMZhCHkgnodD-3zZKxsLXvhKHk25-0YdBuxRX42muzdyC9qpp1YDyYbF3h1bIpqIl8vr2-3-5Quoz41zodfDucTlYWssXO9=w720-h719-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -2836,7 +2839,7 @@
           },
           "totalScore": 48,
           "final": "ผิด",
-          "image": "/img/history/2023/Cookie Run Ovenbreak.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdMcPS7uz_DsEHbiBUzPgjsJmYuMk3g0iyKVxHPBY_Q0AjcGfyf7nUREU5_S__ZHWoM9wuhUi80iHOlqZ3kLkvqZX6HSM_TgBPbk1791nUEX_4kCjRrlj_QCDD6bgeEZXgVD_N91WDJXifzwUMvkMg=w720-h719-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -2853,7 +2856,7 @@
           },
           "totalScore": 38,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNZYd7Ayx3DwzTRd3k30dTXbuzJ24eCgXcU83QSGI4wyewYoJRT8-3cdVPQVeGO2L7jMXGBLy5pv3pDry3BUbXA6LgQP6T5_JrlY30GzgRWksZsGyDrG4lVksP4ug8qB6nJDvWUfdU4JSIGTF1GFLpT=w720-h719-s-no-gm?authuser=0"
         },
         {
           "episode": 4,
@@ -2870,7 +2873,7 @@
           },
           "totalScore": 37,
           "final": "ถูก",
-          "image": "/img/history/2023/Cardfight Vanguard.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEu1wSfjggKRdycL9KfWJeN9PkCPSSzrYKyWGkth9N7bu44CvLsa3OYABuBj58-4kClfMeANaxbWr3AFqs4mS-w1d2Sux6oYl--LASP4x1pb-kDbnA3QdJtUwp0EB5JT00ev_Q1Eod1_KmYWPJg__d=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 4,
@@ -2887,7 +2890,8 @@
           },
           "totalScore": 54,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm?authuser=0"
+          "note": "สละสิทธิ์การแข่งขันแห่งปี",
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNpbl-01bWd7IBECIW6MVqwLlic9QMZ3q_NBGflIORiwWS2ToC4m1MmtkuA42AwzkZS9UUe--qnikn2bl8q5sUDndfHawjN7pn6ZKgL1Dzh0rtLTl4XkEzdCxbhj8_je6DRYSaFJ76oiytyJyT2Shp-=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 4,
@@ -2904,7 +2908,7 @@
           },
           "totalScore": 39,
           "final": "ถูก",
-          "image": "/img/history/2023/MCU.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOyKgkVR-Ph4DfCqVrBbnV81fh0vsfW8QOpAtjqqnsuKqzzl25kMD0jiEKFgAD41HPyaDugGNJ03KICiaOwnMFelVWzV36cwpgEyB3w14LMcJMCbiNKXwDrU4eYrJfvR-htRWW4Fxn96T0Iisn475JE=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -2921,7 +2925,7 @@
           },
           "totalScore": 40,
           "final": "-",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMs6o1w1ip6oYQKywD6ZuUblLlsyM8SoXTB4krrqkofs9-CyNp5jb-c5VjiiIX01hxK32xWwep29Jw3stH-o21a0xxJR11XabnOSYWkIDWw4guT6z-ycjzDZvrWK9zHaPBRdt5wglrLrZAZ5K3cT9t0=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -2938,7 +2942,7 @@
           },
           "totalScore": 43,
           "final": "ถูก",
-          "image": "/img/history/2023/Board Game (1).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOTDfGw7rcKjBPqfA-U4-WyFHqYUfGXB1sEIIcv1B78QRZoZJhiVJGW4FnYm5XUx2MjJPIrKg9ZsF4Q_dwhb_1IZ0zIspcugK0Xv5zUFTCW3zrWvMj_77nrQUmlvTdBtfs9DC-KS9_PUtlu_Wkx6BSb=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -2955,7 +2959,7 @@
           },
           "totalScore": 42,
           "final": "ถูก",
-          "image": "/img/history/2023/Masayuki Suzuki.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNrtfsCAfyQi7ppqo0xF7a_1M5gB1eBDs9Iabq-LIb1FQ40eVHpXIVyccFSGdqCc16vB45nHNRHbXMo-ewkOOAOVQf8JJqp7f5mpWHFc0dZ7RwZfGbZcCMBUwi_FuA8Y6elJvLgqu_Xe9MOkSwmsdG7=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -2972,7 +2976,7 @@
           },
           "totalScore": 61,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMMtOITwUPLxMExEUDMDXqJrUw8R3-LhADxW_L-X9U04wC1UFGKXjRumD5EETsMAtrJhC-x6QvB8c77XHBGvIfaw0vWhS7bN-jTYL8qmyDQbBE6-f6VrIyVdhL_QFdkW0S2meyXZLf4YCynlpRXAxFM=w720-h719-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -2989,7 +2993,7 @@
           },
           "totalScore": 11,
           "final": "-",
-          "image": "/img/history/2023/เบิร์ด ธงไชย.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMejtWffPO4DwkFP2YXi6v3va79FN-kA-REVJYFvqwUQrtncguXwwIix6_Qkh8y3FXCM1weAj9BF247uXmyNAuwB9tiqDawYVk0F4NYMAQLGSCeWzhWuCffpX46oOYMozKFbr4emdSjcuDNCtB06Uhg=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -3006,7 +3010,7 @@
           },
           "totalScore": 46,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPNuDqZIO0qGy9AgG5LQe6k-U2fON8GOgiBBdQaAAhyFikwMvQhi7FZ3H4p9yduv-eN3bX1bFNX5r0OaM9cc-nlJT9gZdmFhF1ZfSgIPJp3ttdkztbWumQQWLPyWcKYLbxB5zgY4ht6WZqidOsHr8hn=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 7,
@@ -3023,7 +3027,7 @@
           },
           "totalScore": 57,
           "final": "ถูก",
-          "image": "/img/history/2023/Plants VS Zombies.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPnFXous3tqzcK87xtmCjzsK6dRwnY6nkCXjmtoJGhofxwuwNceVjoeI3NbVKYZY_1xWKyHot359pGmVUwg05z-vCmeYjZjdRzqF1UyOzy_-gSFucO-18PQTI-YbQIgwWkee9ON31TDdFEAvzT9HYe3=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 7,
@@ -3040,7 +3044,7 @@
           },
           "totalScore": 4,
           "final": "-",
-          "image": "/img/history/2023/Miss Universe.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPtyZuFdtkbBorRnrs_WD6nMwIdvrfYfgoqKG_7gdhKoS-Rf8vh8qS7naz4Ek0Vp6oVE8Tzh0nsSqtYOJOGFMWotHmiz04dsCFjhHSC2pv0c81RrtZ4foMXFcM-4i-14_cfEaC2L5QY6W53Ic1iEKWK=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 7,
@@ -3057,7 +3061,7 @@
           },
           "totalScore": 41,
           "final": "ถูก",
-          "image": "/img/history/2023/สุนทราภรณ์.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMv2zaXW8fQdfjTXY8Gv1f0xJYWb1VIQkiMBenEAbsBnzxwGtFJ9lvEPLtJVSlpRAPk1svGjMrcpWUnLyaJAGhgvHa6nu6LA-d3jGdKY7gNa_Ynkqs1E0wPqBzSVzLrEheLEfWQtBy1z96au75YwPSM=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 8,
@@ -3074,7 +3078,7 @@
           },
           "totalScore": 35,
           "final": "ถูก",
-          "image": "/img/history/2023/เกมซีรีส์ Yakuza.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN5kSODBi9E02XcBRaT7dEV6Z-3uF7c1zVmuDhJKg26_CsNLiJVfXPRzV96PLQz8ZLDjvUIqlN1aFvM3d6fnLoMuuaYQr7vsKZMs5Dfzy1Wp0AtsIeksvhjH7AfGAKZ9_goy7xGzt4KQy_nbn0-n3QC=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 8,
@@ -3091,7 +3095,7 @@
           },
           "totalScore": 37,
           "final": "ผิด",
-          "image": "/img/history/2023/Tilly Birds.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNhfQpnwW-UCIi4jt6ok2IYFAMA9M9MrWUaVADMynC28gbpw5nfvy3vpgFgsfZ7kVbYL6Hsp8-gOhjAteyjWnXF7afFnhr7v-2SvbJtJjcdqt1Do7lPUsAO2qqKqBe4D1sf0VAFPqY9Ng7WjNg0PV0k=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 8,
@@ -3108,7 +3112,7 @@
           },
           "totalScore": 50,
           "final": "ถูก",
-          "image": "/img/history/2023/Cocktail.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO7KzxrMqtMS5XAG8IN9EQyMfC5AYpZi0iiHEHPnnM3IrhbHfWQiW8houqOxkEEUQ7i3t3iyy3qI0HH6yl2HMNZqZbEJ_A_Q5jQTUDTjyPhWSqavi9X8vJnVsU5Oj6DeVKC0HovJ_h1w4bxTy1UX7CR=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 9,
@@ -3125,7 +3129,7 @@
           },
           "totalScore": 60,
           "final": "ถูก",
-          "image": "/img/history/2023/Tattoo Colour.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMmPVjAWjJyJlMHz9Y40aZsdtXsMOSGccdGndc_8qfO9rLXjhv7yRZqodCo9dFLh2mNDCljgRBfDmq7zEcreErOJt9lg5PTko15FzQuO2HQx72CH26SXQhOIdbgIFB5Q2g7ZmfpVApe_EJqCYREGxmK=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 9,
@@ -3142,7 +3146,7 @@
           },
           "totalScore": 65,
           "final": "ถูก",
-          "image": "/img/history/2023/วง Queen (1).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPmBKdFX9V0PJdW-jVqojBB4pnvBPV-pvBvqPBrIyEMXRTaEoB-YF2vDp2GxRRVmZXi-h0qY7N0wSjjusDjBVLy6fdPg2JLlmlX1crKNU96Ib9-u57YGwQcZgnz3gH6LbV4g5u3kyMZGYnIGZbHbeTb=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 9,
@@ -3159,7 +3163,7 @@
           },
           "totalScore": 55,
           "final": "ถูก",
-          "image": "/img/history/2023/Genshin Impact (1).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMW7fl3735-kbspRpreFKZiU37faZqM0u-9JSSgp6pZQk6kmSiFLBUiDv_i6FEVfNj8wJ2FuI142Gk6HysNbWgaQNtTCnwDZWtphdnINxhPoOTT94zdWQkaCiHA0l-jusR7pn9bD37ym63gveKAz_09=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -3176,7 +3180,7 @@
           },
           "totalScore": 38,
           "final": "ถูก",
-          "image": "/img/history/2023/เหรียญกษาปณ์ไทย.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP39ChfxvEPgEhjJvfiYsheAqqU1pLymRUyAaKzJuPSHpDrrIB3FAfQNE0DjdbH04Ox2KjOEm0RHS6heNseay3xuLK-N8Dkv3CaLTCq9uO48hS5pj5Nj0bbs-l0QMXzKhLd5wBMx9pErPvBgSXxkZ6d=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -3193,7 +3197,7 @@
           },
           "totalScore": 55,
           "final": "ผิด",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczNGXiRybdHr50jnZ5cSGVWylSyacpr0_lKea-J997YP8DTnyd2LSErW43LVIV1jv05TzvFz9X3BwyMZ1NDAk0AFH9d5tlu-9ZBq54sW8LK3wfGKAH6cdN-Y2BS3jHh4jxLuJIsoSxuhPwbvBALA7kO_=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNjyjzp3NHUBs7rX0obqnRRbNCEFu7jcLFOSiwghedQyrJu0sIL30umBVU-yjAIrVh5Whs89wQOXaN4WjbTParWI-9nKa0f2QO_WnBAsve4lsQiiYTY6FQix77OkDCX8ZwCrNx-x1EUrd56s285B7qo=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -3210,7 +3214,7 @@
           },
           "totalScore": 34,
           "final": "-",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNkWSjviETF-vuye2Z659qoZAARWcp_GnKKdOzaAyHSHq-Zmg_BQTspXyV7JLF_gpLVvPTgcaXJ9bQcKZB0YGPPk21vm0FCfLiO55INEwhbejFzBfXMnPDJ_VUN5bvWIBKQeIldxkCUTParvKzbwLYB=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 11,
@@ -3227,7 +3231,7 @@
           },
           "totalScore": 43,
           "final": "ถูก",
-          "image": "/img/history/2023/Mario Party.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN9-OIbsYW3zxqpURtMNPZnMJu2gUftk1s5cKt6z0ZMIGM1SjnbvLP-2H9WWeZet6lxVu0-0pGESM9VUPp6tL0Dbe5akhjP4krtRYz6DCw2VmcOzNjCtL_R2hF3ZrPUY_VuTHpJrRdIppyuDfXAQb0w=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 11,
@@ -3244,7 +3248,7 @@
           },
           "totalScore": 39,
           "final": "ผิด",
-          "image": "http://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMqOlRxkTNkydag2J1SxeX4Cc74EJl_KQ-_rLqT6esWteIZs2_J15K19uelylAHFVQlaUm1GeL8hpwzkZEnfMP2I8rHZ4sfztota3Pawthu-mffM4vB6xsbq2_hZ5TikhrT3ldxSZ0isY5woCfxGWdg=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 11,
@@ -3261,7 +3265,7 @@
           },
           "totalScore": 43,
           "final": "ถูก",
-          "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm?authuser=0"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNR6WKIret_27SGn5Kn0xasMI6c-xWGR8vbwlLY2j7pMEqlz8k4Wt29Q0NQSq0eioYP1tGLaUKURbp3gtULo3nhGnk-3ECg9TZ-3__pj3nPb3vrGkiRxTSNlcCkqJi0T9kFB2vj9JoXmV2ya6YICjeJ=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 12,
@@ -3278,7 +3282,7 @@
           },
           "totalScore": 55,
           "final": "ถูก",
-          "image": "/img/history/2023/Saint Seiya.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNXIfm8gnTWoCeFCkGqsvqN3oJgql0UQuXsGMBc0zdeBGZ17edSBaAvn9blHc9iikORrzfwx7y_OpWpcHmydMRXYAaaO3YagGPK0vglnCBIIkOaUs32y_gKYDuwFg49PT9swUL_uH80Ym5K9BB6PBIQ=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 12,
@@ -3295,7 +3299,7 @@
           },
           "totalScore": 45,
           "final": "ถูก",
-          "image": "/img/history/2023/Genshin Impact (1).png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNAfurg0FdjrgIhJ5ZRy-bioy_jGEGsG_yd7yb7qLsJT3BD2H5OpdQ02Z3bPX832u8IH1dXcY_-cVFALbpZ_J9TPJ5Q-Leh3diEWDglgufCXMvLQj1EWV4ib2llcGaUjS7UC9aSHfso4rqUA_uS_9EJ=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 12,
@@ -3312,7 +3316,7 @@
           },
           "totalScore": 32,
           "final": "-",
-          "image": "/img/history/2023/Death Note.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOWKAM9Pt4Di-yFsYRPsTMIiNZXh-SSn2taxv5rFU8s-ljUHikKX6UT8j75Wh-qUjLH9Jy_qOZOMpCFtPS8iRXwLME0vALcGYicPYE92cKKAPhKTNC6opa2UZ-Ro_eLJYQriNjkkJzT7stFyPIxCiXB=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 13,
@@ -3455,7 +3459,7 @@
             "attribute": 0
           },
           "totalScore": 22,
-          "image": "/img/history/2024/Cookie Run Ovenbreak.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdMcPS7uz_DsEHbiBUzPgjsJmYuMk3g0iyKVxHPBY_Q0AjcGfyf7nUREU5_S__ZHWoM9wuhUi80iHOlqZ3kLkvqZX6HSM_TgBPbk1791nUEX_4kCjRrlj_QCDD6bgeEZXgVD_N91WDJXifzwUMvkMg=w720-h719-s-no-gm?authuser=0"
         },
         {
           "date": "",
@@ -3489,7 +3493,7 @@
             "attribute": 20
           },
           "totalScore": 60,
-          "image": "/img/history/2024/hololive.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO_B0kPaBzoUr1GyUyx0GhcjfUM52fy7QrGyv6SJZh7BjjCa5icAA2clE5IF0N58Hres48FSUCVnu4b7pBDCrYDkq00NWMXkX3zrVppujkMZS77I6B0uWZIl1aR0kD_tE6Y3eCI5WAbr5fb0OM4hHol=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "date": "",
@@ -3540,7 +3544,7 @@
             "attribute": 0
           },
           "totalScore": 45,
-          "image": "/img/history/2024/บอร์ดเกม.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMB5eOZnWJ-rFYGvNDHS1Z1wedD3Dm1bMOvhfCVvUZtYCtBdDwrhyJwjCfQMY5LCHRnmq8Z9rbM537uN9QuCEJDNv3xADUm1nPqZFxy8I1BMj-pMw7KElsNw4aa0JQaFnSFAYI43ViilycLSXSLoawL=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "date": "",
@@ -3591,7 +3595,7 @@
             "attribute": 20
           },
           "totalScore": 55,
-          "image": "/img/history/2024/Genshin Impact.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMW7fl3735-kbspRpreFKZiU37faZqM0u-9JSSgp6pZQk6kmSiFLBUiDv_i6FEVfNj8wJ2FuI142Gk6HysNbWgaQNtTCnwDZWtphdnINxhPoOTT94zdWQkaCiHA0l-jusR7pn9bD37ym63gveKAz_09=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "",
@@ -3642,7 +3646,7 @@
             "attribute": 0
           },
           "totalScore": 18,
-          "image": "/img/history/2024/Mario Kart Series.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNKXoc7Edom7Ar-PX_Z3SJC0U9J5ENNWzcy3a2AVWV7Ep-lFusdIn5dFhEGvW5mU3gdj5mlhBeA2IXjU8ayHJQd57ou09wGk1EKJD507IQG9OCnYsrBpxiuHmMM7Enm1oSyn-CMSjbe3GW4BrP1cwaX=w405-h405-s-no-gm?authuser=0"
         },
         {
           "date": "",
@@ -3659,7 +3663,7 @@
             "attribute": 5
           },
           "totalScore": 35,
-          "image": "/img/history/2024/AEW.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPH57c7ciz0kNV4aWpCFPzltRD8qZU7OX7A5KZ07LGfu7kw7KJo52cvW5GHPwgASRx2TnGxgvgJBzPDR9Lz93SXLNoQ75QqC9t1dS-OIXmwjSQRHfHTyfP16qt79olauygvba4s4y7iuILzTK9dBDah=w772-h772-s-no-gm?authuser=0"
         },
         {
           "date": "",
@@ -3761,7 +3765,7 @@
             "attribute": 0
           },
           "totalScore": 36,
-          "image": "/img/history/2024/Plants VS. Zombies.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPnFXous3tqzcK87xtmCjzsK6dRwnY6nkCXjmtoJGhofxwuwNceVjoeI3NbVKYZY_1xWKyHot359pGmVUwg05z-vCmeYjZjdRzqF1UyOzy_-gSFucO-18PQTI-YbQIgwWkee9ON31TDdFEAvzT9HYe3=w720-h720-s-no-gm?authuser=0"
         },
         {
           "date": "",
@@ -3829,7 +3833,7 @@
             "attribute": 5
           },
           "totalScore": 61,
-          "image": "/img/history/2024/Death Note.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOWKAM9Pt4Di-yFsYRPsTMIiNZXh-SSn2taxv5rFU8s-ljUHikKX6UT8j75Wh-qUjLH9Jy_qOZOMpCFtPS8iRXwLME0vALcGYicPYE92cKKAPhKTNC6opa2UZ-Ro_eLJYQriNjkkJzT7stFyPIxCiXB=w1002-h1002-s-no-gm?authuser=0"
         }
       ],
       "playoffs": null,
@@ -4065,7 +4069,7 @@
           },
           "totalScore": 53,
           "final": "ถูก",
-          "image": "/img/history/2024/Cookie Run Ovenbreak.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdMcPS7uz_DsEHbiBUzPgjsJmYuMk3g0iyKVxHPBY_Q0AjcGfyf7nUREU5_S__ZHWoM9wuhUi80iHOlqZ3kLkvqZX6HSM_TgBPbk1791nUEX_4kCjRrlj_QCDD6bgeEZXgVD_N91WDJXifzwUMvkMg=w720-h719-s-no-gm?authuser=0"
         },
         {
           "episode": 2,
@@ -4099,7 +4103,7 @@
           },
           "totalScore": 64,
           "final": "ถูก",
-          "image": "/img/history/2024/Mario Kart Series.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNKXoc7Edom7Ar-PX_Z3SJC0U9J5ENNWzcy3a2AVWV7Ep-lFusdIn5dFhEGvW5mU3gdj5mlhBeA2IXjU8ayHJQd57ou09wGk1EKJD507IQG9OCnYsrBpxiuHmMM7Enm1oSyn-CMSjbe3GW4BrP1cwaX=w405-h405-s-no-gm?authuser=0"
         },
         {
           "episode": 3,
@@ -4218,7 +4222,7 @@
           },
           "totalScore": 65,
           "final": "ถูก",
-          "image": "/img/history/2024/hololive.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO_B0kPaBzoUr1GyUyx0GhcjfUM52fy7QrGyv6SJZh7BjjCa5icAA2clE5IF0N58Hres48FSUCVnu4b7pBDCrYDkq00NWMXkX3zrVppujkMZS77I6B0uWZIl1aR0kD_tE6Y3eCI5WAbr5fb0OM4hHol=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -4252,7 +4256,7 @@
           },
           "totalScore": 39,
           "final": "ผิด",
-          "image": "/img/history/2024/Tales Of The Series.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP-uvvQbghQwtK6o2TE-jnoAcZfOvsvyMSNSAjCJ1XhVZtUgCXpy3zujgClDjBOpfAy3sjCcL8C9BlKmJB2ltS7fdagwTq_hWgH0wCll_BnzPhxDwxwBUmfW-SI1CyVHhhrbOU6vavZB-Lynhpszpol=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -4269,7 +4273,7 @@
           },
           "totalScore": 60,
           "final": "ถูก",
-          "image": "/img/history/2024/Plants VS. Zombies.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPnFXous3tqzcK87xtmCjzsK6dRwnY6nkCXjmtoJGhofxwuwNceVjoeI3NbVKYZY_1xWKyHot359pGmVUwg05z-vCmeYjZjdRzqF1UyOzy_-gSFucO-18PQTI-YbQIgwWkee9ON31TDdFEAvzT9HYe3=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 6,
@@ -4354,7 +4358,7 @@
           },
           "totalScore": 41,
           "final": "ถูก",
-          "image": "/img/history/2024/AEW.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPH57c7ciz0kNV4aWpCFPzltRD8qZU7OX7A5KZ07LGfu7kw7KJo52cvW5GHPwgASRx2TnGxgvgJBzPDR9Lz93SXLNoQ75QqC9t1dS-OIXmwjSQRHfHTyfP16qt79olauygvba4s4y7iuILzTK9dBDah=w772-h772-s-no-gm?authuser=0"
         },
         {
           "episode": 8,
@@ -4371,7 +4375,7 @@
           },
           "totalScore": 45,
           "final": "ถูก",
-          "image": "/img/history/2024/Genshin Impact.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMW7fl3735-kbspRpreFKZiU37faZqM0u-9JSSgp6pZQk6kmSiFLBUiDv_i6FEVfNj8wJ2FuI142Gk6HysNbWgaQNtTCnwDZWtphdnINxhPoOTT94zdWQkaCiHA0l-jusR7pn9bD37ym63gveKAz_09=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 8,
@@ -4473,7 +4477,7 @@
           },
           "totalScore": 45,
           "final": "ถูก",
-          "image": "/img/history/2024/Death Note.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOWKAM9Pt4Di-yFsYRPsTMIiNZXh-SSn2taxv5rFU8s-ljUHikKX6UT8j75Wh-qUjLH9Jy_qOZOMpCFtPS8iRXwLME0vALcGYicPYE92cKKAPhKTNC6opa2UZ-Ro_eLJYQriNjkkJzT7stFyPIxCiXB=w1002-h1002-s-no-gm?authuser=0"
         },
         {
           "episode": 10,
@@ -4507,7 +4511,7 @@
           },
           "totalScore": 2,
           "final": "-",
-          "image": "/img/history/2024/Identity V.png"
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMB1B6WHaxPmLSdUbCOYp9cLwmv7mwAFNuNCx91mceO4SYxns4qKmxf2Qpn3OOjcJFJhwyPOxqL1XaruhT6pFMIr85Qk1xsj2XnLTwFkA1OKwrHjw-nkJwCYo5zcP39cZRf3G7YQUOPfNxcvGZMQMgW=w1002-h1002-s-no-gm?authuser=0"
         }
       ]
     },
@@ -4779,7 +4783,7 @@
             "q4": "SKIP"
           },
           "final": "ถูก",
-          "image": ""
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPtyZuFdtkbBorRnrs_WD6nMwIdvrfYfgoqKG_7gdhKoS-Rf8vh8qS7naz4Ek0Vp6oVE8Tzh0nsSqtYOJOGFMWotHmiz04dsCFjhHSC2pv0c81RrtZ4foMXFcM-4i-14_cfEaC2L5QY6W53Ic1iEKWK=w720-h720-s-no-gm?authuser=0"
         },
         {
           "episode": 5,
@@ -5199,7 +5203,7 @@
             "q4": "-"
           },
           "final": "-",
-          "image": ""
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPH57c7ciz0kNV4aWpCFPzltRD8qZU7OX7A5KZ07LGfu7kw7KJo52cvW5GHPwgASRx2TnGxgvgJBzPDR9Lz93SXLNoQ75QqC9t1dS-OIXmwjSQRHfHTyfP16qt79olauygvba4s4y7iuILzTK9dBDah=w772-h772-s-no-gm?authuser=0"
         },
         {
           "episode": 13,
@@ -5227,7 +5231,7 @@
             "q4": "ไม่ได้เล่น"
           },
           "final": "-",
-          "image": ""
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP-uvvQbghQwtK6o2TE-jnoAcZfOvsvyMSNSAjCJ1XhVZtUgCXpy3zujgClDjBOpfAy3sjCcL8C9BlKmJB2ltS7fdagwTq_hWgH0wCll_BnzPhxDwxwBUmfW-SI1CyVHhhrbOU6vavZB-Lynhpszpol=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "episode": 13,
@@ -5283,7 +5287,7 @@
             "q4": "-"
           },
           "final": "-",
-          "image": ""
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdMcPS7uz_DsEHbiBUzPgjsJmYuMk3g0iyKVxHPBY_Q0AjcGfyf7nUREU5_S__ZHWoM9wuhUi80iHOlqZ3kLkvqZX6HSM_TgBPbk1791nUEX_4kCjRrlj_QCDD6bgeEZXgVD_N91WDJXifzwUMvkMg=w720-h719-s-no-gm?authuser=0"
         },
         {
           "episode": 14,
@@ -5497,7 +5501,7 @@
             "properties": "-"
           },
           "result": "ตกรอบ",
-          "image": ""
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczP-uvvQbghQwtK6o2TE-jnoAcZfOvsvyMSNSAjCJ1XhVZtUgCXpy3zujgClDjBOpfAy3sjCcL8C9BlKmJB2ltS7fdagwTq_hWgH0wCll_BnzPhxDwxwBUmfW-SI1CyVHhhrbOU6vavZB-Lynhpszpol=w1002-h652-s-no-gm?authuser=0"
         },
         {
           "episode": 15,
