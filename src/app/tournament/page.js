@@ -1299,27 +1299,174 @@ export default function TournamentPage() {
 
             {/* Stats Summary Banner */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "24px" }}>
-              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>W - D - L (ชนะ - เสมอ - แพ้)</div>
-                <div style={{ fontSize: "18px", fontWeight: "900", color: "#86efac", marginTop: "2px", fontFamily: "var(--font-num)" }}>
+              {/* Card 1: W-D-L */}
+              <div
+                style={{
+                  background: "rgba(6, 16, 36, 0.9)",
+                  padding: "12px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  minHeight: "72px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "rgba(255,255,255,0.6)",
+                    fontWeight: "600",
+                    minHeight: "26px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  W - D - L (ช-ส-พ)
+                </div>
+                <div
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "900",
+                    color: "#86efac",
+                    fontFamily: "var(--font-num)",
+                    lineHeight: 1,
+                    marginTop: "6px",
+                  }}
+                >
                   {selectedContestant.stats?.win ?? selectedContestant.win}W - {selectedContestant.stats?.draw ?? selectedContestant.draw}D - {selectedContestant.stats?.lose ?? selectedContestant.lose}L
                 </div>
               </div>
-              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ผลต่าง GP (+/-)</div>
-                <div style={{ fontSize: "18px", fontWeight: "900", color: "#38bdf8", marginTop: "2px", fontFamily: "var(--font-num)" }}>
+
+              {/* Card 2: GP Diff */}
+              <div
+                style={{
+                  background: "rgba(6, 16, 36, 0.9)",
+                  padding: "12px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  minHeight: "72px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "rgba(255,255,255,0.6)",
+                    fontWeight: "600",
+                    minHeight: "26px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  ผลต่าง GP (+/-)
+                </div>
+                <div
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "900",
+                    color: "#38bdf8",
+                    fontFamily: "var(--font-num)",
+                    lineHeight: 1,
+                    marginTop: "6px",
+                  }}
+                >
                   {selectedContestant.stats?.scoreDiff ?? selectedContestant.scoreDiff}
                 </div>
               </div>
-              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ชนะ/แพ้ GP</div>
-                <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", marginTop: "4px", fontFamily: "var(--font-num)" }}>
+
+              {/* Card 3: Won/Lost GP */}
+              <div
+                style={{
+                  background: "rgba(6, 16, 36, 0.9)",
+                  padding: "12px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  minHeight: "72px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "rgba(255,255,255,0.6)",
+                    fontWeight: "600",
+                    minHeight: "26px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  ชนะ / แพ้ GP
+                </div>
+                <div
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "900",
+                    color: "#ffd700",
+                    fontFamily: "var(--font-num)",
+                    lineHeight: 1,
+                    marginTop: "6px",
+                  }}
+                >
                   +{selectedContestant.stats?.categoriesWon ?? selectedContestant.categoriesWon} / -{selectedContestant.stats?.categoriesLost ?? selectedContestant.categoriesLost}
                 </div>
               </div>
-              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>คะแนนดิบรวม</div>
-                <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff", marginTop: "2px", fontFamily: "var(--font-num)" }}>
+
+              {/* Card 4: Total Raw Scores */}
+              <div
+                style={{
+                  background: "rgba(6, 16, 36, 0.9)",
+                  padding: "12px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  minHeight: "72px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "rgba(255,255,255,0.6)",
+                    fontWeight: "600",
+                    minHeight: "26px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  คะแนนดิบรวม
+                </div>
+                <div
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "900",
+                    color: "#ffffff",
+                    fontFamily: "var(--font-num)",
+                    lineHeight: 1,
+                    marginTop: "6px",
+                  }}
+                >
                   {selectedContestant.stats?.totalScore ?? selectedContestant.totalScore}
                 </div>
               </div>
