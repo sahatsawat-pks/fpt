@@ -34,49 +34,44 @@ export default function TournamentPhotosPage() {
 
   // Auth check
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const stored = typeof window !== "undefined" ? localStorage.getItem("fpt_admin_auth") : null;
-        if (stored === "true" || stored === "logged_in") {
-          setIsAuthenticated(true);
-          setAuthChecking(false);
-          return;
-        }
-        const res = await fetch("/api/settings?admin=1");
-        const s = await res.json();
-        if (s.success && !s.adminPasswordRequired) {
-          setIsAuthenticated(true);
-        }
-      } catch (err) {
-        console.error("Auth check failed:", err);
-      } finally {
-        setAuthChecking(false);
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("fpt_admin_auth");
+      if (stored === "true") {
+        setIsAuthenticated(true);
       }
-    };
-    checkAuth();
+      setAuthChecking(false);
+    }
   }, []);
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (!passwordInput.trim()) {
+      setAuthError("กรุณากรอกรหัสผ่านผู้ดูแลระบบ");
+      return;
+    }
     setAuthError("");
     try {
-      const res = await fetch("/api/settings?admin=1");
-      const s = await res.json();
-      const validPass = s.gamePassword || "fanpantae_2026";
-      if (passwordInput === validPass || passwordInput === "fpt2026" || passwordInput === "admin") {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify_admin", password: passwordInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.valid) {
         setIsAuthenticated(true);
-        localStorage.setItem("fpt_admin_auth", "true");
+        sessionStorage.setItem("fpt_admin_auth", "true");
+        setPasswordInput("");
       } else {
-        setAuthError("รหัสผ่านไม่ถูกต้อง");
+        setAuthError("รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
       }
     } catch (err) {
-      if (passwordInput === "fanpantae_2026" || passwordInput === "admin") {
-        setIsAuthenticated(true);
-        localStorage.setItem("fpt_admin_auth", "true");
-      } else {
-        setAuthError("ตรวจสอบรหัสผ่านไม่สำเร็จ");
-      }
+      setAuthError("เกิดข้อผิดพลาดในการตรวจสอบรหัสผ่าน");
     }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("fpt_admin_auth");
+    setIsAuthenticated(false);
   };
 
   // Fetch data
@@ -261,13 +256,20 @@ export default function TournamentPhotosPage() {
           <form onSubmit={handleLogin} style={{ marginTop: "20px" }}>
             <input
               type="password"
-              placeholder="รหัสผ่านผู้ดูแลระบบ..."
+              placeholder="กรุณากรอกรหัสผ่าน Admin..."
               value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              style={{ width: "100%", padding: "12px", borderRadius: "10px", background: "rgba(6, 12, 24, 0.8)", border: "1.5px solid rgba(0, 229, 255, 0.4)", color: "#ffffff", fontSize: "14px", textAlign: "center", outline: "none", marginBottom: "12px" }}
+              onChange={(e) => {
+                setPasswordInput(e.target.value);
+                if (authError) setAuthError("");
+              }}
+              style={{ width: "100%", padding: "12px", borderRadius: "10px", background: "rgba(6, 12, 24, 0.8)", border: authError ? "1.5px solid #ff4d4f" : "1.5px solid rgba(0, 229, 255, 0.4)", color: "#ffffff", fontSize: "15px", textAlign: "center", outline: "none", marginBottom: "14px", boxSizing: "border-box" }}
             />
-            {authError && <div style={{ color: "#f43f5e", fontSize: "12px", marginBottom: "12px" }}>{authError}</div>}
-            <button type="submit" style={{ width: "100%", padding: "12px", borderRadius: "10px", background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)", border: "none", color: "#060c18", fontWeight: "800", fontSize: "14px", cursor: "pointer" }}>
+            {authError && (
+              <div style={{ background: "rgba(255, 77, 79, 0.15)", border: "1px solid rgba(255, 77, 79, 0.5)", color: "#ff7875", padding: "10px 14px", borderRadius: "8px", fontSize: "13px", marginBottom: "14px", fontWeight: "600" }}>
+                ⚠️ {authError}
+              </div>
+            )}
+            <button type="submit" style={{ width: "100%", padding: "12px", borderRadius: "10px", background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)", border: "none", color: "#060c18", fontWeight: "800", fontSize: "15px", cursor: "pointer" }}>
               เข้าสู่ระบบ
             </button>
           </form>
@@ -323,6 +325,21 @@ export default function TournamentPhotosPage() {
             <Link href="/tournament" target="_blank" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.4)", color: "#ffd700", fontSize: "13px", fontWeight: "700", textDecoration: "none" }}>
               👁️ ดูหน้าเว็บจริง ↗
             </Link>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: "6px 14px",
+                borderRadius: "8px",
+                background: "rgba(255, 77, 79, 0.15)",
+                color: "#ff7875",
+                fontSize: "13px",
+                border: "1px solid rgba(255, 77, 79, 0.4)",
+                cursor: "pointer",
+                fontWeight: "700",
+              }}
+            >
+              🚪 ออกจากระบบ
+            </button>
           </div>
         </div>
       </header>

@@ -36,52 +36,45 @@ export default function AdminTournamentPage() {
 
   // Check Auth on load
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const stored = typeof window !== "undefined" ? localStorage.getItem("fpt_admin_auth") : null;
-        if (stored === "true" || stored === "logged_in") {
-          setIsAuthenticated(true);
-          setAuthChecking(false);
-          return;
-        }
-
-        // Check if settings require password or if already logged into main admin
-        const res = await fetch("/api/settings?admin=1");
-        const s = await res.json();
-        if (s.success && !s.adminPasswordRequired) {
-          setIsAuthenticated(true);
-        }
-      } catch (err) {
-        console.error("Auth check failed:", err);
-      } finally {
-        setAuthChecking(false);
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("fpt_admin_auth");
+      if (stored === "true") {
+        setIsAuthenticated(true);
       }
-    };
-    checkAuth();
+      setAuthChecking(false);
+    }
   }, []);
 
   // Handle Login
   const handleLogin = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (!passwordInput.trim()) {
+      setAuthError("กรุณากรอกรหัสผ่านผู้ดูแลระบบ");
+      return;
+    }
     setAuthError("");
     try {
-      const res = await fetch("/api/settings?admin=1");
-      const s = await res.json();
-      const validPass = s.gamePassword || "fanpantae_2026";
-      if (passwordInput === validPass || passwordInput === "fpt2026" || passwordInput === "admin") {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify_admin", password: passwordInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.valid) {
         setIsAuthenticated(true);
-        localStorage.setItem("fpt_admin_auth", "true");
+        sessionStorage.setItem("fpt_admin_auth", "true");
+        setPasswordInput("");
       } else {
         setAuthError("รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
       }
     } catch (err) {
-      if (passwordInput === "fanpantae_2026" || passwordInput === "admin") {
-        setIsAuthenticated(true);
-        localStorage.setItem("fpt_admin_auth", "true");
-      } else {
-        setAuthError("ไม่สามารถเชื่อมต่อระบบตรวจสอบรหัสผ่านได้");
-      }
+      setAuthError("เกิดข้อผิดพลาดในการตรวจสอบรหัสผ่าน");
     }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("fpt_admin_auth");
+    setIsAuthenticated(false);
   };
 
   // Fetch Data from API
@@ -471,7 +464,22 @@ export default function AdminTournamentPage() {
               />
             </div>
 
-            {authError && <div style={{ color: "#f43f5e", fontSize: "12px", marginBottom: "14px", fontWeight: "600" }}>{authError}</div>}
+            {authError && (
+              <div
+                style={{
+                  background: "rgba(255, 77, 79, 0.15)",
+                  border: "1px solid rgba(255, 77, 79, 0.5)",
+                  color: "#ff7875",
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  marginBottom: "16px",
+                  fontWeight: "600",
+                }}
+              >
+                ⚠️ {authError}
+              </div>
+            )}
 
             <button
               type="submit"
@@ -690,10 +698,7 @@ export default function AdminTournamentPage() {
             ⚠️ รีเซ็ตข้อมูลทัวร์นาเมนต์
           </button>
           <button
-            onClick={() => {
-              localStorage.removeItem("fpt_admin_auth");
-              setIsAuthenticated(false);
-            }}
+            onClick={handleLogout}
             style={{
               padding: "6px 14px",
               borderRadius: "8px",
