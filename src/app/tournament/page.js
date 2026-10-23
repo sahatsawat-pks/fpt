@@ -1428,7 +1428,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
 
       {/* Responsive Horizontal Scroll Container */}
       <div style={{ position: "relative", zIndex: 2, overflowX: "auto", paddingBottom: "6px" }}>
-        <div style={{ minWidth: "560px" }}>
+        <div style={{ minWidth: "560px", padding: "4px 8px" }}>
           {/* Header Row: Title Banner (Left) & Floating Skewed Column Header Boxes (Right) */}
           <div
             style={{
@@ -2191,409 +2191,442 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
       </div>
 
       {/* Themed Tournament Battle Table */}
-      <div style={{ padding: "14px", overflowX: "auto" }}>
-        <table
+      <div style={{ padding: "10px 12px", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <div
           style={{
-            minWidth: "960px",
+            minWidth: "860px",
             width: "100%",
-            borderCollapse: "collapse",
-            fontSize: "13px",
-            fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-            background: "rgba(4, 10, 24, 0.9)",
-            border: "1px solid rgba(0, 229, 255, 0.25)",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
             borderRadius: "10px",
+            border: "1px solid rgba(0, 229, 255, 0.25)",
             overflow: "hidden",
+            background: "rgba(4, 10, 24, 0.95)",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
           }}
         >
-          {/* Table Header: Two Sides (Emerald for Player 1, Violet for Player 2) */}
-          <thead>
-            <tr style={{ height: "36px", fontSize: "12px", fontWeight: "800" }}>
-              {/* Player 1 Columns (Deep Emerald / Cyan Glass) */}
-              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 8px", width: "150px", textAlign: "left", color: "#86efac" }}>
-                ผู้เข้าแข่งขัน (1)
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 6px", width: "70px", textAlign: "center", color: "#86efac" }}>
-                ชื่อเล่น
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 8px", width: "140px", textAlign: "left", color: "#86efac" }}>
-                หมวดแฟนพันธุ์แท้
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#86efac" }}>
-                3 วินาที
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#86efac" }}>
-                ถาม-ตอบ
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#86efac" }}>
-                จิ๊กซอว์
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "55px", textAlign: "center", color: "#86efac" }}>
-                คุณสมบัติ
-              </th>
-              <th style={{ background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#ffd700" }}>
-                รวมดิบ
-              </th>
-              <th style={{ background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.35)", borderRight: "3px solid #00e5ff", padding: "6px 4px", width: "50px", textAlign: "center", color: "#00e5ff" }}>
-                แต้มลีก
-              </th>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "12px",
+              fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+              tableLayout: "fixed",
+            }}
+          >
+            {/* Table Header: Two Sides (Emerald for Player 1, Violet for Player 2) */}
+            <thead>
+              <tr style={{ height: "36px", fontSize: "11px", fontWeight: "800" }}>
+                {/* Player 1 Columns (Deep Emerald / Cyan Glass - Total 50%) */}
+                <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 6px", width: "13%", minWidth: "95px", textAlign: "left", color: "#86efac" }}>
+                  ผู้เข้าแข่งขัน (1)
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 2px", width: "6%", minWidth: "44px", textAlign: "center", color: "#86efac" }}>
+                  ชื่อเล่น
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 6px", width: "11%", minWidth: "85px", textAlign: "left", color: "#86efac" }}>
+                  หมวดแฟนพันธุ์แท้
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 2px", width: "3.3%", minWidth: "30px", textAlign: "center", color: "#86efac" }}>
+                  3 วินาที
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 2px", width: "3.3%", minWidth: "30px", textAlign: "center", color: "#86efac" }}>
+                  ถาม-ตอบ
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 2px", width: "3.3%", minWidth: "30px", textAlign: "center", color: "#86efac" }}>
+                  จิ๊กซอว์
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 2px", width: "3.4%", minWidth: "32px", textAlign: "center", color: "#86efac" }}>
+                  คุณสมบัติ
+                </th>
+                <th style={{ background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "6px 2px", width: "3.3%", minWidth: "32px", textAlign: "center", color: "#ffd700" }}>
+                  รวมดิบ
+                </th>
+                <th style={{ background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.35)", borderRight: "3px solid #00e5ff", padding: "6px 2px", width: "3.4%", minWidth: "32px", textAlign: "center", color: "#00e5ff" }}>
+                  แต้มลีก
+                </th>
 
-              {/* Player 2 Columns (Deep Violet / Purple Glass) */}
-              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 8px", width: "150px", textAlign: "left", color: "#d8b4fe" }}>
-                ผู้เข้าแข่งขัน (2)
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 6px", width: "70px", textAlign: "center", color: "#d8b4fe" }}>
-                ชื่อเล่น
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 8px", width: "140px", textAlign: "left", color: "#d8b4fe" }}>
-                หมวดแฟนพันธุ์แท้
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#d8b4fe" }}>
-                3 วินาที
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#d8b4fe" }}>
-                ถาม-ตอบ
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#d8b4fe" }}>
-                จิ๊กซอว์
-              </th>
-              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "55px", textAlign: "center", color: "#d8b4fe" }}>
-                คุณสมบัติ
-              </th>
-              <th style={{ background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#ffd700" }}>
-                รวมดิบ
-              </th>
-              <th style={{ background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.35)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#00e5ff" }}>
-                แต้มลีก
-              </th>
-            </tr>
-          </thead>
+                {/* Player 2 Columns (Deep Violet / Purple Glass - Total 50%) */}
+                <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 6px", width: "13%", minWidth: "95px", textAlign: "left", color: "#d8b4fe" }}>
+                  ผู้เข้าแข่งขัน (2)
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 2px", width: "6%", minWidth: "44px", textAlign: "center", color: "#d8b4fe" }}>
+                  ชื่อเล่น
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 6px", width: "11%", minWidth: "85px", textAlign: "left", color: "#d8b4fe" }}>
+                  หมวดแฟนพันธุ์แท้
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 2px", width: "3.3%", minWidth: "30px", textAlign: "center", color: "#d8b4fe" }}>
+                  3 วินาที
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 2px", width: "3.3%", minWidth: "30px", textAlign: "center", color: "#d8b4fe" }}>
+                  ถาม-ตอบ
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 2px", width: "3.3%", minWidth: "30px", textAlign: "center", color: "#d8b4fe" }}>
+                  จิ๊กซอว์
+                </th>
+                <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 2px", width: "3.4%", minWidth: "32px", textAlign: "center", color: "#d8b4fe" }}>
+                  คุณสมบัติ
+                </th>
+                <th style={{ background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "6px 2px", width: "3.3%", minWidth: "32px", textAlign: "center", color: "#ffd700" }}>
+                  รวมดิบ
+                </th>
+                <th style={{ background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.35)", padding: "6px 2px", width: "3.4%", minWidth: "32px", textAlign: "center", color: "#00e5ff" }}>
+                  แต้มลีก
+                </th>
+              </tr>
+            </thead>
 
-          <tbody>
-            {/* ROW 1: Raw Scores & Contestant Info (Themed Dark Cyber-Sports) */}
-            <tr style={{ height: "44px" }}>
-              {/* Player 1 Details */}
-              <td
-                onClick={() => onSelectContestant(p1.name)}
-                style={{
-                  background: "rgba(16, 185, 129, 0.08)",
-                  border: "1px solid rgba(16, 185, 129, 0.2)",
-                  padding: "6px 8px",
-                  fontWeight: "700",
-                  color: "#ffffff",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-                title="คลิกเพื่อดูประวัติ"
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  {p1.photo ? (
-                    <img
-                      src={p1.photo}
-                      alt={p1.name}
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                      style={{ width: "24px", height: "24px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #10b981" }}
-                    />
-                  ) : null}
-                  <span>{p1.name}</span>
-                  {isP1Winner && <span>👑</span>}
-                </div>
-              </td>
-
-              <td
-                style={{
-                  background: "rgba(16, 185, 129, 0.08)",
-                  border: "1px solid rgba(16, 185, 129, 0.2)",
-                  padding: "6px 4px",
-                  fontWeight: "800",
-                  textAlign: "center",
-                  color: "#86efac",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {p1.nickname || "-"}
-              </td>
-
-              <td
-                style={{
-                  background: "rgba(6, 16, 36, 0.6)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                  padding: "6px 8px",
-                  fontWeight: "700",
-                  color: "#38bdf8",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {p1.topic || "-"}
-              </td>
-
-              {/* Player 1: 4 Category Scores */}
-              {catResults.map((r, i) => {
-                const style = getScoreCellStyle(r.v1, r.p1Won, r.p2Won);
-                return (
-                  <td
-                    key={i}
-                    style={{
-                      background: style.background,
-                      color: style.color,
-                      border: style.border,
-                      textAlign: "center",
-                      fontWeight: style.fontWeight || "800",
-                      fontSize: "14px",
-                      textShadow: style.textShadow || "none",
-                    }}
-                  >
-                    {r.v1}
-                  </td>
-                );
-              })}
-
-              {/* Player 1: Raw Total */}
-              <td
-                style={{
-                  background: "rgba(255, 215, 0, 0.14)",
-                  color: "#ffd700",
-                  border: "1px solid rgba(255, 215, 0, 0.35)",
-                  textAlign: "center",
-                  fontWeight: "900",
-                  fontSize: "15px",
-                  fontFamily: "var(--font-kanit), sans-serif",
-                }}
-              >
-                {isCompleted ? p1.sum ?? 0 : "-"}
-              </td>
-
-              {/* Player 1: League Points */}
-              <td
-                style={{
-                  background: "rgba(0, 229, 255, 0.12)",
-                  color: "#00e5ff",
-                  border: "1px solid rgba(0, 229, 255, 0.3)",
-                  borderRight: "3px solid #00e5ff",
-                  textAlign: "center",
-                  fontWeight: "900",
-                  fontSize: "15px",
-                }}
-              >
-                {isCompleted ? (p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : p1.leaguePoint ?? 0) : "-"}
-              </td>
-
-              {/* Player 2 Details */}
-              <td
-                onClick={() => onSelectContestant(p2.name)}
-                style={{
-                  background: "rgba(168, 85, 247, 0.08)",
-                  border: "1px solid rgba(168, 85, 247, 0.2)",
-                  padding: "6px 8px",
-                  fontWeight: "700",
-                  color: "#ffffff",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-                title="คลิกเพื่อดูประวัติ"
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  {p2.photo ? (
-                    <img
-                      src={p2.photo}
-                      alt={p2.name}
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                      style={{ width: "24px", height: "24px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #a855f7" }}
-                    />
-                  ) : null}
-                  <span>{p2.name}</span>
-                  {isP2Winner && <span>👑</span>}
-                </div>
-              </td>
-
-              <td
-                style={{
-                  background: "rgba(168, 85, 247, 0.08)",
-                  border: "1px solid rgba(168, 85, 247, 0.2)",
-                  padding: "6px 4px",
-                  fontWeight: "800",
-                  textAlign: "center",
-                  color: "#d8b4fe",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {p2.nickname || "-"}
-              </td>
-
-              <td
-                style={{
-                  background: "rgba(6, 16, 36, 0.6)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                  padding: "6px 8px",
-                  fontWeight: "700",
-                  color: "#c084fc",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {p2.topic || "-"}
-              </td>
-
-              {/* Player 2: 4 Category Scores */}
-              {catResults.map((r, i) => {
-                const style = getScoreCellStyle(r.v2, r.p2Won, r.p1Won);
-                return (
-                  <td
-                    key={i}
-                    style={{
-                      background: style.background,
-                      color: style.color,
-                      border: style.border,
-                      textAlign: "center",
-                      fontWeight: style.fontWeight || "800",
-                      fontSize: "14px",
-                      textShadow: style.textShadow || "none",
-                    }}
-                  >
-                    {r.v2}
-                  </td>
-                );
-              })}
-
-              {/* Player 2: Raw Total */}
-              <td
-                style={{
-                  background: "rgba(255, 215, 0, 0.14)",
-                  color: "#ffd700",
-                  border: "1px solid rgba(255, 215, 0, 0.35)",
-                  textAlign: "center",
-                  fontWeight: "900",
-                  fontSize: "15px",
-                  fontFamily: "var(--font-kanit), sans-serif",
-                }}
-              >
-                {isCompleted ? p2.sum ?? 0 : "-"}
-              </td>
-
-              {/* Player 2: League Points */}
-              <td
-                style={{
-                  background: "rgba(0, 229, 255, 0.12)",
-                  color: "#00e5ff",
-                  border: "1px solid rgba(0, 229, 255, 0.3)",
-                  textAlign: "center",
-                  fontWeight: "900",
-                  fontSize: "15px",
-                }}
-              >
-                {isCompleted ? (p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : p2.leaguePoint ?? 0) : "-"}
-              </td>
-            </tr>
-
-            {/* ROW 2: Category Points (CP) Bar (Deep Crimson Glass on Left, Deep Emerald Glass on Right) */}
-            <tr style={{ height: "26px", fontSize: "11px", fontWeight: "900" }}>
-              {/* Player 1 CP Label */}
-              <td
-                colSpan={3}
-                style={{
-                  background: "rgba(3, 8, 20, 0.95)",
-                  border: "1px solid rgba(255, 255, 255, 0.06)",
-                  padding: "2px 8px",
-                  textAlign: "right",
-                  color: "#f87171",
-                  fontWeight: "800",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                แต้มหมวด (CP)
-              </td>
-
-              {/* Player 1: CP for 4 rounds */}
-              {catResults.map((r, i) => (
+            <tbody>
+              {/* ROW 1: Raw Scores & Contestant Info (Themed Dark Cyber-Sports) */}
+              <tr style={{ height: "42px" }}>
+                {/* Player 1 Details */}
                 <td
-                  key={i}
+                  onClick={() => onSelectContestant(p1.name)}
                   style={{
-                    background: "linear-gradient(180deg, rgba(185, 28, 28, 0.35) 0%, rgba(127, 29, 29, 0.55) 100%)",
-                    color: "#fca5a5",
-                    border: "1px solid rgba(239, 68, 68, 0.35)",
-                    textAlign: "center",
-                    fontWeight: "900",
-                    fontSize: "12px",
+                    background: "rgba(16, 185, 129, 0.08)",
+                    border: "1px solid rgba(16, 185, 129, 0.2)",
+                    padding: "6px 6px",
+                    fontWeight: "700",
+                    color: "#ffffff",
+                    cursor: "pointer",
+                    overflow: "hidden",
                   }}
+                  title={`คลิกเพื่อดูประวัติ: ${p1.name}`}
                 >
-                  {isCompleted ? r.cp1 : "-"}
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, width: "100%" }}>
+                    {p1.photo ? (
+                      <img
+                        src={p1.photo}
+                        alt={p1.name}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                        style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #10b981", flexShrink: 0 }}
+                      />
+                    ) : null}
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                      {p1.name}
+                    </span>
+                    {isP1Winner && <span style={{ flexShrink: 0, fontSize: "12px" }}>👑</span>}
+                  </div>
                 </td>
-              ))}
 
-              {/* Player 1: Total CP */}
-              <td
-                style={{
-                  background: "linear-gradient(180deg, rgba(220, 38, 38, 0.5) 0%, rgba(153, 27, 27, 0.7) 100%)",
-                  color: "#ffffff",
-                  border: "1px solid rgba(239, 68, 68, 0.55)",
-                  textAlign: "center",
-                  fontWeight: "900",
-                  fontSize: "13px",
-                  textShadow: "0 0 8px rgba(239, 68, 68, 0.7)",
-                }}
-              >
-                {isCompleted ? p1.categoryPoints ?? 0 : "-"}
-              </td>
-
-              {/* Player 1: Blank under LP */}
-              <td style={{ background: "rgba(3, 8, 20, 0.95)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRight: "3px solid #00e5ff" }}></td>
-
-              {/* Player 2 CP Label */}
-              <td
-                colSpan={3}
-                style={{
-                  background: "rgba(3, 8, 20, 0.95)",
-                  border: "1px solid rgba(255, 255, 255, 0.06)",
-                  padding: "2px 8px",
-                  textAlign: "right",
-                  color: "#4ade80",
-                  fontWeight: "800",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                แต้มหมวด (CP)
-              </td>
-
-              {/* Player 2: CP for 4 rounds */}
-              {catResults.map((r, i) => (
                 <td
-                  key={i}
                   style={{
-                    background: "linear-gradient(180deg, rgba(21, 128, 61, 0.35) 0%, rgba(20, 83, 45, 0.55) 100%)",
+                    background: "rgba(16, 185, 129, 0.08)",
+                    border: "1px solid rgba(16, 185, 129, 0.2)",
+                    padding: "6px 2px",
+                    fontWeight: "800",
+                    textAlign: "center",
                     color: "#86efac",
-                    border: "1px solid rgba(34, 197, 94, 0.35)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  title={p1.nickname}
+                >
+                  {p1.nickname || "-"}
+                </td>
+
+                <td
+                  style={{
+                    background: "rgba(6, 16, 36, 0.6)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    padding: "6px 6px",
+                    fontWeight: "700",
+                    color: "#38bdf8",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  title={p1.topic}
+                >
+                  {p1.topic || "-"}
+                </td>
+
+                {/* Player 1: 4 Category Scores */}
+                {catResults.map((r, i) => {
+                  const style = getScoreCellStyle(r.v1, r.p1Won, r.p2Won);
+                  return (
+                    <td
+                      key={i}
+                      style={{
+                        background: style.background,
+                        color: style.color,
+                        border: style.border,
+                        textAlign: "center",
+                        fontWeight: style.fontWeight || "800",
+                        fontSize: "13px",
+                        padding: "6px 2px",
+                        textShadow: style.textShadow || "none",
+                      }}
+                    >
+                      {r.v1}
+                    </td>
+                  );
+                })}
+
+                {/* Player 1: Raw Total */}
+                <td
+                  style={{
+                    background: "rgba(255, 215, 0, 0.14)",
+                    color: "#ffd700",
+                    border: "1px solid rgba(255, 215, 0, 0.35)",
                     textAlign: "center",
                     fontWeight: "900",
-                    fontSize: "12px",
+                    fontSize: "14px",
+                    padding: "6px 2px",
+                    fontFamily: "var(--font-kanit), sans-serif",
                   }}
                 >
-                  {isCompleted ? r.cp2 : "-"}
+                  {isCompleted ? p1.sum ?? 0 : "-"}
                 </td>
-              ))}
 
-              {/* Player 2: Total CP */}
-              <td
-                style={{
-                  background: "linear-gradient(180deg, rgba(34, 197, 94, 0.5) 0%, rgba(21, 128, 61, 0.7) 100%)",
-                  color: "#ffffff",
-                  border: "1px solid rgba(34, 197, 94, 0.55)",
-                  textAlign: "center",
-                  fontWeight: "900",
-                  fontSize: "13px",
-                  textShadow: "0 0 8px rgba(34, 197, 94, 0.7)",
-                }}
-              >
-                {isCompleted ? p2.categoryPoints ?? 0 : "-"}
-              </td>
+                {/* Player 1: League Points */}
+                <td
+                  style={{
+                    background: "rgba(0, 229, 255, 0.12)",
+                    color: "#00e5ff",
+                    border: "1px solid rgba(0, 229, 255, 0.3)",
+                    borderRight: "3px solid #00e5ff",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "14px",
+                    padding: "6px 2px",
+                  }}
+                >
+                  {isCompleted ? (p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : p1.leaguePoint ?? 0) : "-"}
+                </td>
 
-              {/* Player 2: Blank under LP */}
-              <td style={{ background: "rgba(3, 8, 20, 0.95)", border: "1px solid rgba(255, 255, 255, 0.06)" }}></td>
-            </tr>
-          </tbody>
-        </table>
+                {/* Player 2 Details */}
+                <td
+                  onClick={() => onSelectContestant(p2.name)}
+                  style={{
+                    background: "rgba(168, 85, 247, 0.08)",
+                    border: "1px solid rgba(168, 85, 247, 0.2)",
+                    padding: "6px 6px",
+                    fontWeight: "700",
+                    color: "#ffffff",
+                    cursor: "pointer",
+                    overflow: "hidden",
+                  }}
+                  title={`คลิกเพื่อดูประวัติ: ${p2.name}`}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, width: "100%" }}>
+                    {p2.photo ? (
+                      <img
+                        src={p2.photo}
+                        alt={p2.name}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                        style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #a855f7", flexShrink: 0 }}
+                      />
+                    ) : null}
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                      {p2.name}
+                    </span>
+                    {isP2Winner && <span style={{ flexShrink: 0, fontSize: "12px" }}>👑</span>}
+                  </div>
+                </td>
+
+                <td
+                  style={{
+                    background: "rgba(168, 85, 247, 0.08)",
+                    border: "1px solid rgba(168, 85, 247, 0.2)",
+                    padding: "6px 2px",
+                    fontWeight: "800",
+                    textAlign: "center",
+                    color: "#d8b4fe",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  title={p2.nickname}
+                >
+                  {p2.nickname || "-"}
+                </td>
+
+                <td
+                  style={{
+                    background: "rgba(6, 16, 36, 0.6)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    padding: "6px 6px",
+                    fontWeight: "700",
+                    color: "#c084fc",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  title={p2.topic}
+                >
+                  {p2.topic || "-"}
+                </td>
+
+                {/* Player 2: 4 Category Scores */}
+                {catResults.map((r, i) => {
+                  const style = getScoreCellStyle(r.v2, r.p2Won, r.p1Won);
+                  return (
+                    <td
+                      key={i}
+                      style={{
+                        background: style.background,
+                        color: style.color,
+                        border: style.border,
+                        textAlign: "center",
+                        fontWeight: style.fontWeight || "800",
+                        fontSize: "13px",
+                        padding: "6px 2px",
+                        textShadow: style.textShadow || "none",
+                      }}
+                    >
+                      {r.v2}
+                    </td>
+                  );
+                })}
+
+                {/* Player 2: Raw Total */}
+                <td
+                  style={{
+                    background: "rgba(255, 215, 0, 0.14)",
+                    color: "#ffd700",
+                    border: "1px solid rgba(255, 215, 0, 0.35)",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "14px",
+                    padding: "6px 2px",
+                    fontFamily: "var(--font-kanit), sans-serif",
+                  }}
+                >
+                  {isCompleted ? p2.sum ?? 0 : "-"}
+                </td>
+
+                {/* Player 2: League Points */}
+                <td
+                  style={{
+                    background: "rgba(0, 229, 255, 0.12)",
+                    color: "#00e5ff",
+                    border: "1px solid rgba(0, 229, 255, 0.3)",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "14px",
+                    padding: "6px 2px",
+                  }}
+                >
+                  {isCompleted ? (p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : p2.leaguePoint ?? 0) : "-"}
+                </td>
+              </tr>
+
+              {/* ROW 2: Category Points (CP) Bar (Deep Crimson Glass on Left, Deep Emerald Glass on Right) */}
+              <tr style={{ height: "26px", fontSize: "11px", fontWeight: "900" }}>
+                {/* Player 1 CP Label */}
+                <td
+                  colSpan={3}
+                  style={{
+                    background: "rgba(3, 8, 20, 0.95)",
+                    border: "1px solid rgba(255, 255, 255, 0.06)",
+                    padding: "2px 6px",
+                    textAlign: "right",
+                    color: "#f87171",
+                    fontWeight: "800",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  แต้มหมวด (CP)
+                </td>
+
+                {/* Player 1: CP for 4 rounds */}
+                {catResults.map((r, i) => (
+                  <td
+                    key={i}
+                    style={{
+                      background: "linear-gradient(180deg, rgba(185, 28, 28, 0.35) 0%, rgba(127, 29, 29, 0.55) 100%)",
+                      color: "#fca5a5",
+                      border: "1px solid rgba(239, 68, 68, 0.35)",
+                      textAlign: "center",
+                      fontWeight: "900",
+                      fontSize: "12px",
+                      padding: "2px 2px",
+                    }}
+                  >
+                    {isCompleted ? r.cp1 : "-"}
+                  </td>
+                ))}
+
+                {/* Player 1: Total CP */}
+                <td
+                  style={{
+                    background: "linear-gradient(180deg, rgba(220, 38, 38, 0.5) 0%, rgba(153, 27, 27, 0.7) 100%)",
+                    color: "#ffffff",
+                    border: "1px solid rgba(239, 68, 68, 0.55)",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "13px",
+                    padding: "2px 2px",
+                    textShadow: "0 0 8px rgba(239, 68, 68, 0.7)",
+                  }}
+                >
+                  {isCompleted ? p1.categoryPoints ?? 0 : "-"}
+                </td>
+
+                {/* Player 1: Blank under LP */}
+                <td style={{ background: "rgba(3, 8, 20, 0.95)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRight: "3px solid #00e5ff" }}></td>
+
+                {/* Player 2 CP Label */}
+                <td
+                  colSpan={3}
+                  style={{
+                    background: "rgba(3, 8, 20, 0.95)",
+                    border: "1px solid rgba(255, 255, 255, 0.06)",
+                    padding: "2px 6px",
+                    textAlign: "right",
+                    color: "#4ade80",
+                    fontWeight: "800",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  แต้มหมวด (CP)
+                </td>
+
+                {/* Player 2: CP for 4 rounds */}
+                {catResults.map((r, i) => (
+                  <td
+                    key={i}
+                    style={{
+                      background: "linear-gradient(180deg, rgba(21, 128, 61, 0.35) 0%, rgba(20, 83, 45, 0.55) 100%)",
+                      color: "#86efac",
+                      border: "1px solid rgba(34, 197, 94, 0.35)",
+                      textAlign: "center",
+                      fontWeight: "900",
+                      fontSize: "12px",
+                      padding: "2px 2px",
+                    }}
+                  >
+                    {isCompleted ? r.cp2 : "-"}
+                  </td>
+                ))}
+
+                {/* Player 2: Total CP */}
+                <td
+                  style={{
+                    background: "linear-gradient(180deg, rgba(34, 197, 94, 0.5) 0%, rgba(21, 128, 61, 0.7) 100%)",
+                    color: "#ffffff",
+                    border: "1px solid rgba(34, 197, 94, 0.55)",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "13px",
+                    padding: "2px 2px",
+                    textShadow: "0 0 8px rgba(34, 197, 94, 0.7)",
+                  }}
+                >
+                  {isCompleted ? p2.categoryPoints ?? 0 : "-"}
+                </td>
+
+                {/* Player 2: Blank under LP */}
+                <td style={{ background: "rgba(3, 8, 20, 0.95)", border: "1px solid rgba(255, 255, 255, 0.06)" }}></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
