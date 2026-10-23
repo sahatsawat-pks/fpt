@@ -103,6 +103,16 @@ export default function AdminTournamentPage() {
   const matchdays = data?.matchdays || [];
   const contestants = data?.contestants || [];
 
+  const p1Selected = useMemo(() => {
+    if (!matchFormData?.player1?.name) return null;
+    return contestants.find((c) => c.name === matchFormData.player1.name);
+  }, [contestants, matchFormData?.player1?.name]);
+
+  const p2Selected = useMemo(() => {
+    if (!matchFormData?.player2?.name) return null;
+    return contestants.find((c) => c.name === matchFormData.player2.name);
+  }, [contestants, matchFormData?.player2?.name]);
+
   const currentMD = useMemo(() => {
     return matchdays.find((m) => m.id === selectedMatchday) || matchdays[0];
   }, [matchdays, selectedMatchday]);
@@ -1333,14 +1343,108 @@ export default function AdminTournamentPage() {
                   ผู้เข้าแข่งขันที่ 1 (ฝั่งซ้าย)
                 </div>
 
+                {/* Contestant 1 Name Dropdown */}
                 <div style={{ marginBottom: "10px" }}>
-                  <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>ชื่อจริง</label>
-                  <input
-                    type="text"
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>
+                      ชื่อจริง (เลือกจากรายชื่อ)
+                    </label>
+                    {p1Selected?.photo ? (
+                      <span style={{ fontSize: "11px", color: "#38bdf8", display: "flex", alignItems: "center", gap: "4px" }}>
+                        <img
+                          src={p1Selected.photo}
+                          alt={p1Selected.name}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          style={{ width: "16px", height: "16px", borderRadius: "50%", objectFit: "cover" }}
+                        />
+                        มีรูปในระบบ
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <select
                     value={matchFormData.player1.name}
-                    onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, name: e.target.value } })}
-                    style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "12px" }}
-                  />
+                    onChange={(e) => {
+                      const selectedName = e.target.value;
+                      const found = contestants.find((c) => c.name === selectedName);
+                      if (found) {
+                        setMatchFormData((prev) => ({
+                          ...prev,
+                          player1: {
+                            ...prev.player1,
+                            name: found.name,
+                            nickname: found.nickname || prev.player1.nickname,
+                            photo: found.photo || prev.player1.photo || "",
+                          },
+                        }));
+                      } else {
+                        setMatchFormData((prev) => ({
+                          ...prev,
+                          player1: { ...prev.player1, name: selectedName },
+                        }));
+                      }
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "7px 10px",
+                      borderRadius: "6px",
+                      background: "rgba(15, 23, 42, 0.95)",
+                      border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                      color: "#ffffff",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <option value="">-- เลือกผู้เข้าแข่งขัน --</option>
+                    {matchFormData.player1.name && !contestants.some((c) => c.name === matchFormData.player1.name) && (
+                      <option value={matchFormData.player1.name}>
+                        {matchFormData.player1.name} (ระบุเอง)
+                      </option>
+                    )}
+                    <optgroup label="สาย A (Group A)">
+                      {contestants
+                        .filter((c) => c.group === "A")
+                        .map((c) => (
+                          <option key={c.id || c.name} value={c.name}>
+                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                    <optgroup label="สาย B (Group B)">
+                      {contestants
+                        .filter((c) => c.group === "B")
+                        .map((c) => (
+                          <option key={c.id || c.name} value={c.name}>
+                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </select>
+
+                  <div style={{ marginTop: "4px" }}>
+                    <input
+                      type="text"
+                      placeholder="หรือพิมพ์ชื่อจริงแก้ไขเอง..."
+                      value={matchFormData.player1.name}
+                      onChange={(e) =>
+                        setMatchFormData({
+                          ...matchFormData,
+                          player1: { ...matchFormData.player1, name: e.target.value },
+                        })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "4px 8px",
+                        borderRadius: "5px",
+                        background: "rgba(15, 23, 42, 0.5)",
+                        border: "1px dashed rgba(255,255,255,0.2)",
+                        color: "rgba(255,255,255,0.85)",
+                        fontSize: "11px",
+                      }}
+                      title="พิมพ์แก้ไขชื่อจริงตรงนี้ได้หากต้องการกำหนดเอง"
+                    />
+                  </div>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "8px", marginBottom: "10px" }}>
@@ -1357,10 +1461,17 @@ export default function AdminTournamentPage() {
                     <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>หัวข้อที่เล่น</label>
                     <input
                       type="text"
+                      list="player1-topics-list"
+                      placeholder="พิมพ์หรือเลือกหัวข้อ"
                       value={matchFormData.player1.topic}
                       onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, topic: e.target.value } })}
                       style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "12px" }}
                     />
+                    <datalist id="player1-topics-list">
+                      {(p1Selected?.topics || []).map((t, idx) => (
+                        <option key={idx} value={t.topic || t} />
+                      ))}
+                    </datalist>
                   </div>
                 </div>
 
@@ -1436,14 +1547,108 @@ export default function AdminTournamentPage() {
                   ผู้เข้าแข่งขันที่ 2 (ฝั่งขวา)
                 </div>
 
+                {/* Contestant 2 Name Dropdown */}
                 <div style={{ marginBottom: "10px" }}>
-                  <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>ชื่อจริง</label>
-                  <input
-                    type="text"
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>
+                      ชื่อจริง (เลือกจากรายชื่อ)
+                    </label>
+                    {p2Selected?.photo ? (
+                      <span style={{ fontSize: "11px", color: "#ffd700", display: "flex", alignItems: "center", gap: "4px" }}>
+                        <img
+                          src={p2Selected.photo}
+                          alt={p2Selected.name}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          style={{ width: "16px", height: "16px", borderRadius: "50%", objectFit: "cover" }}
+                        />
+                        มีรูปในระบบ
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <select
                     value={matchFormData.player2.name}
-                    onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, name: e.target.value } })}
-                    style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "12px" }}
-                  />
+                    onChange={(e) => {
+                      const selectedName = e.target.value;
+                      const found = contestants.find((c) => c.name === selectedName);
+                      if (found) {
+                        setMatchFormData((prev) => ({
+                          ...prev,
+                          player2: {
+                            ...prev.player2,
+                            name: found.name,
+                            nickname: found.nickname || prev.player2.nickname,
+                            photo: found.photo || prev.player2.photo || "",
+                          },
+                        }));
+                      } else {
+                        setMatchFormData((prev) => ({
+                          ...prev,
+                          player2: { ...prev.player2, name: selectedName },
+                        }));
+                      }
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "7px 10px",
+                      borderRadius: "6px",
+                      background: "rgba(15, 23, 42, 0.95)",
+                      border: "1.5px solid rgba(255, 215, 0, 0.4)",
+                      color: "#ffffff",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <option value="">-- เลือกผู้เข้าแข่งขัน --</option>
+                    {matchFormData.player2.name && !contestants.some((c) => c.name === matchFormData.player2.name) && (
+                      <option value={matchFormData.player2.name}>
+                        {matchFormData.player2.name} (ระบุเอง)
+                      </option>
+                    )}
+                    <optgroup label="สาย A (Group A)">
+                      {contestants
+                        .filter((c) => c.group === "A")
+                        .map((c) => (
+                          <option key={c.id || c.name} value={c.name}>
+                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                    <optgroup label="สาย B (Group B)">
+                      {contestants
+                        .filter((c) => c.group === "B")
+                        .map((c) => (
+                          <option key={c.id || c.name} value={c.name}>
+                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </select>
+
+                  <div style={{ marginTop: "4px" }}>
+                    <input
+                      type="text"
+                      placeholder="หรือพิมพ์ชื่อจริงแก้ไขเอง..."
+                      value={matchFormData.player2.name}
+                      onChange={(e) =>
+                        setMatchFormData({
+                          ...matchFormData,
+                          player2: { ...matchFormData.player2, name: e.target.value },
+                        })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "4px 8px",
+                        borderRadius: "5px",
+                        background: "rgba(15, 23, 42, 0.5)",
+                        border: "1px dashed rgba(255,255,255,0.2)",
+                        color: "rgba(255,255,255,0.85)",
+                        fontSize: "11px",
+                      }}
+                      title="พิมพ์แก้ไขชื่อจริงตรงนี้ได้หากต้องการกำหนดเอง"
+                    />
+                  </div>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "8px", marginBottom: "10px" }}>
@@ -1460,10 +1665,17 @@ export default function AdminTournamentPage() {
                     <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>หัวข้อที่เล่น</label>
                     <input
                       type="text"
+                      list="player2-topics-list"
+                      placeholder="พิมพ์หรือเลือกหัวข้อ"
                       value={matchFormData.player2.topic}
                       onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, topic: e.target.value } })}
                       style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "12px" }}
                     />
+                    <datalist id="player2-topics-list">
+                      {(p2Selected?.topics || []).map((t, idx) => (
+                        <option key={idx} value={t.topic || t} />
+                      ))}
+                    </datalist>
                   </div>
                 </div>
 
