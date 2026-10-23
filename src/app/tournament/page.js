@@ -118,283 +118,536 @@ export default function TournamentPage() {
   }, [selectedContestant, matchdays]);
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #070c18 0%, #0c1527 50%, #060b14 100%)", color: "#f8fafc", fontFamily: "'Prompt', sans-serif" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#030814",
+        color: "#ffffff",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
+      }}
+    >
       {/* ========================================================
-          HEADER & NAVBAR
+          1. TOP NAVIGATION BAR (Themed after official Fan Pan Tae)
          ======================================================== */}
-      <header
+      <nav
         style={{
+          background: "linear-gradient(90deg, #0077b6 0%, #0096c7 50%, #0077b6 100%)",
+          borderBottom: "2px solid #00e5ff",
+          boxShadow: "0 4px 20px rgba(0, 180, 216, 0.35)",
           position: "sticky",
           top: 0,
-          zIndex: 50,
-          background: "rgba(6, 12, 24, 0.92)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(0, 229, 255, 0.2)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+          zIndex: 1000,
+          padding: "0 24px",
         }}
       >
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
-              <div
-                style={{
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "10px",
-                  background: "linear-gradient(135deg, #00e5ff 0%, #3b82f6 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "22px",
-                  boxShadow: "0 0 15px rgba(0, 229, 255, 0.4)",
-                }}
-              >
-                ⚔️
-              </div>
-              <div>
-                <div style={{ fontSize: "16px", fontWeight: "900", letterSpacing: "0.5px", color: "#ffffff", fontFamily: "'Orbitron', sans-serif" }}>
-                  FANPANTAE <span style={{ color: "#00e5ff" }}>TOURNAMENT</span>
-                </div>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "500" }}>SEASON 2026 - 27 • LEAGUE PHASE</div>
-              </div>
-            </Link>
-          </div>
+        <div
+          style={{
+            maxWidth: "1320px",
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: "64px",
+          }}
+        >
+          {/* Logo / Brand */}
+          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <img
+              src="/img/logo.png"
+              alt="FANPANTAE 2026"
+              style={{
+                height: "42px",
+                width: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 12px rgba(0, 229, 255, 0.7))",
+              }}
+            />
+          </Link>
 
-          {/* Desktop Nav */}
-          <nav className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {/* Desktop Nav Links */}
+          <div className="desktop-nav-links">
             <Link
               href="/"
               style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                color: "#e2e8f0",
-                fontSize: "13px",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#e0f2fe",
                 fontWeight: "600",
+                fontSize: "14px",
                 textDecoration: "none",
                 transition: "all 0.2s",
               }}
             >
-              🏠 หน้าแรก
+              หน้าแรก
+            </Link>
+            <Link
+              href="/#leaderboard"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#e0f2fe",
+                fontWeight: "600",
+                fontSize: "14px",
+                textDecoration: "none",
+                transition: "background 0.2s",
+              }}
+            >
+              ตารางคะแนน
             </Link>
             <Link
               href="/history"
               style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
+                padding: "8px 16px",
+                borderRadius: "6px",
                 color: "#ffd700",
-                fontSize: "13px",
                 fontWeight: "700",
+                fontSize: "14px",
                 textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
-                gap: "5px",
+                gap: "4px",
               }}
             >
-              <span>🏆</span> ทำเนียบแชมป์
+              <span>🏆</span> ทำเนียบแชมป์ & สถิติ
             </Link>
             <Link
               href="/tournament"
               style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: "rgba(0, 229, 255, 0.15)",
-                border: "1px solid rgba(0, 229, 255, 0.4)",
-                color: "#00e5ff",
-                fontSize: "13px",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.35) 0%, rgba(0, 150, 200, 0.25) 100%)",
+                border: "1.5px solid #00e5ff",
+                color: "#ffffff",
                 fontWeight: "800",
+                fontSize: "14px",
                 textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
                 gap: "5px",
-                boxShadow: "0 0 12px rgba(0, 229, 255, 0.2)",
+                boxShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
               }}
             >
               <span>⚔️</span> ทัวร์นาเมนต์
             </Link>
             <Link
-              href="/game"
+              href="/draw"
               style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                color: "#f43f5e",
-                fontSize: "13px",
-                fontWeight: "700",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#e0f2fe",
+                fontWeight: "600",
+                fontSize: "14px",
                 textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
               }}
             >
-              <span>🎮</span> โหมดเล่นเกม VS
+              จำลองจับลูกบอล
             </Link>
             <Link
               href="/admin/tournament"
               style={{
-                padding: "7px 14px",
-                borderRadius: "8px",
-                background: "rgba(255, 255, 255, 0.08)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                color: "#94a3b8",
-                fontSize: "12px",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#dbeafe",
                 fontWeight: "600",
+                fontSize: "14px",
                 textDecoration: "none",
               }}
             >
-              🔐 จัดการ Tournament
+              Admin Tournament
             </Link>
-          </nav>
+          </div>
 
           {/* Mobile Hamburger Button */}
           <button
             type="button"
             className="mobile-nav-hamburger-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation"
+            aria-label="Toggle navigation menu"
             style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "8px",
-              border: "1px solid rgba(0, 229, 255, 0.4)",
-              background: mobileMenuOpen ? "rgba(0, 229, 255, 0.2)" : "rgba(15, 23, 42, 0.8)",
+              width: "42px",
+              height: "42px",
+              borderRadius: "10px",
+              border: "1.5px solid rgba(0, 229, 255, 0.45)",
+              background: mobileMenuOpen ? "rgba(0, 229, 255, 0.25)" : "rgba(6, 16, 36, 0.8)",
               color: "#00e5ff",
               fontSize: "20px",
-              display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
+              boxShadow: mobileMenuOpen ? "0 0 14px rgba(0, 229, 255, 0.5)" : "none",
+              transition: "all 0.2s ease",
             }}
           >
             {mobileMenuOpen ? "✕" : "☰"}
           </button>
         </div>
 
-        {/* Mobile Dropdown Drawer */}
+        {/* Mobile Dropdown Menu Drawer */}
         {mobileMenuOpen && (
-          <div style={{ background: "rgba(6, 12, 24, 0.98)", borderTop: "1px solid rgba(0, 229, 255, 0.2)", padding: "14px 20px", display: "flex", flexDirection: "column", gap: "8px" }}>
-            <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ padding: "10px 14px", borderRadius: "8px", color: "#e2e8f0", textDecoration: "none", fontSize: "14px" }}>
-              🏠 หน้าแรก
+          <div
+            className="mobile-nav-drawer"
+            style={{
+              padding: "12px 0 16px 0",
+              borderTop: "1px solid rgba(0, 229, 255, 0.15)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+            }}
+          >
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#ffffff",
+                fontWeight: "700",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🏠</span> หน้าแรก
             </Link>
-            <Link href="/history" onClick={() => setMobileMenuOpen(false)} style={{ padding: "10px 14px", borderRadius: "8px", color: "#ffd700", textDecoration: "none", fontSize: "14px", fontWeight: "700" }}>
-              🏆 ทำเนียบแชมป์
+            <Link
+              href="/#leaderboard"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#e0f2fe",
+                fontWeight: "700",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนหลัก
             </Link>
-            <Link href="/tournament" onClick={() => setMobileMenuOpen(false)} style={{ padding: "10px 14px", borderRadius: "8px", background: "rgba(0, 229, 255, 0.15)", color: "#00e5ff", textDecoration: "none", fontSize: "14px", fontWeight: "800" }}>
-              ⚔️ ทัวร์นาเมนต์
+            <Link
+              href="/history"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 170, 0, 0.08) 100%)",
+                border: "1px solid rgba(255, 215, 0, 0.4)",
+                color: "#ffd700",
+                fontWeight: "800",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🏆</span> ทำเนียบแชมป์ & สถิติ
             </Link>
-            <Link href="/game" onClick={() => setMobileMenuOpen(false)} style={{ padding: "10px 14px", borderRadius: "8px", color: "#f43f5e", textDecoration: "none", fontSize: "14px", fontWeight: "700" }}>
-              🎮 โหมดเล่นเกม VS
+            <Link
+              href="/tournament"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.25) 0%, rgba(59, 130, 246, 0.15) 100%)",
+                border: "1.5px solid #00e5ff",
+                color: "#00e5ff",
+                fontWeight: "800",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                boxShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
             </Link>
-            <Link href="/admin/tournament" onClick={() => setMobileMenuOpen(false)} style={{ padding: "10px 14px", borderRadius: "8px", color: "#94a3b8", textDecoration: "none", fontSize: "13px" }}>
-              🔐 จัดการ Tournament
+            <Link
+              href="/draw"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#e0f2fe",
+                fontWeight: "700",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🎱</span> จำลองจับลูกบอล
+            </Link>
+            <Link
+              href="/admin/tournament"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(99, 102, 241, 0.15)",
+                border: "1px solid rgba(99, 102, 241, 0.35)",
+                color: "#c7d2fe",
+                fontWeight: "700",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>⚙️</span> Admin Tournament
             </Link>
           </div>
         )}
-      </header>
+      </nav>
 
       {/* ========================================================
-          HERO BANNER
+          2. HERO SECTION (Based on Main Fan Pan Tae Style)
          ======================================================== */}
       <section
         style={{
           position: "relative",
+          minHeight: "440px",
           overflow: "hidden",
-          padding: "40px 20px 28px 20px",
-          background: "radial-gradient(ellipse at top, rgba(0, 229, 255, 0.12) 0%, rgba(15, 23, 42, 0) 70%)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "radial-gradient(circle at 50% 40%, #0c2d5e 0%, #061633 45%, #020712 100%)",
+          padding: "50px 24px",
+          borderBottom: "1px solid rgba(0, 229, 255, 0.2)",
         }}
       >
-        <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "20px" }}>
-            <div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "4px 12px", borderRadius: "20px", background: "rgba(0, 229, 255, 0.12)", border: "1px solid rgba(0, 229, 255, 0.3)", color: "#00e5ff", fontSize: "12px", fontWeight: "700", marginBottom: "12px" }}>
-                <span>🔥</span> OFFICIAL TOURNAMENT 2026 - 27
-              </div>
-              <h1 style={{ fontSize: "clamp(26px, 5vw, 42px)", fontWeight: "900", letterSpacing: "-0.5px", margin: 0, textShadow: "0 0 30px rgba(0, 229, 255, 0.4)", fontFamily: "'Orbitron', 'Prompt', sans-serif" }}>
-                FANPANTAE <span style={{ color: "#00e5ff" }}>TOURNAMENT</span>
-              </h1>
-              <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "15px", marginTop: "8px", maxWidth: "600px", lineHeight: "1.5" }}>
-                การแข่งขันระบบลีกเฟส 2 กลุ่ม รวม 24 ยอดฝีมือ ประลองกันหมวดต่อหมวด (3 วินาที, คำถาม-คำตอบ, จิ๊กซอว์, คุณสมบัติ) สู่เกียรติยศสูงสุด
-              </p>
-            </div>
+        {/* Radiating perspective light streaks (Stars & beams) */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: `
+              radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+              radial-gradient(2px 2px at 150px 80px, #00e5ff, rgba(0,0,0,0)),
+              radial-gradient(1.5px 1.5px at 300px 180px, #ffffff, rgba(0,0,0,0)),
+              radial-gradient(2px 2px at 450px 60px, #00e5ff, rgba(0,0,0,0)),
+              radial-gradient(1.5px 1.5px at 600px 250px, #ffffff, rgba(0,0,0,0)),
+              radial-gradient(2px 2px at 750px 100px, #00e5ff, rgba(0,0,0,0)),
+              radial-gradient(2px 2px at 900px 190px, #ffffff, rgba(0,0,0,0)),
+              radial-gradient(1.5px 1.5px at 1100px 70px, #00e5ff, rgba(0,0,0,0))
+            `,
+            backgroundSize: "600px 350px",
+            opacity: 0.8,
+          }}
+        ></div>
 
-            {/* Quick Stat Pills */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-              <div style={{ padding: "14px 20px", borderRadius: "14px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(0, 229, 255, 0.25)", minWidth: "130px", backdropFilter: "blur(10px)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", fontWeight: "600" }}>ผู้เข้าแข่งขัน</div>
-                <div style={{ fontSize: "24px", fontWeight: "900", color: "#00e5ff", marginTop: "2px" }}>24 คน</div>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>กลุ่ม A (12) • กลุ่ม B (12)</div>
-              </div>
+        {/* Central burst rays */}
+        <div
+          style={{
+            position: "absolute",
+            top: "40%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "900px",
+            height: "900px",
+            background: "conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(0, 229, 255, 0.08) 30deg, transparent 60deg, rgba(0, 180, 216, 0.12) 90deg, transparent 130deg, rgba(0, 229, 255, 0.08) 180deg, transparent 240deg, rgba(0, 180, 216, 0.1) 300deg, transparent 360deg)",
+            filter: "blur(20px)",
+            pointerEvents: "none",
+          }}
+        ></div>
 
-              <div style={{ padding: "14px 20px", borderRadius: "14px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255, 215, 0, 0.25)", minWidth: "130px", backdropFilter: "blur(10px)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", fontWeight: "600" }}>รอบการแข่งขัน</div>
-                <div style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", marginTop: "2px" }}>6 Matchdays</div>
-                <div style={{ fontSize: "11px", color: "#10b981", fontWeight: "600" }}>แข่งแล้ว 3 แมตช์เดย์</div>
-              </div>
-
-              <div style={{ padding: "14px 20px", borderRadius: "14px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(244, 63, 94, 0.25)", minWidth: "140px", backdropFilter: "blur(10px)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", fontWeight: "600" }}>จ่าฝูงกลุ่ม A / B</div>
-                <div style={{ fontSize: "16px", fontWeight: "800", color: "#ffffff", marginTop: "4px" }}>
-                  A: <span style={{ color: "#00e5ff" }}>ซ่า (12 แต้ม)</span>
-                </div>
-                <div style={{ fontSize: "16px", fontWeight: "800", color: "#ffffff" }}>
-                  B: <span style={{ color: "#ffd700" }}>พีม (11 แต้ม)</span>
-                </div>
-              </div>
-            </div>
+        <div style={{ position: "relative", zIndex: 10, maxWidth: "1100px", width: "100%", textAlign: "center" }}>
+          {/* Tag Pill */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 20px",
+              borderRadius: "24px",
+              background: "linear-gradient(90deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 170, 0, 0.3) 100%)",
+              border: "1.5px solid #ffd700",
+              color: "#ffd700",
+              fontSize: "13px",
+              fontWeight: "900",
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
+              marginBottom: "16px",
+            }}
+          >
+            <span>⚔️</span> FANPANTAE TOURNAMENT 2026 - 27
           </div>
 
-          {/* Primary View Switcher Navigation */}
-          <div style={{ display: "flex", gap: "8px", marginTop: "28px", overflowX: "auto", paddingBottom: "4px" }}>
-            {[
-              { id: "standings", label: "📊 ตารางคะแนน (Standings)", icon: "📊" },
-              { id: "matches", label: "⚔️ ตารางการแข่งขัน (Matches & Fixtures)", icon: "⚔️" },
-              { id: "topics", label: "🏅 สถิติคลิปคะแนนรายหัวข้อ (Top Records)", icon: "🏅" },
-              { id: "checklist", label: "📋 ผังหัวข้อที่ลงทะเบียน (Topics Checklist)", icon: "📋" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: "12px 20px",
-                  borderRadius: "12px",
-                  fontSize: "14px",
-                  fontWeight: "700",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s ease",
-                  border: activeTab === tab.id ? "1.5px solid #00e5ff" : "1px solid rgba(255, 255, 255, 0.1)",
-                  background: activeTab === tab.id ? "linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%)" : "rgba(15, 23, 42, 0.6)",
-                  color: activeTab === tab.id ? "#00e5ff" : "rgba(255, 255, 255, 0.7)",
-                  boxShadow: activeTab === tab.id ? "0 0 16px rgba(0, 229, 255, 0.25)" : "none",
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {/* Title */}
+          <h1
+            style={{
+              fontSize: "clamp(28px, 5.5vw, 48px)",
+              fontWeight: "900",
+              background: "linear-gradient(180deg, #ffffff 0%, #ffd700 70%, #f59e0b 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              margin: "0 0 12px 0",
+              letterSpacing: "-0.5px",
+              filter: "drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8))",
+            }}
+          >
+            การแข่งขันระบบลีกเฟส • VS DUEL BATTLE
+          </h1>
+
+          <p
+            style={{
+              color: "rgba(224, 242, 254, 0.85)",
+              fontSize: "clamp(14px, 2vw, 17px)",
+              maxWidth: "760px",
+              margin: "0 auto 28px",
+              lineHeight: "1.6",
+              textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)",
+            }}
+          >
+            การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ) 2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป
+          </p>
+
+          {/* Stat Badges Row */}
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "12px" }}>
+            <div
+              style={{
+                padding: "10px 20px",
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                minWidth: "150px",
+              }}
+            >
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>ผู้เข้าแข่งขัน</div>
+              <div style={{ fontSize: "22px", fontWeight: "900", color: "#00e5ff", fontFamily: "var(--font-num)" }}>24 คน</div>
+              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>กลุ่มละ 12 คน</div>
+            </div>
+
+            <div
+              style={{
+                padding: "10px 20px",
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                border: "1.5px solid rgba(255, 215, 0, 0.4)",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                minWidth: "150px",
+              }}
+            >
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>รอบการแข่งขัน</div>
+              <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>6 แมตช์เดย์</div>
+              <div style={{ fontSize: "10px", color: "#86efac", fontWeight: "700" }}>แข่งแล้ว 3 แมตช์เดย์</div>
+            </div>
+
+            <div
+              style={{
+                padding: "10px 20px",
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                border: "1.5px solid rgba(244, 63, 94, 0.4)",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                minWidth: "170px",
+              }}
+            >
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>จ่าฝูงกลุ่มปัจจุบัน</div>
+              <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff", marginTop: "4px" }}>
+                A: <strong style={{ color: "#00e5ff" }}>ซ่า (12 LP)</strong>
+              </div>
+              <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff" }}>
+                B: <strong style={{ color: "#ffd700" }}>พีม (11 LP)</strong>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ========================================================
-          MAIN CONTENT AREA
+          3. MAIN CONTENT CONTAINER
          ======================================================== */}
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 20px 80px 20px" }}>
+      <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "36px 20px 80px 20px" }}>
+        {/* Navigation Tabs (Style matches other pages) */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            gap: "10px",
+            marginBottom: "36px",
+          }}
+        >
+          {[
+            { id: "standings", label: "📊 ตารางคะแนน (Standings)" },
+            { id: "matches", label: "⚔️ ตารางการแข่งขัน (Matches & Fixtures)" },
+            { id: "topics", label: "🏅 สถิติคลิปคะแนนรายหัวข้อ (Top Records)" },
+            { id: "checklist", label: "📋 ผังหัวข้อที่ลงทะเบียน (Topics Checklist)" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: "12px 24px",
+                borderRadius: "30px",
+                fontWeight: "800",
+                fontSize: "14px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                border: activeTab === tab.id ? "2px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.25)",
+                background: activeTab === tab.id
+                  ? "linear-gradient(135deg, rgba(0, 229, 255, 0.3) 0%, rgba(0, 119, 182, 0.4) 100%)"
+                  : "rgba(10, 25, 47, 0.6)",
+                color: activeTab === tab.id ? "#ffffff" : "#80d0ff",
+                boxShadow: activeTab === tab.id ? "0 0 20px rgba(0, 229, 255, 0.5)" : "none",
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* ========================================================
-            TAB 1: STANDINGS TABLE
+            TAB 1: STANDINGS
            ======================================================== */}
         {activeTab === "standings" && (
           <div>
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
+            {/* Group Switcher Bar */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "16px",
+                marginBottom: "24px",
+              }}
+            >
               <div>
-                <h2 style={{ fontSize: "22px", fontWeight: "800", color: "#ffffff", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span>📊</span> ตารางคะแนนรอบลีก (League Phase Standings)
+                <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
+                  ตารางคะแนนรอบลีก (League Phase Standings)
                 </h2>
-                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px", marginTop: "4px" }}>
-                  คะแนนลีก: ชนะขาดลอย (+5 หรือ +4), ชนะทั่วไป (+3), เสมอ (+1), แพ้ขาดลอย (-1 หรือ -2)
-                </p>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
+                  ระบบคิดแต้ม: ชนะขาดลอย (+5 หรือ +4 LP), ชนะทั่วไป (+3 LP), เสมอ (+1 LP), แพ้ขาดลอย (-1 หรือ -2 LP)
+                </div>
               </div>
 
-              {/* Group Toggle */}
-              <div style={{ display: "flex", background: "rgba(15, 23, 42, 0.8)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+              {/* Group Toggle Pills */}
+              <div
+                style={{
+                  display: "flex",
+                  background: "rgba(10, 25, 47, 0.8)",
+                  padding: "4px",
+                  borderRadius: "24px",
+                  border: "1.5px solid rgba(0, 229, 255, 0.3)",
+                }}
+              >
                 {[
                   { id: "all", label: "ทั้ง 2 กลุ่ม" },
                   { id: "A", label: "กลุ่ม A" },
@@ -404,14 +657,15 @@ export default function TournamentPage() {
                     key={g.id}
                     onClick={() => setSelectedGroup(g.id)}
                     style={{
-                      padding: "8px 18px",
-                      borderRadius: "8px",
+                      padding: "8px 20px",
+                      borderRadius: "20px",
                       fontSize: "13px",
-                      fontWeight: "700",
+                      fontWeight: "800",
                       border: "none",
                       cursor: "pointer",
                       background: selectedGroup === g.id ? "#00e5ff" : "transparent",
-                      color: selectedGroup === g.id ? "#060c18" : "rgba(255, 255, 255, 0.7)",
+                      color: selectedGroup === g.id ? "#030814" : "#e0f2fe",
+                      boxShadow: selectedGroup === g.id ? "0 0 15px rgba(0, 229, 255, 0.5)" : "none",
                       transition: "all 0.15s ease",
                     }}
                   >
@@ -421,11 +675,11 @@ export default function TournamentPage() {
               </div>
             </div>
 
-            {/* Standings Grid (Group A & Group B side-by-side or stacked) */}
-            <div style={{ display: "grid", gridTemplateColumns: selectedGroup === "all" ? "repeat(auto-fit, minmax(600px, 1fr))" : "1fr", gap: "24px" }}>
+            {/* Standings Tables */}
+            <div style={{ display: "grid", gridTemplateColumns: selectedGroup === "all" ? "repeat(auto-fit, minmax(580px, 1fr))" : "1fr", gap: "28px" }}>
               {(selectedGroup === "all" || selectedGroup === "A") && (
-                <StandingsCard
-                  groupName="Group A"
+                <FanpantaeStandingsTable
+                  groupName="GROUP A"
                   badgeColor="#00e5ff"
                   list={standings.groupA || []}
                   onSelectContestant={(c) => setSelectedContestant(c)}
@@ -433,8 +687,8 @@ export default function TournamentPage() {
               )}
 
               {(selectedGroup === "all" || selectedGroup === "B") && (
-                <StandingsCard
-                  groupName="Group B"
+                <FanpantaeStandingsTable
+                  groupName="GROUP B"
                   badgeColor="#ffd700"
                   list={standings.groupB || []}
                   onSelectContestant={(c) => setSelectedContestant(c)}
@@ -449,8 +703,8 @@ export default function TournamentPage() {
            ======================================================== */}
         {activeTab === "matches" && (
           <div>
-            {/* Matchday Selector Buttons */}
-            <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "8px", marginBottom: "20px" }}>
+            {/* Matchday Selector Pills (Matches History Season Tabs) */}
+            <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px", marginBottom: "20px" }}>
               {matchdays.map((md) => {
                 const isSelected = md.id === selectedMatchday;
                 const completedCount = md.matches.filter((m) => m.status === "completed").length;
@@ -459,23 +713,27 @@ export default function TournamentPage() {
                     key={md.id}
                     onClick={() => setSelectedMatchday(md.id)}
                     style={{
-                      padding: "10px 18px",
-                      borderRadius: "12px",
+                      padding: "12px 20px",
+                      borderRadius: "14px",
                       textAlign: "left",
-                      minWidth: "160px",
+                      minWidth: "170px",
                       cursor: "pointer",
-                      border: isSelected ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)",
-                      background: isSelected ? "rgba(0, 229, 255, 0.15)" : "rgba(15, 23, 42, 0.7)",
-                      color: isSelected ? "#00e5ff" : "#ffffff",
-                      boxShadow: isSelected ? "0 0 14px rgba(0, 229, 255, 0.25)" : "none",
+                      border: isSelected ? "2px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                      background: isSelected
+                        ? "linear-gradient(135deg, rgba(0, 229, 255, 0.25) 0%, rgba(0, 119, 182, 0.35) 100%)"
+                        : "rgba(10, 25, 47, 0.7)",
+                      color: isSelected ? "#ffffff" : "rgba(255,255,255,0.7)",
+                      boxShadow: isSelected ? "0 0 16px rgba(0, 229, 255, 0.4)" : "none",
                       transition: "all 0.15s ease",
                     }}
                   >
-                    <div style={{ fontSize: "14px", fontWeight: "800" }}>{md.name}</div>
-                    <div style={{ fontSize: "11px", color: isSelected ? "rgba(0, 229, 255, 0.8)" : "rgba(255,255,255,0.5)", marginTop: "2px" }}>
+                    <div style={{ fontSize: "14px", fontWeight: "900", color: isSelected ? "#00e5ff" : "#ffffff" }}>
+                      {md.name}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
                       {md.dateRange || "รอประกาศวันแข่ง"}
                     </div>
-                    <div style={{ fontSize: "10px", marginTop: "4px", color: completedCount === md.matches.length && md.matches.length > 0 ? "#10b981" : "#94a3b8", fontWeight: "600" }}>
+                    <div style={{ fontSize: "11px", marginTop: "4px", color: completedCount === md.matches.length && md.matches.length > 0 ? "#86efac" : "#94a3b8", fontWeight: "700" }}>
                       {completedCount}/{md.matches.length} คู่เสร็จสิ้น
                     </div>
                   </button>
@@ -483,10 +741,24 @@ export default function TournamentPage() {
               })}
             </div>
 
-            {/* Filters Bar */}
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", background: "rgba(15, 23, 42, 0.6)", padding: "14px 18px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "24px" }}>
+            {/* Filter Bar */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "14px",
+                background: "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                padding: "14px 20px",
+                borderRadius: "16px",
+                border: "1px solid rgba(0, 229, 255, 0.25)",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
+                marginBottom: "24px",
+              }}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>กรองกลุ่ม:</span>
+                <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>กรองกลุ่ม:</span>
                 <div style={{ display: "flex", gap: "6px" }}>
                   {["all", "A", "B"].map((g) => (
                     <button
@@ -494,12 +766,12 @@ export default function TournamentPage() {
                       onClick={() => setSelectedGroup(g)}
                       style={{
                         padding: "6px 14px",
-                        borderRadius: "8px",
+                        borderRadius: "16px",
                         fontSize: "12px",
-                        fontWeight: "700",
-                        border: selectedGroup === g ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)",
-                        background: selectedGroup === g ? "#00e5ff" : "rgba(255,255,255,0.05)",
-                        color: selectedGroup === g ? "#060c18" : "#ffffff",
+                        fontWeight: "800",
+                        border: selectedGroup === g ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                        background: selectedGroup === g ? "#00e5ff" : "rgba(255,255,255,0.06)",
+                        color: selectedGroup === g ? "#030814" : "#ffffff",
                         cursor: "pointer",
                       }}
                     >
@@ -510,56 +782,39 @@ export default function TournamentPage() {
               </div>
 
               {/* Search Box */}
-              <div style={{ position: "relative", minWidth: "260px" }}>
+              <div style={{ position: "relative", minWidth: "280px" }}>
                 <input
                   type="text"
-                  placeholder="🔍 ค้นหาชื่อ, ชื่อเล่น, หัวข้อ หรือรหัสคู่..."
+                  placeholder="🔍 ค้นหาชื่อ, ชื่อเล่น, หรือหัวข้อ..."
                   value={matchSearch}
                   onChange={(e) => setMatchSearch(e.target.value)}
                   style={{
                     width: "100%",
                     padding: "8px 14px 8px 34px",
-                    borderRadius: "10px",
-                    background: "rgba(6, 12, 24, 0.8)",
-                    border: "1px solid rgba(0, 229, 255, 0.3)",
+                    borderRadius: "20px",
+                    background: "rgba(6, 16, 36, 0.9)",
+                    border: "1px solid rgba(0, 229, 255, 0.4)",
                     color: "#ffffff",
                     fontSize: "13px",
                     outline: "none",
                   }}
                 />
-                <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
+                <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
                   🔍
                 </span>
-                {matchSearch && (
-                  <button
-                    onClick={() => setMatchSearch("")}
-                    style={{
-                      position: "absolute",
-                      right: "10px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      background: "transparent",
-                      border: "none",
-                      color: "rgba(255,255,255,0.5)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ✕
-                  </button>
-                )}
               </div>
             </div>
 
-            {/* Matches List */}
+            {/* Matches Grid */}
             {filteredMatches.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "60px 20px", color: "rgba(255,255,255,0.5)", background: "rgba(15, 23, 42, 0.4)", borderRadius: "16px", border: "1px dashed rgba(255,255,255,0.15)" }}>
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "rgba(255,255,255,0.5)", background: "rgba(10, 25, 47, 0.5)", borderRadius: "16px", border: "1px dashed rgba(0, 229, 255, 0.3)" }}>
                 <div style={{ fontSize: "36px", marginBottom: "10px" }}>🔍</div>
-                <div style={{ fontSize: "16px", fontWeight: "600" }}>ไม่พบคู่แข่งขันที่ตรงกับเงื่อนไขการค้นหา</div>
+                <div style={{ fontSize: "16px", fontWeight: "700" }}>ไม่พบคู่แข่งขันที่ตรงกับการค้นหา</div>
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(460px, 1fr))", gap: "20px" }}>
                 {filteredMatches.map((match) => (
-                  <MatchCard
+                  <FanpantaeMatchCard
                     key={match.id}
                     match={match}
                     onSelectContestant={(name) => {
@@ -574,18 +829,18 @@ export default function TournamentPage() {
         )}
 
         {/* ========================================================
-            TAB 3: TOP RECORDS BY TOPIC
+            TAB 3: TOP TOPIC RECORDS
            ======================================================== */}
         {activeTab === "topics" && (
           <div>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
               <div>
-                <h2 style={{ fontSize: "22px", fontWeight: "800", color: "#ffffff", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span>🏅</span> สถิติคลิปคะแนนรายหัวข้อ (Individual Topic Rankings)
+                <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", margin: 0 }}>
+                  สถิติคลิปคะแนนรายหัวข้อ (Top Topic Records)
                 </h2>
-                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px", marginTop: "4px" }}>
-                  อันดับคะแนนสูงสุดในการแข่งขันแต่ละหัวข้อ รวม 96 สถิติ
-                </p>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
+                  อันดับผลงานที่ทำคะแนนสูงสุดในแต่ละหัวข้อ รวม 96 สถิติ
+                </div>
               </div>
 
               {/* Sort By Pills */}
@@ -593,7 +848,7 @@ export default function TournamentPage() {
                 {[
                   { id: "sum", label: "รวมคะแนนดิบ" },
                   { id: "3sec", label: "3 วินาที" },
-                  { id: "qa", label: "คำถาม-คำตอบ" },
+                  { id: "qa", label: "ถาม-ตอบ" },
                   { id: "jigsaw", label: "จิ๊กซอว์" },
                   { id: "attribute", label: "คุณสมบัติ" },
                 ].map((s) => (
@@ -601,13 +856,13 @@ export default function TournamentPage() {
                     key={s.id}
                     onClick={() => setTopicSortBy(s.id)}
                     style={{
-                      padding: "7px 14px",
-                      borderRadius: "8px",
+                      padding: "6px 14px",
+                      borderRadius: "16px",
                       fontSize: "12px",
-                      fontWeight: "700",
-                      border: topicSortBy === s.id ? "1px solid #ffd700" : "1px solid rgba(255,255,255,0.1)",
-                      background: topicSortBy === s.id ? "#ffd700" : "rgba(255,255,255,0.05)",
-                      color: topicSortBy === s.id ? "#060c18" : "#ffffff",
+                      fontWeight: "800",
+                      border: topicSortBy === s.id ? "1.5px solid #ffd700" : "1px solid rgba(255,255,255,0.15)",
+                      background: topicSortBy === s.id ? "#ffd700" : "rgba(255,255,255,0.06)",
+                      color: topicSortBy === s.id ? "#030814" : "#ffffff",
                       cursor: "pointer",
                     }}
                   >
@@ -617,7 +872,7 @@ export default function TournamentPage() {
               </div>
             </div>
 
-            {/* Search Filter */}
+            {/* Search Input */}
             <div style={{ marginBottom: "20px" }}>
               <input
                 type="text"
@@ -626,51 +881,66 @@ export default function TournamentPage() {
                 onChange={(e) => setTopicSearch(e.target.value)}
                 style={{
                   width: "100%",
-                  maxWidth: "400px",
-                  padding: "10px 16px",
-                  borderRadius: "10px",
-                  background: "rgba(15, 23, 42, 0.8)",
-                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                  maxWidth: "420px",
+                  padding: "9px 16px",
+                  borderRadius: "20px",
+                  background: "rgba(10, 25, 47, 0.8)",
+                  border: "1px solid rgba(0, 229, 255, 0.4)",
                   color: "#ffffff",
-                  fontSize: "14px",
+                  fontSize: "13px",
                   outline: "none",
                 }}
               />
             </div>
 
-            {/* Topic Rankings Table */}
-            <div style={{ background: "rgba(15, 23, 42, 0.7)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.4)" }}>
+            {/* Topic Table in Fan Pan Tae Theme */}
+            <div
+              style={{
+                background: "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
+                borderRadius: "20px",
+                border: "1.5px solid rgba(0, 229, 255, 0.3)",
+                overflow: "hidden",
+                boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
+              }}
+            >
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "14px" }}>
                   <thead>
-                    <tr style={{ background: "rgba(6, 12, 24, 0.9)", borderBottom: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                      <th style={{ padding: "14px 16px", width: "60px", textAlign: "center" }}>อันดับ</th>
+                    <tr
+                      style={{
+                        background: "linear-gradient(90deg, #0f3460 0%, #16213e 100%)",
+                        borderBottom: "2px solid #00e5ff",
+                        color: "rgba(255,255,255,0.8)",
+                        fontSize: "12px",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      <th style={{ padding: "14px 16px", width: "70px", textAlign: "center" }}>อันดับ</th>
                       <th style={{ padding: "14px 16px" }}>ผู้เข้าแข่งขัน</th>
                       <th style={{ padding: "14px 16px" }}>หัวข้อ (Topic)</th>
-                      <th style={{ padding: "14px 12px", textAlign: "center" }}>3 วินาที</th>
-                      <th style={{ padding: "14px 12px", textAlign: "center" }}>ถาม-ตอบ</th>
-                      <th style={{ padding: "14px 12px", textAlign: "center" }}>จิ๊กซอว์</th>
-                      <th style={{ padding: "14px 12px", textAlign: "center" }}>คุณสมบัติ</th>
-                      <th style={{ padding: "14px 16px", textAlign: "center", color: "#00e5ff", fontWeight: "800" }}>รวมคะแนน</th>
+                      <th style={{ padding: "14px 12px", textAlign: "center", color: "#86efac" }}>3 วินาที</th>
+                      <th style={{ padding: "14px 12px", textAlign: "center", color: "#f3f4f6" }}>ถาม-ตอบ</th>
+                      <th style={{ padding: "14px 12px", textAlign: "center", color: "#fca5a5" }}>จิ๊กซอว์</th>
+                      <th style={{ padding: "14px 12px", textAlign: "center", color: "#67e8f9" }}>คุณสมบัติ</th>
+                      <th style={{ padding: "14px 16px", textAlign: "center", color: "#ffd700", fontWeight: "900" }}>คะแนนรวม</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredTopicRankings.map((item, index) => {
-                      const isTop3 = index < 3;
                       const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : null;
                       return (
                         <tr
                           key={`${item.name}-${item.topic}-${index}`}
                           style={{
                             borderBottom: "1px solid rgba(255,255,255,0.06)",
-                            background: isTop3 ? "rgba(255, 215, 0, 0.04)" : "transparent",
-                            transition: "background 0.15s ease",
+                            background: medal ? "rgba(255, 215, 0, 0.05)" : "transparent",
                           }}
                         >
-                          <td style={{ padding: "14px 16px", textAlign: "center", fontWeight: "800" }}>
+                          <td style={{ padding: "12px 16px", textAlign: "center", fontWeight: "900" }}>
                             {medal ? <span style={{ fontSize: "18px" }}>{medal}</span> : <span style={{ color: "rgba(255,255,255,0.6)" }}>#{item.rank}</span>}
                           </td>
-                          <td style={{ padding: "14px 16px" }}>
+                          <td style={{ padding: "12px 16px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                               <img
                                 src={item.photo || "/default-avatar.png"}
@@ -678,39 +948,41 @@ export default function TournamentPage() {
                                 onError={(e) => {
                                   e.target.style.display = "none";
                                 }}
-                                style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(0, 229, 255, 0.4)", background: "#1e293b" }}
+                                style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #00e5ff", background: "#0b1528" }}
                               />
                               <div>
-                                <div style={{ fontWeight: "700", color: "#ffffff" }}>
-                                  {item.nickname ? `${item.nickname} (${item.name})` : item.name}
+                                <div style={{ fontWeight: "800", color: "#ffffff" }}>
+                                  {item.nickname ? <span style={{ color: "#ffd700" }}>{item.nickname} </span> : null}
+                                  {item.name}
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: "14px 16px", color: "#38bdf8", fontWeight: "600" }}>{item.topic}</td>
-                          <td style={{ padding: "14px 12px", textAlign: "center", color: item.scores?.["3sec"] !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
+                          <td style={{ padding: "12px 16px", color: "#38bdf8", fontWeight: "700" }}>{item.topic}</td>
+                          <td style={{ padding: "12px 12px", textAlign: "center", color: item.scores?.["3sec"] !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
                             {item.scores?.["3sec"] ?? "-"}
                           </td>
-                          <td style={{ padding: "14px 12px", textAlign: "center", color: item.scores?.qa !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
+                          <td style={{ padding: "12px 12px", textAlign: "center", color: item.scores?.qa !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
                             {item.scores?.qa ?? "-"}
                           </td>
-                          <td style={{ padding: "14px 12px", textAlign: "center", color: item.scores?.jigsaw !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
+                          <td style={{ padding: "12px 12px", textAlign: "center", color: item.scores?.jigsaw !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
                             {item.scores?.jigsaw ?? "-"}
                           </td>
-                          <td style={{ padding: "14px 12px", textAlign: "center", color: item.scores?.attribute !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
+                          <td style={{ padding: "12px 12px", textAlign: "center", color: item.scores?.attribute !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
                             {item.scores?.attribute ?? "-"}
                           </td>
-                          <td style={{ padding: "14px 16px", textAlign: "center" }}>
+                          <td style={{ padding: "12px 16px", textAlign: "center" }}>
                             <span
                               style={{
                                 display: "inline-block",
                                 padding: "4px 12px",
                                 borderRadius: "8px",
-                                background: item.sum >= 70 ? "rgba(0, 229, 255, 0.2)" : "rgba(255,255,255,0.08)",
-                                color: item.sum >= 70 ? "#00e5ff" : "#ffffff",
-                                fontWeight: "800",
+                                background: item.sum >= 70 ? "rgba(255, 215, 0, 0.2)" : "rgba(255,255,255,0.08)",
+                                color: item.sum >= 70 ? "#ffd700" : "#ffffff",
+                                fontWeight: "900",
                                 fontSize: "15px",
-                                border: item.sum >= 70 ? "1px solid rgba(0, 229, 255, 0.4)" : "none",
+                                fontFamily: "var(--font-num)",
+                                border: item.sum >= 70 ? "1px solid rgba(255, 215, 0, 0.5)" : "none",
                               }}
                             >
                               {item.sum}
@@ -727,18 +999,18 @@ export default function TournamentPage() {
         )}
 
         {/* ========================================================
-            TAB 4: CHECKLIST OF REGISTERED TOPICS
+            TAB 4: TOPICS CHECKLIST
            ======================================================== */}
         {activeTab === "checklist" && (
           <div>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
               <div>
-                <h2 style={{ fontSize: "22px", fontWeight: "800", color: "#ffffff", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span>📋</span> ผังหัวข้อที่ลงทะเบียน (Contestants Topic Checklist)
+                <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", margin: 0 }}>
+                  ผังหัวข้อที่ลงทะเบียน (Topics Checklist)
                 </h2>
-                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px", marginTop: "4px" }}>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
                   ผู้เข้าแข่งขันแต่ละท่านมี 4 หัวข้อหลัก พร้อม 2 ชุดคำถามต่อหัวข้อ
-                </p>
+                </div>
               </div>
 
               <div style={{ display: "flex", gap: "6px" }}>
@@ -747,13 +1019,13 @@ export default function TournamentPage() {
                     key={g}
                     onClick={() => setSelectedGroup(g)}
                     style={{
-                      padding: "6px 14px",
-                      borderRadius: "8px",
+                      padding: "6px 16px",
+                      borderRadius: "16px",
                       fontSize: "12px",
-                      fontWeight: "700",
-                      border: selectedGroup === g ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)",
-                      background: selectedGroup === g ? "#00e5ff" : "rgba(255,255,255,0.05)",
-                      color: selectedGroup === g ? "#060c18" : "#ffffff",
+                      fontWeight: "800",
+                      border: selectedGroup === g ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                      background: selectedGroup === g ? "#00e5ff" : "rgba(255,255,255,0.06)",
+                      color: selectedGroup === g ? "#030814" : "#ffffff",
                       cursor: "pointer",
                     }}
                   >
@@ -770,11 +1042,11 @@ export default function TournamentPage() {
                   <div
                     key={contestant.id || contestant.name}
                     style={{
-                      background: "rgba(15, 23, 42, 0.7)",
-                      borderRadius: "16px",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "linear-gradient(150deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                      borderRadius: "18px",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
                       padding: "20px",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
@@ -784,49 +1056,48 @@ export default function TournamentPage() {
                         onError={(e) => {
                           e.target.style.display = "none";
                         }}
-                        style={{ width: "46px", height: "46px", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(0, 229, 255, 0.5)", background: "#1e293b" }}
+                        style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", border: "2px solid #00e5ff", background: "#0b1528" }}
                       />
                       <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontSize: "16px", fontWeight: "800", color: "#ffffff" }}>
-                            {contestant.nickname ? `${contestant.nickname} • ` : ""}
+                          <span style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff" }}>
+                            {contestant.nickname ? <span style={{ color: "#ffd700" }}>{contestant.nickname} • </span> : ""}
                             {contestant.name}
                           </span>
-                          <span style={{ padding: "2px 8px", borderRadius: "10px", background: contestant.group === "A" ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 215, 0, 0.2)", color: contestant.group === "A" ? "#00e5ff" : "#ffd700", fontSize: "11px", fontWeight: "700" }}>
+                          <span style={{ padding: "2px 8px", borderRadius: "8px", background: contestant.group === "A" ? "rgba(0, 229, 255, 0.25)" : "rgba(255, 215, 0, 0.25)", color: contestant.group === "A" ? "#00e5ff" : "#ffd700", fontSize: "11px", fontWeight: "900" }}>
                             กลุ่ม {contestant.group}
                           </span>
                         </div>
-                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
+                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "2px" }}>
                           แต้มลีก: <strong style={{ color: "#00e5ff" }}>{contestant.stats?.leaguePoints ?? 0} LP</strong> • อันดับ #{contestant.stats?.rank ?? "-"}
                         </div>
                       </div>
                     </div>
 
-                    {/* Topics List */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       {(contestant.topics || []).map((t, tIdx) => (
                         <div
                           key={tIdx}
                           style={{
                             padding: "10px 14px",
-                            borderRadius: "10px",
-                            background: "rgba(6, 12, 24, 0.6)",
-                            border: "1px solid rgba(255,255,255,0.06)",
+                            borderRadius: "12px",
+                            background: "rgba(6, 16, 36, 0.8)",
+                            border: "1px solid rgba(255,255,255,0.08)",
                           }}
                         >
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                            <span style={{ fontSize: "13px", fontWeight: "700", color: "#38bdf8" }}>{t.topic}</span>
+                            <span style={{ fontSize: "13px", fontWeight: "800", color: "#38bdf8" }}>{t.topic}</span>
                             <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>หัวข้อที่ {tIdx + 1}</span>
                           </div>
                           <div style={{ display: "flex", gap: "8px" }}>
-                            <div style={{ flex: 1, padding: "4px 8px", borderRadius: "6px", background: t.set1?.played ? "rgba(16, 185, 129, 0.15)" : "rgba(255,255,255,0.04)", border: t.set1?.played ? "1px solid rgba(16, 185, 129, 0.3)" : "1px solid rgba(255,255,255,0.08)", fontSize: "11px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ color: t.set1?.played ? "#10b981" : "rgba(255,255,255,0.5)" }}>ชุดที่ 1</span>
+                            <div style={{ flex: 1, padding: "5px 8px", borderRadius: "8px", background: t.set1?.played ? "rgba(16, 185, 129, 0.18)" : "rgba(255,255,255,0.04)", border: t.set1?.played ? "1px solid #10b981" : "1px solid rgba(255,255,255,0.1)", fontSize: "11px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ color: t.set1?.played ? "#86efac" : "rgba(255,255,255,0.5)" }}>ชุด 1</span>
                               <strong style={{ color: t.set1?.played ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
                                 {t.set1?.played ? `${t.set1.sum} คะแนน` : "ยังไม่แข่ง"}
                               </strong>
                             </div>
-                            <div style={{ flex: 1, padding: "4px 8px", borderRadius: "6px", background: t.set2?.played ? "rgba(16, 185, 129, 0.15)" : "rgba(255,255,255,0.04)", border: t.set2?.played ? "1px solid rgba(16, 185, 129, 0.3)" : "1px solid rgba(255,255,255,0.08)", fontSize: "11px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ color: t.set2?.played ? "#10b981" : "rgba(255,255,255,0.5)" }}>ชุดที่ 2</span>
+                            <div style={{ flex: 1, padding: "5px 8px", borderRadius: "8px", background: t.set2?.played ? "rgba(16, 185, 129, 0.18)" : "rgba(255,255,255,0.04)", border: t.set2?.played ? "1px solid #10b981" : "1px solid rgba(255,255,255,0.1)", fontSize: "11px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ color: t.set2?.played ? "#86efac" : "rgba(255,255,255,0.5)" }}>ชุด 2</span>
                               <strong style={{ color: t.set2?.played ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
                                 {t.set2?.played ? `${t.set2.sum} คะแนน` : "ยังไม่แข่ง"}
                               </strong>
@@ -840,18 +1111,18 @@ export default function TournamentPage() {
             </div>
           </div>
         )}
-      </main>
+      </div>
 
       {/* ========================================================
-          CONTESTANT DETAIL SPOTLIGHT MODAL
+          4. CONTESTANT SPOTLIGHT MODAL (Matches page.js theme)
          ======================================================== */}
       {selectedContestant && (
         <div
           style={{
             position: "fixed",
             inset: 0,
-            zIndex: 100,
-            background: "rgba(0, 0, 0, 0.85)",
+            zIndex: 2000,
+            background: "rgba(2, 6, 18, 0.88)",
             backdropFilter: "blur(12px)",
             display: "flex",
             alignItems: "center",
@@ -862,15 +1133,15 @@ export default function TournamentPage() {
         >
           <div
             style={{
-              background: "linear-gradient(180deg, #0e172a 0%, #070d18 100%)",
-              borderRadius: "20px",
-              border: "1.5px solid rgba(0, 229, 255, 0.4)",
-              maxWidth: "650px",
+              background: "linear-gradient(150deg, rgba(16, 32, 60, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",
+              borderRadius: "24px",
+              border: "2px solid #00e5ff",
+              maxWidth: "680px",
               width: "100%",
               maxHeight: "90vh",
               overflowY: "auto",
               padding: "28px",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.2)",
+              boxShadow: "0 25px 70px rgba(0,0,0,0.9), 0 0 35px rgba(0, 229, 255, 0.4)",
               color: "#ffffff",
               position: "relative",
             }}
@@ -900,7 +1171,7 @@ export default function TournamentPage() {
             </button>
 
             {/* Profile Header */}
-            <div style={{ display: "flex", alignItems: "center", gap: "18px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "20px", marginBottom: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "18px", borderBottom: "1px solid rgba(255,255,255,0.12)", paddingBottom: "20px", marginBottom: "20px" }}>
               <img
                 src={selectedContestant.photo || "/default-avatar.png"}
                 alt={selectedContestant.name}
@@ -913,21 +1184,21 @@ export default function TournamentPage() {
                   borderRadius: "50%",
                   objectFit: "cover",
                   border: "3px solid #00e5ff",
-                  boxShadow: "0 0 20px rgba(0, 229, 255, 0.4)",
-                  background: "#1e293b",
+                  boxShadow: "0 0 20px rgba(0, 229, 255, 0.5)",
+                  background: "#0b1528",
                 }}
               />
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <h3 style={{ fontSize: "22px", fontWeight: "900", margin: 0 }}>
-                    {selectedContestant.nickname ? `${selectedContestant.nickname} • ` : ""}
+                    {selectedContestant.nickname ? <span style={{ color: "#ffd700" }}>{selectedContestant.nickname} • </span> : ""}
                     {selectedContestant.name}
                   </h3>
-                  <span style={{ padding: "3px 10px", borderRadius: "12px", background: selectedContestant.group === "A" ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 215, 0, 0.2)", color: selectedContestant.group === "A" ? "#00e5ff" : "#ffd700", fontSize: "12px", fontWeight: "800" }}>
+                  <span style={{ padding: "3px 10px", borderRadius: "12px", background: selectedContestant.group === "A" ? "rgba(0, 229, 255, 0.25)" : "rgba(255, 215, 0, 0.25)", color: selectedContestant.group === "A" ? "#00e5ff" : "#ffd700", fontSize: "12px", fontWeight: "900" }}>
                     กลุ่ม {selectedContestant.group}
                   </span>
                 </div>
-                <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
+                <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>
                   อันดับปัจจุบัน: <strong style={{ color: "#ffd700" }}>#{selectedContestant.stats?.rank || selectedContestant.rank}</strong> • แต้มลีกสะสม: <strong style={{ color: "#00e5ff" }}>{selectedContestant.stats?.leaguePoints ?? selectedContestant.leaguePoints} LP</strong>
                 </div>
               </div>
@@ -935,27 +1206,27 @@ export default function TournamentPage() {
 
             {/* Stats Summary Banner */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "24px" }}>
-              <div style={{ background: "rgba(6, 12, 24, 0.8)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ชนะ - เสมอ - แพ้</div>
-                <div style={{ fontSize: "18px", fontWeight: "800", color: "#10b981", marginTop: "2px" }}>
+                <div style={{ fontSize: "18px", fontWeight: "900", color: "#86efac", marginTop: "2px", fontFamily: "var(--font-num)" }}>
                   {selectedContestant.stats?.win ?? selectedContestant.win}W - {selectedContestant.stats?.draw ?? selectedContestant.draw}D - {selectedContestant.stats?.lose ?? selectedContestant.lose}L
                 </div>
               </div>
-              <div style={{ background: "rgba(6, 12, 24, 0.8)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>แต้มหมวด (+/-)</div>
-                <div style={{ fontSize: "18px", fontWeight: "800", color: "#38bdf8", marginTop: "2px" }}>
+                <div style={{ fontSize: "18px", fontWeight: "900", color: "#38bdf8", marginTop: "2px", fontFamily: "var(--font-num)" }}>
                   {selectedContestant.stats?.scoreDiff ?? selectedContestant.scoreDiff}
                 </div>
               </div>
-              <div style={{ background: "rgba(6, 12, 24, 0.8)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ชนะ/แพ้หมวด</div>
-                <div style={{ fontSize: "16px", fontWeight: "800", color: "#f59e0b", marginTop: "4px" }}>
+                <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", marginTop: "4px", fontFamily: "var(--font-num)" }}>
                   +{selectedContestant.stats?.categoriesWon ?? selectedContestant.categoriesWon} / -{selectedContestant.stats?.categoriesLost ?? selectedContestant.categoriesLost}
                 </div>
               </div>
-              <div style={{ background: "rgba(6, 12, 24, 0.8)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>คะแนนดิบรวม</div>
-                <div style={{ fontSize: "18px", fontWeight: "800", color: "#ffffff", marginTop: "2px" }}>
+                <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff", marginTop: "2px", fontFamily: "var(--font-num)" }}>
                   {selectedContestant.stats?.totalScore ?? selectedContestant.totalScore}
                 </div>
               </div>
@@ -964,16 +1235,16 @@ export default function TournamentPage() {
             {/* Registered Topics Section */}
             {selectedContestant.topics && selectedContestant.topics.length > 0 && (
               <div style={{ marginBottom: "24px" }}>
-                <div style={{ fontSize: "15px", fontWeight: "800", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ fontSize: "15px", fontWeight: "900", color: "#ffd700", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <span>📚</span> หัวข้อประจำตัวและสถิติชุดข้อสอบ
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   {selectedContestant.topics.map((t, idx) => (
-                    <div key={idx} style={{ background: "rgba(6, 12, 24, 0.7)", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <div style={{ fontSize: "13px", fontWeight: "700", color: "#38bdf8", marginBottom: "6px" }}>{t.topic}</div>
-                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", display: "flex", justifyContent: "space-between" }}>
-                        <span>ชุด 1: {t.set1?.played ? <strong style={{ color: "#10b981" }}>{t.set1.sum} คะแนน</strong> : "ยังไม่แข่ง"}</span>
-                        <span>ชุด 2: {t.set2?.played ? <strong style={{ color: "#10b981" }}>{t.set2.sum} คะแนน</strong> : "ยังไม่แข่ง"}</span>
+                    <div key={idx} style={{ background: "rgba(6, 16, 36, 0.8)", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div style={{ fontSize: "13px", fontWeight: "800", color: "#38bdf8", marginBottom: "6px" }}>{t.topic}</div>
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", display: "flex", justifyContent: "space-between" }}>
+                        <span>ชุด 1: {t.set1?.played ? <strong style={{ color: "#86efac" }}>{t.set1.sum} คะแนน</strong> : "ยังไม่แข่ง"}</span>
+                        <span>ชุด 2: {t.set2?.played ? <strong style={{ color: "#86efac" }}>{t.set2.sum} คะแนน</strong> : "ยังไม่แข่ง"}</span>
                       </div>
                     </div>
                   ))}
@@ -983,7 +1254,7 @@ export default function TournamentPage() {
 
             {/* Tournament Matches History */}
             <div>
-              <div style={{ fontSize: "15px", fontWeight: "800", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ fontSize: "15px", fontWeight: "900", color: "#ffd700", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
                 <span>⚔️</span> ประวัติการแข่งขันในทัวร์นาเมนต์ ({contestantMatches.length} แมตช์)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -993,7 +1264,7 @@ export default function TournamentPage() {
                     style={{
                       padding: "12px 16px",
                       borderRadius: "12px",
-                      background: "rgba(6, 12, 24, 0.7)",
+                      background: "rgba(6, 16, 36, 0.8)",
                       border: "1px solid rgba(255,255,255,0.08)",
                       display: "flex",
                       alignItems: "center",
@@ -1005,11 +1276,11 @@ export default function TournamentPage() {
                         <span style={{ fontSize: "11px", padding: "2px 6px", borderRadius: "6px", background: "rgba(255,255,255,0.1)", color: "#94a3b8" }}>
                           {m.matchdayName} ({m.matchId})
                         </span>
-                        <span style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff" }}>
-                          vs {m.opponent.nickname ? `${m.opponent.nickname} (${m.opponent.name})` : m.opponent.name}
+                        <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffffff" }}>
+                          vs {m.opponent.nickname ? <strong style={{ color: "#ffd700" }}>{m.opponent.nickname} </strong> : ""}{m.opponent.name}
                         </span>
                       </div>
-                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "4px" }}>
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
                         หัวข้อ: {m.me.topic || "-"} vs {m.opponent.topic || "-"}
                       </div>
                     </div>
@@ -1017,15 +1288,15 @@ export default function TournamentPage() {
                     <div style={{ textAlign: "right" }}>
                       {m.status === "completed" ? (
                         <>
-                          <div style={{ fontSize: "15px", fontWeight: "900", color: m.outcome === "win" ? "#10b981" : m.outcome === "lose" ? "#f43f5e" : "#ffd700" }}>
+                          <div style={{ fontSize: "15px", fontWeight: "900", color: m.outcome === "win" ? "#86efac" : m.outcome === "lose" ? "#fca5a5" : "#ffd700" }}>
                             {m.outcome === "win" ? "🏆 ชนะ" : m.outcome === "lose" ? "แพ้" : "🤝 เสมอ"} ({m.me.categoryPoints} - {m.opponent.categoryPoints} หมวด)
                           </div>
                           <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>
-                            คะแนนดิบ: {m.me.sum} vs {m.opponent.sum} • ได้ {m.me.leaguePoint > 0 ? `+${m.me.leaguePoint}` : m.me.leaguePoint} LP
+                            ดิบ: {m.me.sum} vs {m.opponent.sum} • ได้ {m.me.leaguePoint > 0 ? `+${m.me.leaguePoint}` : m.me.leaguePoint} LP
                           </div>
                         </>
                       ) : (
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", padding: "4px 8px", borderRadius: "6px", background: "rgba(255,255,255,0.05)" }}>
+                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", padding: "4px 8px", borderRadius: "6px", background: "rgba(255,255,255,0.06)" }}>
                           รอดำเนินการ
                         </span>
                       )}
@@ -1037,201 +1308,286 @@ export default function TournamentPage() {
           </div>
         </div>
       )}
+
+      {/* ========================================================
+          5. OFFICIAL FOOTER (Matches page.js and history/page.js)
+         ======================================================== */}
+      <footer
+        style={{
+          background: "rgba(3, 8, 20, 0.98)",
+          borderTop: "1px solid rgba(0, 229, 255, 0.2)",
+          padding: "36px 20px",
+          textAlign: "center",
+          fontSize: "14px",
+          color: "rgba(255,255,255,0.5)",
+        }}
+      >
+        <div style={{ maxWidth: "160px", margin: "0 auto 12px" }}>
+          <img src="/img/logo.png" alt="FANPANTAE 2026" style={{ width: "100%", height: "auto", opacity: 0.7 }} />
+        </div>
+        <p style={{ margin: "0 0 8px 0", color: "rgba(255,255,255,0.8)", fontWeight: "600" }}>
+          แฟนพันธุ์แท้ทัวร์นาเมนต์ 2026 - 27 (FANPANTAE TOURNAMENT)
+        </p>
+        <p style={{ fontSize: "12px", margin: 0, color: "rgba(255,255,255,0.4)" }}>
+          ระบบจำลองการแข่งขันและคำนวณคะแนนอัตโนมัติ สำหรับทีมงานและผู้ชม
+        </p>
+      </footer>
     </div>
   );
 }
 
 // ========================================================
-// SUB-COMPONENT: STANDINGS CARD TABLE
+// SUB-COMPONENT: FANPANTAE STANDINGS TABLE (Skewed Header)
 // ========================================================
-function StandingsCard({ groupName, badgeColor, list, onSelectContestant }) {
+function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContestant }) {
   return (
     <div
       style={{
-        background: "rgba(15, 23, 42, 0.7)",
-        borderRadius: "18px",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        background: "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
+        borderRadius: "20px",
+        border: "1.5px solid rgba(0, 229, 255, 0.35)",
+        boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
         overflow: "hidden",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
       }}
     >
-      {/* Table Header Banner */}
+      {/* Table Title Banner */}
       <div
         style={{
           padding: "16px 20px",
-          background: `linear-gradient(90deg, rgba(6, 12, 24, 0.95) 0%, rgba(15, 23, 42, 0.8) 100%)`,
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+          background: "linear-gradient(90deg, #0077b6 0%, #0096c7 100%)",
+          borderBottom: "2px solid #00e5ff",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div
+          <span
             style={{
               padding: "4px 12px",
               borderRadius: "8px",
-              background: `linear-gradient(135deg, ${badgeColor} 0%, #3b82f6 100%)`,
-              color: "#060c18",
+              background: "#030814",
+              color: badgeColor,
               fontWeight: "900",
               fontSize: "14px",
-              fontFamily: "'Orbitron', sans-serif",
+              letterSpacing: "1px",
+              boxShadow: "0 0 10px rgba(0,0,0,0.5)",
             }}
           >
             {groupName}
-          </div>
-          <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>12 ผู้เข้าแข่งขัน • 4 อันดับแรกผ่านเข้ารอบ</span>
+          </span>
+          <span style={{ fontSize: "13px", color: "#ffffff", fontWeight: "700" }}>
+            12 ผู้เข้าแข่งขัน • 4 อันดับแรกผ่านเข้ารอบ (Top 4 Qualify)
+          </span>
         </div>
-        <div style={{ fontSize: "11px", color: "#10b981", fontWeight: "700" }}>🟢 Top 4 Qualification</div>
+        <div style={{ fontSize: "11px", color: "#86efac", fontWeight: "800" }}>🟢 TOP 4 QUALIFIED</div>
       </div>
 
-      {/* Table Rows */}
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-          <thead>
-            <tr style={{ background: "rgba(6, 12, 24, 0.6)", color: "rgba(255,255,255,0.5)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              <th style={{ padding: "12px 14px", width: "45px", textAlign: "center" }}>#</th>
-              <th style={{ padding: "12px 14px", textAlign: "left" }}>ผู้เข้าแข่งขัน</th>
-              <th style={{ padding: "12px 12px", textAlign: "center", color: "#00e5ff", fontWeight: "800" }}>แต้มลีก</th>
-              <th style={{ padding: "12px 10px", textAlign: "center" }}>ช - ส - พ</th>
-              <th style={{ padding: "12px 12px", textAlign: "center" }}>หมวด (+/-)</th>
-              <th style={{ padding: "12px 12px", textAlign: "center" }}>คะแนนดิบ</th>
-              <th style={{ padding: "12px 12px", textAlign: "center" }}>ข้อมูล</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((c, idx) => {
-              const isQualified = idx < 4;
-              return (
-                <tr
-                  key={c.name}
+      {/* Skewed Header Row */}
+      <div style={{ padding: "14px 14px 6px 14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+          <div
+            style={{
+              width: "60px",
+              height: "32px",
+              borderRadius: "8px",
+              transform: "skewX(-16deg)",
+              background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)",
+              border: "1.5px solid #ffd700",
+              boxShadow: "0 0 10px rgba(255, 215, 0, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
+              อันดับ
+            </span>
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              height: "32px",
+              borderRadius: "8px",
+              transform: "skewX(-16deg)",
+              background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
+              border: "1.5px solid rgba(255, 255, 255, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 14px",
+            }}
+          >
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffffff", letterSpacing: "0.5px" }}>
+              ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง)
+            </span>
+          </div>
+
+          <div style={{ width: "70px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #092338 0%, #04101c 100%)", border: "1.5px solid #00e5ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>แต้มลีก</span>
+          </div>
+          <div style={{ width: "70px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)", border: "1.5px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#ffffff" }}>ช-ส-พ</span>
+          </div>
+          <div style={{ width: "70px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)", border: "1.5px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#ffffff" }}>หมวด (+/-)</span>
+          </div>
+          <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)", border: "1.5px solid #ffd700", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#ffd700" }}>คะแนนดิบ</span>
+          </div>
+        </div>
+
+        {/* Rows */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
+          {list.map((c, idx) => {
+            const isTop4 = idx < 4;
+            return (
+              <div
+                key={c.name}
+                onClick={() => onSelectContestant(c)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "6px 8px",
+                  borderRadius: "10px",
+                  background: isTop4 ? "rgba(0, 229, 255, 0.08)" : "rgba(6, 16, 36, 0.6)",
+                  border: isTop4 ? "1px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0.06)",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {/* Rank */}
+                <div
                   style={{
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                    background: isQualified ? "rgba(0, 229, 255, 0.03)" : "transparent",
-                    transition: "background 0.15s ease",
+                    width: "56px",
+                    height: "36px",
+                    borderRadius: "6px",
+                    background: isTop4 ? badgeColor : "rgba(255,255,255,0.08)",
+                    color: isTop4 ? "#030814" : "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: "900",
+                    fontSize: "14px",
+                    fontFamily: "var(--font-num)",
+                    boxShadow: isTop4 ? "0 0 10px rgba(0, 229, 255, 0.4)" : "none",
+                    flexShrink: 0,
                   }}
                 >
-                  <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: "24px",
-                        height: "24px",
-                        lineHeight: "24px",
-                        borderRadius: "50%",
-                        background: isQualified ? badgeColor : "rgba(255,255,255,0.08)",
-                        color: isQualified ? "#060c18" : "rgba(255,255,255,0.7)",
-                        fontWeight: "800",
-                        fontSize: "12px",
-                      }}
-                    >
-                      {c.rank}
-                    </span>
-                  </td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => onSelectContestant(c)}>
-                      <img
-                        src={c.photo || "/default-avatar.png"}
-                        alt={c.name}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                        style={{
-                          width: "36px",
-                          height: "36px",
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                          border: isQualified ? `2px solid ${badgeColor}` : "1.5px solid rgba(255,255,255,0.2)",
-                          background: "#1e293b",
-                        }}
-                      />
-                      <div>
-                        <div style={{ fontWeight: "700", color: "#ffffff", fontSize: "14px" }}>
-                          {c.nickname ? <span style={{ color: badgeColor }}>{c.nickname} </span> : null}
-                          {c.name}
-                        </div>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>
-                          ชนะหมวด: +{c.categoriesWon} / เสียหมวด: -{c.categoriesLost}
-                        </div>
-                      </div>
+                  {c.rank}
+                </div>
+
+                {/* Contestant Name */}
+                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                  <img
+                    src={c.photo || "/default-avatar.png"}
+                    alt={c.name}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: isTop4 ? `2px solid ${badgeColor}` : "1.5px solid rgba(255,255,255,0.2)",
+                      background: "#0b1528",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: "800", color: "#ffffff", fontSize: "14px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {c.nickname ? <span style={{ color: "#ffd700" }}>{c.nickname} </span> : null}
+                      {c.name}
                     </div>
-                  </td>
-                  <td style={{ padding: "12px 12px", textAlign: "center" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "4px 10px",
-                        borderRadius: "8px",
-                        background: "rgba(0, 229, 255, 0.15)",
-                        color: "#00e5ff",
-                        fontWeight: "900",
-                        fontSize: "15px",
-                        border: "1px solid rgba(0, 229, 255, 0.3)",
-                      }}
-                    >
-                      {c.leaguePoints}
-                    </span>
-                  </td>
-                  <td style={{ padding: "12px 10px", textAlign: "center", color: "rgba(255,255,255,0.8)", fontWeight: "600" }}>
-                    <span style={{ color: "#10b981" }}>{c.win}</span> - <span style={{ color: "#ffd700" }}>{c.draw}</span> - <span style={{ color: "#f43f5e" }}>{c.lose}</span>
-                  </td>
-                  <td style={{ padding: "12px 12px", textAlign: "center", fontWeight: "700", color: c.scoreDiff?.startsWith("+") ? "#10b981" : c.scoreDiff?.startsWith("-") ? "#f43f5e" : "#94a3b8" }}>
-                    {c.scoreDiff}
-                  </td>
-                  <td style={{ padding: "12px 12px", textAlign: "center", fontWeight: "700", color: "#ffffff" }}>
-                    {c.totalScore}
-                  </td>
-                  <td style={{ padding: "12px 12px", textAlign: "center" }}>
-                    <button
-                      onClick={() => onSelectContestant(c)}
-                      style={{
-                        padding: "4px 10px",
-                        borderRadius: "6px",
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.15)",
-                        color: "rgba(255,255,255,0.7)",
-                        fontSize: "11px",
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
-                      }}
-                    >
-                      ดูโปรไฟล์
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                      +{c.categoriesWon} / -{c.categoriesLost} หมวด
+                    </div>
+                  </div>
+                </div>
+
+                {/* League Points */}
+                <div
+                  style={{
+                    width: "66px",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "15px",
+                    color: "#00e5ff",
+                    fontFamily: "var(--font-num)",
+                  }}
+                >
+                  {c.leaguePoints}
+                </div>
+
+                {/* W-D-L */}
+                <div style={{ width: "66px", textAlign: "center", fontSize: "12px", fontWeight: "700" }}>
+                  <span style={{ color: "#86efac" }}>{c.win}</span>-<span style={{ color: "#ffd700" }}>{c.draw}</span>-<span style={{ color: "#fca5a5" }}>{c.lose}</span>
+                </div>
+
+                {/* Score Diff */}
+                <div
+                  style={{
+                    width: "66px",
+                    textAlign: "center",
+                    fontSize: "13px",
+                    fontWeight: "800",
+                    fontFamily: "var(--font-num)",
+                    color: c.scoreDiff?.startsWith("+") ? "#86efac" : c.scoreDiff?.startsWith("-") ? "#fca5a5" : "#94a3b8",
+                  }}
+                >
+                  {c.scoreDiff}
+                </div>
+
+                {/* Total Score */}
+                <div
+                  style={{
+                    width: "70px",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "14px",
+                    fontFamily: "var(--font-num)",
+                    color: "#ffd700",
+                  }}
+                >
+                  {c.totalScore}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
 
 // ========================================================
-// SUB-COMPONENT: MATCH CARD WITH VS LAYOUT
+// SUB-COMPONENT: FANPANTAE MATCH CARD (VS BATTLE LAYOUT)
 // ========================================================
-function MatchCard({ match, onSelectContestant }) {
+function FanpantaeMatchCard({ match, onSelectContestant }) {
   const isCompleted = match.status === "completed";
   const p1 = match.player1;
   const p2 = match.player2;
 
-  // Round results
+  // Round Results in official Fan Pan Tae category colors:
+  // 3s (Green), QA (Silver), Jigsaw (Red), Prop (Cyan)
   const rounds = [
-    { key: "3sec", label: "3 วินาที", s1: p1.scores?.["3sec"], s2: p2.scores?.["3sec"] },
-    { key: "qa", label: "คำถาม-คำตอบ", s1: p1.scores?.qa, s2: p2.scores?.qa },
-    { key: "jigsaw", label: "จิ๊กซอว์", s1: p1.scores?.jigsaw, s2: p2.scores?.jigsaw },
-    { key: "attribute", label: "คุณสมบัติ", s1: p1.scores?.attribute, s2: p2.scores?.attribute },
+    { key: "3sec", label: "3 วินาที", s1: p1.scores?.["3sec"], s2: p2.scores?.["3sec"], border: "#52c41a", color: "#86efac" },
+    { key: "qa", label: "ถาม-ตอบ", s1: p1.scores?.qa, s2: p2.scores?.qa, border: "#e0e0e0", color: "#f3f4f6" },
+    { key: "jigsaw", label: "จิ๊กซอว์", s1: p1.scores?.jigsaw, s2: p2.scores?.jigsaw, border: "#ff4d4f", color: "#fca5a5" },
+    { key: "attribute", label: "คุณสมบัติ", s1: p1.scores?.attribute, s2: p2.scores?.attribute, border: "#00e5ff", color: "#67e8f9" },
   ];
 
   return (
     <div
       style={{
-        background: "rgba(15, 23, 42, 0.75)",
+        background: "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
         borderRadius: "18px",
-        border: isCompleted ? "1px solid rgba(0, 229, 255, 0.25)" : "1px solid rgba(255, 255, 255, 0.1)",
+        border: isCompleted ? "1.5px solid rgba(0, 229, 255, 0.35)" : "1px solid rgba(255, 255, 255, 0.12)",
         overflow: "hidden",
-        boxShadow: "0 10px 25px rgba(0,0,0,0.4)",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -1241,34 +1597,43 @@ function MatchCard({ match, onSelectContestant }) {
       <div
         style={{
           padding: "10px 16px",
-          background: "rgba(6, 12, 24, 0.8)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          background: "linear-gradient(90deg, #0f3460 0%, #16213e 100%)",
+          borderBottom: "1px solid rgba(0, 229, 255, 0.3)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ padding: "3px 8px", borderRadius: "6px", background: match.group === "A" ? "rgba(0, 229, 255, 0.2)" : match.group === "B" ? "rgba(255, 215, 0, 0.2)" : "rgba(255, 255, 255, 0.1)", color: match.group === "A" ? "#00e5ff" : match.group === "B" ? "#ffd700" : "#ffffff", fontSize: "11px", fontWeight: "800" }}>
+          <span
+            style={{
+              padding: "3px 10px",
+              borderRadius: "6px",
+              background: match.group === "A" ? "#00e5ff" : match.group === "B" ? "#ffd700" : "rgba(255, 255, 255, 0.2)",
+              color: "#030814",
+              fontSize: "12px",
+              fontWeight: "900",
+            }}
+          >
             {match.id}
           </span>
-          {match.matchNumber && <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>คู่ที่ {match.matchNumber}</span>}
+          {match.matchNumber && <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", fontWeight: "600" }}>คู่ที่ {match.matchNumber}</span>}
         </div>
 
         <div>
           {isCompleted ? (
-            <span style={{ fontSize: "11px", color: "#10b981", fontWeight: "700", display: "flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ fontSize: "12px", color: "#86efac", fontWeight: "800", display: "flex", alignItems: "center", gap: "4px" }}>
               <span>●</span> แข่งขันเสร็จสิ้น
             </span>
           ) : (
-            <span style={{ fontSize: "11px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}>
               <span>○</span> ยังไม่แข่งขัน
             </span>
           )}
         </div>
       </div>
 
-      {/* Contestants VS Showcase */}
+      {/* VS Contestants Showcase */}
       <div style={{ padding: "18px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
         {/* Player 1 */}
         <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} onClick={() => onSelectContestant(p1.name)}>
@@ -1280,13 +1645,13 @@ function MatchCard({ match, onSelectContestant }) {
                 e.target.style.display = "none";
               }}
               style={{
-                width: "56px",
-                height: "56px",
+                width: "58px",
+                height: "58px",
                 borderRadius: "50%",
                 objectFit: "cover",
-                border: match.winner === "player1" ? "3px solid #10b981" : "2px solid rgba(255,255,255,0.2)",
-                boxShadow: match.winner === "player1" ? "0 0 15px rgba(16, 185, 129, 0.4)" : "none",
-                background: "#1e293b",
+                border: match.winner === "player1" ? "3px solid #ffd700" : "2px solid rgba(255,255,255,0.25)",
+                boxShadow: match.winner === "player1" ? "0 0 15px rgba(255, 215, 0, 0.5)" : "none",
+                background: "#0b1528",
               }}
             />
             {match.winner === "player1" && (
@@ -1294,29 +1659,30 @@ function MatchCard({ match, onSelectContestant }) {
             )}
           </div>
           <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", marginTop: "6px" }}>
-            {p1.nickname || p1.name}
+            {p1.nickname ? <span style={{ color: "#ffd700" }}>{p1.nickname} </span> : null}
+            {p1.name}
           </div>
-          <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: "600", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "160px", margin: "2px auto 0 auto" }}>
+          <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: "700", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "160px", margin: "2px auto 0 auto" }}>
             {p1.topic || "-"}
           </div>
         </div>
 
-        {/* Center VS Score / Category Points */}
+        {/* Center VS Score */}
         <div style={{ textAlign: "center", minWidth: "120px" }}>
           {isCompleted ? (
             <div>
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.5px" }}>แต้มหมวด (CP)</div>
-              <div style={{ fontSize: "28px", fontWeight: "900", color: "#ffffff", fontFamily: "'Orbitron', sans-serif", letterSpacing: "1px", margin: "2px 0" }}>
-                <span style={{ color: match.winner === "player1" ? "#10b981" : "#ffffff" }}>{p1.categoryPoints}</span>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.5px" }}>แต้มหมวด (CP)</div>
+              <div style={{ fontSize: "30px", fontWeight: "900", color: "#ffffff", fontFamily: "var(--font-num)", letterSpacing: "1px", margin: "2px 0" }}>
+                <span style={{ color: match.winner === "player1" ? "#ffd700" : "#ffffff" }}>{p1.categoryPoints}</span>
                 <span style={{ color: "rgba(255,255,255,0.3)", margin: "0 6px" }}>-</span>
-                <span style={{ color: match.winner === "player2" ? "#10b981" : "#ffffff" }}>{p2.categoryPoints}</span>
+                <span style={{ color: match.winner === "player2" ? "#ffd700" : "#ffffff" }}>{p2.categoryPoints}</span>
               </div>
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>
-                รวม: {p1.sum} vs {p2.sum}
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>
+                ดิบ: {p1.sum} vs {p2.sum}
               </div>
             </div>
           ) : (
-            <div style={{ fontSize: "20px", fontWeight: "900", color: "rgba(255,255,255,0.3)", fontFamily: "'Orbitron', sans-serif" }}>
+            <div style={{ fontSize: "22px", fontWeight: "900", color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-num)" }}>
               VS
             </div>
           )}
@@ -1332,13 +1698,13 @@ function MatchCard({ match, onSelectContestant }) {
                 e.target.style.display = "none";
               }}
               style={{
-                width: "56px",
-                height: "56px",
+                width: "58px",
+                height: "58px",
                 borderRadius: "50%",
                 objectFit: "cover",
-                border: match.winner === "player2" ? "3px solid #10b981" : "2px solid rgba(255,255,255,0.2)",
-                boxShadow: match.winner === "player2" ? "0 0 15px rgba(16, 185, 129, 0.4)" : "none",
-                background: "#1e293b",
+                border: match.winner === "player2" ? "3px solid #ffd700" : "2px solid rgba(255,255,255,0.25)",
+                boxShadow: match.winner === "player2" ? "0 0 15px rgba(255, 215, 0, 0.5)" : "none",
+                background: "#0b1528",
               }}
             />
             {match.winner === "player2" && (
@@ -1346,17 +1712,18 @@ function MatchCard({ match, onSelectContestant }) {
             )}
           </div>
           <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", marginTop: "6px" }}>
-            {p2.nickname || p2.name}
+            {p2.nickname ? <span style={{ color: "#ffd700" }}>{p2.nickname} </span> : null}
+            {p2.name}
           </div>
-          <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: "600", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "160px", margin: "2px auto 0 auto" }}>
+          <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: "700", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "160px", margin: "2px auto 0 auto" }}>
             {p2.topic || "-"}
           </div>
         </div>
       </div>
 
-      {/* Round-by-Round Breakdown */}
+      {/* Round-by-Round Breakdown (Official Color Scheme) */}
       {isCompleted && (
-        <div style={{ background: "rgba(6, 12, 24, 0.5)", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "10px 14px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
+        <div style={{ background: "rgba(6, 16, 36, 0.8)", borderTop: "1px solid rgba(255,255,255,0.08)", padding: "10px 14px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
           {rounds.map((r) => {
             const val1 = r.s1 ?? 0;
             const val2 = r.s2 ?? 0;
@@ -1365,12 +1732,12 @@ function MatchCard({ match, onSelectContestant }) {
             const tied = val1 > 0 && val1 === val2;
 
             return (
-              <div key={r.key} style={{ textAlign: "center", padding: "6px 4px", borderRadius: "8px", background: "rgba(15, 23, 42, 0.6)" }}>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", marginBottom: "3px" }}>{r.label}</div>
-                <div style={{ fontSize: "12px", fontWeight: "800", display: "flex", justifyContent: "center", gap: "6px" }}>
-                  <span style={{ color: p1Won ? "#10b981" : tied ? "#ffd700" : "rgba(255,255,255,0.6)" }}>{r.s1 ?? "-"}</span>
+              <div key={r.key} style={{ textAlign: "center", padding: "6px 4px", borderRadius: "8px", background: "rgba(10, 25, 47, 0.7)", border: `1px solid ${r.border}` }}>
+                <div style={{ fontSize: "10px", color: r.color, fontWeight: "800", marginBottom: "3px" }}>{r.label}</div>
+                <div style={{ fontSize: "13px", fontWeight: "900", fontFamily: "var(--font-num)", display: "flex", justifyContent: "center", gap: "6px" }}>
+                  <span style={{ color: p1Won ? "#ffd700" : tied ? "#ffffff" : "rgba(255,255,255,0.6)" }}>{r.s1 ?? "-"}</span>
                   <span style={{ color: "rgba(255,255,255,0.2)" }}>:</span>
-                  <span style={{ color: p2Won ? "#10b981" : tied ? "#ffd700" : "rgba(255,255,255,0.6)" }}>{r.s2 ?? "-"}</span>
+                  <span style={{ color: p2Won ? "#ffd700" : tied ? "#ffffff" : "rgba(255,255,255,0.6)" }}>{r.s2 ?? "-"}</span>
                 </div>
               </div>
             );
@@ -1382,8 +1749,8 @@ function MatchCard({ match, onSelectContestant }) {
       <div
         style={{
           padding: "10px 16px",
-          background: "rgba(6, 12, 24, 0.9)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+          background: "rgba(3, 8, 20, 0.95)",
+          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -1394,44 +1761,21 @@ function MatchCard({ match, onSelectContestant }) {
           <>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ color: "rgba(255,255,255,0.5)" }}>แต้มลีก:</span>
-              <strong style={{ color: p1.leaguePoint > 0 ? "#10b981" : p1.leaguePoint < 0 ? "#f43f5e" : "#ffffff" }}>
+              <strong style={{ color: p1.leaguePoint > 0 ? "#86efac" : p1.leaguePoint < 0 ? "#fca5a5" : "#ffffff", fontFamily: "var(--font-num)" }}>
                 {p1.nickname || p1.name} ({p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : p1.leaguePoint} LP)
               </strong>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <strong style={{ color: p2.leaguePoint > 0 ? "#10b981" : p2.leaguePoint < 0 ? "#f43f5e" : "#ffffff" }}>
+              <strong style={{ color: p2.leaguePoint > 0 ? "#86efac" : p2.leaguePoint < 0 ? "#fca5a5" : "#ffffff", fontFamily: "var(--font-num)" }}>
                 {p2.nickname || p2.name} ({p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : p2.leaguePoint} LP)
               </strong>
             </div>
           </>
         ) : (
-          <div style={{ width: "100%", textAlign: "center", color: "rgba(255,255,255,0.4)" }}>
+          <div style={{ width: "100%", textAlign: "center", color: "rgba(255,255,255,0.5)" }}>
             รอการแข่งขันตามกำหนดการ
           </div>
         )}
-      </div>
-
-      {/* Play in Game Mode Link */}
-      <div style={{ padding: "8px 16px", background: "rgba(10, 18, 36, 0.95)", borderTop: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "flex-end" }}>
-        <Link
-          href={`/game?mode=battle&p1=${encodeURIComponent(p1.nickname || p1.name)}&p2=${encodeURIComponent(p2.nickname || p2.name)}`}
-          style={{
-            padding: "4px 10px",
-            borderRadius: "6px",
-            background: "rgba(244, 63, 94, 0.15)",
-            border: "1px solid rgba(244, 63, 94, 0.35)",
-            color: "#f43f5e",
-            fontSize: "11px",
-            fontWeight: "700",
-            textDecoration: "none",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            transition: "all 0.15s ease",
-          }}
-        >
-          <span>🎮</span> เล่นคู่นี้ในเกม VS Mode ↗
-        </Link>
       </div>
     </div>
   );

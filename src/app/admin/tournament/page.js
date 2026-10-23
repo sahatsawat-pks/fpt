@@ -496,28 +496,30 @@ export default function AdminTournamentPage() {
       )}
 
       {/* Header Bar */}
-      <header style={{ background: "rgba(6, 12, 24, 0.95)", borderBottom: "1px solid rgba(0, 229, 255, 0.2)", padding: "14px 24px", position: "sticky", top: 0, zIndex: 40, backdropFilter: "blur(12px)" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <header style={{ background: "#0d1b2a", borderBottom: "2px solid #00e5ff", padding: "16px 24px", position: "sticky", top: 0, zIndex: 40, boxShadow: "0 4px 20px rgba(0, 229, 255, 0.2)" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "linear-gradient(135deg, #00e5ff 0%, #3b82f6 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>
-              ⚔️
-            </div>
-            <div>
-              <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", fontFamily: "'Orbitron', sans-serif" }}>
-                TOURNAMENT <span style={{ color: "#00e5ff" }}>CONTROL CENTER</span>
-              </div>
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ระบบจัดการคะแนนและผู้เข้าแข่งขัน 2026-27</div>
+            <Link href="/" title="กลับหน้าหลัก">
+              <img src="/img/logo.png" alt="Fanpantae 2026" style={{ height: "36px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))" }} />
+            </Link>
+            <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "12px" }}>
+              <h1 style={{ fontSize: "16px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
+                ห้องควบคุม Tournament (Tournament Control Room)
+              </h1>
+              <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+                แฟนพันธุ์แท้ทัวร์นาเมนต์ 2026 - 27
+              </p>
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Link href="/admin/tournament/photos" style={{ padding: "7px 14px", borderRadius: "8px", background: "linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%)", border: "1px solid rgba(255, 215, 0, 0.4)", color: "#ffd700", fontSize: "12px", fontWeight: "800", textDecoration: "none", display: "flex", alignItems: "center", gap: "5px" }}>
-              <span>📸</span> หน้าใส่รูปผู้เข้าแข่งขัน ↗
+            <Link href="/admin/tournament/photos" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.4)", color: "#ffd700", fontSize: "13px", fontWeight: "700", textDecoration: "none", display: "flex", alignItems: "center", gap: "5px" }}>
+              <span>📸</span> จัดการรูปถ่ายผู้เข้าแข่งขัน
             </Link>
-            <Link href="/tournament" target="_blank" style={{ padding: "7px 12px", borderRadius: "8px", background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.3)", color: "#00e5ff", fontSize: "12px", fontWeight: "700", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px" }}>
+            <Link href="/tournament" target="_blank" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(0, 180, 216, 0.15)", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#00e5ff", fontSize: "13px", fontWeight: "700", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px" }}>
               <span>👁️</span> ดูหน้าสาธารณะ
             </Link>
-            <Link href="/admin" style={{ padding: "7px 12px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", color: "#e2e8f0", fontSize: "12px", fontWeight: "600", textDecoration: "none" }}>
+            <Link href="/admin" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.2)", color: "#80d0ff", fontSize: "13px", textDecoration: "none" }}>
               ⚙️ Admin หลัก
             </Link>
             <button
@@ -526,26 +528,25 @@ export default function AdminTournamentPage() {
                 setIsAuthenticated(false);
               }}
               style={{
-                padding: "7px 12px",
+                padding: "6px 14px",
                 borderRadius: "8px",
-                background: "rgba(244, 63, 94, 0.15)",
-                border: "1px solid rgba(244, 63, 94, 0.3)",
-                color: "#f43f5e",
-                fontSize: "12px",
-                fontWeight: "700",
+                background: "rgba(255, 77, 79, 0.15)",
+                border: "1px solid rgba(255, 77, 79, 0.4)",
+                color: "#ff7875",
+                fontSize: "13px",
                 cursor: "pointer",
               }}
             >
-              ออกจากระบบ
+              🚪 ออกจากระบบ
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Container */}
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "24px" }}>
+      <main style={{ maxWidth: "1280px", margin: "0 auto", padding: "24px 20px" }}>
         {/* Navigation Tabs */}
-        <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "12px", marginBottom: "24px", overflowX: "auto" }}>
+        <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid rgba(255,255,255,0.1)", marginBottom: "24px", overflowX: "auto" }}>
           {[
             { id: "matches", label: "🎯 บันทึกผลการแข่งขัน (Match Scoring)" },
             { id: "contestants", label: `👥 รายชื่อผู้เข้าแข่งขัน & ผูกรูปภาพ (${contestants.length})` },
@@ -555,14 +556,15 @@ export default function AdminTournamentPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
-                padding: "10px 18px",
-                borderRadius: "10px",
-                fontSize: "14px",
+                padding: "12px 20px",
+                fontSize: "15px",
                 fontWeight: "700",
-                border: activeTab === tab.id ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)",
-                background: activeTab === tab.id ? "rgba(0, 229, 255, 0.15)" : "rgba(15, 23, 42, 0.6)",
-                color: activeTab === tab.id ? "#00e5ff" : "rgba(255,255,255,0.7)",
+                background: activeTab === tab.id ? "rgba(0, 229, 255, 0.12)" : "transparent",
+                color: activeTab === tab.id ? "#00e5ff" : "rgba(255,255,255,0.6)",
+                border: "none",
+                borderBottom: activeTab === tab.id ? "2px solid #00e5ff" : "2px solid transparent",
                 cursor: "pointer",
+                borderRadius: "6px 6px 0 0",
                 whiteSpace: "nowrap",
                 transition: "all 0.15s ease",
               }}
@@ -570,6 +572,27 @@ export default function AdminTournamentPage() {
               {tab.label}
             </button>
           ))}
+          <Link
+            href="/admin/tournament/photos"
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: "rgba(255, 215, 0, 0.1)",
+              color: "#ffd700",
+              border: "none",
+              borderBottom: "2px solid transparent",
+              borderRadius: "6px 6px 0 0",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s ease",
+            }}
+          >
+            📸 หน้าใส่รูปถ่ายผู้เข้าแข่งขัน ↗
+          </Link>
         </div>
 
         {/* ========================================================

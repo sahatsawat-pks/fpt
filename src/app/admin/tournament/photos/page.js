@@ -277,7 +277,7 @@ export default function TournamentPhotosPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #070c18 0%, #0c1527 50%, #060b14 100%)", color: "#f8fafc", fontFamily: "'Prompt', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#030814", color: "#f8fafc", fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)" }}>
       {/* Toast Alert */}
       {toast && (
         <div
@@ -300,25 +300,27 @@ export default function TournamentPhotosPage() {
       )}
 
       {/* Header Bar */}
-      <header style={{ background: "rgba(6, 12, 24, 0.95)", borderBottom: "1px solid rgba(0, 229, 255, 0.2)", padding: "14px 24px", position: "sticky", top: 0, zIndex: 40, backdropFilter: "blur(12px)" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <header style={{ background: "#0d1b2a", borderBottom: "2px solid #00e5ff", padding: "16px 24px", position: "sticky", top: 0, zIndex: 40, boxShadow: "0 4px 20px rgba(0, 229, 255, 0.2)" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "linear-gradient(135deg, #00e5ff 0%, #3b82f6 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
-              📸
-            </div>
-            <div>
-              <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", fontFamily: "'Orbitron', sans-serif" }}>
-                CONTESTANT <span style={{ color: "#00e5ff" }}>PHOTO MANAGER</span>
-              </div>
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ระบบจัดการและผูกรูปถ่ายผู้เข้าแข่งขัน FANPANTAE TOURNAMENT</div>
+            <Link href="/" title="กลับหน้าหลัก">
+              <img src="/img/logo.png" alt="Fanpantae 2026" style={{ height: "36px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))" }} />
+            </Link>
+            <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "12px" }}>
+              <h1 style={{ fontSize: "16px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
+                จัดการรูปถ่ายผู้เข้าแข่งขัน (Contestant Photo Manager)
+              </h1>
+              <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+                แฟนพันธุ์แท้ทัวร์นาเมนต์ 2026 - 27
+              </p>
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Link href="/admin/tournament" style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", color: "#e2e8f0", fontSize: "12px", fontWeight: "700", textDecoration: "none" }}>
-              ← หน้าจัดการ Tournament
+            <Link href="/admin/tournament" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(0, 180, 216, 0.15)", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#00e5ff", fontSize: "13px", fontWeight: "700", textDecoration: "none" }}>
+              ← กลับห้องควบคุม Tournament
             </Link>
-            <Link href="/tournament" target="_blank" style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.3)", color: "#00e5ff", fontSize: "12px", fontWeight: "700", textDecoration: "none" }}>
+            <Link href="/tournament" target="_blank" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.4)", color: "#ffd700", fontSize: "13px", fontWeight: "700", textDecoration: "none" }}>
               👁️ ดูหน้าเว็บจริง ↗
             </Link>
           </div>
@@ -326,7 +328,7 @@ export default function TournamentPhotosPage() {
       </header>
 
       {/* Main Container */}
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 20px 80px 20px" }}>
+      <main style={{ maxWidth: "1280px", margin: "0 auto", padding: "28px 20px 80px 20px" }}>
         {/* Top Stats Banner */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px", marginBottom: "24px" }}>
           <div
