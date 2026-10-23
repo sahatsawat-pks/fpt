@@ -1484,16 +1484,15 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                 style={{
                   transform: "skewX(20deg)",
                   fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
-                  fontStyle: "italic",
-                  fontWeight: "900",
-                  fontSize: "clamp(15px, 1.8vw, 20px)",
+                  fontWeight: "700",
+                  fontSize: "clamp(14px, 1.6vw, 18px)",
                   color: "#ffffff",
-                  letterSpacing: "1px",
+                  letterSpacing: "0.5px",
                   textTransform: "uppercase",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  textShadow: "0 2px 8px rgba(0,0,0,0.8)",
+                  textShadow: "0 2px 6px rgba(0,0,0,0.7)",
                 }}
               >
                 {titleText}
@@ -1518,8 +1517,8 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
               title="ชนะ (Wins)"
             >
               <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
-                <div style={{ fontSize: "13px", fontWeight: "900", fontStyle: "italic", color: "#86efac" }}>W</div>
-                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>ชนะ</div>
+                <div style={{ fontSize: "13px", fontWeight: "700", color: "#86efac" }}>W</div>
+                <div style={{ fontSize: "9px", fontWeight: "400", color: "#ffffff", opacity: 0.85 }}>ชนะ</div>
               </div>
             </div>
 
@@ -1541,8 +1540,8 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
               title="เสมอ (Draws)"
             >
               <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
-                <div style={{ fontSize: "13px", fontWeight: "900", fontStyle: "italic", color: "#e2e8f0" }}>D</div>
-                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>เสมอ</div>
+                <div style={{ fontSize: "13px", fontWeight: "700", color: "#e2e8f0" }}>D</div>
+                <div style={{ fontSize: "9px", fontWeight: "400", color: "#ffffff", opacity: 0.85 }}>เสมอ</div>
               </div>
             </div>
 
@@ -1564,8 +1563,8 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
               title="แพ้ (Losses)"
             >
               <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
-                <div style={{ fontSize: "13px", fontWeight: "900", fontStyle: "italic", color: "#fca5a5" }}>L</div>
-                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>แพ้</div>
+                <div style={{ fontSize: "13px", fontWeight: "700", color: "#fca5a5" }}>L</div>
+                <div style={{ fontSize: "9px", fontWeight: "400", color: "#ffffff", opacity: 0.85 }}>แพ้</div>
               </div>
             </div>
 
@@ -1587,8 +1586,8 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
               title="ผลต่างคะแนน / หมวด (Score Difference)"
             >
               <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
-                <div style={{ fontSize: "12px", fontWeight: "900", fontStyle: "italic", color: "#7dd3fc" }}>DIFF</div>
-                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>ผลต่าง</div>
+                <div style={{ fontSize: "12px", fontWeight: "700", color: "#7dd3fc" }}>DIFF</div>
+                <div style={{ fontSize: "9px", fontWeight: "400", color: "#ffffff", opacity: 0.85 }}>ผลต่าง</div>
               </div>
             </div>
 
@@ -1610,8 +1609,8 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
               title="แต้มสะสมในลีก (League Points)"
             >
               <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
-                <div style={{ fontSize: "12px", fontWeight: "900", fontStyle: "italic", color: "#fde047" }}>PTS</div>
-                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>คะแนน</div>
+                <div style={{ fontSize: "12px", fontWeight: "700", color: "#fde047" }}>PTS</div>
+                <div style={{ fontSize: "9px", fontWeight: "400", color: "#ffffff", opacity: 0.85 }}>คะแนน</div>
               </div>
             </div>
           </div>
@@ -1717,11 +1716,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       style={{
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
-                        fontStyle: "italic",
-                        fontWeight: "900",
-                        fontSize: "20px",
+                        fontWeight: "600",
+                        fontSize: "18px",
                         color: rankColor,
-                        textShadow: isRank1 ? "0 0 10px rgba(255, 215, 0, 0.6)" : "0 2px 6px rgba(0,0,0,0.8)",
+                        textShadow: isRank1 ? "0 0 10px rgba(255, 215, 0, 0.5)" : "0 2px 4px rgba(0,0,0,0.7)",
                       }}
                     >
                       {c.rank || idx + 1}
@@ -1782,15 +1780,14 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       <span
                         style={{
                           fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                          fontStyle: "italic",
-                          fontWeight: "800",
+                          fontWeight: "500",
                           fontSize: "15px",
-                          letterSpacing: "0.5px",
+                          letterSpacing: "0.2px",
                           color: isRank1 ? "#ffd700" : "#ffffff",
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          textShadow: isRank1 ? "0 0 10px rgba(255, 215, 0, 0.5)" : "0 2px 6px rgba(0,0,0,0.8)",
+                          textShadow: isRank1 ? "0 0 8px rgba(255, 215, 0, 0.4)" : "0 1px 3px rgba(0,0,0,0.6)",
                         }}
                       >
                         {displayName}
@@ -1818,11 +1815,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       style={{
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
-                        fontStyle: "italic",
-                        fontWeight: "900",
-                        fontSize: "18px",
+                        fontWeight: "600",
+                        fontSize: "17px",
                         color: "#ffffff",
-                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                        textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
                     >
                       {c.win ?? 0}
@@ -1849,11 +1845,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       style={{
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
-                        fontStyle: "italic",
-                        fontWeight: "900",
-                        fontSize: "18px",
+                        fontWeight: "600",
+                        fontSize: "17px",
                         color: "#ffffff",
-                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                        textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
                     >
                       {c.draw ?? 0}
@@ -1880,11 +1875,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       style={{
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
-                        fontStyle: "italic",
-                        fontWeight: "900",
-                        fontSize: "18px",
+                        fontWeight: "600",
+                        fontSize: "17px",
                         color: "#ffffff",
-                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                        textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
                     >
                       {c.lose ?? 0}
@@ -1911,11 +1905,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       style={{
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
-                        fontStyle: "italic",
-                        fontWeight: "900",
-                        fontSize: "18px",
+                        fontWeight: "600",
+                        fontSize: "17px",
                         color: "#ffffff",
-                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                        textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
                     >
                       {cleanDiff}
@@ -1942,11 +1935,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       style={{
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
-                        fontStyle: "italic",
-                        fontWeight: "900",
-                        fontSize: "19px",
+                        fontWeight: "600",
+                        fontSize: "18px",
                         color: "#ffffff",
-                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                        textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
                     >
                       {c.leaguePoints ?? 0}
@@ -1980,11 +1972,11 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
         <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#38bdf8" }}></span>
-            <span style={{ color: "#e0f2fe", fontWeight: "700" }}>อันดับ 1-4: ผ่านเข้ารอบน็อคเอาท์ (Top 4 Qualified)</span>
+            <span style={{ color: "#e0f2fe", fontWeight: "500" }}>อันดับ 1-4: ผ่านเข้ารอบน็อคเอาท์ (Top 4 Qualified)</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#ff1744" }}></span>
-            <span style={{ color: "#fca5a5", fontWeight: "700" }}>อันดับ 5-12: ตกรอบ (Eliminated)</span>
+            <span style={{ color: "#fca5a5", fontWeight: "500" }}>อันดับ 5-12: ตกรอบ (Eliminated)</span>
           </div>
         </div>
         <div style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "11px" }}>
