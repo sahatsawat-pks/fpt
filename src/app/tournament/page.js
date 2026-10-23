@@ -1804,18 +1804,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                 rankBorder = "2.5px solid #ffd700";
                 rankBg = "linear-gradient(180deg, #2b2207 0%, #100c02 100%)";
                 rankColor = "#ffd700";
-              } else if (isRank2) {
-                rankBorder = "2.5px solid #e2e8f0";
-                rankBg = "linear-gradient(180deg, #1c2638 0%, #09101d 100%)";
-                rankColor = "#ffffff";
-              } else if (isRank3) {
-                rankBorder = "2.5px solid #f59e0b";
-                rankBg = "linear-gradient(180deg, #261b0a 0%, #0e0903 100%)";
-                rankColor = "#ffffff";
-              } else if (isRank4) {
+              } else if (isRank2 || isRank3 || isRank4) {
                 rankBorder = "2.5px solid #38bdf8";
                 rankBg = "linear-gradient(180deg, #0e223a 0%, #050e1a 100%)";
-                rankColor = "#ffffff";
+                rankColor = "#bae6fd";
               } else if (isDangerZone) {
                 rankBorder = "2.5px solid #ff1744"; // Red for rank 5+
                 rankBg = "linear-gradient(180deg, #2b0c11 0%, #0e0305 100%)";
@@ -1826,8 +1818,8 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
               const nameBorder = isDangerZone
                 ? "2.5px solid #ff1744" // Red border on Name box for Rank 5+
                 : isRank1
-                ? "2px solid rgba(255, 215, 0, 0.7)"
-                : "2px solid #64748b";
+                ? "2.5px solid #ffd700"
+                : "2.5px solid #38bdf8";
 
               const nameBg = isDangerZone
                 ? "linear-gradient(180deg, #220b10 0%, #0a0305 100%)"
@@ -1987,6 +1979,44 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                       >
                         {displayName}
                       </span>
+
+                      {/* Qualification Badge */}
+                      {isRank1 && (
+                        <span
+                          style={{
+                            marginLeft: "auto",
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            background: "rgba(255, 215, 0, 0.2)",
+                            border: "1px solid #ffd700",
+                            color: "#ffd700",
+                            fontSize: "10px",
+                            fontWeight: "800",
+                            letterSpacing: "0.5px",
+                            flexShrink: 0,
+                          }}
+                        >
+                          👑 FINAL
+                        </span>
+                      )}
+                      {(isRank2 || isRank3 || isRank4) && (
+                        <span
+                          style={{
+                            marginLeft: "auto",
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            background: "rgba(56, 189, 248, 0.15)",
+                            border: "1px solid rgba(56, 189, 248, 0.4)",
+                            color: "#7dd3fc",
+                            fontSize: "10px",
+                            fontWeight: "700",
+                            letterSpacing: "0.5px",
+                            flexShrink: 0,
+                          }}
+                        >
+                          KNOCKOUT
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -2166,8 +2196,12 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
       >
         <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#38bdf8" }}></span>
-            <span style={{ color: "#e0f2fe", fontWeight: "500" }}>อันดับ 1-4: ผ่านเข้ารอบน็อคเอาท์ (Top 4 Qualified)</span>
+            <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#ffd700", boxShadow: "0 0 8px rgba(255, 215, 0, 0.7)" }}></span>
+            <span style={{ color: "#fef08a", fontWeight: "600" }}>อันดับ 1: เข้ารอบชิงชนะเลิศทันที (Direct to Final)</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#38bdf8", boxShadow: "0 0 8px rgba(56, 189, 248, 0.5)" }}></span>
+            <span style={{ color: "#bae6fd", fontWeight: "500" }}>อันดับ 2-4: ผ่านเข้ารอบน็อคเอาท์ (Knockout Stage)</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#ff1744" }}></span>

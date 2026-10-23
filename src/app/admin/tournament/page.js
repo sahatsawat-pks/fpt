@@ -278,6 +278,299 @@ function AdminContestantDropdown({
   );
 }
 
+// ========================================================
+// CUSTOM TOPIC DROPDOWN (Matches Contestant Dropdown style)
+// ========================================================
+function AdminTopicDropdown({
+  contestant,
+  allTopics = [],
+  value = "",
+  themeColor = "#00e5ff",
+  placeholder = "-- เลือกหัวข้อที่เล่น --",
+  onChange,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen]);
+
+  // Player's registered 4 topics
+  const playerTopics = useMemo(() => {
+    if (!contestant?.topics) return [];
+    return contestant.topics
+      .map((t) => (typeof t === "string" ? t : t?.topic))
+      .filter(Boolean);
+  }, [contestant]);
+
+  // Other tournament topics (excluding player's topics)
+  const otherTopics = useMemo(() => {
+    const pSet = new Set(playerTopics);
+    return allTopics.filter((t) => !pSet.has(t));
+  }, [allTopics, playerTopics]);
+
+  const q = search.trim().toLowerCase();
+
+  const filteredPlayerTopics = useMemo(() => {
+    if (!q) return playerTopics;
+    return playerTopics.filter((t) => t.toLowerCase().includes(q));
+  }, [playerTopics, q]);
+
+  const filteredOtherTopics = useMemo(() => {
+    if (!q) return otherTopics;
+    return otherTopics.filter((t) => t.toLowerCase().includes(q));
+  }, [otherTopics, q]);
+
+  const isCustomNew =
+    search.trim() &&
+    !playerTopics.some((t) => t.toLowerCase() === q) &&
+    !otherTopics.some((t) => t.toLowerCase() === q);
+
+  return (
+    <div ref={dropdownRef} style={{ position: "relative", width: "100%" }}>
+      {/* Trigger Box */}
+      <div
+        onClick={() => {
+          setIsOpen(!isOpen);
+          setSearch("");
+        }}
+        style={{
+          padding: "6px 12px",
+          borderRadius: "8px",
+          background: "rgba(3, 10, 24, 0.95)",
+          border: isOpen ? `1.5px solid ${themeColor}` : `1px solid rgba(255, 255, 255, 0.2)`,
+          boxShadow: isOpen ? `0 0 14px ${themeColor}40` : "none",
+          color: "#ffffff",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "8px",
+          minHeight: "42px",
+          transition: "all 0.15s ease",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0, overflow: "hidden", flex: 1 }}>
+          <span style={{ fontSize: "14px" }}>🎯</span>
+          {value ? (
+            <span style={{ fontWeight: "700", fontSize: "12px", color: "#ffffff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {value}
+            </span>
+          ) : (
+            <span style={{ color: "rgba(255, 255, 255, 0.45)", fontSize: "12px" }}>
+              {placeholder}
+            </span>
+          )}
+        </div>
+        <span
+          style={{
+            fontSize: "10px",
+            color: themeColor,
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+            flexShrink: 0,
+          }}
+        >
+          ▼
+        </span>
+      </div>
+
+      {/* Floating Options Panel */}
+      {isOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            background: "linear-gradient(160deg, #07162b 0%, #030a14 100%)",
+            border: `1.5px solid ${themeColor}`,
+            borderRadius: "10px",
+            boxShadow: `0 14px 40px rgba(0, 0, 0, 0.9), 0 0 25px ${themeColor}35`,
+            maxHeight: "280px",
+            overflowY: "auto",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          {/* Sticky Search Input */}
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              background: "#07162b",
+              padding: "8px 10px",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="🔍 ค้นหา หรือพิมพ์ชื่อหัวข้อ..."
+              autoFocus
+              style={{
+                width: "100%",
+                padding: "6px 10px",
+                borderRadius: "6px",
+                background: "#030a14",
+                border: `1px solid ${themeColor}60`,
+                color: "#ffffff",
+                fontSize: "12px",
+                outline: "none",
+              }}
+            />
+          </div>
+
+          {/* Quick Custom add if typed */}
+          {isCustomNew && (
+            <div
+              onClick={() => {
+                onChange(search.trim());
+                setIsOpen(false);
+              }}
+              style={{
+                padding: "8px 12px",
+                background: "rgba(16, 185, 129, 0.15)",
+                borderBottom: "1px solid rgba(16, 185, 129, 0.3)",
+                color: "#10b981",
+                fontSize: "12px",
+                fontWeight: "700",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <span>➕</span>
+              <span>ใช้หัวข้อ: <strong>&quot;{search.trim()}&quot;</strong></span>
+            </div>
+          )}
+
+          {/* Section 1: Contestant's Registered Topics */}
+          {filteredPlayerTopics.length > 0 && (
+            <div>
+              <div
+                style={{
+                  padding: "6px 12px 4px 12px",
+                  fontSize: "10px",
+                  fontWeight: "800",
+                  color: themeColor,
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  background: "rgba(255, 255, 255, 0.03)",
+                }}
+              >
+                ⭐ หัวข้อประจำตัว ({filteredPlayerTopics.length})
+              </div>
+              {filteredPlayerTopics.map((topic, idx) => {
+                const isSelected = topic === value;
+                return (
+                  <div
+                    key={`p-${idx}`}
+                    onClick={() => {
+                      onChange(topic);
+                      setIsOpen(false);
+                    }}
+                    style={{
+                      padding: "8px 12px",
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                      background: isSelected ? `${themeColor}25` : "transparent",
+                      color: isSelected ? themeColor : "#ffffff",
+                      fontSize: "12px",
+                      fontWeight: isSelected ? "800" : "600",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    <span>{topic}</span>
+                    <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", background: `${themeColor}20`, color: themeColor }}>
+                      หัวข้อลงทะเบียน
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Section 2: Other Tournament Topics */}
+          {filteredOtherTopics.length > 0 && (
+            <div>
+              <div
+                style={{
+                  padding: "6px 12px 4px 12px",
+                  fontSize: "10px",
+                  fontWeight: "800",
+                  color: "rgba(255, 255, 255, 0.5)",
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  background: "rgba(255, 255, 255, 0.03)",
+                }}
+              >
+                📚 หัวข้ออื่นๆ ในทัวร์นาเมนต์ ({filteredOtherTopics.length})
+              </div>
+              {filteredOtherTopics.map((topic, idx) => {
+                const isSelected = topic === value;
+                return (
+                  <div
+                    key={`o-${idx}`}
+                    onClick={() => {
+                      onChange(topic);
+                      setIsOpen(false);
+                    }}
+                    style={{
+                      padding: "8px 12px",
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                      background: isSelected ? `${themeColor}25` : "transparent",
+                      color: isSelected ? themeColor : "#cbd5e1",
+                      fontSize: "12px",
+                      fontWeight: isSelected ? "800" : "500",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    {topic}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {filteredPlayerTopics.length === 0 && filteredOtherTopics.length === 0 && !isCustomNew && (
+            <div style={{ padding: "16px", textAlign: "center", color: "rgba(255, 255, 255, 0.5)", fontSize: "12px" }}>
+              ไม่พบหัวข้อที่ค้นหา
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminTournamentPage() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -298,6 +591,16 @@ export default function AdminTournamentPage() {
   const [editingMatch, setEditingMatch] = useState(null);
   const [matchFormData, setMatchFormData] = useState(null);
   const [savingMatch, setSavingMatch] = useState(false);
+
+  // Contestant Full Edit Modal State
+  const [editingContestant, setEditingContestant] = useState(null);
+  const [contestantFormData, setContestantFormData] = useState(null);
+  const [savingContestant, setSavingContestant] = useState(false);
+
+  // Matchday Edit Modal State
+  const [editingMatchday, setEditingMatchday] = useState(null);
+  const [matchdayFormData, setMatchdayFormData] = useState(null);
+  const [savingMatchday, setSavingMatchday] = useState(false);
 
   // Contestant Quick Photo Edit State
   const [contestantPhotos, setContestantPhotos] = useState({});
@@ -376,6 +679,17 @@ export default function AdminTournamentPage() {
   const standings = data?.standings || { groupA: [], groupB: [] };
   const matchdays = data?.matchdays || [];
   const contestants = data?.contestants || [];
+
+  const allTopics = useMemo(() => {
+    const topicsSet = new Set();
+    (data?.contestants || []).forEach((c) => {
+      (c.topics || []).forEach((t) => {
+        const title = typeof t === "string" ? t : t?.topic;
+        if (title && title.trim()) topicsSet.add(title.trim());
+      });
+    });
+    return Array.from(topicsSet).sort();
+  }, [data?.contestants]);
 
   const p1Selected = useMemo(() => {
     if (!matchFormData?.player1?.name) return null;
@@ -633,6 +947,105 @@ export default function AdminTournamentPage() {
       alert("เกิดข้อผิดพลาดในการบันทึกรูป");
     } finally {
       setSavingContestantName(null);
+    }
+  };
+
+  // Open Contestant Full Edit Modal
+  const handleOpenEditContestant = (c) => {
+    setEditingContestant(c);
+    setContestantFormData({
+      name: c.name || "",
+      newName: c.name || "",
+      nickname: c.nickname || "",
+      group: c.group || "A",
+      photo: contestantPhotos[c.name] !== undefined ? contestantPhotos[c.name] : (c.photo || ""),
+      topics: [
+        c.topics?.[0]?.topic || (typeof c.topics?.[0] === "string" ? c.topics[0] : "") || "",
+        c.topics?.[1]?.topic || (typeof c.topics?.[1] === "string" ? c.topics[1] : "") || "",
+        c.topics?.[2]?.topic || (typeof c.topics?.[2] === "string" ? c.topics[2] : "") || "",
+        c.topics?.[3]?.topic || (typeof c.topics?.[3] === "string" ? c.topics[3] : "") || "",
+      ],
+    });
+  };
+
+  // Save Contestant Full Edit
+  const handleSaveContestant = async () => {
+    if (!editingContestant || !contestantFormData) return;
+    setSavingContestant(true);
+    try {
+      const formattedTopics = (contestantFormData.topics || [])
+        .filter((t) => t && t.trim())
+        .map((t) => ({ topic: t.trim() }));
+
+      const res = await fetch("/api/tournament", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_contestant",
+          name: editingContestant.name,
+          newName: contestantFormData.newName.trim(),
+          nickname: contestantFormData.nickname.trim(),
+          group: contestantFormData.group,
+          photo: contestantFormData.photo.trim(),
+          topics: formattedTopics,
+        }),
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        setData(result.data);
+        showToast(`อัปเดตข้อมูล ${contestantFormData.newName || editingContestant.name} สำเร็จ!`);
+        setEditingContestant(null);
+        setContestantFormData(null);
+      } else {
+        alert(result.error || "เกิดข้อผิดพลาดในการบันทึกข้อมูลผู้เข้าแข่งขัน");
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    } finally {
+      setSavingContestant(false);
+    }
+  };
+
+  // Open Matchday Edit Modal
+  const handleOpenEditMatchday = (md) => {
+    const target = md || currentMD;
+    if (!target) return;
+    setEditingMatchday(target);
+    setMatchdayFormData({
+      matchdayId: target.id,
+      name: target.name || "",
+      dateRange: target.dateRange || "",
+    });
+  };
+
+  // Save Matchday Edit
+  const handleSaveMatchday = async () => {
+    if (!editingMatchday || !matchdayFormData) return;
+    setSavingMatchday(true);
+    try {
+      const res = await fetch("/api/tournament", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_matchday",
+          matchdayId: matchdayFormData.matchdayId,
+          name: matchdayFormData.name.trim(),
+          dateRange: matchdayFormData.dateRange.trim(),
+        }),
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        setData(result.data);
+        showToast(`อัปเดต ${matchdayFormData.name} สำเร็จ!`);
+        setEditingMatchday(null);
+        setMatchdayFormData(null);
+      } else {
+        alert(result.error || "เกิดข้อผิดพลาดในการบันทึก Matchday");
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    } finally {
+      setSavingMatchday(false);
     }
   };
 
@@ -1055,33 +1468,61 @@ export default function AdminTournamentPage() {
            ======================================================== */}
         {activeTab === "matches" && (
           <div className="admin-tab-content">
-            {/* Matchday Selector Pills */}
-            <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px", marginBottom: "18px" }}>
-              {matchdays.map((md) => {
-                const isSelected = md.id === selectedMatchday;
-                const completedCount = md.matches.filter((m) => m.status === "completed").length;
-                return (
-                  <button
-                    key={md.id}
-                    onClick={() => setSelectedMatchday(md.id)}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "10px",
-                      textAlign: "left",
-                      minWidth: "150px",
-                      cursor: "pointer",
-                      border: isSelected ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)",
-                      background: isSelected ? "rgba(0, 229, 255, 0.2)" : "rgba(15, 23, 42, 0.7)",
-                      color: isSelected ? "#00e5ff" : "#ffffff",
-                    }}
-                  >
-                    <div style={{ fontSize: "13px", fontWeight: "800" }}>{md.name}</div>
-                    <div style={{ fontSize: "11px", color: isSelected ? "#00e5ff" : "rgba(255,255,255,0.5)" }}>
-                      เสร็จสิ้น {completedCount}/{md.matches.length} คู่
-                    </div>
-                  </button>
-                );
-              })}
+            {/* Matchday Selector Pills & Controls */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
+              <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px", flex: 1 }}>
+                {matchdays.map((md) => {
+                  const isSelected = md.id === selectedMatchday;
+                  const completedCount = md.matches.filter((m) => m.status === "completed").length;
+                  return (
+                    <button
+                      key={md.id}
+                      onClick={() => setSelectedMatchday(md.id)}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: "10px",
+                        textAlign: "left",
+                        minWidth: "155px",
+                        cursor: "pointer",
+                        border: isSelected ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)",
+                        background: isSelected ? "rgba(0, 229, 255, 0.2)" : "rgba(15, 23, 42, 0.7)",
+                        color: isSelected ? "#00e5ff" : "#ffffff",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      <div style={{ fontSize: "13px", fontWeight: "800" }}>{md.name}</div>
+                      <div style={{ fontSize: "11px", color: isSelected ? "#00e5ff" : "rgba(255,255,255,0.5)", marginTop: "2px" }}>
+                        {md.dateRange ? `${md.dateRange} • ` : ""}เสร็จ {completedCount}/{md.matches.length} คู่
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Edit Matchday Button */}
+              <button
+                type="button"
+                onClick={() => handleOpenEditMatchday(currentMD)}
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%)",
+                  border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                  color: "#00e5ff",
+                  fontSize: "12px",
+                  fontWeight: "800",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  whiteSpace: "nowrap",
+                  boxShadow: "0 0 12px rgba(0, 229, 255, 0.2)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <span>📅</span>
+                <span>ปรับแต่ง Matchdays (ชื่อ & วันที่)</span>
+              </button>
             </div>
 
             {/* Filter & Search Bar */}
@@ -1294,7 +1735,7 @@ export default function AdminTournamentPage() {
                       <th style={{ padding: "12px 14px", textAlign: "left" }}>ชื่อเล่น & ชื่อจริง</th>
                       <th style={{ padding: "12px 14px", textAlign: "left" }}>หัวข้อประจำตัว (Topics)</th>
                       <th style={{ padding: "12px 14px", textAlign: "left" }}>URL รูปภาพ (Google Photos)</th>
-                      <th style={{ padding: "12px 14px", width: "100px", textAlign: "center" }}>บันทึก</th>
+                      <th style={{ padding: "12px 14px", width: "180px", textAlign: "center" }}>จัดการ</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1332,7 +1773,7 @@ export default function AdminTournamentPage() {
                             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", maxWidth: "280px" }}>
                               {(c.topics || []).map((t, idx) => (
                                 <span key={idx} style={{ padding: "2px 6px", borderRadius: "4px", background: "rgba(255,255,255,0.06)", fontSize: "10px", color: "#38bdf8" }}>
-                                  {t.topic}
+                                  {t.topic || t}
                                 </span>
                               ))}
                             </div>
@@ -1357,22 +1798,44 @@ export default function AdminTournamentPage() {
                             />
                           </td>
                           <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                            <button
-                              onClick={() => handleSaveContestantPhoto(c.name)}
-                              disabled={isSaving}
-                              style={{
-                                padding: "6px 12px",
-                                borderRadius: "6px",
-                                background: isSaving ? "#64748b" : "#10b981",
-                                border: "none",
-                                color: "#ffffff",
-                                fontWeight: "700",
-                                fontSize: "11px",
-                                cursor: isSaving ? "not-allowed" : "pointer",
-                              }}
-                            >
-                              {isSaving ? "กำลังบันทึก..." : "💾 บันทึกรูป"}
-                            </button>
+                            <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                              <button
+                                onClick={() => handleSaveContestantPhoto(c.name)}
+                                disabled={isSaving}
+                                title="บันทึกรูปภาพที่กรอกในช่องนี้"
+                                style={{
+                                  padding: "6px 9px",
+                                  borderRadius: "6px",
+                                  background: isSaving ? "#64748b" : "#10b981",
+                                  border: "none",
+                                  color: "#ffffff",
+                                  fontWeight: "700",
+                                  fontSize: "11px",
+                                  cursor: isSaving ? "not-allowed" : "pointer",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {isSaving ? "..." : "💾 บันทึกรูป"}
+                              </button>
+                              <button
+                                onClick={() => handleOpenEditContestant(c)}
+                                title="แก้ไขชื่อเล่น, ชื่อจริง, สาย, รูปภาพ และหัวข้อทั้ง 4"
+                                style={{
+                                  padding: "6px 9px",
+                                  borderRadius: "6px",
+                                  background: "rgba(0, 229, 255, 0.15)",
+                                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                                  color: "#00e5ff",
+                                  fontWeight: "700",
+                                  fontSize: "11px",
+                                  cursor: "pointer",
+                                  whiteSpace: "nowrap",
+                                  transition: "all 0.15s ease",
+                                }}
+                              >
+                                ✏️ แก้ไขข้อมูล
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1677,20 +2140,45 @@ export default function AdminTournamentPage() {
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>หัวข้อที่เล่น</label>
-                    <input
-                      type="text"
-                      list="player1-topics-list"
-                      placeholder="พิมพ์หรือเลือกหัวข้อ"
+                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700", marginBottom: "4px", display: "block" }}>
+                      หัวข้อที่เล่น
+                    </label>
+                    <AdminTopicDropdown
+                      contestant={p1Selected}
+                      allTopics={allTopics}
                       value={matchFormData.player1.topic}
-                      onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, topic: e.target.value } })}
-                      style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "12px" }}
+                      themeColor="#00e5ff"
+                      placeholder="-- เลือกหัวข้อที่เล่น --"
+                      onChange={(topic) =>
+                        setMatchFormData((prev) => ({
+                          ...prev,
+                          player1: { ...prev.player1, topic },
+                        }))
+                      }
                     />
-                    <datalist id="player1-topics-list">
-                      {(p1Selected?.topics || []).map((t, idx) => (
-                        <option key={idx} value={t.topic || t} />
-                      ))}
-                    </datalist>
+                    <div style={{ marginTop: "4px" }}>
+                      <input
+                        type="text"
+                        placeholder="หรือพิมพ์ชื่อหัวข้อแก้ไขเอง..."
+                        value={matchFormData.player1.topic}
+                        onChange={(e) =>
+                          setMatchFormData({
+                            ...matchFormData,
+                            player1: { ...matchFormData.player1, topic: e.target.value },
+                          })
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "5px 8px",
+                          borderRadius: "5px",
+                          background: "rgba(15, 23, 42, 0.5)",
+                          border: "1px dashed rgba(255,255,255,0.2)",
+                          color: "rgba(255,255,255,0.85)",
+                          fontSize: "11px",
+                        }}
+                        title="พิมพ์แก้ไขชื่อหัวข้อตรงนี้ได้หากต้องการกำหนดเอง"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1826,20 +2314,45 @@ export default function AdminTournamentPage() {
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>หัวข้อที่เล่น</label>
-                    <input
-                      type="text"
-                      list="player2-topics-list"
-                      placeholder="พิมพ์หรือเลือกหัวข้อ"
+                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700", marginBottom: "4px", display: "block" }}>
+                      หัวข้อที่เล่น
+                    </label>
+                    <AdminTopicDropdown
+                      contestant={p2Selected}
+                      allTopics={allTopics}
                       value={matchFormData.player2.topic}
-                      onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, topic: e.target.value } })}
-                      style={{ width: "100%", padding: "6px 10px", borderRadius: "6px", background: "rgba(15, 23, 42, 0.8)", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "12px" }}
+                      themeColor="#ffd700"
+                      placeholder="-- เลือกหัวข้อที่เล่น --"
+                      onChange={(topic) =>
+                        setMatchFormData((prev) => ({
+                          ...prev,
+                          player2: { ...prev.player2, topic },
+                        }))
+                      }
                     />
-                    <datalist id="player2-topics-list">
-                      {(p2Selected?.topics || []).map((t, idx) => (
-                        <option key={idx} value={t.topic || t} />
-                      ))}
-                    </datalist>
+                    <div style={{ marginTop: "4px" }}>
+                      <input
+                        type="text"
+                        placeholder="หรือพิมพ์ชื่อหัวข้อแก้ไขเอง..."
+                        value={matchFormData.player2.topic}
+                        onChange={(e) =>
+                          setMatchFormData({
+                            ...matchFormData,
+                            player2: { ...matchFormData.player2, topic: e.target.value },
+                          })
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "5px 8px",
+                          borderRadius: "5px",
+                          background: "rgba(15, 23, 42, 0.5)",
+                          border: "1px dashed rgba(255,255,255,0.2)",
+                          color: "rgba(255,255,255,0.85)",
+                          fontSize: "11px",
+                        }}
+                        title="พิมพ์แก้ไขชื่อหัวข้อตรงนี้ได้หากต้องการกำหนดเอง"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1945,6 +2458,473 @@ export default function AdminTournamentPage() {
                 }}
               >
                 {savingMatch ? "กำลังบันทึก..." : "💾 บันทึกผลการแข่งขัน"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          EDIT CONTESTANT FULL PROFILE MODAL
+         ======================================================== */}
+      {editingContestant && contestantFormData && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 110,
+            background: "rgba(2, 6, 15, 0.85)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+          onClick={() => setEditingContestant(null)}
+        >
+          <div
+            style={{
+              background: "linear-gradient(160deg, #0a192f 0%, #060d1a 100%)",
+              border: "1.5px solid #00e5ff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "600px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              padding: "24px",
+              color: "#ffffff",
+              boxShadow: "0 25px 70px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.25)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "14px", marginBottom: "18px" }}>
+              <div>
+                <h3 style={{ fontSize: "18px", fontWeight: "900", margin: 0, color: "#ffffff" }}>
+                  ✏️ ปรับข้อมูลผู้เข้าแข่งขัน: {editingContestant.name}
+                </h3>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
+                  แก้ไขชื่อเล่น, ชื่อจริง, สายการแข่งขัน, รูปโปรไฟล์ และ 4 หัวข้อที่ลงทะเบียน
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingContestant(null)}
+                style={{
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "32px",
+                  height: "32px",
+                  color: "#ffffff",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Profile Avatar & Names */}
+            <div style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "18px", background: "rgba(15, 23, 42, 0.6)", padding: "14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div
+                style={{
+                  width: "68px",
+                  height: "68px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  border: `2px solid ${contestantFormData.group === "A" ? "#00e5ff" : "#ffd700"}`,
+                  background: "#1e293b",
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {contestantFormData.photo ? (
+                  <img
+                    src={contestantFormData.photo}
+                    alt={contestantFormData.newName}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <span style={{ fontSize: "28px" }}>👤</span>
+                )}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "15px", fontWeight: "800", color: "#ffffff" }}>
+                  {contestantFormData.nickname ? <span style={{ color: "#00e5ff" }}>{contestantFormData.nickname} </span> : null}
+                  {contestantFormData.newName || editingContestant.name}
+                </div>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginTop: "3px" }}>
+                  กลุ่ม {contestantFormData.group} • แต้มลีก: {editingContestant.stats?.leaguePoints ?? 0} LP
+                </div>
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+              <div>
+                <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
+                  ชื่อจริง - นามสกุล *
+                </label>
+                <input
+                  type="text"
+                  value={contestantFormData.newName}
+                  onChange={(e) => setContestantFormData({ ...contestantFormData, newName: e.target.value })}
+                  placeholder="เช่น สมชาย ใจดี"
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(15, 23, 42, 0.8)",
+                    border: "1px solid rgba(0, 229, 255, 0.4)",
+                    color: "#ffffff",
+                    fontSize: "13px",
+                    outline: "none",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
+                  ชื่อเล่น
+                </label>
+                <input
+                  type="text"
+                  value={contestantFormData.nickname}
+                  onChange={(e) => setContestantFormData({ ...contestantFormData, nickname: e.target.value })}
+                  placeholder="เช่น นัท, พีท, แมน"
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(15, 23, 42, 0.8)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    color: "#ffffff",
+                    fontSize: "13px",
+                    outline: "none",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "12px", marginBottom: "16px" }}>
+              <div>
+                <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
+                  กลุ่ม / สาย
+                </label>
+                <select
+                  value={contestantFormData.group}
+                  onChange={(e) => setContestantFormData({ ...contestantFormData, group: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(15, 23, 42, 0.95)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    color: contestantFormData.group === "A" ? "#00e5ff" : "#ffd700",
+                    fontSize: "13px",
+                    fontWeight: "800",
+                    outline: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="A">กลุ่ม A</option>
+                  <option value="B">กลุ่ม B</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
+                  URL รูปโปรไฟล์ (Google Photos หรือเว็บฝากรูป)
+                </label>
+                <input
+                  type="text"
+                  value={contestantFormData.photo}
+                  onChange={(e) => setContestantFormData({ ...contestantFormData, photo: e.target.value })}
+                  placeholder="https://..."
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(15, 23, 42, 0.8)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    color: "#ffffff",
+                    fontSize: "12px",
+                    outline: "none",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 4 Registered Topics */}
+            <div style={{ background: "rgba(15, 23, 42, 0.6)", padding: "14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "20px" }}>
+              <div style={{ fontSize: "13px", fontWeight: "800", color: "#38bdf8", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
+                <span>🎯</span>
+                <span>4 หัวข้อประจำตัวที่ลงทะเบียน (Topics):</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                {[0, 1, 2, 3].map((idx) => (
+                  <div key={idx}>
+                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", display: "block", marginBottom: "4px" }}>
+                      หัวข้อที่ {idx + 1}
+                    </label>
+                    <input
+                      type="text"
+                      value={contestantFormData.topics[idx] || ""}
+                      onChange={(e) => {
+                        const newTopics = [...contestantFormData.topics];
+                        newTopics[idx] = e.target.value;
+                        setContestantFormData({ ...contestantFormData, topics: newTopics });
+                      }}
+                      placeholder={`หัวข้อที่ ${idx + 1}`}
+                      style={{
+                        width: "100%",
+                        padding: "7px 10px",
+                        borderRadius: "6px",
+                        background: "#070c18",
+                        border: "1px solid rgba(56, 189, 248, 0.3)",
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "12px", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "16px" }}>
+              <button
+                type="button"
+                onClick={() => setEditingContestant(null)}
+                style={{
+                  padding: "9px 18px",
+                  borderRadius: "8px",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                }}
+              >
+                ยกเลิก
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveContestant}
+                disabled={savingContestant}
+                style={{
+                  padding: "9px 22px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)",
+                  border: "none",
+                  color: "#060c18",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                  cursor: savingContestant ? "not-allowed" : "pointer",
+                  boxShadow: "0 4px 15px rgba(0, 229, 255, 0.4)",
+                }}
+              >
+                {savingContestant ? "กำลังบันทึก..." : "💾 บันทึกข้อมูลผู้เข้าแข่งขัน"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          EDIT MATCHDAY MODAL
+         ======================================================== */}
+      {editingMatchday && matchdayFormData && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 110,
+            background: "rgba(2, 6, 15, 0.85)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+          onClick={() => setEditingMatchday(null)}
+        >
+          <div
+            style={{
+              background: "linear-gradient(160deg, #0a192f 0%, #060d1a 100%)",
+              border: "1.5px solid #00e5ff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "540px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              padding: "24px",
+              color: "#ffffff",
+              boxShadow: "0 25px 70px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.25)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "14px", marginBottom: "18px" }}>
+              <div>
+                <h3 style={{ fontSize: "18px", fontWeight: "900", margin: 0, color: "#ffffff" }}>
+                  📅 ปรับแต่ง Matchday: {editingMatchday.name}
+                </h3>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
+                  แก้ไขชื่อ Matchday และช่วงเวลาการแข่งขันที่จะแสดงในหน้า Tournament
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingMatchday(null)}
+                style={{
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "32px",
+                  height: "32px",
+                  color: "#ffffff",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick Switch Matchdays Buttons */}
+            <div style={{ marginBottom: "18px" }}>
+              <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "700", display: "block", marginBottom: "6px" }}>
+                เลือก Matchday ที่ต้องการแก้ไข:
+              </label>
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                {matchdays.map((m) => {
+                  const isCurrent = m.id === matchdayFormData.matchdayId;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => {
+                        setEditingMatchday(m);
+                        setMatchdayFormData({
+                          matchdayId: m.id,
+                          name: m.name || "",
+                          dateRange: m.dateRange || "",
+                        });
+                      }}
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "6px",
+                        background: isCurrent ? "rgba(0, 229, 255, 0.25)" : "rgba(255, 255, 255, 0.05)",
+                        border: isCurrent ? "1.5px solid #00e5ff" : "1px solid rgba(255, 255, 255, 0.1)",
+                        color: isCurrent ? "#00e5ff" : "#ffffff",
+                        fontSize: "11px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {m.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div style={{ marginBottom: "14px" }}>
+              <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
+                ชื่อ Matchday *
+              </label>
+              <input
+                type="text"
+                value={matchdayFormData.name}
+                onChange={(e) => setMatchdayFormData({ ...matchdayFormData, name: e.target.value })}
+                placeholder="เช่น Matchday 1, รอบรองชนะเลิศ, รอบชิงชนะเลิศ"
+                style={{
+                  width: "100%",
+                  padding: "9px 12px",
+                  borderRadius: "8px",
+                  background: "rgba(15, 23, 42, 0.8)",
+                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  outline: "none",
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: "18px" }}>
+              <label style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", display: "block", marginBottom: "5px" }}>
+                ช่วงเวลาแข่งขัน (Date Range)
+              </label>
+              <input
+                type="text"
+                value={matchdayFormData.dateRange}
+                onChange={(e) => setMatchdayFormData({ ...matchdayFormData, dateRange: e.target.value })}
+                placeholder="เช่น 7 Jul - 30 Jul 2026 หรือ 15 - 19 ต.ค. 2569"
+                style={{
+                  width: "100%",
+                  padding: "9px 12px",
+                  borderRadius: "8px",
+                  background: "rgba(15, 23, 42, 0.8)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  outline: "none",
+                }}
+              />
+            </div>
+
+            {/* Info Card */}
+            <div style={{ background: "rgba(15, 23, 42, 0.5)", padding: "12px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)", marginBottom: "20px" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>
+                📌 รหัส Matchday: <strong style={{ color: "#00e5ff" }}>{matchdayFormData.matchdayId}</strong> • จำนวนคู่แข่งทั้งหมด: <strong style={{ color: "#ffffff" }}>{editingMatchday.matches?.length || 0} คู่</strong>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "12px", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "16px" }}>
+              <button
+                type="button"
+                onClick={() => setEditingMatchday(null)}
+                style={{
+                  padding: "9px 18px",
+                  borderRadius: "8px",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                }}
+              >
+                ยกเลิก
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveMatchday}
+                disabled={savingMatchday}
+                style={{
+                  padding: "9px 22px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)",
+                  border: "none",
+                  color: "#060c18",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                  cursor: savingMatchday ? "not-allowed" : "pointer",
+                  boxShadow: "0 4px 15px rgba(0, 229, 255, 0.4)",
+                }}
+              >
+                {savingMatchday ? "กำลังบันทึก..." : "💾 บันทึกการแก้ไข Matchday"}
               </button>
             </div>
           </div>

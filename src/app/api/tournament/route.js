@@ -264,36 +264,51 @@ export async function POST(request) {
       return NextResponse.json({ success: true, data: currentData, updatedMatch });
     }
 
-    // Update contestant info (e.g. photo or topics)
+    // Update contestant info (name, nickname, photo, group, topics)
     if (action === "update_contestant") {
-      const { name, photo, nickname, topics } = body;
+      const { name, newName, photo, nickname, group, topics } = body;
       if (!name) {
         return NextResponse.json({ success: false, error: "Contestant name is required" }, { status: 400 });
       }
 
-      const updateInArray = (arr) => {
-        if (!Array.isArray(arr)) return;
-        arr.forEach((item) => {
-          if (item.name === name) {
-            if (photo !== undefined) item.photo = photo;
-            if (nickname !== undefined) item.nickname = nickname;
-            if (topics !== undefined) item.topics = topics;
-          }
-        });
-      };
+      const finalName = newName && newName.trim() ? newName.trim() : name;
 
-      updateInArray(currentData.contestants);
-      updateInArray(currentData.standings?.groupA);
-      updateInArray(currentData.standings?.groupB);
+      // Update in contestants list
+      (currentData.contestants || []).forEach((item) => {
+        if (item.name === name) {
+          item.name = finalName;
+          if (photo !== undefined) item.photo = photo;
+          if (nickname !== undefined) item.nickname = nickname;
+          if (group !== undefined) item.group = group;
+          if (topics !== undefined) item.topics = topics;
+        }
+      });
 
-      // Update in matchdays
+      // Update in standings (group A and B)
+      ["groupA", "groupB"].forEach((grpKey) => {
+        if (Array.isArray(currentData.standings?.[grpKey])) {
+          currentData.standings[grpKey].forEach((item) => {
+            if (item.name === name) {
+              item.name = finalName;
+              if (photo !== undefined) item.photo = photo;
+              if (nickname !== undefined) item.nickname = nickname;
+              if (group !== undefined) item.group = group;
+              if (topics !== undefined) item.topics = topics;
+            }
+          });
+        }
+      });
+
+      // Update in matchdays matches
       (currentData.matchdays || []).forEach((md) => {
         (md.matches || []).forEach((m) => {
           if (m.player1?.name === name) {
+            m.player1.name = finalName;
             if (photo !== undefined) m.player1.photo = photo;
             if (nickname !== undefined) m.player1.nickname = nickname;
           }
           if (m.player2?.name === name) {
+            m.player2.name = finalName;
             if (photo !== undefined) m.player2.photo = photo;
             if (nickname !== undefined) m.player2.nickname = nickname;
           }
@@ -303,6 +318,7 @@ export async function POST(request) {
       // Update in topic rankings
       (currentData.topicRankings || []).forEach((t) => {
         if (t.name === name) {
+          t.name = finalName;
           if (photo !== undefined) t.photo = photo;
           if (nickname !== undefined) t.nickname = nickname;
         }
@@ -316,10 +332,10 @@ export async function POST(request) {
           let lbChanged = false;
           lbData.forEach((p) => {
             if (p.name === name || (nickname && p.nickname === nickname)) {
-              if (photo !== undefined) {
-                p.image = photo;
-                lbChanged = true;
-              }
+              p.name = finalName;
+              if (photo !== undefined) p.image = photo;
+              if (nickname !== undefined) p.nickname = nickname;
+              lbChanged = true;
             }
           });
           if (lbChanged) {
@@ -329,6 +345,34 @@ export async function POST(request) {
         }
       } catch (e) {}
 
+      currentData.updatedAt = new Date().toISOString();
+      await saveKVData("fpt_tournament", currentData, writeData);
+      return NextResponse.json({ success: true, data: currentData });
+    }
+
+    // Update matchday information
+    if (action === "update_matchday") {
+      const { matchdayId, name, dateRange } = body;
+      const md = (currentData.matchdays || []).find((m) => m.id === matchdayId);
+      if (md) {
+        if (name !== undefined) md.name = name;
+        if (dateRange !== undefined) md.dateRange = dateRange;
+        currentData.updatedAt = new Date().toISOString();
+        await saveKVData("fpt_tournament", currentData, writeData);
+        return NextResponse.json({ success: true, data: currentData });
+      }
+      return NextResponse.json({ success: false, error: "Matchday not found" }, { status: 404 });
+    }
+
+    // Bulk update matchdays
+    if (action === "update_matchdays" && Array.isArray(body.matchdays)) {
+      body.matchdays.forEach((incoming) => {
+        const md = (currentData.matchdays || []).find((m) => m.id === incoming.id);
+        if (md) {
+          if (incoming.name !== undefined) md.name = incoming.name;
+          if (incoming.dateRange !== undefined) md.dateRange = incoming.dateRange;
+        }
+      });
       currentData.updatedAt = new Date().toISOString();
       await saveKVData("fpt_tournament", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
