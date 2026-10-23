@@ -126,6 +126,50 @@ export default function TournamentPage() {
         fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
       }}
     >
+      {/* Dynamic Tournament Animations */}
+      <style>{`
+        @keyframes heroGlowPulse {
+          0%, 100% { filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 215, 0, 0.3)); }
+          50% { filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 30px rgba(255, 215, 0, 0.7)); }
+        }
+        @keyframes badgePulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+          50% { transform: scale(1.025); box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+        }
+        @keyframes radarSpinSlow {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes radarPulseFade {
+          0%, 100% { opacity: 0.14; }
+          50% { opacity: 0.24; }
+        }
+        @keyframes tabFadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes cardEntrance {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes modalZoomIn {
+          from { opacity: 0; transform: scale(0.92) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes livePulseDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.85); }
+        }
+        .tournament-tab-content {
+          animation: tabFadeIn 0.3s ease-out forwards;
+        }
+        .tournament-card-entrance {
+          animation: cardEntrance 0.3s ease-out forwards;
+        }
+        .tournament-modal-zoom {
+          animation: modalZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
       {/* ========================================================
           1. TOP NAVIGATION BAR (Themed after official Fan Pan Tae)
          ======================================================== */}
@@ -482,6 +526,7 @@ export default function TournamentPage() {
               textTransform: "uppercase",
               boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
               marginBottom: "16px",
+              animation: "badgePulse 3.5s ease-in-out infinite",
             }}
           >
             <span>⚔️</span> FANPANTAE TOURNAMENT 2026 - 27
@@ -498,6 +543,7 @@ export default function TournamentPage() {
               margin: "0 0 12px 0",
               letterSpacing: "-0.5px",
               filter: "drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8))",
+              animation: "heroGlowPulse 4s ease-in-out infinite",
             }}
           >
             การแข่งขันระบบ League Phase
@@ -617,7 +663,7 @@ export default function TournamentPage() {
             TAB 1: STANDINGS
            ======================================================== */}
         {activeTab === "standings" && (
-          <div>
+          <div className="tournament-tab-content">
             {/* Group Switcher Bar */}
             <div
               style={{
@@ -675,8 +721,8 @@ export default function TournamentPage() {
               </div>
             </div>
 
-            {/* Standings Tables */}
-            <div style={{ display: "grid", gridTemplateColumns: selectedGroup === "all" ? "repeat(auto-fit, minmax(580px, 1fr))" : "1fr", gap: "28px" }}>
+            {/* Standings Tables (Stacked Top & Bottom for Wider Broadcast Look) */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "36px" }}>
               {(selectedGroup === "all" || selectedGroup === "A") && (
                 <FanpantaeStandingsTable
                   groupName="GROUP A"
@@ -702,7 +748,7 @@ export default function TournamentPage() {
             TAB 2: MATCHES & FIXTURES
            ======================================================== */}
         {activeTab === "matches" && (
-          <div>
+          <div className="tournament-tab-content">
             {/* Matchday Selector Pills (Matches History Season Tabs) */}
             <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px", marginBottom: "20px" }}>
               {matchdays.map((md) => {
@@ -832,7 +878,7 @@ export default function TournamentPage() {
             TAB 3: TOP TOPIC RECORDS
            ======================================================== */}
         {activeTab === "topics" && (
-          <div>
+          <div className="tournament-tab-content">
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
               <div>
                 <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", margin: 0 }}>
@@ -1002,7 +1048,7 @@ export default function TournamentPage() {
             TAB 4: TOPICS CHECKLIST
            ======================================================== */}
         {activeTab === "checklist" && (
-          <div>
+          <div className="tournament-tab-content">
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
               <div>
                 <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", margin: 0 }}>
@@ -1132,6 +1178,7 @@ export default function TournamentPage() {
           onClick={() => setSelectedContestant(null)}
         >
           <div
+            className="tournament-modal-zoom"
             style={{
               background: "linear-gradient(150deg, rgba(16, 32, 60, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",
               borderRadius: "24px",
@@ -1367,6 +1414,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
           pointerEvents: "none",
           opacity: 0.16,
           zIndex: 1,
+          animation: "radarSpinSlow 75s linear infinite, radarPulseFade 4s ease-in-out infinite",
         }}
         viewBox="0 0 600 600"
       >
@@ -1412,7 +1460,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                   fontStyle: "italic",
                   fontWeight: "900",
-                  fontSize: "15px",
+                  fontSize: "clamp(15px, 1.8vw, 20px)",
                   color: "#ffffff",
                   letterSpacing: "1px",
                   textTransform: "uppercase",
@@ -1968,25 +2016,51 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
     return { ...cat, v1: s1, v2: s2, cp1, cp2, p1Won, p2Won, tied };
   });
 
-  // Cell coloring helper mimicking Excel sheet
+  // Cell coloring helper mimicking dark tournament cyber-sports theme
   const getScoreCellStyle = (val, isWon, isLost) => {
     if (!isCompleted || val === "-" || val === null || val === undefined) {
-      return { background: "#ffffff", color: "#64748b" };
+      return {
+        background: "rgba(255, 255, 255, 0.03)",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+        color: "rgba(255, 255, 255, 0.4)",
+      };
     }
     if (val === 0) {
-      // 0 gets highlighted in deep red with white text
-      return { background: "#dc2626", color: "#ffffff", fontWeight: "800" };
+      // 0 gets neon red glow
+      return {
+        background: "rgba(239, 68, 68, 0.22)",
+        border: "1px solid rgba(239, 68, 68, 0.55)",
+        color: "#fca5a5",
+        fontWeight: "900",
+        textShadow: "0 0 8px rgba(239, 68, 68, 0.6)",
+      };
     }
     if (isWon) {
-      // Winner gets light green
-      return { background: "#dcfce7", color: "#14532d", fontWeight: "800" };
+      // Winner gets neon green glow
+      return {
+        background: "rgba(34, 197, 94, 0.22)",
+        border: "1px solid rgba(34, 197, 94, 0.55)",
+        color: "#86efac",
+        fontWeight: "900",
+        textShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
+      };
     }
     if (isLost) {
-      // Loser gets light pink
-      return { background: "#fecdd3", color: "#991b1b", fontWeight: "800" };
+      // Loser gets soft red tint
+      return {
+        background: "rgba(239, 68, 68, 0.1)",
+        border: "1px solid rgba(239, 68, 68, 0.25)",
+        color: "#f87171",
+        fontWeight: "800",
+      };
     }
-    // Draw / default gets light cream
-    return { background: "#fef3c7", color: "#854d0e", fontWeight: "800" };
+    // Draw / default gets soft gold tint
+    return {
+      background: "rgba(255, 215, 0, 0.12)",
+      border: "1px solid rgba(255, 215, 0, 0.35)",
+      color: "#ffd700",
+      fontWeight: "800",
+    };
   };
 
   const isP1Winner = match.winner === "player1";
@@ -1995,12 +2069,22 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
   return (
     <div
+      className="tournament-card-entrance"
       style={{
         background: "linear-gradient(150deg, rgba(16, 32, 60, 0.9) 0%, rgba(8, 16, 32, 0.98) 100%)",
         borderRadius: "16px",
         border: isCompleted ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0.12)",
         overflow: "hidden",
         boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-3px)";
+        e.currentTarget.style.boxShadow = "0 12px 30px rgba(0, 229, 255, 0.25)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.5)";
       }}
     >
       {/* Match Top Bar */}
@@ -2106,7 +2190,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
         </div>
       </div>
 
-      {/* Excel Spreadsheet Comparison Table */}
+      {/* Themed Tournament Battle Table */}
       <div style={{ padding: "14px", overflowX: "auto" }}>
         <table
           style={{
@@ -2115,87 +2199,88 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
             borderCollapse: "collapse",
             fontSize: "13px",
             fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-            background: "#ffffff",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-            borderRadius: "6px",
+            background: "rgba(4, 10, 24, 0.9)",
+            border: "1px solid rgba(0, 229, 255, 0.25)",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+            borderRadius: "10px",
             overflow: "hidden",
           }}
         >
-          {/* Table Header: Two Sides (Green for Player 1, Purple for Player 2) */}
+          {/* Table Header: Two Sides (Emerald for Player 1, Violet for Player 2) */}
           <thead>
-            <tr style={{ height: "34px", color: "#0f172a", fontSize: "12px", fontWeight: "800" }}>
-              {/* Player 1 Columns (Light Sage Green) */}
-              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 8px", width: "150px", textAlign: "left", color: "#14532d" }}>
+            <tr style={{ height: "36px", fontSize: "12px", fontWeight: "800" }}>
+              {/* Player 1 Columns (Deep Emerald / Cyan Glass) */}
+              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 8px", width: "150px", textAlign: "left", color: "#86efac" }}>
                 ผู้เข้าแข่งขัน (1)
               </th>
-              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 6px", width: "70px", textAlign: "center", color: "#14532d" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 6px", width: "70px", textAlign: "center", color: "#86efac" }}>
                 ชื่อเล่น
               </th>
-              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 8px", width: "140px", textAlign: "left", color: "#14532d" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 8px", width: "140px", textAlign: "left", color: "#86efac" }}>
                 หมวดแฟนพันธุ์แท้
               </th>
-              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#14532d" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#86efac" }}>
                 3 วินาที
               </th>
-              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#14532d" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#86efac" }}>
                 ถาม-ตอบ
               </th>
-              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#14532d" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#86efac" }}>
                 จิ๊กซอว์
               </th>
-              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "55px", textAlign: "center", color: "#14532d" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.35) 100%)", border: "1px solid rgba(16, 185, 129, 0.3)", padding: "6px 4px", width: "55px", textAlign: "center", color: "#86efac" }}>
                 คุณสมบัติ
               </th>
-              <th style={{ background: "#fed7aa", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#9a3412" }}>
+              <th style={{ background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#ffd700" }}>
                 รวมดิบ
               </th>
-              <th style={{ background: "#e2e8f0", border: "1px solid #000000", borderRight: "4px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#0f172a" }}>
+              <th style={{ background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.35)", borderRight: "3px solid #00e5ff", padding: "6px 4px", width: "50px", textAlign: "center", color: "#00e5ff" }}>
                 แต้มลีก
               </th>
 
-              {/* Player 2 Columns (Light Lavender) */}
-              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 8px", width: "150px", textAlign: "left", color: "#581c87" }}>
+              {/* Player 2 Columns (Deep Violet / Purple Glass) */}
+              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 8px", width: "150px", textAlign: "left", color: "#d8b4fe" }}>
                 ผู้เข้าแข่งขัน (2)
               </th>
-              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 6px", width: "70px", textAlign: "center", color: "#581c87" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 6px", width: "70px", textAlign: "center", color: "#d8b4fe" }}>
                 ชื่อเล่น
               </th>
-              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 8px", width: "140px", textAlign: "left", color: "#581c87" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 8px", width: "140px", textAlign: "left", color: "#d8b4fe" }}>
                 หมวดแฟนพันธุ์แท้
               </th>
-              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#581c87" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#d8b4fe" }}>
                 3 วินาที
               </th>
-              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#581c87" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#d8b4fe" }}>
                 ถาม-ตอบ
               </th>
-              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#581c87" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#d8b4fe" }}>
                 จิ๊กซอว์
               </th>
-              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "55px", textAlign: "center", color: "#581c87" }}>
+              <th style={{ background: "linear-gradient(180deg, rgba(168, 85, 247, 0.22) 0%, rgba(88, 28, 135, 0.35) 100%)", border: "1px solid rgba(168, 85, 247, 0.3)", padding: "6px 4px", width: "55px", textAlign: "center", color: "#d8b4fe" }}>
                 คุณสมบัติ
               </th>
-              <th style={{ background: "#fed7aa", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#9a3412" }}>
+              <th style={{ background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#ffd700" }}>
                 รวมดิบ
               </th>
-              <th style={{ background: "#e2e8f0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#0f172a" }}>
+              <th style={{ background: "rgba(0, 229, 255, 0.15)", border: "1px solid rgba(0, 229, 255, 0.35)", padding: "6px 4px", width: "50px", textAlign: "center", color: "#00e5ff" }}>
                 แต้มลีก
               </th>
             </tr>
           </thead>
 
           <tbody>
-            {/* ROW 1: Raw Scores & Contestant Info (Exactly like the Excel screenshot) */}
-            <tr style={{ height: "42px" }}>
+            {/* ROW 1: Raw Scores & Contestant Info (Themed Dark Cyber-Sports) */}
+            <tr style={{ height: "44px" }}>
               {/* Player 1 Details */}
               <td
                 onClick={() => onSelectContestant(p1.name)}
                 style={{
-                  background: "#c8e6c9",
-                  border: "1px solid #000000",
+                  background: "rgba(16, 185, 129, 0.08)",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
                   padding: "6px 8px",
                   fontWeight: "700",
-                  color: "#14532d",
+                  color: "#ffffff",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                 }}
@@ -2209,7 +2294,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                       }}
-                      style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover" }}
+                      style={{ width: "24px", height: "24px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #10b981" }}
                     />
                   ) : null}
                   <span>{p1.name}</span>
@@ -2219,12 +2304,12 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
               <td
                 style={{
-                  background: "#c8e6c9",
-                  border: "1px solid #000000",
+                  background: "rgba(16, 185, 129, 0.08)",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
                   padding: "6px 4px",
-                  fontWeight: "700",
+                  fontWeight: "800",
                   textAlign: "center",
-                  color: "#14532d",
+                  color: "#86efac",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -2233,11 +2318,11 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
               <td
                 style={{
-                  background: "#ffffff",
-                  border: "1px solid #000000",
+                  background: "rgba(6, 16, 36, 0.6)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
                   padding: "6px 8px",
                   fontWeight: "700",
-                  color: "#15803d",
+                  color: "#38bdf8",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -2253,10 +2338,11 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                     style={{
                       background: style.background,
                       color: style.color,
-                      border: "1px solid #000000",
+                      border: style.border,
                       textAlign: "center",
-                      fontWeight: style.fontWeight || "700",
+                      fontWeight: style.fontWeight || "800",
                       fontSize: "14px",
+                      textShadow: style.textShadow || "none",
                     }}
                   >
                     {r.v1}
@@ -2267,12 +2353,13 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               {/* Player 1: Raw Total */}
               <td
                 style={{
-                  background: "#fed7aa",
-                  color: "#9a3412",
-                  border: "1px solid #000000",
+                  background: "rgba(255, 215, 0, 0.14)",
+                  color: "#ffd700",
+                  border: "1px solid rgba(255, 215, 0, 0.35)",
                   textAlign: "center",
                   fontWeight: "900",
                   fontSize: "15px",
+                  fontFamily: "var(--font-kanit), sans-serif",
                 }}
               >
                 {isCompleted ? p1.sum ?? 0 : "-"}
@@ -2281,13 +2368,13 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               {/* Player 1: League Points */}
               <td
                 style={{
-                  background: "#ffffff",
-                  color: "#0f172a",
-                  border: "1px solid #000000",
-                  borderRight: "4px solid #000000",
+                  background: "rgba(0, 229, 255, 0.12)",
+                  color: "#00e5ff",
+                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                  borderRight: "3px solid #00e5ff",
                   textAlign: "center",
-                  fontWeight: "800",
-                  fontSize: "14px",
+                  fontWeight: "900",
+                  fontSize: "15px",
                 }}
               >
                 {isCompleted ? (p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : p1.leaguePoint ?? 0) : "-"}
@@ -2297,11 +2384,11 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               <td
                 onClick={() => onSelectContestant(p2.name)}
                 style={{
-                  background: "#e9d5ff",
-                  border: "1px solid #000000",
+                  background: "rgba(168, 85, 247, 0.08)",
+                  border: "1px solid rgba(168, 85, 247, 0.2)",
                   padding: "6px 8px",
                   fontWeight: "700",
-                  color: "#581c87",
+                  color: "#ffffff",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                 }}
@@ -2315,7 +2402,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                       }}
-                      style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover" }}
+                      style={{ width: "24px", height: "24px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #a855f7" }}
                     />
                   ) : null}
                   <span>{p2.name}</span>
@@ -2325,12 +2412,12 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
               <td
                 style={{
-                  background: "#e9d5ff",
-                  border: "1px solid #000000",
+                  background: "rgba(168, 85, 247, 0.08)",
+                  border: "1px solid rgba(168, 85, 247, 0.2)",
                   padding: "6px 4px",
-                  fontWeight: "700",
+                  fontWeight: "800",
                   textAlign: "center",
-                  color: "#581c87",
+                  color: "#d8b4fe",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -2339,11 +2426,11 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
               <td
                 style={{
-                  background: "#ffffff",
-                  border: "1px solid #000000",
+                  background: "rgba(6, 16, 36, 0.6)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
                   padding: "6px 8px",
                   fontWeight: "700",
-                  color: "#6b21a8",
+                  color: "#c084fc",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -2359,10 +2446,11 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                     style={{
                       background: style.background,
                       color: style.color,
-                      border: "1px solid #000000",
+                      border: style.border,
                       textAlign: "center",
-                      fontWeight: style.fontWeight || "700",
+                      fontWeight: style.fontWeight || "800",
                       fontSize: "14px",
+                      textShadow: style.textShadow || "none",
                     }}
                   >
                     {r.v2}
@@ -2373,12 +2461,13 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               {/* Player 2: Raw Total */}
               <td
                 style={{
-                  background: "#fed7aa",
-                  color: "#9a3412",
-                  border: "1px solid #000000",
+                  background: "rgba(255, 215, 0, 0.14)",
+                  color: "#ffd700",
+                  border: "1px solid rgba(255, 215, 0, 0.35)",
                   textAlign: "center",
                   fontWeight: "900",
                   fontSize: "15px",
+                  fontFamily: "var(--font-kanit), sans-serif",
                 }}
               >
                 {isCompleted ? p2.sum ?? 0 : "-"}
@@ -2387,29 +2476,29 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               {/* Player 2: League Points */}
               <td
                 style={{
-                  background: "#ffffff",
-                  color: "#0f172a",
-                  border: "1px solid #000000",
+                  background: "rgba(0, 229, 255, 0.12)",
+                  color: "#00e5ff",
+                  border: "1px solid rgba(0, 229, 255, 0.3)",
                   textAlign: "center",
-                  fontWeight: "800",
-                  fontSize: "14px",
+                  fontWeight: "900",
+                  fontSize: "15px",
                 }}
               >
                 {isCompleted ? (p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : p2.leaguePoint ?? 0) : "-"}
               </td>
             </tr>
 
-            {/* ROW 2: Category Points (CP) Bar (Dark Crimson on Left, Dark Forest Green on Right) */}
-            <tr style={{ height: "24px", fontSize: "11px", fontWeight: "900" }}>
+            {/* ROW 2: Category Points (CP) Bar (Deep Crimson Glass on Left, Deep Emerald Glass on Right) */}
+            <tr style={{ height: "26px", fontSize: "11px", fontWeight: "900" }}>
               {/* Player 1 CP Label */}
               <td
                 colSpan={3}
                 style={{
-                  background: "#f1f5f9",
-                  border: "1px solid #000000",
+                  background: "rgba(3, 8, 20, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.06)",
                   padding: "2px 8px",
                   textAlign: "right",
-                  color: "#991b1b",
+                  color: "#f87171",
                   fontWeight: "800",
                   letterSpacing: "0.5px",
                 }}
@@ -2417,14 +2506,14 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                 แต้มหมวด (CP)
               </td>
 
-              {/* Player 1: CP for 4 rounds (Dark Maroon / Crimson Bar) */}
+              {/* Player 1: CP for 4 rounds */}
               {catResults.map((r, i) => (
                 <td
                   key={i}
                   style={{
-                    background: "#7f1d1d",
-                    color: "#ffffff",
-                    border: "1px solid #000000",
+                    background: "linear-gradient(180deg, rgba(185, 28, 28, 0.35) 0%, rgba(127, 29, 29, 0.55) 100%)",
+                    color: "#fca5a5",
+                    border: "1px solid rgba(239, 68, 68, 0.35)",
                     textAlign: "center",
                     fontWeight: "900",
                     fontSize: "12px",
@@ -2437,29 +2526,30 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               {/* Player 1: Total CP */}
               <td
                 style={{
-                  background: "#7f1d1d",
+                  background: "linear-gradient(180deg, rgba(220, 38, 38, 0.5) 0%, rgba(153, 27, 27, 0.7) 100%)",
                   color: "#ffffff",
-                  border: "1px solid #000000",
+                  border: "1px solid rgba(239, 68, 68, 0.55)",
                   textAlign: "center",
                   fontWeight: "900",
                   fontSize: "13px",
+                  textShadow: "0 0 8px rgba(239, 68, 68, 0.7)",
                 }}
               >
                 {isCompleted ? p1.categoryPoints ?? 0 : "-"}
               </td>
 
               {/* Player 1: Blank under LP */}
-              <td style={{ background: "#f8fafc", border: "1px solid #000000", borderRight: "4px solid #000000" }}></td>
+              <td style={{ background: "rgba(3, 8, 20, 0.95)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRight: "3px solid #00e5ff" }}></td>
 
               {/* Player 2 CP Label */}
               <td
                 colSpan={3}
                 style={{
-                  background: "#f1f5f9",
-                  border: "1px solid #000000",
+                  background: "rgba(3, 8, 20, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.06)",
                   padding: "2px 8px",
                   textAlign: "right",
-                  color: "#166534",
+                  color: "#4ade80",
                   fontWeight: "800",
                   letterSpacing: "0.5px",
                 }}
@@ -2467,14 +2557,14 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                 แต้มหมวด (CP)
               </td>
 
-              {/* Player 2: CP for 4 rounds (Dark Forest Green Bar) */}
+              {/* Player 2: CP for 4 rounds */}
               {catResults.map((r, i) => (
                 <td
                   key={i}
                   style={{
-                    background: "#14532d",
-                    color: "#ffffff",
-                    border: "1px solid #000000",
+                    background: "linear-gradient(180deg, rgba(21, 128, 61, 0.35) 0%, rgba(20, 83, 45, 0.55) 100%)",
+                    color: "#86efac",
+                    border: "1px solid rgba(34, 197, 94, 0.35)",
                     textAlign: "center",
                     fontWeight: "900",
                     fontSize: "12px",
@@ -2487,19 +2577,20 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               {/* Player 2: Total CP */}
               <td
                 style={{
-                  background: "#14532d",
+                  background: "linear-gradient(180deg, rgba(34, 197, 94, 0.5) 0%, rgba(21, 128, 61, 0.7) 100%)",
                   color: "#ffffff",
-                  border: "1px solid #000000",
+                  border: "1px solid rgba(34, 197, 94, 0.55)",
                   textAlign: "center",
                   fontWeight: "900",
                   fontSize: "13px",
+                  textShadow: "0 0 8px rgba(34, 197, 94, 0.7)",
                 }}
               >
                 {isCompleted ? p2.categoryPoints ?? 0 : "-"}
               </td>
 
               {/* Player 2: Blank under LP */}
-              <td style={{ background: "#f8fafc", border: "1px solid #000000" }}></td>
+              <td style={{ background: "rgba(3, 8, 20, 0.95)", border: "1px solid rgba(255, 255, 255, 0.06)" }}></td>
             </tr>
           </tbody>
         </table>

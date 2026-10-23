@@ -408,45 +408,76 @@ export default function AdminTournamentPage() {
 
   if (!isAuthenticated) {
     return (
-      <div style={{ minHeight: "100vh", background: "radial-gradient(ellipse at center, #0f1f38 0%, #060b14 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", fontFamily: "'Prompt', sans-serif" }}>
-        <div style={{ background: "rgba(15, 23, 42, 0.9)", border: "1.5px solid rgba(0, 229, 255, 0.4)", borderRadius: "20px", padding: "36px", maxWidth: "420px", width: "100%", boxShadow: "0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0,229,255,0.2)", textAlign: "center" }}>
-          <div style={{ width: "60px", height: "60px", borderRadius: "14px", background: "linear-gradient(135deg, #00e5ff 0%, #3b82f6 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", margin: "0 auto 16px auto", boxShadow: "0 0 20px rgba(0, 229, 255, 0.5)" }}>
-            🔐
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "radial-gradient(ellipse at center, #0a192f 0%, #030812 100%)",
+          color: "#fff",
+          fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "440px",
+            width: "100%",
+            background: "linear-gradient(160deg, rgba(16, 32, 60, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",
+            border: "1px solid rgba(0, 229, 255, 0.35)",
+            boxShadow: "0 0 40px rgba(0, 229, 255, 0.15)",
+            borderRadius: "20px",
+            padding: "36px 30px",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ maxWidth: "260px", margin: "0 auto 16px" }}>
+            <img
+              src="/img/logo.png"
+              alt="Fanpantae 2026"
+              style={{ width: "100%", height: "auto", filter: "drop-shadow(0 0 16px rgba(0,229,255,0.5))" }}
+            />
           </div>
-          <h2 style={{ fontSize: "22px", fontWeight: "900", color: "#ffffff", margin: 0, fontFamily: "'Orbitron', 'Prompt', sans-serif" }}>
-            TOURNAMENT ADMIN
+          <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#00e5ff", marginBottom: "8px" }}>
+            ห้องควบคุม Tournament (Tournament Admin)
           </h2>
-          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px", marginTop: "6px" }}>
-            ระบบจัดการคะแนนและข้อมูล FANPANTAE TOURNAMENT 2026-27
+          <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.65)", marginBottom: "24px" }}>
+            กรุณากรอกรหัสผ่านผู้ดูแลระบบเพื่อเข้าสู่การควบคุม
           </p>
 
-          <form onSubmit={handleLogin} style={{ marginTop: "24px" }}>
-            <input
-              type="password"
-              placeholder="กรอกรหัสผ่านผู้ดูแลระบบ..."
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                borderRadius: "10px",
-                background: "rgba(6, 12, 24, 0.8)",
-                border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                color: "#ffffff",
-                fontSize: "15px",
-                outline: "none",
-                marginBottom: "12px",
-                textAlign: "center",
-              }}
-            />
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom: "20px", textAlign: "left" }}>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "8px" }}>
+                รหัสผ่าน Admin
+              </label>
+              <input
+                type="password"
+                placeholder="กรอกรหัสผ่านผู้ดูแลระบบ..."
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                autoFocus
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  border: authError ? "1px solid #ff4d4f" : "1px solid rgba(0, 229, 255, 0.4)",
+                  background: "rgba(0, 15, 30, 0.7)",
+                  color: "#ffffff",
+                  fontSize: "16px",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
 
-            {authError && <div style={{ color: "#f43f5e", fontSize: "12px", marginBottom: "12px" }}>{authError}</div>}
+            {authError && <div style={{ color: "#f43f5e", fontSize: "12px", marginBottom: "14px", fontWeight: "600" }}>{authError}</div>}
 
             <button
               type="submit"
               style={{
                 width: "100%",
-                padding: "12px",
+                padding: "13px",
                 borderRadius: "10px",
                 background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)",
                 border: "none",
@@ -455,15 +486,20 @@ export default function AdminTournamentPage() {
                 fontSize: "15px",
                 cursor: "pointer",
                 boxShadow: "0 4px 15px rgba(0, 229, 255, 0.4)",
+                transition: "transform 0.15s ease",
               }}
             >
-              เข้าสู่ระบบ Admin
+              เข้าสู่ระบบ Tournament Admin
             </button>
           </form>
 
-          <div style={{ marginTop: "20px" }}>
-            <Link href="/tournament" style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", textDecoration: "none" }}>
-              ← กลับไปหน้าหลักทัวร์นาเมนต์
+          <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px" }}>
+            <Link href="/tournament" style={{ color: "#00e5ff", fontSize: "13px", textDecoration: "none" }}>
+              ← ดูหน้า Tournament
+            </Link>
+            <span style={{ color: "rgba(255,255,255,0.2)" }}>|</span>
+            <Link href="/admin" style={{ color: "#c7d2fe", fontSize: "13px", textDecoration: "none" }}>
+              ไปหน้า Admin ปกติ →
             </Link>
           </div>
         </div>
@@ -472,7 +508,47 @@ export default function AdminTournamentPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #070c18 0%, #0b1323 100%)", color: "#f8fafc", fontFamily: "'Prompt', sans-serif" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "radial-gradient(ellipse at top center, #0f2744 0%, #07101f 60%, #02050a 100%)",
+        color: "#ffffff",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
+      }}
+    >
+      {/* Dynamic CSS animations */}
+      <style>{`
+        @keyframes adminFadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes tabFadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes modalPopIn {
+          from { opacity: 0; transform: scale(0.92) translateY(16px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes toastSlideIn {
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .admin-tab-content {
+          animation: tabFadeIn 0.25s ease-out forwards;
+        }
+        .admin-modal-zoom {
+          animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .admin-card-panel {
+          transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .admin-card-panel:hover {
+          border-color: rgba(0, 229, 255, 0.45) !important;
+          box-shadow: 0 10px 30px rgba(0, 229, 255, 0.15) !important;
+        }
+      `}</style>
+
       {/* Toast Notification */}
       {toast && (
         <div
@@ -480,7 +556,7 @@ export default function AdminTournamentPage() {
             position: "fixed",
             bottom: "24px",
             right: "24px",
-            zIndex: 999,
+            zIndex: 9999,
             padding: "12px 20px",
             borderRadius: "12px",
             background: toast.type === "info" ? "#0284c7" : "#10b981",
@@ -488,58 +564,148 @@ export default function AdminTournamentPage() {
             fontWeight: "700",
             fontSize: "14px",
             boxShadow: "0 10px 30px rgba(0,0,0,0.6)",
-            animation: "fadeIn 0.2s ease-out",
+            animation: "toastSlideIn 0.25s ease-out forwards",
           }}
         >
           {toast.message}
         </div>
       )}
 
-      {/* Header Bar */}
-      <header style={{ background: "#0d1b2a", borderBottom: "2px solid #00e5ff", padding: "16px 24px", position: "sticky", top: 0, zIndex: 40, boxShadow: "0 4px 20px rgba(0, 229, 255, 0.2)" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <Link href="/" title="กลับหน้าหลัก">
-              <img src="/img/logo.png" alt="Fanpantae 2026" style={{ height: "36px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))" }} />
-            </Link>
-            <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "12px" }}>
-              <h1 style={{ fontSize: "16px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
-                ห้องควบคุม Tournament (Tournament Control Room)
-              </h1>
-              <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
-                แฟนพันธุ์แท้ทัวร์นาเมนต์ 2026 - 27
-              </p>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Link href="/admin/tournament/photos" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.4)", color: "#ffd700", fontSize: "13px", fontWeight: "700", textDecoration: "none", display: "flex", alignItems: "center", gap: "5px" }}>
-              <span>📸</span> จัดการรูปถ่ายผู้เข้าแข่งขัน
-            </Link>
-            <Link href="/tournament" target="_blank" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(0, 180, 216, 0.15)", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#00e5ff", fontSize: "13px", fontWeight: "700", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px" }}>
-              <span>👁️</span> ดูหน้าสาธารณะ
-            </Link>
-            <Link href="/admin" style={{ padding: "6px 14px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.2)", color: "#80d0ff", fontSize: "13px", textDecoration: "none" }}>
-              ⚙️ Admin หลัก
-            </Link>
-            <button
-              onClick={() => {
-                localStorage.removeItem("fpt_admin_auth");
-                setIsAuthenticated(false);
-              }}
+      {/* Top Navbar matching Regular Admin */}
+      <header
+        style={{
+          background: "rgba(5, 15, 30, 0.95)",
+          borderBottom: "1px solid rgba(0, 229, 255, 0.25)",
+          backdropFilter: "blur(10px)",
+          padding: "14px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <Link href="/" title="กลับหน้าหลัก">
+            <img
+              src="/img/logo.png"
+              alt="Fanpantae 2026"
               style={{
-                padding: "6px 14px",
-                borderRadius: "8px",
-                background: "rgba(255, 77, 79, 0.15)",
-                border: "1px solid rgba(255, 77, 79, 0.4)",
-                color: "#ff7875",
-                fontSize: "13px",
-                cursor: "pointer",
+                height: "36px",
+                width: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
               }}
-            >
-              🚪 ออกจากระบบ
-            </button>
+            />
+          </Link>
+          <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "12px" }}>
+            <h1 style={{ fontSize: "16px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
+              ห้องควบคุม Tournament (Tournament Control Room)
+            </h1>
+            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+              แฟนพันธุ์แท้ทัวร์นาเมนต์ 2026 - 27
+            </p>
           </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <Link
+            href="/"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255,255,255,0.06)",
+              color: "#80d0ff",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(0, 229, 255, 0.3)",
+            }}
+          >
+            🏠 หน้าหลัก
+          </Link>
+          <Link
+            href="/tournament"
+            target="_blank"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(0, 180, 216, 0.15)",
+              color: "#00e5ff",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(0, 229, 255, 0.4)",
+              fontWeight: "700",
+            }}
+          >
+            ⚔️ หน้า Tournament (/tournament)
+          </Link>
+          <Link
+            href="/admin"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(99, 102, 241, 0.15)",
+              color: "#c7d2fe",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(99, 102, 241, 0.4)",
+              fontWeight: "700",
+            }}
+          >
+            ⚙️ Admin ปกติ (/admin)
+          </Link>
+          <Link
+            href="/admin/tournament/photos"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255, 215, 0, 0.15)",
+              color: "#ffd700",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(255, 215, 0, 0.4)",
+              fontWeight: "700",
+            }}
+          >
+            📸 จัดการรูปถ่ายผู้เข้าแข่งขัน
+          </Link>
+          <button
+            type="button"
+            onClick={handleReset}
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(239, 68, 68, 0.2)",
+              color: "#fca5a5",
+              fontSize: "13px",
+              fontWeight: "700",
+              border: "1px solid rgba(239, 68, 68, 0.5)",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            ⚠️ รีเซ็ตข้อมูลทัวร์นาเมนต์
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("fpt_admin_auth");
+              setIsAuthenticated(false);
+            }}
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255, 77, 79, 0.15)",
+              color: "#ff7875",
+              fontSize: "13px",
+              border: "1px solid rgba(255, 77, 79, 0.4)",
+              cursor: "pointer",
+            }}
+          >
+            🚪 ออกจากระบบ
+          </button>
         </div>
       </header>
 
@@ -599,7 +765,7 @@ export default function AdminTournamentPage() {
             TAB 1: MATCH SCORING
            ======================================================== */}
         {activeTab === "matches" && (
-          <div>
+          <div className="admin-tab-content">
             {/* Matchday Selector Pills */}
             <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px", marginBottom: "18px" }}>
               {matchdays.map((md) => {
@@ -688,15 +854,17 @@ export default function AdminTournamentPage() {
                 return (
                   <div
                     key={match.id}
+                    className="admin-card-panel"
                     style={{
-                      background: "rgba(15, 23, 42, 0.75)",
+                      background: "rgba(10, 22, 40, 0.75)",
                       borderRadius: "14px",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(0, 229, 255, 0.2)",
                       overflow: "hidden",
                       padding: "16px",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
+                      backdropFilter: "blur(10px)",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
@@ -773,7 +941,7 @@ export default function AdminTournamentPage() {
             TAB 2: CONTESTANTS & PHOTOS
            ======================================================== */}
         {activeTab === "contestants" && (
-          <div>
+          <div className="admin-tab-content">
             {/* Dedicated Photo Manager Link Banner */}
             <div
               style={{
@@ -827,7 +995,7 @@ export default function AdminTournamentPage() {
               </p>
             </div>
 
-            <div style={{ background: "rgba(15, 23, 42, 0.7)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden" }}>
+            <div style={{ background: "rgba(10, 22, 40, 0.75)", borderRadius: "16px", border: "1px solid rgba(0, 229, 255, 0.25)", overflow: "hidden", backdropFilter: "blur(12px)", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                   <thead>
@@ -931,7 +1099,7 @@ export default function AdminTournamentPage() {
             TAB 3: STANDINGS & SYNC CONTROLS
            ======================================================== */}
         {activeTab === "standings" && (
-          <div>
+          <div className="admin-tab-content">
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
               <div>
                 <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#ffffff", margin: 0 }}>
@@ -980,7 +1148,7 @@ export default function AdminTournamentPage() {
             {/* Standings Tables side by side */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))", gap: "20px" }}>
               {/* Group A */}
-              <div style={{ background: "rgba(15, 23, 42, 0.7)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden" }}>
+              <div style={{ background: "rgba(10, 22, 40, 0.75)", borderRadius: "16px", border: "1px solid rgba(0, 229, 255, 0.25)", overflow: "hidden", backdropFilter: "blur(12px)", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
                 <div style={{ padding: "12px 16px", background: "rgba(6, 12, 24, 0.9)", borderBottom: "1px solid rgba(255,255,255,0.1)", fontWeight: "800", color: "#00e5ff" }}>
                   กลุ่ม A (Group A Standings)
                 </div>
@@ -1013,7 +1181,7 @@ export default function AdminTournamentPage() {
               </div>
 
               {/* Group B */}
-              <div style={{ background: "rgba(15, 23, 42, 0.7)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden" }}>
+              <div style={{ background: "rgba(10, 22, 40, 0.75)", borderRadius: "16px", border: "1px solid rgba(0, 229, 255, 0.25)", overflow: "hidden", backdropFilter: "blur(12px)", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
                 <div style={{ padding: "12px 16px", background: "rgba(6, 12, 24, 0.9)", borderBottom: "1px solid rgba(255,255,255,0.1)", fontWeight: "800", color: "#ffd700" }}>
                   กลุ่ม B (Group B Standings)
                 </div>
@@ -1068,9 +1236,10 @@ export default function AdminTournamentPage() {
           onClick={() => setEditingMatch(null)}
         >
           <div
+            className="admin-modal-zoom"
             style={{
-              background: "linear-gradient(180deg, #0e172a 0%, #070d18 100%)",
-              borderRadius: "18px",
+              background: "linear-gradient(150deg, #0d1e38 0%, #07101f 100%)",
+              borderRadius: "20px",
               border: "1.5px solid rgba(0, 229, 255, 0.4)",
               maxWidth: "750px",
               width: "100%",
@@ -1078,7 +1247,7 @@ export default function AdminTournamentPage() {
               overflowY: "auto",
               padding: "24px",
               color: "#ffffff",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
+              boxShadow: "0 25px 70px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.2)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
