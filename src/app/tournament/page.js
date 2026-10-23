@@ -698,7 +698,8 @@ export default function TournamentPage() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: "16px",
-                marginBottom: "24px",
+                maxWidth: "960px",
+                margin: "0 auto 24px auto",
               }}
             >
               <div>
@@ -1420,6 +1421,9 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
     <div
       style={{
         position: "relative",
+        maxWidth: "960px",
+        width: "100%",
+        margin: "0 auto",
         background: "radial-gradient(ellipse at 50% 30%, #0a2d6c 0%, #04143a 55%, #010817 100%)",
         borderRadius: "24px",
         border: "1.5px solid rgba(56, 189, 248, 0.4)",
