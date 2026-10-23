@@ -812,7 +812,7 @@ export default function TournamentPage() {
                 <div style={{ fontSize: "16px", fontWeight: "700" }}>ไม่พบคู่แข่งขันที่ตรงกับการค้นหา</div>
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(460px, 1fr))", gap: "20px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
                 {filteredMatches.map((match) => (
                   <FanpantaeMatchCard
                     key={match.id}
@@ -1922,52 +1922,106 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
 }
 
 // ========================================================
-// SUB-COMPONENT: FANPANTAE MATCH CARD (VS BATTLE LAYOUT)
+// ========================================================
+// SUB-COMPONENT: FANPANTAE MATCH CARD (Excel Spreadsheet Style)
 // ========================================================
 function FanpantaeMatchCard({ match, onSelectContestant }) {
   const isCompleted = match.status === "completed";
   const p1 = match.player1;
   const p2 = match.player2;
 
-  // Round Results in official Fan Pan Tae category colors:
-  // 3s (Green), QA (Silver), Jigsaw (Red), Prop (Cyan)
-  const rounds = [
-    { key: "3sec", label: "3 วินาที", s1: p1.scores?.["3sec"], s2: p2.scores?.["3sec"], border: "#52c41a", color: "#86efac" },
-    { key: "qa", label: "ถาม-ตอบ", s1: p1.scores?.qa, s2: p2.scores?.qa, border: "#e0e0e0", color: "#f3f4f6" },
-    { key: "jigsaw", label: "จิ๊กซอว์", s1: p1.scores?.jigsaw, s2: p2.scores?.jigsaw, border: "#ff4d4f", color: "#fca5a5" },
-    { key: "attribute", label: "คุณสมบัติ", s1: p1.scores?.attribute, s2: p2.scores?.attribute, border: "#00e5ff", color: "#67e8f9" },
+  // Round breakdown and Category Points (CP) computation
+  const categories = [
+    { key: "3sec", label: "3 วินาที", s1: p1.scores?.["3sec"], s2: p2.scores?.["3sec"] },
+    { key: "qa", label: "ถาม-ตอบ", s1: p1.scores?.qa, s2: p2.scores?.qa },
+    { key: "jigsaw", label: "จิ๊กซอว์", s1: p1.scores?.jigsaw, s2: p2.scores?.jigsaw },
+    { key: "attribute", label: "คุณสมบัติ", s1: p1.scores?.attribute, s2: p2.scores?.attribute },
   ];
+
+  const catResults = categories.map((cat) => {
+    const v1 = typeof cat.s1 === "number" ? cat.s1 : null;
+    const v2 = typeof cat.s2 === "number" ? cat.s2 : null;
+    if (!isCompleted || (v1 === null && v2 === null)) {
+      return { ...cat, v1: "-", v2: "-", cp1: "-", cp2: "-", p1Won: false, p2Won: false, tied: false };
+    }
+    const s1 = v1 ?? 0;
+    const s2 = v2 ?? 0;
+    let cp1 = 0;
+    let cp2 = 0;
+    let p1Won = false;
+    let p2Won = false;
+    let tied = false;
+
+    if (s1 > s2) {
+      cp1 = 1;
+      cp2 = 0;
+      p1Won = true;
+    } else if (s2 > s1) {
+      cp1 = 0;
+      cp2 = 1;
+      p2Won = true;
+    } else if (s1 > 0 && s1 === s2) {
+      cp1 = 1;
+      cp2 = 1;
+      tied = true;
+    }
+    return { ...cat, v1: s1, v2: s2, cp1, cp2, p1Won, p2Won, tied };
+  });
+
+  // Cell coloring helper mimicking Excel sheet
+  const getScoreCellStyle = (val, isWon, isLost) => {
+    if (!isCompleted || val === "-" || val === null || val === undefined) {
+      return { background: "#ffffff", color: "#64748b" };
+    }
+    if (val === 0) {
+      // 0 gets highlighted in deep red with white text
+      return { background: "#dc2626", color: "#ffffff", fontWeight: "800" };
+    }
+    if (isWon) {
+      // Winner gets light green
+      return { background: "#dcfce7", color: "#14532d", fontWeight: "800" };
+    }
+    if (isLost) {
+      // Loser gets light pink
+      return { background: "#fecdd3", color: "#991b1b", fontWeight: "800" };
+    }
+    // Draw / default gets light cream
+    return { background: "#fef3c7", color: "#854d0e", fontWeight: "800" };
+  };
+
+  const isP1Winner = match.winner === "player1";
+  const isP2Winner = match.winner === "player2";
+  const isDraw = isCompleted && match.winner === "draw";
 
   return (
     <div
       style={{
-        background: "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
-        borderRadius: "18px",
-        border: isCompleted ? "1.5px solid rgba(0, 229, 255, 0.35)" : "1px solid rgba(255, 255, 255, 0.12)",
+        background: "linear-gradient(150deg, rgba(16, 32, 60, 0.9) 0%, rgba(8, 16, 32, 0.98) 100%)",
+        borderRadius: "16px",
+        border: isCompleted ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0.12)",
         overflow: "hidden",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
       }}
     >
-      {/* Match Header Bar */}
+      {/* Match Top Bar */}
       <div
         style={{
           padding: "10px 16px",
-          background: "linear-gradient(90deg, #0f3460 0%, #16213e 100%)",
-          borderBottom: "1px solid rgba(0, 229, 255, 0.3)",
+          background: "linear-gradient(90deg, #0b2244 0%, #111a2e 100%)",
+          borderBottom: "1.5px solid rgba(0, 229, 255, 0.25)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "10px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <span
             style={{
-              padding: "3px 10px",
+              padding: "4px 10px",
               borderRadius: "6px",
-              background: match.group === "A" ? "#00e5ff" : match.group === "B" ? "#ffd700" : "rgba(255, 255, 255, 0.2)",
+              background: match.group === "A" ? "#00e5ff" : "#ffd700",
               color: "#030814",
               fontSize: "12px",
               fontWeight: "900",
@@ -1975,165 +2029,480 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
           >
             {match.id}
           </span>
-          {match.matchNumber && <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", fontWeight: "600" }}>คู่ที่ {match.matchNumber}</span>}
+          {match.matchNumber && (
+            <span style={{ fontSize: "14px", color: "#ffffff", fontWeight: "800" }}>
+              คู่ที่ {match.matchNumber} (กลุ่ม {match.group})
+            </span>
+          )}
+          {isCompleted ? (
+            <span
+              style={{
+                fontSize: "11px",
+                color: "#86efac",
+                fontWeight: "800",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "rgba(34, 197, 94, 0.15)",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                border: "1px solid rgba(34, 197, 94, 0.3)",
+              }}
+            >
+              ● แข่งขันเสร็จสิ้น
+            </span>
+          ) : (
+            <span
+              style={{
+                fontSize: "11px",
+                color: "#94a3b8",
+                fontWeight: "700",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "rgba(148, 163, 184, 0.15)",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                border: "1px solid rgba(148, 163, 184, 0.3)",
+              }}
+            >
+              ○ ยังไม่แข่งขัน
+            </span>
+          )}
         </div>
 
+        {/* Winner Summary Pill */}
         <div>
           {isCompleted ? (
-            <span style={{ fontSize: "12px", color: "#86efac", fontWeight: "800", display: "flex", alignItems: "center", gap: "4px" }}>
-              <span>●</span> แข่งขันเสร็จสิ้น
-            </span>
+            <div style={{ fontSize: "13px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
+              {isP1Winner && (
+                <span style={{ color: "#ffd700" }}>
+                  👑 ผู้ชนะ: <strong>{p1.nickname ? `${p1.nickname} ` : ""}{p1.name}</strong>
+                  <span style={{ color: "rgba(255,255,255,0.7)", marginLeft: "6px", fontSize: "12px" }}>
+                    (หมวด {p1.categoryPoints}-{p2.categoryPoints} • ดิบ {p1.sum} vs {p2.sum})
+                  </span>
+                </span>
+              )}
+              {isP2Winner && (
+                <span style={{ color: "#ffd700" }}>
+                  👑 ผู้ชนะ: <strong>{p2.nickname ? `${p2.nickname} ` : ""}{p2.name}</strong>
+                  <span style={{ color: "rgba(255,255,255,0.7)", marginLeft: "6px", fontSize: "12px" }}>
+                    (หมวด {p2.categoryPoints}-{p1.categoryPoints} • ดิบ {p2.sum} vs {p1.sum})
+                  </span>
+                </span>
+              )}
+              {isDraw && (
+                <span style={{ color: "#38bdf8" }}>
+                  🤝 เสมอกัน
+                  <span style={{ color: "rgba(255,255,255,0.7)", marginLeft: "6px", fontSize: "12px" }}>
+                    (หมวด {p1.categoryPoints}-{p2.categoryPoints} • ดิบ {p1.sum} vs {p2.sum})
+                  </span>
+                </span>
+              )}
+            </div>
           ) : (
-            <span style={{ fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: "4px" }}>
-              <span>○</span> ยังไม่แข่งขัน
-            </span>
+            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>รอการแข่งขันตามกำหนดการ</div>
           )}
         </div>
       </div>
 
-      {/* VS Contestants Showcase */}
-      <div style={{ padding: "18px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-        {/* Player 1 */}
-        <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} onClick={() => onSelectContestant(p1.name)}>
-          <div style={{ position: "relative", display: "inline-block" }}>
-            <img
-              src={p1.photo || "/default-avatar.png"}
-              alt={p1.name}
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-              style={{
-                width: "58px",
-                height: "58px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: match.winner === "player1" ? "3px solid #ffd700" : "2px solid rgba(255,255,255,0.25)",
-                boxShadow: match.winner === "player1" ? "0 0 15px rgba(255, 215, 0, 0.5)" : "none",
-                background: "#0b1528",
-              }}
-            />
-            {match.winner === "player1" && (
-              <span style={{ position: "absolute", top: "-8px", right: "-4px", fontSize: "16px" }}>👑</span>
-            )}
-          </div>
-          <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", marginTop: "6px" }}>
-            {p1.nickname ? <span style={{ color: "#ffd700" }}>{p1.nickname} </span> : null}
-            {p1.name}
-          </div>
-          <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: "700", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "160px", margin: "2px auto 0 auto" }}>
-            {p1.topic || "-"}
-          </div>
-        </div>
+      {/* Excel Spreadsheet Comparison Table */}
+      <div style={{ padding: "14px", overflowX: "auto" }}>
+        <table
+          style={{
+            minWidth: "960px",
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+            background: "#ffffff",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+            borderRadius: "6px",
+            overflow: "hidden",
+          }}
+        >
+          {/* Table Header: Two Sides (Green for Player 1, Purple for Player 2) */}
+          <thead>
+            <tr style={{ height: "34px", color: "#0f172a", fontSize: "12px", fontWeight: "800" }}>
+              {/* Player 1 Columns (Light Sage Green) */}
+              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 8px", width: "150px", textAlign: "left", color: "#14532d" }}>
+                ผู้เข้าแข่งขัน (1)
+              </th>
+              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 6px", width: "70px", textAlign: "center", color: "#14532d" }}>
+                ชื่อเล่น
+              </th>
+              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 8px", width: "140px", textAlign: "left", color: "#14532d" }}>
+                หมวดแฟนพันธุ์แท้
+              </th>
+              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#14532d" }}>
+                3 วินาที
+              </th>
+              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#14532d" }}>
+                ถาม-ตอบ
+              </th>
+              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#14532d" }}>
+                จิ๊กซอว์
+              </th>
+              <th style={{ background: "#bbf7d0", border: "1px solid #000000", padding: "6px 4px", width: "55px", textAlign: "center", color: "#14532d" }}>
+                คุณสมบัติ
+              </th>
+              <th style={{ background: "#fed7aa", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#9a3412" }}>
+                รวมดิบ
+              </th>
+              <th style={{ background: "#e2e8f0", border: "1px solid #000000", borderRight: "4px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#0f172a" }}>
+                แต้มลีก
+              </th>
 
-        {/* Center VS Score */}
-        <div style={{ textAlign: "center", minWidth: "120px" }}>
-          {isCompleted ? (
-            <div>
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.5px" }}>แต้มหมวด (CP)</div>
-              <div style={{ fontSize: "30px", fontWeight: "900", color: "#ffffff", fontFamily: "var(--font-num)", letterSpacing: "1px", margin: "2px 0" }}>
-                <span style={{ color: match.winner === "player1" ? "#ffd700" : "#ffffff" }}>{p1.categoryPoints}</span>
-                <span style={{ color: "rgba(255,255,255,0.3)", margin: "0 6px" }}>-</span>
-                <span style={{ color: match.winner === "player2" ? "#ffd700" : "#ffffff" }}>{p2.categoryPoints}</span>
-              </div>
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>
-                ดิบ: {p1.sum} vs {p2.sum}
-              </div>
-            </div>
-          ) : (
-            <div style={{ fontSize: "22px", fontWeight: "900", color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-num)" }}>
-              VS
-            </div>
-          )}
-        </div>
+              {/* Player 2 Columns (Light Lavender) */}
+              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 8px", width: "150px", textAlign: "left", color: "#581c87" }}>
+                ผู้เข้าแข่งขัน (2)
+              </th>
+              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 6px", width: "70px", textAlign: "center", color: "#581c87" }}>
+                ชื่อเล่น
+              </th>
+              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 8px", width: "140px", textAlign: "left", color: "#581c87" }}>
+                หมวดแฟนพันธุ์แท้
+              </th>
+              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#581c87" }}>
+                3 วินาที
+              </th>
+              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#581c87" }}>
+                ถาม-ตอบ
+              </th>
+              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#581c87" }}>
+                จิ๊กซอว์
+              </th>
+              <th style={{ background: "#e9d5ff", border: "1px solid #000000", padding: "6px 4px", width: "55px", textAlign: "center", color: "#581c87" }}>
+                คุณสมบัติ
+              </th>
+              <th style={{ background: "#fed7aa", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#9a3412" }}>
+                รวมดิบ
+              </th>
+              <th style={{ background: "#e2e8f0", border: "1px solid #000000", padding: "6px 4px", width: "50px", textAlign: "center", color: "#0f172a" }}>
+                แต้มลีก
+              </th>
+            </tr>
+          </thead>
 
-        {/* Player 2 */}
-        <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} onClick={() => onSelectContestant(p2.name)}>
-          <div style={{ position: "relative", display: "inline-block" }}>
-            <img
-              src={p2.photo || "/default-avatar.png"}
-              alt={p2.name}
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-              style={{
-                width: "58px",
-                height: "58px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: match.winner === "player2" ? "3px solid #ffd700" : "2px solid rgba(255,255,255,0.25)",
-                boxShadow: match.winner === "player2" ? "0 0 15px rgba(255, 215, 0, 0.5)" : "none",
-                background: "#0b1528",
-              }}
-            />
-            {match.winner === "player2" && (
-              <span style={{ position: "absolute", top: "-8px", right: "-4px", fontSize: "16px" }}>👑</span>
-            )}
-          </div>
-          <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", marginTop: "6px" }}>
-            {p2.nickname ? <span style={{ color: "#ffd700" }}>{p2.nickname} </span> : null}
-            {p2.name}
-          </div>
-          <div style={{ fontSize: "11px", color: "#38bdf8", fontWeight: "700", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "160px", margin: "2px auto 0 auto" }}>
-            {p2.topic || "-"}
-          </div>
-        </div>
-      </div>
-
-      {/* Round-by-Round Breakdown (Official Color Scheme) */}
-      {isCompleted && (
-        <div style={{ background: "rgba(6, 16, 36, 0.8)", borderTop: "1px solid rgba(255,255,255,0.08)", padding: "10px 14px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
-          {rounds.map((r) => {
-            const val1 = r.s1 ?? 0;
-            const val2 = r.s2 ?? 0;
-            const p1Won = val1 > val2;
-            const p2Won = val2 > val1;
-            const tied = val1 > 0 && val1 === val2;
-
-            return (
-              <div key={r.key} style={{ textAlign: "center", padding: "6px 4px", borderRadius: "8px", background: "rgba(10, 25, 47, 0.7)", border: `1px solid ${r.border}` }}>
-                <div style={{ fontSize: "10px", color: r.color, fontWeight: "800", marginBottom: "3px" }}>{r.label}</div>
-                <div style={{ fontSize: "13px", fontWeight: "900", fontFamily: "var(--font-num)", display: "flex", justifyContent: "center", gap: "6px" }}>
-                  <span style={{ color: p1Won ? "#ffd700" : tied ? "#ffffff" : "rgba(255,255,255,0.6)" }}>{r.s1 ?? "-"}</span>
-                  <span style={{ color: "rgba(255,255,255,0.2)" }}>:</span>
-                  <span style={{ color: p2Won ? "#ffd700" : tied ? "#ffffff" : "rgba(255,255,255,0.6)" }}>{r.s2 ?? "-"}</span>
+          <tbody>
+            {/* ROW 1: Raw Scores & Contestant Info (Exactly like the Excel screenshot) */}
+            <tr style={{ height: "42px" }}>
+              {/* Player 1 Details */}
+              <td
+                onClick={() => onSelectContestant(p1.name)}
+                style={{
+                  background: "#c8e6c9",
+                  border: "1px solid #000000",
+                  padding: "6px 8px",
+                  fontWeight: "700",
+                  color: "#14532d",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+                title="คลิกเพื่อดูประวัติ"
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  {p1.photo ? (
+                    <img
+                      src={p1.photo}
+                      alt={p1.name}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                      style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover" }}
+                    />
+                  ) : null}
+                  <span>{p1.name}</span>
+                  {isP1Winner && <span>👑</span>}
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              </td>
 
-      {/* Match Footer with League Points */}
-      <div
-        style={{
-          padding: "10px 16px",
-          background: "rgba(3, 8, 20, 0.95)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          fontSize: "12px",
-        }}
-      >
-        {isCompleted ? (
-          <>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ color: "rgba(255,255,255,0.5)" }}>แต้มลีก:</span>
-              <strong style={{ color: p1.leaguePoint > 0 ? "#86efac" : p1.leaguePoint < 0 ? "#fca5a5" : "#ffffff", fontFamily: "var(--font-num)" }}>
-                {p1.nickname || p1.name} ({p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : p1.leaguePoint} LP)
-              </strong>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <strong style={{ color: p2.leaguePoint > 0 ? "#86efac" : p2.leaguePoint < 0 ? "#fca5a5" : "#ffffff", fontFamily: "var(--font-num)" }}>
-                {p2.nickname || p2.name} ({p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : p2.leaguePoint} LP)
-              </strong>
-            </div>
-          </>
-        ) : (
-          <div style={{ width: "100%", textAlign: "center", color: "rgba(255,255,255,0.5)" }}>
-            รอการแข่งขันตามกำหนดการ
-          </div>
-        )}
+              <td
+                style={{
+                  background: "#c8e6c9",
+                  border: "1px solid #000000",
+                  padding: "6px 4px",
+                  fontWeight: "700",
+                  textAlign: "center",
+                  color: "#14532d",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {p1.nickname || "-"}
+              </td>
+
+              <td
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #000000",
+                  padding: "6px 8px",
+                  fontWeight: "700",
+                  color: "#15803d",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {p1.topic || "-"}
+              </td>
+
+              {/* Player 1: 4 Category Scores */}
+              {catResults.map((r, i) => {
+                const style = getScoreCellStyle(r.v1, r.p1Won, r.p2Won);
+                return (
+                  <td
+                    key={i}
+                    style={{
+                      background: style.background,
+                      color: style.color,
+                      border: "1px solid #000000",
+                      textAlign: "center",
+                      fontWeight: style.fontWeight || "700",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {r.v1}
+                  </td>
+                );
+              })}
+
+              {/* Player 1: Raw Total */}
+              <td
+                style={{
+                  background: "#fed7aa",
+                  color: "#9a3412",
+                  border: "1px solid #000000",
+                  textAlign: "center",
+                  fontWeight: "900",
+                  fontSize: "15px",
+                }}
+              >
+                {isCompleted ? p1.sum ?? 0 : "-"}
+              </td>
+
+              {/* Player 1: League Points */}
+              <td
+                style={{
+                  background: "#ffffff",
+                  color: "#0f172a",
+                  border: "1px solid #000000",
+                  borderRight: "4px solid #000000",
+                  textAlign: "center",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                }}
+              >
+                {isCompleted ? (p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : p1.leaguePoint ?? 0) : "-"}
+              </td>
+
+              {/* Player 2 Details */}
+              <td
+                onClick={() => onSelectContestant(p2.name)}
+                style={{
+                  background: "#e9d5ff",
+                  border: "1px solid #000000",
+                  padding: "6px 8px",
+                  fontWeight: "700",
+                  color: "#581c87",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+                title="คลิกเพื่อดูประวัติ"
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  {p2.photo ? (
+                    <img
+                      src={p2.photo}
+                      alt={p2.name}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                      style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "cover" }}
+                    />
+                  ) : null}
+                  <span>{p2.name}</span>
+                  {isP2Winner && <span>👑</span>}
+                </div>
+              </td>
+
+              <td
+                style={{
+                  background: "#e9d5ff",
+                  border: "1px solid #000000",
+                  padding: "6px 4px",
+                  fontWeight: "700",
+                  textAlign: "center",
+                  color: "#581c87",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {p2.nickname || "-"}
+              </td>
+
+              <td
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #000000",
+                  padding: "6px 8px",
+                  fontWeight: "700",
+                  color: "#6b21a8",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {p2.topic || "-"}
+              </td>
+
+              {/* Player 2: 4 Category Scores */}
+              {catResults.map((r, i) => {
+                const style = getScoreCellStyle(r.v2, r.p2Won, r.p1Won);
+                return (
+                  <td
+                    key={i}
+                    style={{
+                      background: style.background,
+                      color: style.color,
+                      border: "1px solid #000000",
+                      textAlign: "center",
+                      fontWeight: style.fontWeight || "700",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {r.v2}
+                  </td>
+                );
+              })}
+
+              {/* Player 2: Raw Total */}
+              <td
+                style={{
+                  background: "#fed7aa",
+                  color: "#9a3412",
+                  border: "1px solid #000000",
+                  textAlign: "center",
+                  fontWeight: "900",
+                  fontSize: "15px",
+                }}
+              >
+                {isCompleted ? p2.sum ?? 0 : "-"}
+              </td>
+
+              {/* Player 2: League Points */}
+              <td
+                style={{
+                  background: "#ffffff",
+                  color: "#0f172a",
+                  border: "1px solid #000000",
+                  textAlign: "center",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                }}
+              >
+                {isCompleted ? (p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : p2.leaguePoint ?? 0) : "-"}
+              </td>
+            </tr>
+
+            {/* ROW 2: Category Points (CP) Bar (Dark Crimson on Left, Dark Forest Green on Right) */}
+            <tr style={{ height: "24px", fontSize: "11px", fontWeight: "900" }}>
+              {/* Player 1 CP Label */}
+              <td
+                colSpan={3}
+                style={{
+                  background: "#f1f5f9",
+                  border: "1px solid #000000",
+                  padding: "2px 8px",
+                  textAlign: "right",
+                  color: "#991b1b",
+                  fontWeight: "800",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                แต้มหมวด (CP)
+              </td>
+
+              {/* Player 1: CP for 4 rounds (Dark Maroon / Crimson Bar) */}
+              {catResults.map((r, i) => (
+                <td
+                  key={i}
+                  style={{
+                    background: "#7f1d1d",
+                    color: "#ffffff",
+                    border: "1px solid #000000",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "12px",
+                  }}
+                >
+                  {isCompleted ? r.cp1 : "-"}
+                </td>
+              ))}
+
+              {/* Player 1: Total CP */}
+              <td
+                style={{
+                  background: "#7f1d1d",
+                  color: "#ffffff",
+                  border: "1px solid #000000",
+                  textAlign: "center",
+                  fontWeight: "900",
+                  fontSize: "13px",
+                }}
+              >
+                {isCompleted ? p1.categoryPoints ?? 0 : "-"}
+              </td>
+
+              {/* Player 1: Blank under LP */}
+              <td style={{ background: "#f8fafc", border: "1px solid #000000", borderRight: "4px solid #000000" }}></td>
+
+              {/* Player 2 CP Label */}
+              <td
+                colSpan={3}
+                style={{
+                  background: "#f1f5f9",
+                  border: "1px solid #000000",
+                  padding: "2px 8px",
+                  textAlign: "right",
+                  color: "#166534",
+                  fontWeight: "800",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                แต้มหมวด (CP)
+              </td>
+
+              {/* Player 2: CP for 4 rounds (Dark Forest Green Bar) */}
+              {catResults.map((r, i) => (
+                <td
+                  key={i}
+                  style={{
+                    background: "#14532d",
+                    color: "#ffffff",
+                    border: "1px solid #000000",
+                    textAlign: "center",
+                    fontWeight: "900",
+                    fontSize: "12px",
+                  }}
+                >
+                  {isCompleted ? r.cp2 : "-"}
+                </td>
+              ))}
+
+              {/* Player 2: Total CP */}
+              <td
+                style={{
+                  background: "#14532d",
+                  color: "#ffffff",
+                  border: "1px solid #000000",
+                  textAlign: "center",
+                  fontWeight: "900",
+                  fontSize: "13px",
+                }}
+              >
+                {isCompleted ? p2.categoryPoints ?? 0 : "-"}
+              </td>
+
+              {/* Player 2: Blank under LP */}
+              <td style={{ background: "#f8fafc", border: "1px solid #000000" }}></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );
