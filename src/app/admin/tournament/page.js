@@ -1,8 +1,282 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import defaultTournamentData from "@/app/data/tournament.json";
+
+// ========================================================
+// CUSTOM CONTESTANT DROPDOWN (Matches /admin dropdown design)
+// ========================================================
+function AdminContestantDropdown({
+  contestants,
+  value,
+  themeColor = "#00e5ff",
+  placeholder = "-- เลือกผู้เข้าแข่งขัน --",
+  onSelect,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const dropdownRef = useRef(null);
+
+  // Close on click outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const selected = contestants.find((c) => c.name === value);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return contestants;
+    return contestants.filter(
+      (c) =>
+        (c.name || "").toLowerCase().includes(q) ||
+        (c.nickname || "").toLowerCase().includes(q) ||
+        (c.group || "").toLowerCase().includes(q) ||
+        (c.topics || []).some((t) => (t.topic || "").toLowerCase().includes(q))
+    );
+  }, [contestants, search]);
+
+  return (
+    <div ref={dropdownRef} style={{ position: "relative", width: "100%" }}>
+      {/* Trigger Box */}
+      <div
+        onClick={() => {
+          setIsOpen(!isOpen);
+          setSearch("");
+        }}
+        style={{
+          padding: "6px 12px",
+          borderRadius: "8px",
+          background: "rgba(3, 10, 24, 0.95)",
+          border: isOpen ? `1.5px solid ${themeColor}` : `1px solid rgba(255, 255, 255, 0.2)`,
+          boxShadow: isOpen ? `0 0 14px ${themeColor}40` : "none",
+          color: "#ffffff",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "10px",
+          minHeight: "46px",
+          transition: "all 0.15s ease",
+        }}
+      >
+        {selected ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0, overflow: "hidden", flex: 1 }}>
+            {/* Group Badge */}
+            <span
+              style={{
+                padding: "2px 6px",
+                borderRadius: "4px",
+                background: selected.group === "A" ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 215, 0, 0.2)",
+                color: selected.group === "A" ? "#00e5ff" : "#ffd700",
+                fontWeight: "900",
+                fontSize: "11px",
+                flexShrink: 0,
+              }}
+            >
+              สาย {selected.group}
+            </span>
+
+            {/* Avatar */}
+            <div
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                border: `1.5px solid ${themeColor}`,
+                background: "#08101e",
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {selected.photo ? (
+                <img src={selected.photo} alt={selected.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <span style={{ fontSize: "13px" }}>👤</span>
+              )}
+            </div>
+
+            {/* Name + Nickname */}
+            <div style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{ fontWeight: "800", fontSize: "13px", color: "#ffffff" }}>
+                {selected.name}
+              </span>
+              {selected.nickname && (
+                <span style={{ color: themeColor, fontWeight: "700", fontSize: "12px", marginLeft: "6px" }}>
+                  ({selected.nickname})
+                </span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <span style={{ color: "rgba(255, 255, 255, 0.45)", fontSize: "13px" }}>
+            {placeholder}
+          </span>
+        )}
+
+        {/* Dropdown Arrow */}
+        <span
+          style={{
+            fontSize: "10px",
+            color: themeColor,
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+            flexShrink: 0,
+          }}
+        >
+          ▼
+        </span>
+      </div>
+
+      {/* Floating Options Panel */}
+      {isOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            background: "linear-gradient(160deg, #07162b 0%, #030a14 100%)",
+            border: `1.5px solid ${themeColor}`,
+            borderRadius: "10px",
+            boxShadow: `0 14px 40px rgba(0, 0, 0, 0.9), 0 0 25px ${themeColor}35`,
+            maxHeight: "260px",
+            overflowY: "auto",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          {/* Sticky Search Input */}
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              background: "#07162b",
+              padding: "8px 10px",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="🔍 ค้นหาชื่อเล่น หรือ ชื่อจริง..."
+              autoFocus
+              style={{
+                width: "100%",
+                padding: "6px 10px",
+                borderRadius: "6px",
+                background: "#030a14",
+                border: `1px solid ${themeColor}60`,
+                color: "#ffffff",
+                fontSize: "12px",
+                outline: "none",
+              }}
+            />
+          </div>
+
+          {/* Options List */}
+          {filtered.length === 0 ? (
+            <div style={{ padding: "16px", textAlign: "center", color: "rgba(255, 255, 255, 0.5)", fontSize: "12px" }}>
+              ไม่พบผู้เข้าแข่งขันที่ตรงกับการค้นหา
+            </div>
+          ) : (
+            filtered.map((c) => {
+              const isSelected = c.name === value;
+              return (
+                <div
+                  key={c.id || c.name}
+                  onClick={() => {
+                    onSelect(c);
+                    setIsOpen(false);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "8px 12px",
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                    background: isSelected ? `${themeColor}25` : "transparent",
+                    cursor: "pointer",
+                    transition: "background 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  {/* Group Tag */}
+                  <span
+                    style={{
+                      padding: "2px 5px",
+                      borderRadius: "3px",
+                      background: c.group === "A" ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 215, 0, 0.2)",
+                      color: c.group === "A" ? "#00e5ff" : "#ffd700",
+                      fontWeight: "800",
+                      fontSize: "10px",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {c.group}
+                  </span>
+
+                  {/* Photo */}
+                  <div
+                    style={{
+                      width: "28px",
+                      height: "28px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      background: "#08101e",
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {c.photo ? (
+                      <img src={c.photo} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <span style={{ fontSize: "12px" }}>👤</span>
+                    )}
+                  </div>
+
+                  {/* Name Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: "12px", fontWeight: "700", color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {c.name}
+                      {c.nickname && (
+                        <span style={{ color: themeColor, marginLeft: "6px", fontWeight: "600" }}>
+                          ({c.nickname})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminTournamentPage() {
   // Authentication State
@@ -1345,82 +1619,27 @@ export default function AdminTournamentPage() {
 
                 {/* Contestant 1 Name Dropdown */}
                 <div style={{ marginBottom: "10px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>
-                      ชื่อจริง (เลือกจากรายชื่อ)
-                    </label>
-                    {p1Selected?.photo ? (
-                      <span style={{ fontSize: "11px", color: "#38bdf8", display: "flex", alignItems: "center", gap: "4px" }}>
-                        <img
-                          src={p1Selected.photo}
-                          alt={p1Selected.name}
-                          onError={(e) => { e.currentTarget.style.display = "none"; }}
-                          style={{ width: "16px", height: "16px", borderRadius: "50%", objectFit: "cover" }}
-                        />
-                        มีรูปในระบบ
-                      </span>
-                    ) : null}
-                  </div>
+                  <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700", marginBottom: "4px", display: "block" }}>
+                    เลือกผู้เข้าแข่งขัน (ฝั่งซ้าย)
+                  </label>
 
-                  <select
+                  <AdminContestantDropdown
+                    contestants={contestants}
                     value={matchFormData.player1.name}
-                    onChange={(e) => {
-                      const selectedName = e.target.value;
-                      const found = contestants.find((c) => c.name === selectedName);
-                      if (found) {
-                        setMatchFormData((prev) => ({
-                          ...prev,
-                          player1: {
-                            ...prev.player1,
-                            name: found.name,
-                            nickname: found.nickname || prev.player1.nickname,
-                            photo: found.photo || prev.player1.photo || "",
-                          },
-                        }));
-                      } else {
-                        setMatchFormData((prev) => ({
-                          ...prev,
-                          player1: { ...prev.player1, name: selectedName },
-                        }));
-                      }
+                    themeColor="#00e5ff"
+                    placeholder="-- เลือกผู้เข้าแข่งขันฝั่งซ้าย --"
+                    onSelect={(found) => {
+                      setMatchFormData((prev) => ({
+                        ...prev,
+                        player1: {
+                          ...prev.player1,
+                          name: found.name,
+                          nickname: found.nickname || prev.player1.nickname,
+                          photo: found.photo || prev.player1.photo || "",
+                        },
+                      }));
                     }}
-                    style={{
-                      width: "100%",
-                      padding: "7px 10px",
-                      borderRadius: "6px",
-                      background: "rgba(15, 23, 42, 0.95)",
-                      border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                      color: "#ffffff",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <option value="">-- เลือกผู้เข้าแข่งขัน --</option>
-                    {matchFormData.player1.name && !contestants.some((c) => c.name === matchFormData.player1.name) && (
-                      <option value={matchFormData.player1.name}>
-                        {matchFormData.player1.name} (ระบุเอง)
-                      </option>
-                    )}
-                    <optgroup label="สาย A (Group A)">
-                      {contestants
-                        .filter((c) => c.group === "A")
-                        .map((c) => (
-                          <option key={c.id || c.name} value={c.name}>
-                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="สาย B (Group B)">
-                      {contestants
-                        .filter((c) => c.group === "B")
-                        .map((c) => (
-                          <option key={c.id || c.name} value={c.name}>
-                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  </select>
+                  />
 
                   <div style={{ marginTop: "4px" }}>
                     <input
@@ -1435,7 +1654,7 @@ export default function AdminTournamentPage() {
                       }
                       style={{
                         width: "100%",
-                        padding: "4px 8px",
+                        padding: "5px 8px",
                         borderRadius: "5px",
                         background: "rgba(15, 23, 42, 0.5)",
                         border: "1px dashed rgba(255,255,255,0.2)",
@@ -1549,82 +1768,27 @@ export default function AdminTournamentPage() {
 
                 {/* Contestant 2 Name Dropdown */}
                 <div style={{ marginBottom: "10px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                    <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>
-                      ชื่อจริง (เลือกจากรายชื่อ)
-                    </label>
-                    {p2Selected?.photo ? (
-                      <span style={{ fontSize: "11px", color: "#ffd700", display: "flex", alignItems: "center", gap: "4px" }}>
-                        <img
-                          src={p2Selected.photo}
-                          alt={p2Selected.name}
-                          onError={(e) => { e.currentTarget.style.display = "none"; }}
-                          style={{ width: "16px", height: "16px", borderRadius: "50%", objectFit: "cover" }}
-                        />
-                        มีรูปในระบบ
-                      </span>
-                    ) : null}
-                  </div>
+                  <label style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "700", marginBottom: "4px", display: "block" }}>
+                    เลือกผู้เข้าแข่งขัน (ฝั่งขวา)
+                  </label>
 
-                  <select
+                  <AdminContestantDropdown
+                    contestants={contestants}
                     value={matchFormData.player2.name}
-                    onChange={(e) => {
-                      const selectedName = e.target.value;
-                      const found = contestants.find((c) => c.name === selectedName);
-                      if (found) {
-                        setMatchFormData((prev) => ({
-                          ...prev,
-                          player2: {
-                            ...prev.player2,
-                            name: found.name,
-                            nickname: found.nickname || prev.player2.nickname,
-                            photo: found.photo || prev.player2.photo || "",
-                          },
-                        }));
-                      } else {
-                        setMatchFormData((prev) => ({
-                          ...prev,
-                          player2: { ...prev.player2, name: selectedName },
-                        }));
-                      }
+                    themeColor="#ffd700"
+                    placeholder="-- เลือกผู้เข้าแข่งขันฝั่งขวา --"
+                    onSelect={(found) => {
+                      setMatchFormData((prev) => ({
+                        ...prev,
+                        player2: {
+                          ...prev.player2,
+                          name: found.name,
+                          nickname: found.nickname || prev.player2.nickname,
+                          photo: found.photo || prev.player2.photo || "",
+                        },
+                      }));
                     }}
-                    style={{
-                      width: "100%",
-                      padding: "7px 10px",
-                      borderRadius: "6px",
-                      background: "rgba(15, 23, 42, 0.95)",
-                      border: "1.5px solid rgba(255, 215, 0, 0.4)",
-                      color: "#ffffff",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <option value="">-- เลือกผู้เข้าแข่งขัน --</option>
-                    {matchFormData.player2.name && !contestants.some((c) => c.name === matchFormData.player2.name) && (
-                      <option value={matchFormData.player2.name}>
-                        {matchFormData.player2.name} (ระบุเอง)
-                      </option>
-                    )}
-                    <optgroup label="สาย A (Group A)">
-                      {contestants
-                        .filter((c) => c.group === "A")
-                        .map((c) => (
-                          <option key={c.id || c.name} value={c.name}>
-                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="สาย B (Group B)">
-                      {contestants
-                        .filter((c) => c.group === "B")
-                        .map((c) => (
-                          <option key={c.id || c.name} value={c.name}>
-                            {c.nickname ? `${c.nickname} - ${c.name}` : c.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  </select>
+                  />
 
                   <div style={{ marginTop: "4px" }}>
                     <input
@@ -1639,7 +1803,7 @@ export default function AdminTournamentPage() {
                       }
                       style={{
                         width: "100%",
-                        padding: "4px 8px",
+                        padding: "5px 8px",
                         borderRadius: "5px",
                         background: "rgba(15, 23, 42, 0.5)",
                         border: "1px dashed rgba(255,255,255,0.2)",

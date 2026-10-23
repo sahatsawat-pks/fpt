@@ -658,7 +658,7 @@ export default function TournamentPage() {
       {/* ========================================================
           3. MAIN CONTENT CONTAINER
          ======================================================== */}
-      <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "36px 20px 80px 20px" }}>
+      <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "36px clamp(24px, 4vw, 56px) 80px clamp(24px, 4vw, 56px)" }}>
         {/* Navigation Tabs (Style matches other pages) */}
         <div
           style={{
@@ -1448,7 +1448,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
         border: "1.5px solid rgba(56, 189, 248, 0.4)",
         boxShadow: "0 18px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
         overflow: "hidden",
-        padding: "24px 20px 20px 20px",
+        padding: "26px clamp(20px, 3.5vw, 36px)",
       }}
     >
       {/* Background SVG Radar / Concentric HUD Rings */}
