@@ -768,7 +768,7 @@ export default function TournamentPage() {
                   groupName="GROUP A"
                   badgeColor="#00e5ff"
                   list={standings.groupA || []}
-                  onSelectContestant={(c) => setSelectedContestant(c)}
+                  onSelectContestant={(c) => setSelectedContestant({ ...c, group: "A" })}
                 />
               )}
 
@@ -777,7 +777,7 @@ export default function TournamentPage() {
                   groupName="GROUP B"
                   badgeColor="#ffd700"
                   list={standings.groupB || []}
-                  onSelectContestant={(c) => setSelectedContestant(c)}
+                  onSelectContestant={(c) => setSelectedContestant({ ...c, group: "B" })}
                 />
               )}
             </div>
@@ -1262,40 +1262,62 @@ export default function TournamentPage() {
             </button>
 
             {/* Profile Header */}
-            <div style={{ display: "flex", alignItems: "center", gap: "18px", borderBottom: "1px solid rgba(255,255,255,0.12)", paddingBottom: "20px", marginBottom: "20px" }}>
-              <img
-                src={getOptimizedAvatarUrl(selectedContestant.photo, 200) || "/default-avatar.png"}
-                alt={selectedContestant.name}
-                loading="eager"
-                decoding="async"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: "3px solid #00e5ff",
-                  boxShadow: "0 0 20px rgba(0, 229, 255, 0.5)",
-                  background: "#0b1528",
-                }}
-              />
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <h3 style={{ fontSize: "22px", fontWeight: "900", margin: 0 }}>
-                    {selectedContestant.nickname ? <span style={{ color: "#ffd700" }}>{selectedContestant.nickname} • </span> : ""}
-                    {selectedContestant.name}
-                  </h3>
-                  <span style={{ padding: "3px 10px", borderRadius: "12px", background: selectedContestant.group === "A" ? "rgba(0, 229, 255, 0.25)" : "rgba(255, 215, 0, 0.25)", color: selectedContestant.group === "A" ? "#00e5ff" : "#ffd700", fontSize: "12px", fontWeight: "900" }}>
-                    กลุ่ม {selectedContestant.group}
-                  </span>
+            {(() => {
+              const contestantGroup =
+                selectedContestant.group ||
+                contestants.find((x) => x.name === selectedContestant.name)?.group ||
+                ((standings.groupA || []).some((x) => x.name === selectedContestant.name) ? "A" : "B");
+              const isGroupA = contestantGroup === "A";
+              const groupColor = isGroupA ? "#00e5ff" : "#ffd700";
+
+              return (
+                <div style={{ display: "flex", alignItems: "center", gap: "18px", borderBottom: "1px solid rgba(255,255,255,0.12)", paddingBottom: "20px", marginBottom: "20px" }}>
+                  <img
+                    src={getOptimizedAvatarUrl(selectedContestant.photo, 200) || "/default-avatar.png"}
+                    alt={selectedContestant.name}
+                    loading="eager"
+                    decoding="async"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: `3px solid ${groupColor}`,
+                      boxShadow: `0 0 20px ${groupColor}80`,
+                      background: "#0b1528",
+                    }}
+                  />
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                      <h3 style={{ fontSize: "22px", fontWeight: "900", margin: 0, color: "#ffffff" }}>
+                        {selectedContestant.nickname ? <span style={{ color: groupColor }}>{selectedContestant.nickname} • </span> : ""}
+                        {selectedContestant.name}
+                      </h3>
+                      <span
+                        style={{
+                          padding: "3px 10px",
+                          borderRadius: "12px",
+                          background: isGroupA ? "rgba(0, 229, 255, 0.25)" : "rgba(255, 215, 0, 0.25)",
+                          border: `1.5px solid ${groupColor}`,
+                          color: groupColor,
+                          fontSize: "12px",
+                          fontWeight: "900",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        กลุ่ม {contestantGroup}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>
+                      สายการแข่งขัน: <strong style={{ color: groupColor }}>กลุ่ม {contestantGroup}</strong> • อันดับปัจจุบัน: <strong style={{ color: "#ffd700" }}>#{selectedContestant.stats?.rank || selectedContestant.rank}</strong> • แต้มลีกสะสม: <strong style={{ color: "#00e5ff" }}>{selectedContestant.stats?.leaguePoints ?? selectedContestant.leaguePoints} LP</strong>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>
-                  อันดับปัจจุบัน: <strong style={{ color: "#ffd700" }}>#{selectedContestant.stats?.rank || selectedContestant.rank}</strong> • แต้มลีกสะสม: <strong style={{ color: "#00e5ff" }}>{selectedContestant.stats?.leaguePoints ?? selectedContestant.leaguePoints} LP</strong>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Stats Summary Banner */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "24px" }}>
@@ -2014,7 +2036,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                             flexShrink: 0,
                           }}
                         >
-                          KNOCKOUT
+                          PLAYOFF
                         </span>
                       )}
                     </div>
@@ -2201,7 +2223,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#38bdf8", boxShadow: "0 0 8px rgba(56, 189, 248, 0.5)" }}></span>
-            <span style={{ color: "#bae6fd", fontWeight: "500" }}>อันดับ 2-4: ผ่านเข้ารอบน็อคเอาท์ (Knockout Stage)</span>
+            <span style={{ color: "#bae6fd", fontWeight: "500" }}>อันดับ 2-4: ผ่านเข้ารอบเพลย์ออฟ (Playoff Stage)</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#ff1744" }}></span>
