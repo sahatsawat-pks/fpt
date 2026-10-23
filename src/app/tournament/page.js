@@ -1998,7 +1998,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
   const p1 = match.player1;
   const p2 = match.player2;
 
-  // Round breakdown and Category Points (CP) computation
+  // Round breakdown and Game Points (GP) computation
   const categories = [
     { key: "3sec", label: "3 วินาที", icon: "⚡", s1: p1.scores?.["3sec"], s2: p2.scores?.["3sec"] },
     { key: "qa", label: "ถาม-ตอบ", icon: "❓", s1: p1.scores?.qa, s2: p2.scores?.qa },
@@ -2411,7 +2411,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   marginBottom: "4px",
                 }}
               >
-                แต้มหมวด (CP)
+                แต้มหมวด (GP)
               </div>
 
               {/* Big Duel Score Numbers */}
@@ -2646,7 +2646,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                 ⚔️ ผลคะแนนรายหมวด (4-ROUND HEAD-TO-HEAD)
               </span>
               <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>
-                ชนะในหมวดได้ +1 CP
+                ชนะในหมวดได้ +1 GP
               </span>
             </div>
 
@@ -2663,22 +2663,22 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
                 if (isCompleted) {
                   if (isP1CatWin) {
-                    outcomeText = `👑 ${p1.nickname || p1.name.split(" ")[0]} (+1 CP)`;
+                    outcomeText = `👑 ${p1.nickname || p1.name.split(" ")[0]} (+1 GP)`;
                     outcomeBg = "rgba(16, 185, 129, 0.18)";
                     outcomeBorder = "rgba(16, 185, 129, 0.4)";
                     outcomeColor = "#86efac";
                   } else if (isP2CatWin) {
-                    outcomeText = `👑 ${p2.nickname || p2.name.split(" ")[0]} (+1 CP)`;
+                    outcomeText = `👑 ${p2.nickname || p2.name.split(" ")[0]} (+1 GP)`;
                     outcomeBg = "rgba(168, 85, 247, 0.18)";
                     outcomeBorder = "rgba(168, 85, 247, 0.4)";
                     outcomeColor = "#d8b4fe";
                   } else if (isCatTied) {
-                    outcomeText = "🤝 เสมอ (+1 CP)";
+                    outcomeText = "🤝 เสมอ (+1 GP)";
                     outcomeBg = "rgba(56, 189, 248, 0.18)";
                     outcomeBorder = "rgba(56, 189, 248, 0.4)";
                     outcomeColor = "#7dd3fc";
                   } else {
-                    outcomeText = "0 - 0 (0 CP)";
+                    outcomeText = "0 - 0 (0 GP)";
                     outcomeBg = "rgba(239, 68, 68, 0.15)";
                     outcomeBorder = "rgba(239, 68, 68, 0.35)";
                     outcomeColor = "#fca5a5";
@@ -3127,7 +3127,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   </td>
                 </tr>
 
-                {/* ROW 2: Category Points (CP) Bar (Deep Crimson Glass on Left, Deep Emerald Glass on Right) */}
+                {/* ROW 2: Game Points (GP) Bar (Deep Crimson Glass on Left, Deep Emerald Glass on Right) */}
                 <tr style={{ height: "26px", fontSize: "11px", fontWeight: "900" }}>
                   {/* Player 1 CP Label */}
                   <td
@@ -3142,7 +3142,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       letterSpacing: "0.5px",
                     }}
                   >
-                    แต้มหมวด (CP)
+                    แต้มหมวด (GP)
                   </td>
 
                   {/* Player 1: CP for 4 rounds */}
@@ -3195,7 +3195,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       letterSpacing: "0.5px",
                     }}
                   >
-                    แต้มหมวด (CP)
+                    แต้มหมวด (GP)
                   </td>
 
                   {/* Player 2: CP for 4 rounds */}

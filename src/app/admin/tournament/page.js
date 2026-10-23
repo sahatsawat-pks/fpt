@@ -1518,10 +1518,10 @@ export default function AdminTournamentPage() {
                   </div>
                 </div>
 
-                {/* CP & LP summary */}
+                {/* GP & LP summary */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
-                    <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>แต้มหมวด (CP)</label>
+                    <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>แต้มหมวด (GP)</label>
                     <input
                       type="number"
                       value={matchFormData.player1.categoryPoints}
@@ -1722,10 +1722,10 @@ export default function AdminTournamentPage() {
                   </div>
                 </div>
 
-                {/* CP & LP summary */}
+                {/* GP & LP summary */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
-                    <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>แต้มหมวด (CP)</label>
+                    <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>แต้มหมวด (GP)</label>
                     <input
                       type="number"
                       value={matchFormData.player2.categoryPoints}
