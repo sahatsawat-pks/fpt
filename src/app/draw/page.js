@@ -8,7 +8,7 @@ const BALL_COLORS = [
   { name: "ทอง", top: "linear-gradient(135deg, #ffd700 0%, #b8860b 100%)", bottom: "rgba(184, 134, 11, 0.4)", glow: "#ffd700", text: "#fff" },
   { name: "ฟ้า", top: "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)", bottom: "rgba(0, 119, 182, 0.4)", glow: "#00e5ff", text: "#fff" },
   { name: "แดง", top: "linear-gradient(135deg, #ff4d4f 0%, #a8071a 100%)", bottom: "rgba(168, 7, 26, 0.4)", glow: "#ff4d4f", text: "#fff" },
-  { name: "เขียว", top: "linear-gradient(135deg, #52c41a 0%, #237804 100%)", bottom: "rgba(35, 120, 4, 0.4)", glow: "#52c41a", text: "#fff" },
+  { name: "เขียว", top: "linear-gradient(135deg, #73d13d 0%, #52c41a 45%, #135200 100%)", bottom: "rgba(35, 120, 4, 0.4)", glow: "#52c41a", text: "#fff" },
   { name: "ส้ม", top: "linear-gradient(135deg, #faad14 0%, #d46b08 100%)", bottom: "rgba(212, 107, 8, 0.4)", glow: "#faad14", text: "#fff" },
   { name: "ม่วง", top: "linear-gradient(135deg, #722ed1 0%, #391085 100%)", bottom: "rgba(57, 16, 133, 0.4)", glow: "#722ed1", text: "#fff" },
   { name: "ชมพู", top: "linear-gradient(135deg, #eb2f96 0%, #9e1068 100%)", bottom: "rgba(158, 16, 104, 0.4)", glow: "#eb2f96", text: "#fff" },

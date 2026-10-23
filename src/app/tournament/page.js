@@ -2587,8 +2587,8 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       style={{
                         padding: "2px 8px",
                         borderRadius: "12px",
-                        background: "rgba(16, 185, 129, 0.2)",
-                        border: "1px solid rgba(16, 185, 129, 0.4)",
+                        background: "linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.15) 100%)",
+                        border: "1px solid rgba(16, 185, 129, 0.5)",
                         color: "#86efac",
                         fontSize: "11px",
                         fontWeight: "800",
@@ -2755,8 +2755,8 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       style={{
                         padding: "2px 8px",
                         borderRadius: "12px",
-                        background: "rgba(168, 85, 247, 0.2)",
-                        border: "1px solid rgba(168, 85, 247, 0.4)",
+                        background: "linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(126, 34, 206, 0.15) 100%)",
+                        border: "1px solid rgba(168, 85, 247, 0.5)",
                         color: "#d8b4fe",
                         fontSize: "11px",
                         fontWeight: "800",
@@ -2929,13 +2929,13 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                 if (isCompleted) {
                   if (isP1CatWin) {
                     outcomeText = `👑 ${p1.nickname || p1.name.split(" ")[0]} (+1 GP)`;
-                    outcomeBg = "rgba(16, 185, 129, 0.18)";
-                    outcomeBorder = "rgba(16, 185, 129, 0.4)";
+                    outcomeBg = "linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(6, 78, 59, 0.35) 100%)";
+                    outcomeBorder = "rgba(16, 185, 129, 0.55)";
                     outcomeColor = "#86efac";
                   } else if (isP2CatWin) {
                     outcomeText = `👑 ${p2.nickname || p2.name.split(" ")[0]} (+1 GP)`;
-                    outcomeBg = "rgba(168, 85, 247, 0.18)";
-                    outcomeBorder = "rgba(168, 85, 247, 0.4)";
+                    outcomeBg = "linear-gradient(135deg, rgba(168, 85, 247, 0.28) 0%, rgba(88, 28, 135, 0.35) 100%)";
+                    outcomeBorder = "rgba(168, 85, 247, 0.55)";
                     outcomeColor = "#d8b4fe";
                   } else if (isCatTied) {
                     outcomeText = "🤝 เสมอ (+1 GP)";
@@ -3045,14 +3045,18 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       <div
                         style={{
                           width: `${r.pct1}%`,
-                          background: isP1CatWin ? "linear-gradient(90deg, #10b981, #34d399)" : "rgba(16, 185, 129, 0.5)",
+                          background: isP1CatWin
+                            ? "linear-gradient(90deg, #10b981 0%, #34d399 50%, #ffd700 100%)"
+                            : "linear-gradient(90deg, rgba(16, 185, 129, 0.6) 0%, rgba(5, 150, 105, 0.3) 100%)",
                           transition: "width 0.4s ease",
                         }}
                       />
                       <div
                         style={{
                           width: `${r.pct2}%`,
-                          background: isP2CatWin ? "linear-gradient(90deg, #c084fc, #ffd700)" : "rgba(168, 85, 247, 0.5)",
+                          background: isP2CatWin
+                            ? "linear-gradient(90deg, #ffd700 0%, #c084fc 50%, #a855f7 100%)"
+                            : "linear-gradient(90deg, rgba(126, 34, 206, 0.3) 0%, rgba(168, 85, 247, 0.6) 100%)",
                           transition: "width 0.4s ease",
                         }}
                       />
