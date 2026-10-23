@@ -657,43 +657,83 @@ export default function MainPage() {
     rank5Label = "";
   }
 
-  const filteredStandings = denseRankedLeaderboard
-    .filter((item) => {
-      const q = searchQuery.trim().toLowerCase();
-      let matchesQuery = true;
-      if (q) {
-        if (item.waitingNextMatch) {
-          matchesQuery = "รอลุ้นผลในวันแข่งขันถัดไป".toLowerCase().includes(q) || "รอลุ้นผล".toLowerCase().includes(q);
-        } else {
-          matchesQuery =
-            item.name?.toLowerCase().includes(q) ||
-            item.nickname?.toLowerCase().includes(q) ||
-            item.topic?.toLowerCase().includes(q);
-        }
-      }
-
-      if (!matchesQuery) return false;
-
-      if (statusFilter === "all") return true;
-      const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
-      if (statusFilter === "playing") return evalStatus.statusClass === "status-playing";
-      if (statusFilter === "qualified") return evalStatus.isGuaranteedQualified;
-      if (statusFilter === "pending") return !evalStatus.isGuaranteedQualified && !evalStatus.isEliminated && evalStatus.statusClass !== "status-playing";
-      if (statusFilter === "eliminated") return evalStatus.isEliminated;
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortBy === "order") {
-        return (Number(a.playOrder) || 999) - (Number(b.playOrder) || 999);
-      }
-      if (sortBy === "poll") {
-        const prA = getContestantPollRank(a, pollList) ?? 999;
-        const prB = getContestantPollRank(b, pollList) ?? 999;
-        if (prA !== prB) return prA - prB;
-        return (Number(a.rank) || 999) - (Number(b.rank) || 999);
-      }
-      return (Number(a.rank) || 999) - (Number(b.rank) || 999);
+  // Contestants who have not played yet in qualifying round
+  const unplayedContestants = useMemo(() => {
+    const list = leaderboard.filter((item) => {
+      const s = item.scores || {};
+      const hasAnyScore = ["3sec", "qa", "jigsaw", "attribute"].some(
+        (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+      ) || (Number(item.totalScore) || 0) > 0 || Boolean(item.isPlaying) || Boolean(item.waitingNextMatch);
+      return !hasAnyScore;
     });
+
+    return list.sort((a, b) => {
+      if (a.order && b.order) return Number(a.order) - Number(b.order);
+      if (a.order) return -1;
+      if (b.order) return 1;
+      const prA = getContestantPollRank(a, pollList) ?? 999;
+      const prB = getContestantPollRank(b, pollList) ?? 999;
+      if (prA !== prB) return prA - prB;
+      return (a.nickname || a.name || "").localeCompare(b.nickname || b.name || "", "th");
+    });
+  }, [leaderboard, pollList]);
+
+  const filteredStandings = useMemo(() => {
+    // When sorting by poll, also include unplayed contestants in their poll ranking position
+    let sourceList = denseRankedLeaderboard;
+    if (sortBy === "poll") {
+      const unplayedMapped = unplayedContestants.map((u) => ({
+        ...u,
+        isUnplayed: true,
+        rank: null,
+      }));
+      sourceList = [...denseRankedLeaderboard, ...unplayedMapped];
+    }
+
+    return sourceList
+      .filter((item) => {
+        const q = searchQuery.trim().toLowerCase();
+        let matchesQuery = true;
+        if (q) {
+          if (item.waitingNextMatch) {
+            matchesQuery = "รอลุ้นผลในวันแข่งขันถัดไป".toLowerCase().includes(q) || "รอลุ้นผล".toLowerCase().includes(q);
+          } else {
+            matchesQuery =
+              item.name?.toLowerCase().includes(q) ||
+              item.nickname?.toLowerCase().includes(q) ||
+              item.topic?.toLowerCase().includes(q);
+          }
+        }
+
+        if (!matchesQuery) return false;
+
+        if (statusFilter === "all") return true;
+
+        if (item.isUnplayed) {
+          if (statusFilter === "pending") return true;
+          return false;
+        }
+
+        const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+        if (statusFilter === "playing") return evalStatus.statusClass === "status-playing";
+        if (statusFilter === "qualified") return evalStatus.isGuaranteedQualified;
+        if (statusFilter === "pending") return !evalStatus.isGuaranteedQualified && !evalStatus.isEliminated && evalStatus.statusClass !== "status-playing";
+        if (statusFilter === "eliminated") return evalStatus.isEliminated;
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === "order") {
+          return (Number(a.playOrder) || 999) - (Number(b.playOrder) || 999);
+        }
+        if (sortBy === "poll") {
+          const prA = getContestantPollRank(a, pollList) ?? 999;
+          const prB = getContestantPollRank(b, pollList) ?? 999;
+          if (prA !== prB) return prA - prB;
+          return (Number(a.rank) || 999) - (Number(b.rank) || 999);
+        }
+        return (Number(a.rank) || 999) - (Number(b.rank) || 999);
+      });
+  }, [denseRankedLeaderboard, unplayedContestants, sortBy, searchQuery, statusFilter, targetN, pollList]);
 
   const filteredPoll = pollList.filter((item) => {
     const q = searchQuery.trim().toLowerCase();
@@ -2253,19 +2293,31 @@ export default function MainPage() {
                       </div>
                     ) : (
                       filteredStandings.map((item) => {
-                        const evalStatus = evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
+                        const evalStatus = item.isUnplayed
+                          ? {
+                              isGuaranteedQualified: false,
+                              isEliminated: false,
+                              statusClass: "status-unplayed",
+                              statusText: "ยังไม่แข่ง",
+                              detailedStatus: "ยังไม่ได้ลงแข่งขัน อยู่ระหว่างรอคิวแข่งขันรอบคัดเลือก",
+                            }
+                          : evaluatePlayerStatus(item, denseRankedLeaderboard, targetN);
                         const pollRank = getContestantPollRank(item, pollList);
-                        const isPlaying = evalStatus.statusClass === "status-playing";
-                        const isEliminated = !isPlaying && evalStatus.isEliminated;
-                        const isTopSafe = !isPlaying && (Number(item.rank) || 99) <= 5;
-                        const borderColor = isPlaying
+                        const isPlaying = !item.isUnplayed && evalStatus.statusClass === "status-playing";
+                        const isEliminated = !item.isUnplayed && !isPlaying && evalStatus.isEliminated;
+                        const isTopSafe = !item.isUnplayed && !isPlaying && (Number(item.rank) || 99) <= 5;
+                        const borderColor = item.isUnplayed
+                          ? "rgba(148, 163, 184, 0.35)"
+                          : isPlaying
                           ? "#00e5ff"
                           : isTopSafe
                           ? "#ffd700"
                           : isEliminated
                           ? "#ff4d4f"
                           : "rgba(148, 163, 184, 0.4)";
-                        const glowShadow = isPlaying
+                        const glowShadow = item.isUnplayed
+                          ? "0 0 6px rgba(0, 0, 0, 0.4)"
+                          : isPlaying
                           ? "0 0 16px rgba(0, 229, 255, 0.7)"
                           : isTopSafe
                           ? "0 0 14px rgba(255, 215, 0, 0.45)"
@@ -2447,7 +2499,7 @@ export default function MainPage() {
 
                                 {/* Dynamic Badges & Status Chip */}
                                 <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-                                  {sortBy !== "rank" && item.rank && !item.waitingNextMatch && (
+                                  {sortBy !== "rank" && item.rank && !item.waitingNextMatch && !item.isUnplayed && (
                                     <span style={{
                                       fontSize: "11px",
                                       padding: "2px 7px",
@@ -2462,7 +2514,7 @@ export default function MainPage() {
                                       อันดับ #{item.rank}
                                     </span>
                                   )}
-                                  {sortBy !== "order" && item.playOrder && (
+                                  {sortBy !== "order" && item.playOrder && !item.isUnplayed && (
                                     <span style={{
                                       fontSize: "11px",
                                       padding: "2px 7px",
@@ -2495,24 +2547,30 @@ export default function MainPage() {
                                   <span style={{
                                     fontSize: "11px",
                                     fontWeight: "800",
-                                    padding: "3px 8px",
+                                    padding: "3px 9px",
                                     borderRadius: "12px",
-                                    background: evalStatus.statusClass === "status-playing"
+                                    background: item.isUnplayed
+                                      ? "rgba(148, 163, 184, 0.18)"
+                                      : evalStatus.statusClass === "status-playing"
                                       ? "rgba(0, 229, 255, 0.16)"
                                       : evalStatus.statusClass === "status-qualified"
                                       ? "rgba(34, 197, 94, 0.25)"
                                       : evalStatus.statusClass === "status-eliminated"
                                       ? "rgba(239, 68, 68, 0.25)"
                                       : "rgba(99, 102, 241, 0.22)",
-                                    color: evalStatus.statusClass === "status-playing"
+                                    color: item.isUnplayed
+                                      ? "#cbd5e1"
+                                      : evalStatus.statusClass === "status-playing"
                                       ? "#00e5ff"
                                       : evalStatus.statusClass === "status-qualified"
                                       ? "#86efac"
                                       : evalStatus.statusClass === "status-eliminated"
                                       ? "#fca5a5"
                                       : "#a5b4fc",
-                                    border: `1px solid ${
-                                      evalStatus.statusClass === "status-playing"
+                                    border: `1px ${item.isUnplayed ? "dashed" : "solid"} ${
+                                      item.isUnplayed
+                                        ? "rgba(148, 163, 184, 0.45)"
+                                        : evalStatus.statusClass === "status-playing"
                                         ? "#00e5ff"
                                         : evalStatus.statusClass === "status-qualified"
                                         ? "#22c55e"
@@ -2520,9 +2578,12 @@ export default function MainPage() {
                                         ? "#ef4444"
                                         : "#818cf8"
                                     }`,
-                                    boxShadow: evalStatus.statusClass === "status-playing" ? "0 0 10px rgba(0, 229, 255, 0.5)" : "none"
+                                    boxShadow: evalStatus.statusClass === "status-playing" ? "0 0 10px rgba(0, 229, 255, 0.5)" : "none",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "4px"
                                   }}>
-                                    {evalStatus.statusText}
+                                    {item.isUnplayed ? "⏳ ยังไม่แข่ง" : evalStatus.statusText}
                                   </span>
                                 </div>
                               </div>
@@ -2640,10 +2701,18 @@ export default function MainPage() {
                                 fontStyle: "italic",
                                 fontWeight: "900",
                                 fontSize: "26px",
-                                color: item.totalScore === 100 ? "#52c41a" : item.waitingNextMatch ? "rgba(255,255,255,0.4)" : "#ffd700",
-                                textShadow: item.totalScore === 100 ? "0 0 14px rgba(82, 196, 26, 0.9)" : item.waitingNextMatch ? "none" : "0 0 12px rgba(255, 215, 0, 0.8)"
+                                color: item.isUnplayed || item.waitingNextMatch
+                                  ? "rgba(255,255,255,0.4)"
+                                  : item.totalScore === 100
+                                  ? "#52c41a"
+                                  : "#ffd700",
+                                textShadow: item.isUnplayed || item.waitingNextMatch
+                                  ? "none"
+                                  : item.totalScore === 100
+                                  ? "0 0 14px rgba(82, 196, 26, 0.9)"
+                                  : "0 0 12px rgba(255, 215, 0, 0.8)"
                               }}>
-                                {item.waitingNextMatch ? "-" : (item.totalScore ?? 0)}
+                                {item.isUnplayed || item.waitingNextMatch ? "-" : (item.totalScore ?? 0)}
                               </span>
                             </div>
                           </div>
@@ -2656,6 +2725,211 @@ export default function MainPage() {
             </div>
           </div>
         )}
+
+        {/* ========================================================
+            SECTION: CONTESTANTS AWAITING COMPETITION (ผู้เข้าแข่งขันที่ยังไม่ได้ลงแข่งขัน)
+           ======================================================== */}
+        {(() => {
+          const displayUnplayed = unplayedContestants.filter((c) => {
+            if (!searchQuery.trim()) return true;
+            const q = searchQuery.trim().toLowerCase();
+            return (
+              (c.name || "").toLowerCase().includes(q) ||
+              (c.nickname || "").toLowerCase().includes(q) ||
+              (c.topic || "").toLowerCase().includes(q)
+            );
+          });
+
+          if (unplayedContestants.length === 0) {
+            return null;
+          }
+
+          return (
+            <div style={{
+              marginTop: "32px",
+              background: "linear-gradient(160deg, rgba(14, 28, 52, 0.78) 0%, rgba(5, 12, 24, 0.94) 100%)",
+              border: "1.5px solid rgba(0, 229, 255, 0.3)",
+              borderRadius: "20px",
+              padding: "20px 22px",
+              boxShadow: "0 10px 35px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.08)"
+            }}>
+              {/* Section Top Header Pill */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: "linear-gradient(90deg, #020712 0%, #0a172e 50%, #020712 100%)",
+                border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                borderRadius: "14px",
+                transform: "skewX(-14deg)",
+                padding: "10px 22px",
+                marginBottom: "18px",
+                boxShadow: "0 6px 20px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.2)"
+              }}>
+                <div style={{ transform: "skewX(14deg)", display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "20px" }}>⏳</span>
+                  <div>
+                    <h3 style={{
+                      fontStyle: "italic",
+                      fontWeight: "900",
+                      fontSize: "18px",
+                      letterSpacing: "1px",
+                      color: "#ffffff",
+                      margin: 0,
+                      textShadow: "0 2px 8px rgba(0,0,0,0.8)"
+                    }}>
+                      CONTESTANTS AWAITING COMPETITION
+                    </h3>
+                    <div style={{ fontSize: "11.5px", color: "rgba(255,255,255,0.7)", fontStyle: "italic", marginTop: "1px" }}>
+                      รายชื่อผู้เข้าแข่งขันที่ยังไม่ได้ลงแข่งขัน • รอบคัดเลือก แฟนพันธุ์แท้แห่งปี 2026
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  transform: "skewX(14deg)",
+                  fontSize: "12.5px",
+                  fontWeight: "800",
+                  color: "#67e8f9",
+                  background: "rgba(0, 229, 255, 0.15)",
+                  border: "1.5px solid rgba(0, 229, 255, 0.45)",
+                  padding: "5px 14px",
+                  borderRadius: "20px",
+                  boxShadow: "0 0 10px rgba(0, 229, 255, 0.25)"
+                }}>
+                  รอแข่ง {unplayedContestants.length} คน
+                </div>
+              </div>
+
+              {/* Contestants Cards Grid */}
+              {displayUnplayed.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "30px", color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+                  ไม่พบรายชื่อผู้เข้าแข่งขันที่ยังไม่แข่งตามเงื่อนไขการค้นหา
+                </div>
+              ) : (
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                  gap: "12px"
+                }}>
+                  {displayUnplayed.map((item) => {
+                    const pollRank = getContestantPollRank(item, pollList);
+                    return (
+                      <div
+                        key={item.id || item.name}
+                        onClick={() => setSelectedSpotlight(item)}
+                        title="คลิกเพื่อดูข้อมูลผู้เข้าแข่งขัน"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "12px 14px",
+                          background: "linear-gradient(145deg, rgba(16, 32, 60, 0.65) 0%, rgba(8, 16, 32, 0.88) 100%)",
+                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          borderRadius: "12px",
+                          cursor: "pointer",
+                          transition: "transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "translateY(-3px)";
+                          e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.6)";
+                          e.currentTarget.style.boxShadow = "0 8px 22px rgba(0, 229, 255, 0.25)";
+                          e.currentTarget.style.background = "linear-gradient(145deg, rgba(20, 42, 78, 0.85) 0%, rgba(10, 22, 44, 0.95) 100%)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                          e.currentTarget.style.boxShadow = "none";
+                          e.currentTarget.style.background = "linear-gradient(145deg, rgba(16, 32, 60, 0.65) 0%, rgba(8, 16, 32, 0.88) 100%)";
+                        }}
+                      >
+                        {/* Avatar */}
+                        <div style={{
+                          width: "44px",
+                          height: "44px",
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                          border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                          background: "#081020",
+                          flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}>
+                          {item.image ? (
+                            <img
+                              src={getOptimizedImageUrl(item.image, 100)}
+                              alt={item.name}
+                              referrerPolicy="no-referrer"
+                              loading="lazy"
+                              decoding="async"
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                          ) : (
+                            <span style={{ fontSize: "18px" }}>👤</span>
+                          )}
+                        </div>
+
+                        {/* Info */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "baseline", gap: "6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <span style={{ fontStyle: "italic", fontWeight: "900", fontSize: "17px", color: "#ffffff" }}>
+                              {item.nickname || item.name.split(" ")[0]}
+                            </span>
+                            <span style={{ fontStyle: "italic", fontWeight: "700", fontSize: "13px", color: "rgba(255, 255, 255, 0.8)", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {item.name}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: "11.5px", color: "#80d0ff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: "1px" }}>
+                            • {item.topic}
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", flexWrap: "wrap" }}>
+                            <span style={{
+                              fontSize: "10.5px",
+                              fontWeight: "800",
+                              padding: "2px 7px",
+                              borderRadius: "6px",
+                              background: "rgba(148, 163, 184, 0.16)",
+                              border: "1px dashed rgba(148, 163, 184, 0.45)",
+                              color: "#cbd5e1"
+                            }}>
+                              ⏳ ยังไม่แข่ง
+                            </span>
+                            {pollRank !== null && (
+                              <span style={{
+                                fontSize: "10.5px",
+                                fontWeight: "800",
+                                padding: "2px 7px",
+                                borderRadius: "6px",
+                                background: "rgba(255, 215, 0, 0.12)",
+                                border: "1px solid rgba(255, 215, 0, 0.35)",
+                                color: "#ffd700"
+                              }}>
+                                📊 โพล: #{pollRank}
+                              </span>
+                            )}
+                            {item.order && (
+                              <span style={{
+                                fontSize: "10.5px",
+                                fontWeight: "700",
+                                padding: "2px 7px",
+                                borderRadius: "6px",
+                                background: "rgba(0, 229, 255, 0.1)",
+                                border: "1px solid rgba(0, 229, 255, 0.3)",
+                                color: "#67e8f9"
+                              }}>
+                                🎲 คิวแข่ง: #{item.order}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     )}
 
@@ -2975,6 +3249,55 @@ export default function MainPage() {
                                 {item.name}
                               </span>
                             </div>
+
+                            {/* Contestant Status Tag in Poll Table */}
+                            {(() => {
+                              const isCompeted = matchedContestant && (
+                                ["3sec", "qa", "jigsaw", "attribute"].some(
+                                  (k) => matchedContestant.scores?.[k] !== null && matchedContestant.scores?.[k] !== undefined && matchedContestant.scores?.[k] !== ""
+                                ) || (Number(matchedContestant.totalScore) || 0) > 0 || Boolean(matchedContestant.isPlaying) || Boolean(matchedContestant.waitingNextMatch)
+                              );
+
+                              if (!isCompeted) {
+                                return (
+                                  <span style={{
+                                    fontSize: "11px",
+                                    fontWeight: "800",
+                                    padding: "2px 8px",
+                                    borderRadius: "10px",
+                                    background: "rgba(148, 163, 184, 0.16)",
+                                    border: "1px dashed rgba(148, 163, 184, 0.45)",
+                                    color: "#cbd5e1",
+                                    marginLeft: "auto",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "3px",
+                                    flexShrink: 0
+                                  }}>
+                                    ⏳ ยังไม่แข่ง
+                                  </span>
+                                );
+                              }
+
+                              return (
+                                <span style={{
+                                  fontSize: "11px",
+                                  fontWeight: "800",
+                                  padding: "2px 8px",
+                                  borderRadius: "10px",
+                                  background: "rgba(34, 197, 94, 0.15)",
+                                  border: "1px solid rgba(34, 197, 94, 0.4)",
+                                  color: "#86efac",
+                                  marginLeft: "auto",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "3px",
+                                  flexShrink: 0
+                                }}>
+                                  คะแนน: {matchedContestant.totalScore ?? 0}
+                                </span>
+                              );
+                            })()}
                           </div>
                         </div>
 
@@ -3206,6 +3529,31 @@ export default function MainPage() {
                       </div>
                     );
                   })()}
+                  {(() => {
+                    if (selectedSpotlight.waitingNextMatch) return null;
+                    const spScores = selectedSpotlight.scores || {};
+                    const isCompeted = ["3sec", "qa", "jigsaw", "attribute"].some(
+                      (k) => spScores[k] !== null && spScores[k] !== undefined && spScores[k] !== ""
+                    ) || (Number(selectedSpotlight.totalScore) || 0) > 0 || Boolean(selectedSpotlight.isPlaying);
+
+                    if (!isCompeted) {
+                      return (
+                        <div style={{
+                          display: "inline-block",
+                          padding: "4px 14px",
+                          borderRadius: "20px",
+                          background: "rgba(148, 163, 184, 0.16)",
+                          border: "1px dashed rgba(148, 163, 184, 0.45)",
+                          color: "#cbd5e1",
+                          fontSize: "13px",
+                          fontWeight: "800"
+                        }}>
+                          ⏳ ยังไม่ได้ลงแข่งขัน (รอคิวแข่ง)
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </div>
 
@@ -3220,7 +3568,7 @@ export default function MainPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                   <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>คะแนนรวมสะสม</span>
                   <span style={{ fontSize: "28px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 14px rgba(255,215,0,0.6)" }}>
-                    {selectedSpotlight.waitingNextMatch ? "-" : (selectedSpotlight.totalScore ?? 0)} <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>/ 100</span>
+                    {selectedSpotlight.waitingNextMatch || selectedSpotlight.isUnplayed || (!selectedSpotlight.totalScore && !selectedSpotlight.scores?.['3sec'] && selectedSpotlight.scores?.['3sec'] !== 0) ? "-" : (selectedSpotlight.totalScore ?? 0)} <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>/ 100</span>
                   </span>
                 </div>
 
