@@ -1286,13 +1286,13 @@ export default function TournamentPage() {
                 </div>
               </div>
               <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>แต้มหมวด (+/-)</div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ผลต่าง GP (+/-)</div>
                 <div style={{ fontSize: "18px", fontWeight: "900", color: "#38bdf8", marginTop: "2px", fontFamily: "var(--font-num)" }}>
                   {selectedContestant.stats?.scoreDiff ?? selectedContestant.scoreDiff}
                 </div>
               </div>
               <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ชนะ/แพ้หมวด</div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ชนะ/แพ้ GP</div>
                 <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", marginTop: "4px", fontFamily: "var(--font-num)" }}>
                   +{selectedContestant.stats?.categoriesWon ?? selectedContestant.categoriesWon} / -{selectedContestant.stats?.categoriesLost ?? selectedContestant.categoriesLost}
                 </div>
@@ -1362,7 +1362,7 @@ export default function TournamentPage() {
                       {m.status === "completed" ? (
                         <>
                           <div style={{ fontSize: "15px", fontWeight: "900", color: m.outcome === "win" ? "#86efac" : m.outcome === "lose" ? "#fca5a5" : "#ffd700" }}>
-                            {m.outcome === "win" ? "🏆 ชนะ" : m.outcome === "lose" ? "แพ้" : "🤝 เสมอ"} ({m.me.categoryPoints} - {m.opponent.categoryPoints} หมวด)
+                            {m.outcome === "win" ? "🏆 ชนะ" : m.outcome === "lose" ? "แพ้" : "🤝 เสมอ"} ({m.me.categoryPoints} - {m.opponent.categoryPoints})
                           </div>
                           <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>
                             ดิบ: {m.me.sum} vs {m.opponent.sum} • ได้ {m.me.leaguePoint > 0 ? `+${m.me.leaguePoint}` : m.me.leaguePoint} LP
@@ -2411,7 +2411,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   marginBottom: "4px",
                 }}
               >
-                แต้มหมวด (GP)
+                คะแนน (GP)
               </div>
 
               {/* Big Duel Score Numbers */}
@@ -3142,7 +3142,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       letterSpacing: "0.5px",
                     }}
                   >
-                    แต้มหมวด (GP)
+                    คะแนน (GP)
                   </td>
 
                   {/* Player 1: CP for 4 rounds */}
@@ -3195,7 +3195,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       letterSpacing: "0.5px",
                     }}
                   >
-                    แต้มหมวด (GP)
+                    คะแนน (GP)
                   </td>
 
                   {/* Player 2: CP for 4 rounds */}

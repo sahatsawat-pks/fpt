@@ -921,13 +921,13 @@ export default function AdminTournamentPage() {
                         <div style={{ fontSize: "11px", color: "#38bdf8", marginTop: "2px" }}>{p1.topic || "-"}</div>
                         {isCompleted && (
                           <div style={{ marginTop: "4px", fontSize: "11px", color: "rgba(255,255,255,0.7)" }}>
-                            ดิบ: <strong>{p1.sum}</strong> • หมวด: <strong style={{ color: "#00e5ff" }}>{p1.categoryPoints}</strong> • ลีก: <strong style={{ color: "#10b981" }}>{p1.leaguePoint} LP</strong>
+                            ดิบ: <strong>{p1.sum}</strong> • GP: <strong style={{ color: "#00e5ff" }}>{p1.categoryPoints}</strong> • ลีก: <strong style={{ color: "#10b981" }}>{p1.leaguePoint} LP</strong>
                           </div>
                         )}
                       </div>
 
                       <div style={{ textAlign: "center", padding: "0 8px" }}>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>แต้มหมวด</div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>คะแนน GP</div>
                         <div style={{ fontSize: "20px", fontWeight: "900", color: "#ffffff", fontFamily: "'Orbitron', sans-serif" }}>
                           {p1.categoryPoints ?? 0} - {p2.categoryPoints ?? 0}
                         </div>
@@ -940,7 +940,7 @@ export default function AdminTournamentPage() {
                         <div style={{ fontSize: "11px", color: "#38bdf8", marginTop: "2px" }}>{p2.topic || "-"}</div>
                         {isCompleted && (
                           <div style={{ marginTop: "4px", fontSize: "11px", color: "rgba(255,255,255,0.7)" }}>
-                            ดิบ: <strong>{p2.sum}</strong> • หมวด: <strong style={{ color: "#00e5ff" }}>{p2.categoryPoints}</strong> • ลีก: <strong style={{ color: "#10b981" }}>{p2.leaguePoint} LP</strong>
+                            ดิบ: <strong>{p2.sum}</strong> • GP: <strong style={{ color: "#00e5ff" }}>{p2.categoryPoints}</strong> • ลีก: <strong style={{ color: "#10b981" }}>{p2.leaguePoint} LP</strong>
                           </div>
                         )}
                       </div>
@@ -1521,7 +1521,7 @@ export default function AdminTournamentPage() {
                 {/* GP & LP summary */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
-                    <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>แต้มหมวด (GP)</label>
+                    <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>คะแนน (GP)</label>
                     <input
                       type="number"
                       value={matchFormData.player1.categoryPoints}
@@ -1725,7 +1725,7 @@ export default function AdminTournamentPage() {
                 {/* GP & LP summary */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
-                    <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>แต้มหมวด (GP)</label>
+                    <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>คะแนน (GP)</label>
                     <input
                       type="number"
                       value={matchFormData.player2.categoryPoints}
