@@ -2298,11 +2298,16 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   <span
                     style={{
                       position: "absolute",
-                      top: "-8px",
-                      right: "-6px",
-                      fontSize: "18px",
-                      filter: "drop-shadow(0 0 6px rgba(255,215,0,0.8))",
+                      top: "-16px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      fontSize: "20px",
+                      lineHeight: 1,
+                      filter: "drop-shadow(0 0 8px rgba(255,215,0,0.9))",
+                      zIndex: 3,
+                      pointerEvents: "none",
                     }}
+                    title="ผู้ชนะ (Winner)"
                   >
                     👑
                   </span>
@@ -2610,11 +2615,16 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   <span
                     style={{
                       position: "absolute",
-                      top: "-8px",
-                      left: "-6px",
-                      fontSize: "18px",
-                      filter: "drop-shadow(0 0 6px rgba(255,215,0,0.8))",
+                      top: "-16px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      fontSize: "20px",
+                      lineHeight: 1,
+                      filter: "drop-shadow(0 0 8px rgba(255,215,0,0.9))",
+                      zIndex: 3,
+                      pointerEvents: "none",
                     }}
+                    title="ผู้ชนะ (Winner)"
                   >
                     👑
                   </span>
