@@ -990,7 +990,7 @@ export default function AdminTournamentPage() {
                       <th style={{ padding: "8px", width: "40px", textAlign: "center" }}>#</th>
                       <th style={{ padding: "8px", textAlign: "left" }}>ผู้เข้าแข่งขัน</th>
                       <th style={{ padding: "8px", textAlign: "center", color: "#00e5ff" }}>แต้มลีก</th>
-                      <th style={{ padding: "8px", textAlign: "center" }}>ช-ส-พ</th>
+                      <th style={{ padding: "8px", textAlign: "center" }}>W-D-L</th>
                       <th style={{ padding: "8px", textAlign: "center" }}>หมวด (+/-)</th>
                       <th style={{ padding: "8px", textAlign: "center" }}>คะแนนดิบ</th>
                     </tr>
@@ -1023,7 +1023,7 @@ export default function AdminTournamentPage() {
                       <th style={{ padding: "8px", width: "40px", textAlign: "center" }}>#</th>
                       <th style={{ padding: "8px", textAlign: "left" }}>ผู้เข้าแข่งขัน</th>
                       <th style={{ padding: "8px", textAlign: "center", color: "#ffd700" }}>แต้มลีก</th>
-                      <th style={{ padding: "8px", textAlign: "center" }}>ช-ส-พ</th>
+                      <th style={{ padding: "8px", textAlign: "center" }}>W-D-L</th>
                       <th style={{ padding: "8px", textAlign: "center" }}>หมวด (+/-)</th>
                       <th style={{ padding: "8px", textAlign: "center" }}>คะแนนดิบ</th>
                     </tr>

@@ -500,7 +500,7 @@ export default function TournamentPage() {
               filter: "drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8))",
             }}
           >
-            การแข่งขันระบบลีกเฟส • VS DUEL BATTLE
+            การแข่งขันระบบ League Phase
           </h1>
 
           <p
@@ -544,7 +544,7 @@ export default function TournamentPage() {
               }}
             >
               <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>รอบการแข่งขัน</div>
-              <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>6 แมตช์เดย์</div>
+              <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>6 Matchdays</div>
               <div style={{ fontSize: "10px", color: "#86efac", fontWeight: "700" }}>แข่งแล้ว 3 แมตช์เดย์</div>
             </div>
 
@@ -1207,7 +1207,7 @@ export default function TournamentPage() {
             {/* Stats Summary Banner */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "24px" }}>
               <div style={{ background: "rgba(6, 16, 36, 0.9)", padding: "12px", borderRadius: "12px", textAlign: "center", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>ชนะ - เสมอ - แพ้</div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>W - D - L (ชนะ - เสมอ - แพ้)</div>
                 <div style={{ fontSize: "18px", fontWeight: "900", color: "#86efac", marginTop: "2px", fontFamily: "var(--font-num)" }}>
                   {selectedContestant.stats?.win ?? selectedContestant.win}W - {selectedContestant.stats?.draw ?? selectedContestant.draw}D - {selectedContestant.stats?.lose ?? selectedContestant.lose}L
                 </div>
@@ -1337,226 +1337,584 @@ export default function TournamentPage() {
 }
 
 // ========================================================
-// SUB-COMPONENT: FANPANTAE STANDINGS TABLE (Skewed Header)
+// ========================================================
+// SUB-COMPONENT: FANPANTAE STANDINGS TABLE (Broadcast Graphic Style)
 // ========================================================
 function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContestant }) {
+  const titleText = `THE FAN TOURNAMENT 2026/27 ${groupName || "GROUP"}`;
+
   return (
     <div
       style={{
-        background: "linear-gradient(150deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
-        borderRadius: "20px",
-        border: "1.5px solid rgba(0, 229, 255, 0.35)",
-        boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
+        position: "relative",
+        background: "radial-gradient(ellipse at 50% 30%, #0a2d6c 0%, #04143a 55%, #010817 100%)",
+        borderRadius: "24px",
+        border: "1.5px solid rgba(56, 189, 248, 0.4)",
+        boxShadow: "0 18px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
         overflow: "hidden",
+        padding: "24px 20px 20px 20px",
       }}
     >
-      {/* Table Title Banner */}
+      {/* Background SVG Radar / Concentric HUD Rings */}
+      <svg
+        style={{
+          position: "absolute",
+          top: "45%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "740px",
+          height: "740px",
+          pointerEvents: "none",
+          opacity: 0.16,
+          zIndex: 1,
+        }}
+        viewBox="0 0 600 600"
+      >
+        <circle cx="300" cy="300" r="130" fill="none" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="6 6" />
+        <circle cx="300" cy="300" r="210" fill="none" stroke="#38bdf8" strokeWidth="1.5" />
+        <circle cx="300" cy="300" r="275" fill="none" stroke="#38bdf8" strokeWidth="2" strokeDasharray="16 12" />
+        <circle cx="300" cy="300" r="290" fill="none" stroke="#38bdf8" strokeWidth="0.8" />
+        <line x1="10" y1="300" x2="590" y2="300" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4 8" />
+        <line x1="300" y1="10" x2="300" y2="590" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4 8" />
+      </svg>
+
+      {/* Responsive Horizontal Scroll Container */}
+      <div style={{ position: "relative", zIndex: 2, overflowX: "auto", paddingBottom: "6px" }}>
+        <div style={{ minWidth: "560px" }}>
+          {/* Header Row: Title Banner (Left) & Floating Skewed Column Header Boxes (Right) */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "12px",
+            }}
+          >
+            {/* Title Capsule (Skewed) */}
+            <div
+              style={{
+                flex: 1,
+                height: "44px",
+                borderRadius: "8px",
+                transform: "skewX(-20deg)",
+                background: "linear-gradient(180deg, #182844 0%, #091322 100%)",
+                border: "2.5px solid #94a3b8",
+                boxShadow: "0 6px 18px rgba(0, 0, 0, 0.6)",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 18px",
+                minWidth: 0,
+              }}
+            >
+              <div
+                style={{
+                  transform: "skewX(20deg)",
+                  fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
+                  fontStyle: "italic",
+                  fontWeight: "900",
+                  fontSize: "15px",
+                  color: "#ffffff",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  textShadow: "0 2px 8px rgba(0,0,0,0.8)",
+                }}
+              >
+                {titleText}
+              </div>
+            </div>
+
+            {/* W Header Capsule (Green) */}
+            <div
+              style={{
+                width: "52px",
+                height: "44px",
+                borderRadius: "8px",
+                transform: "skewX(-20deg)",
+                background: "linear-gradient(180deg, #092612 0%, #030f06 100%)",
+                border: "2.5px solid #22c55e",
+                boxShadow: "0 0 12px rgba(34, 197, 94, 0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+              title="ชนะ (Wins)"
+            >
+              <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
+                <div style={{ fontSize: "13px", fontWeight: "900", fontStyle: "italic", color: "#86efac" }}>W</div>
+                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>ชนะ</div>
+              </div>
+            </div>
+
+            {/* D Header Capsule (Silver) */}
+            <div
+              style={{
+                width: "52px",
+                height: "44px",
+                borderRadius: "8px",
+                transform: "skewX(-20deg)",
+                background: "linear-gradient(180deg, #172131 0%, #070d16 100%)",
+                border: "2.5px solid #cbd5e1",
+                boxShadow: "0 0 10px rgba(203, 213, 225, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+              title="เสมอ (Draws)"
+            >
+              <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
+                <div style={{ fontSize: "13px", fontWeight: "900", fontStyle: "italic", color: "#e2e8f0" }}>D</div>
+                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>เสมอ</div>
+              </div>
+            </div>
+
+            {/* L Header Capsule (Red) */}
+            <div
+              style={{
+                width: "52px",
+                height: "44px",
+                borderRadius: "8px",
+                transform: "skewX(-20deg)",
+                background: "linear-gradient(180deg, #290a0e 0%, #0e0305 100%)",
+                border: "2.5px solid #ef4444",
+                boxShadow: "0 0 12px rgba(239, 68, 68, 0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+              title="แพ้ (Losses)"
+            >
+              <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
+                <div style={{ fontSize: "13px", fontWeight: "900", fontStyle: "italic", color: "#fca5a5" }}>L</div>
+                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>แพ้</div>
+              </div>
+            </div>
+
+            {/* DIFF Header Capsule (Blue) */}
+            <div
+              style={{
+                width: "58px",
+                height: "44px",
+                borderRadius: "8px",
+                transform: "skewX(-20deg)",
+                background: "linear-gradient(180deg, #09203c 0%, #030c18 100%)",
+                border: "2.5px solid #38bdf8",
+                boxShadow: "0 0 12px rgba(56, 189, 248, 0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+              title="ผลต่างคะแนน / หมวด (Score Difference)"
+            >
+              <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
+                <div style={{ fontSize: "12px", fontWeight: "900", fontStyle: "italic", color: "#7dd3fc" }}>DIFF</div>
+                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>ผลต่าง</div>
+              </div>
+            </div>
+
+            {/* PTS Header Capsule (Gold) */}
+            <div
+              style={{
+                width: "62px",
+                height: "44px",
+                borderRadius: "8px",
+                transform: "skewX(-20deg)",
+                background: "linear-gradient(180deg, #2b2207 0%, #100c02 100%)",
+                border: "2.5px solid #facc15",
+                boxShadow: "0 0 14px rgba(250, 204, 21, 0.4)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+              title="แต้มสะสมในลีก (League Points)"
+            >
+              <div style={{ transform: "skewX(20deg)", textAlign: "center", lineHeight: 1.05 }}>
+                <div style={{ fontSize: "12px", fontWeight: "900", fontStyle: "italic", color: "#fde047" }}>PTS</div>
+                <div style={{ fontSize: "9px", fontWeight: "700", color: "#ffffff", opacity: 0.9 }}>คะแนน</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Standings Rows */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+            {list.map((c, idx) => {
+              const isTop4 = idx < 4;
+              const isRank1 = idx === 0;
+              const isRank2 = idx === 1;
+              const isRank3 = idx === 2;
+              const isRank4 = idx === 3;
+              const isDangerZone = idx >= 4; // Rank 5+ Danger/Elimination zone (Red border)
+
+              // Rank border styling matching broadcast screenshot
+              let rankBorder = "2.5px solid #94a3b8";
+              let rankBg = "linear-gradient(180deg, #172131 0%, #070d16 100%)";
+              let rankColor = "#ffffff";
+
+              if (isRank1) {
+                rankBorder = "2.5px solid #ffd700";
+                rankBg = "linear-gradient(180deg, #2b2207 0%, #100c02 100%)";
+                rankColor = "#ffd700";
+              } else if (isRank2) {
+                rankBorder = "2.5px solid #e2e8f0";
+                rankBg = "linear-gradient(180deg, #1c2638 0%, #09101d 100%)";
+                rankColor = "#ffffff";
+              } else if (isRank3) {
+                rankBorder = "2.5px solid #f59e0b";
+                rankBg = "linear-gradient(180deg, #261b0a 0%, #0e0903 100%)";
+                rankColor = "#ffffff";
+              } else if (isRank4) {
+                rankBorder = "2.5px solid #38bdf8";
+                rankBg = "linear-gradient(180deg, #0e223a 0%, #050e1a 100%)";
+                rankColor = "#ffffff";
+              } else if (isDangerZone) {
+                rankBorder = "2.5px solid #ff1744"; // Red for rank 5+
+                rankBg = "linear-gradient(180deg, #2b0c11 0%, #0e0305 100%)";
+                rankColor = "#ffffff";
+              }
+
+              // Name box border styling
+              const nameBorder = isDangerZone
+                ? "2.5px solid #ff1744" // Red border on Name box for Rank 5+
+                : isRank1
+                ? "2px solid rgba(255, 215, 0, 0.7)"
+                : "2px solid #64748b";
+
+              const nameBg = isDangerZone
+                ? "linear-gradient(180deg, #220b10 0%, #0a0305 100%)"
+                : "linear-gradient(180deg, #152238 0%, #09101d 100%)";
+
+              // Clean formatted display name: [Nickname] [First Name] (e.g. "ปาร์ค พศวัต")
+              const firstName = c.name ? c.name.split(" ")[0] : "";
+              const displayName = c.nickname
+                ? `${c.nickname} ${firstName}`
+                : firstName || c.name || "ผู้เข้าแข่งขัน";
+
+              // Clean diff number (strip '+' sign if present to match TV graphic: 7, 8, 3, 0, 1)
+              const cleanDiff = String(c.scoreDiff ?? 0).replace(/^\+/, "");
+
+              return (
+                <div
+                  key={c.name || idx}
+                  onClick={() => onSelectContestant(c)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    cursor: "pointer",
+                    transition: "transform 0.15s ease, filter 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.filter = "brightness(1.15)";
+                    e.currentTarget.style.transform = "translateX(3px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.filter = "brightness(1)";
+                    e.currentTarget.style.transform = "translateX(0)";
+                  }}
+                >
+                  {/* 1. Rank Capsule */}
+                  <div
+                    style={{
+                      width: "58px",
+                      height: "44px",
+                      borderRadius: "8px",
+                      transform: "skewX(-20deg)",
+                      background: rankBg,
+                      border: rankBorder,
+                      boxShadow: isRank1
+                        ? "0 0 14px rgba(255, 215, 0, 0.45)"
+                        : isDangerZone
+                        ? "0 0 10px rgba(255, 23, 68, 0.35)"
+                        : "0 4px 12px rgba(0, 0, 0, 0.5)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        transform: "skewX(20deg)",
+                        fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
+                        fontStyle: "italic",
+                        fontWeight: "900",
+                        fontSize: "20px",
+                        color: rankColor,
+                        textShadow: isRank1 ? "0 0 10px rgba(255, 215, 0, 0.6)" : "0 2px 6px rgba(0,0,0,0.8)",
+                      }}
+                    >
+                      {c.rank || idx + 1}
+                    </span>
+                  </div>
+
+                  {/* 2. Name Capsule */}
+                  <div
+                    style={{
+                      flex: 1,
+                      height: "44px",
+                      borderRadius: "8px",
+                      transform: "skewX(-20deg)",
+                      background: nameBg,
+                      border: nameBorder,
+                      boxShadow: isDangerZone
+                        ? "0 0 10px rgba(255, 23, 68, 0.25)"
+                        : "0 4px 12px rgba(0, 0, 0, 0.5)",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "0 14px",
+                      minWidth: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        transform: "skewX(20deg)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        minWidth: 0,
+                        width: "100%",
+                      }}
+                    >
+                      {c.photo ? (
+                        <img
+                          src={c.photo}
+                          alt={c.name}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: isRank1
+                              ? "1.5px solid #ffd700"
+                              : isTop4
+                              ? "1.5px solid #38bdf8"
+                              : "1.5px solid #ff1744",
+                            background: "#08101e",
+                            flexShrink: 0,
+                          }}
+                        />
+                      ) : null}
+
+                      <span
+                        style={{
+                          fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+                          fontStyle: "italic",
+                          fontWeight: "800",
+                          fontSize: "15px",
+                          letterSpacing: "0.5px",
+                          color: isRank1 ? "#ffd700" : "#ffffff",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          textShadow: isRank1 ? "0 0 10px rgba(255, 215, 0, 0.5)" : "0 2px 6px rgba(0,0,0,0.8)",
+                        }}
+                      >
+                        {displayName}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 3. W (Win) Capsule */}
+                  <div
+                    style={{
+                      width: "52px",
+                      height: "44px",
+                      borderRadius: "8px",
+                      transform: "skewX(-20deg)",
+                      background: "linear-gradient(180deg, #092612 0%, #030f06 100%)",
+                      border: "2px solid #22c55e",
+                      boxShadow: "0 0 10px rgba(34, 197, 94, 0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        transform: "skewX(20deg)",
+                        fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
+                        fontStyle: "italic",
+                        fontWeight: "900",
+                        fontSize: "18px",
+                        color: "#ffffff",
+                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                      }}
+                    >
+                      {c.win ?? 0}
+                    </span>
+                  </div>
+
+                  {/* 4. D (Draw) Capsule */}
+                  <div
+                    style={{
+                      width: "52px",
+                      height: "44px",
+                      borderRadius: "8px",
+                      transform: "skewX(-20deg)",
+                      background: "linear-gradient(180deg, #172131 0%, #070d16 100%)",
+                      border: "2px solid #cbd5e1",
+                      boxShadow: "0 0 8px rgba(203, 213, 225, 0.2)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        transform: "skewX(20deg)",
+                        fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
+                        fontStyle: "italic",
+                        fontWeight: "900",
+                        fontSize: "18px",
+                        color: "#ffffff",
+                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                      }}
+                    >
+                      {c.draw ?? 0}
+                    </span>
+                  </div>
+
+                  {/* 5. L (Lose) Capsule */}
+                  <div
+                    style={{
+                      width: "52px",
+                      height: "44px",
+                      borderRadius: "8px",
+                      transform: "skewX(-20deg)",
+                      background: "linear-gradient(180deg, #290a0e 0%, #0e0305 100%)",
+                      border: "2px solid #ef4444",
+                      boxShadow: "0 0 10px rgba(239, 68, 68, 0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        transform: "skewX(20deg)",
+                        fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
+                        fontStyle: "italic",
+                        fontWeight: "900",
+                        fontSize: "18px",
+                        color: "#ffffff",
+                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                      }}
+                    >
+                      {c.lose ?? 0}
+                    </span>
+                  </div>
+
+                  {/* 6. DIFF Capsule */}
+                  <div
+                    style={{
+                      width: "58px",
+                      height: "44px",
+                      borderRadius: "8px",
+                      transform: "skewX(-20deg)",
+                      background: "linear-gradient(180deg, #09203c 0%, #030c18 100%)",
+                      border: "2px solid #38bdf8",
+                      boxShadow: "0 0 10px rgba(56, 189, 248, 0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        transform: "skewX(20deg)",
+                        fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
+                        fontStyle: "italic",
+                        fontWeight: "900",
+                        fontSize: "18px",
+                        color: "#ffffff",
+                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                      }}
+                    >
+                      {cleanDiff}
+                    </span>
+                  </div>
+
+                  {/* 7. PTS Capsule */}
+                  <div
+                    style={{
+                      width: "62px",
+                      height: "44px",
+                      borderRadius: "8px",
+                      transform: "skewX(-20deg)",
+                      background: "linear-gradient(180deg, #2b2207 0%, #100c02 100%)",
+                      border: "2px solid #facc15",
+                      boxShadow: "0 0 12px rgba(250, 204, 21, 0.3)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        transform: "skewX(20deg)",
+                        fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
+                        fontStyle: "italic",
+                        fontWeight: "900",
+                        fontSize: "19px",
+                        color: "#ffffff",
+                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                      }}
+                    >
+                      {c.leaguePoints ?? 0}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Broadcast Legend Footer */}
       <div
         style={{
-          padding: "16px 20px",
-          background: "linear-gradient(90deg, #0077b6 0%, #0096c7 100%)",
-          borderBottom: "2px solid #00e5ff",
+          marginTop: "16px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "10px",
+          padding: "10px 14px",
+          borderRadius: "10px",
+          background: "rgba(3, 10, 24, 0.6)",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          fontSize: "12px",
+          position: "relative",
+          zIndex: 2,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span
-            style={{
-              padding: "4px 12px",
-              borderRadius: "8px",
-              background: "#030814",
-              color: badgeColor,
-              fontWeight: "900",
-              fontSize: "14px",
-              letterSpacing: "1px",
-              boxShadow: "0 0 10px rgba(0,0,0,0.5)",
-            }}
-          >
-            {groupName}
-          </span>
-          <span style={{ fontSize: "13px", color: "#ffffff", fontWeight: "700" }}>
-            12 ผู้เข้าแข่งขัน • 4 อันดับแรกผ่านเข้ารอบ (Top 4 Qualify)
-          </span>
-        </div>
-        <div style={{ fontSize: "11px", color: "#86efac", fontWeight: "800" }}>🟢 TOP 4 QUALIFIED</div>
-      </div>
-
-      {/* Skewed Header Row */}
-      <div style={{ padding: "14px 14px 6px 14px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-          <div
-            style={{
-              width: "60px",
-              height: "32px",
-              borderRadius: "8px",
-              transform: "skewX(-16deg)",
-              background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)",
-              border: "1.5px solid #ffd700",
-              boxShadow: "0 0 10px rgba(255, 215, 0, 0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-              อันดับ
-            </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#38bdf8" }}></span>
+            <span style={{ color: "#e0f2fe", fontWeight: "700" }}>อันดับ 1-4: ผ่านเข้ารอบน็อคเอาท์ (Top 4 Qualified)</span>
           </div>
-
-          <div
-            style={{
-              flex: 1,
-              height: "32px",
-              borderRadius: "8px",
-              transform: "skewX(-16deg)",
-              background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
-              border: "1.5px solid rgba(255, 255, 255, 0.3)",
-              display: "flex",
-              alignItems: "center",
-              padding: "0 14px",
-            }}
-          >
-            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffffff", letterSpacing: "0.5px" }}>
-              ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง)
-            </span>
-          </div>
-
-          <div style={{ width: "70px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #092338 0%, #04101c 100%)", border: "1.5px solid #00e5ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>แต้มลีก</span>
-          </div>
-          <div style={{ width: "70px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)", border: "1.5px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#ffffff" }}>ช-ส-พ</span>
-          </div>
-          <div style={{ width: "70px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)", border: "1.5px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#ffffff" }}>หมวด (+/-)</span>
-          </div>
-          <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)", border: "1.5px solid #ffd700", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "11px", color: "#ffd700" }}>คะแนนดิบ</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "2px", background: "#ff1744" }}></span>
+            <span style={{ color: "#fca5a5", fontWeight: "700" }}>อันดับ 5-12: ตกรอบ (Eliminated)</span>
           </div>
         </div>
-
-        {/* Rows */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
-          {list.map((c, idx) => {
-            const isTop4 = idx < 4;
-            return (
-              <div
-                key={c.name}
-                onClick={() => onSelectContestant(c)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "6px 8px",
-                  borderRadius: "10px",
-                  background: isTop4 ? "rgba(0, 229, 255, 0.08)" : "rgba(6, 16, 36, 0.6)",
-                  border: isTop4 ? "1px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0.06)",
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                {/* Rank */}
-                <div
-                  style={{
-                    width: "56px",
-                    height: "36px",
-                    borderRadius: "6px",
-                    background: isTop4 ? badgeColor : "rgba(255,255,255,0.08)",
-                    color: isTop4 ? "#030814" : "#ffffff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: "900",
-                    fontSize: "14px",
-                    fontFamily: "var(--font-num)",
-                    boxShadow: isTop4 ? "0 0 10px rgba(0, 229, 255, 0.4)" : "none",
-                    flexShrink: 0,
-                  }}
-                >
-                  {c.rank}
-                </div>
-
-                {/* Contestant Name */}
-                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-                  <img
-                    src={c.photo || "/default-avatar.png"}
-                    alt={c.name}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      border: isTop4 ? `2px solid ${badgeColor}` : "1.5px solid rgba(255,255,255,0.2)",
-                      background: "#0b1528",
-                      flexShrink: 0,
-                    }}
-                  />
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: "800", color: "#ffffff", fontSize: "14px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {c.nickname ? <span style={{ color: "#ffd700" }}>{c.nickname} </span> : null}
-                      {c.name}
-                    </div>
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
-                      +{c.categoriesWon} / -{c.categoriesLost} หมวด
-                    </div>
-                  </div>
-                </div>
-
-                {/* League Points */}
-                <div
-                  style={{
-                    width: "66px",
-                    textAlign: "center",
-                    fontWeight: "900",
-                    fontSize: "15px",
-                    color: "#00e5ff",
-                    fontFamily: "var(--font-num)",
-                  }}
-                >
-                  {c.leaguePoints}
-                </div>
-
-                {/* W-D-L */}
-                <div style={{ width: "66px", textAlign: "center", fontSize: "12px", fontWeight: "700" }}>
-                  <span style={{ color: "#86efac" }}>{c.win}</span>-<span style={{ color: "#ffd700" }}>{c.draw}</span>-<span style={{ color: "#fca5a5" }}>{c.lose}</span>
-                </div>
-
-                {/* Score Diff */}
-                <div
-                  style={{
-                    width: "66px",
-                    textAlign: "center",
-                    fontSize: "13px",
-                    fontWeight: "800",
-                    fontFamily: "var(--font-num)",
-                    color: c.scoreDiff?.startsWith("+") ? "#86efac" : c.scoreDiff?.startsWith("-") ? "#fca5a5" : "#94a3b8",
-                  }}
-                >
-                  {c.scoreDiff}
-                </div>
-
-                {/* Total Score */}
-                <div
-                  style={{
-                    width: "70px",
-                    textAlign: "center",
-                    fontWeight: "900",
-                    fontSize: "14px",
-                    fontFamily: "var(--font-num)",
-                    color: "#ffd700",
-                  }}
-                >
-                  {c.totalScore}
-                </div>
-              </div>
-            );
-          })}
+        <div style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "11px" }}>
+          *คลิกที่แถวผู้เข้าแข่งขันเพื่อดูสถิติและประวัติการแข่ง
         </div>
       </div>
     </div>
