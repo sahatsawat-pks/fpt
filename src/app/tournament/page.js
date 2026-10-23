@@ -4,6 +4,19 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import defaultTournamentData from "@/app/data/tournament.json";
 
+function getOptimizedAvatarUrl(url, size = 120) {
+  if (!url || typeof url !== "string") return "";
+  let clean = url.trim();
+  if (clean.includes("lh3.googleusercontent.com")) {
+    if (clean.includes("=")) {
+      clean = clean.split("=")[0] + `=s${size}-c`;
+    } else {
+      clean = clean + `=s${size}-c`;
+    }
+  }
+  return clean;
+}
+
 export default function TournamentPage() {
   const [data, setData] = useState(defaultTournamentData);
   const [loading, setLoading] = useState(true);
@@ -1016,8 +1029,10 @@ export default function TournamentPage() {
                           <td style={{ padding: "12px 16px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                               <img
-                                src={item.photo || "/default-avatar.png"}
+                                src={getOptimizedAvatarUrl(item.photo, 80) || "/default-avatar.png"}
                                 alt={item.name}
+                                loading="lazy"
+                                decoding="async"
                                 onError={(e) => {
                                   e.target.style.display = "none";
                                 }}
@@ -1124,8 +1139,10 @@ export default function TournamentPage() {
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
                       <img
-                        src={contestant.photo || "/default-avatar.png"}
+                        src={getOptimizedAvatarUrl(contestant.photo, 120) || "/default-avatar.png"}
                         alt={contestant.name}
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           e.target.style.display = "none";
                         }}
@@ -1247,8 +1264,10 @@ export default function TournamentPage() {
             {/* Profile Header */}
             <div style={{ display: "flex", alignItems: "center", gap: "18px", borderBottom: "1px solid rgba(255,255,255,0.12)", paddingBottom: "20px", marginBottom: "20px" }}>
               <img
-                src={selectedContestant.photo || "/default-avatar.png"}
+                src={getOptimizedAvatarUrl(selectedContestant.photo, 200) || "/default-avatar.png"}
                 alt={selectedContestant.name}
+                loading="eager"
+                decoding="async"
                 onError={(e) => {
                   e.target.style.display = "none";
                 }}
@@ -1760,8 +1779,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                     >
                       {c.photo ? (
                         <img
-                          src={c.photo}
+                          src={getOptimizedAvatarUrl(c.photo, 80)}
                           alt={c.name}
+                          loading="eager"
+                          decoding="async"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
                           }}
@@ -1779,7 +1800,30 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                             flexShrink: 0,
                           }}
                         />
-                      ) : null}
+                      ) : (
+                        <div
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "50%",
+                            background: "rgba(255, 255, 255, 0.08)",
+                            border: isRank1
+                              ? "1.5px solid #ffd700"
+                              : isTop4
+                              ? "1.5px solid #38bdf8"
+                              : "1.5px solid #ff1744",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            color: "#ffffff",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {c.nickname?.[0] || c.name?.[0] || "•"}
+                        </div>
+                      )}
 
                       <span
                         style={{
@@ -2264,8 +2308,10 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               <div style={{ position: "relative", flexShrink: 0 }}>
                 {p1.photo ? (
                   <img
-                    src={p1.photo}
+                    src={getOptimizedAvatarUrl(p1.photo, 140)}
                     alt={p1.name}
+                    loading="eager"
+                    decoding="async"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                     }}
@@ -2581,8 +2627,10 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
               <div style={{ position: "relative", flexShrink: 0 }}>
                 {p2.photo ? (
                   <img
-                    src={p2.photo}
+                    src={getOptimizedAvatarUrl(p2.photo, 140)}
                     alt={p2.name}
+                    loading="eager"
+                    decoding="async"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                     }}
@@ -2920,8 +2968,10 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, width: "100%" }}>
                       {p1.photo ? (
                         <img
-                          src={p1.photo}
+                          src={getOptimizedAvatarUrl(p1.photo, 60)}
                           alt={p1.name}
+                          loading="eager"
+                          decoding="async"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
                           }}
@@ -3039,8 +3089,10 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, width: "100%" }}>
                       {p2.photo ? (
                         <img
-                          src={p2.photo}
+                          src={getOptimizedAvatarUrl(p2.photo, 60)}
                           alt={p2.name}
+                          loading="eager"
+                          decoding="async"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
                           }}
