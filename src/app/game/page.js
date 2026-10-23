@@ -448,6 +448,23 @@ export default function Home() {
   });
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("mode") === "battle") {
+          setGameMode("battle");
+          const p1 = params.get("p1");
+          const p2 = params.get("p2");
+          if (p1 || p2) {
+            setPlayerNames((prev) => ({
+              player1: p1 || prev.player1,
+              player2: p2 || prev.player2,
+            }));
+          }
+        }
+      } catch (e) {}
+    }
+
     try {
       const savedTotal = localStorage.getItem("fpt_total_contestants");
       if (savedTotal && !isNaN(parseInt(savedTotal, 10))) {

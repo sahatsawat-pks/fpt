@@ -1503,6 +1503,25 @@ export default function AdminPage() {
           >
             🏆 จัดการทำเนียบแชมป์ & สถิติเก่า
           </button>
+          <Link
+            href="/admin/tournament"
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: "rgba(0, 229, 255, 0.12)",
+              color: "#00e5ff",
+              border: "1px solid rgba(0, 229, 255, 0.35)",
+              borderRadius: "6px 6px 0 0",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              transition: "all 0.2s ease"
+            }}
+          >
+            ⚔️ จัดการ Tournament 2026-27 ↗
+          </Link>
         </div>
 
         {/* ========================================================

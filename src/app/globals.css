@@ -3754,3 +3754,38 @@ main {
     }
 }
 
+/* --- Responsive Navigation & Mobile Hamburger Menu --- */
+.desktop-nav-links {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+}
+
+.mobile-nav-hamburger-btn {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .desktop-nav-links {
+        display: none !important;
+    }
+    .mobile-nav-hamburger-btn {
+        display: flex !important;
+    }
+}
+
+@keyframes mobileNavSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobile-nav-drawer {
+    animation: mobileNavSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

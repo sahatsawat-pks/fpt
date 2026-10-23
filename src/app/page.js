@@ -482,6 +482,9 @@ export default function MainPage() {
   const [currentPhase, setCurrentPhase] = useState("qualifying"); // 'qualifying' | 'finals'
   const [tablePhase, setTablePhase] = useState("auto"); // 'auto' | 'finals' | 'qualifying'
 
+  // Mobile Navigation Drawer State
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   // Auth & Protection State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
@@ -909,8 +912,8 @@ export default function MainPage() {
             />
           </Link>
 
-          {/* Nav Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          {/* Desktop Nav Links */}
+          <div className="desktop-nav-links">
             <Link
               href="/"
               style={{
@@ -965,6 +968,24 @@ export default function MainPage() {
               <span>🏆</span> ทำเนียบแชมป์ & สถิติ
             </Link>
             <Link
+              href="/tournament"
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px",
+                color: "#00e5ff",
+                fontWeight: "700",
+                fontSize: "14px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "rgba(0, 229, 255, 0.1)",
+                border: "1px solid rgba(0, 229, 255, 0.3)"
+              }}
+            >
+              <span>⚔️</span> ทัวร์นาเมนต์
+            </Link>
+            <Link
               href="/draw"
               style={{
                 padding: "8px 16px",
@@ -977,23 +998,6 @@ export default function MainPage() {
             >
               จำลองจับลูกบอล
             </Link>
-            {/* <Link
-              href="/game"
-              style={{
-                padding: "8px 18px",
-                borderRadius: "6px",
-                background: "rgba(3, 105, 161, 0.6)",
-                border: "1px solid rgba(0, 229, 255, 0.5)",
-                color: "#ffffff",
-                fontWeight: "800",
-                fontSize: "14px",
-                textDecoration: "none",
-                marginLeft: "6px",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.2)"
-              }}
-            >
-              🎮 เข้าเล่นเกม
-            </Link> */}
             <Link
               href="/admin"
               style={{
@@ -1008,7 +1012,166 @@ export default function MainPage() {
               Admin เท่านั้น
             </Link>
           </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            className="mobile-nav-hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+            style={{
+              width: "42px",
+              height: "42px",
+              borderRadius: "10px",
+              border: "1.5px solid rgba(0, 229, 255, 0.45)",
+              background: mobileMenuOpen ? "rgba(0, 229, 255, 0.25)" : "rgba(6, 16, 36, 0.8)",
+              color: "#00e5ff",
+              fontSize: "20px",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              boxShadow: mobileMenuOpen ? "0 0 14px rgba(0, 229, 255, 0.5)" : "none",
+              transition: "all 0.2s ease"
+            }}
+          >
+            {mobileMenuOpen ? "✕" : "☰"}
+          </button>
         </div>
+
+        {/* Mobile Dropdown Menu Drawer */}
+        {mobileMenuOpen && (
+          <div
+            className="mobile-nav-drawer"
+            style={{
+              padding: "12px 0 16px 0",
+              borderTop: "1px solid rgba(0, 229, 255, 0.15)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px"
+            }}
+          >
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(0, 229, 255, 0.15)",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                color: "#ffffff",
+                fontWeight: "800",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🏠</span> หน้าแรก
+            </Link>
+            <a
+              href="#leaderboard"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTableTab("standings");
+                setMobileMenuOpen(false);
+                const el = document.getElementById("leaderboard");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#e0f2fe",
+                fontWeight: "700",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนแข่งขัน
+            </a>
+            <Link
+              href="/history"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 170, 0, 0.08) 100%)",
+                border: "1px solid rgba(255, 215, 0, 0.4)",
+                color: "#ffd700",
+                fontWeight: "800",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🏆</span> ทำเนียบแชมป์ & สถิติ
+            </Link>
+            <Link
+              href="/tournament"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.4)",
+                color: "#00e5ff",
+                fontWeight: "800",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
+            </Link>
+            <Link
+              href="/draw"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#e0f2fe",
+                fontWeight: "700",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>🎱</span> จำลองจับลูกบอล
+            </Link>
+            <Link
+              href="/admin"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "10px",
+                background: "rgba(99, 102, 241, 0.15)",
+                border: "1px solid rgba(99, 102, 241, 0.35)",
+                color: "#c7d2fe",
+                fontWeight: "700",
+                fontSize: "15px",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>⚙️</span> Admin เท่านั้น
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* ========================================================
