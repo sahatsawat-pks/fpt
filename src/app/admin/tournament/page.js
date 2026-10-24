@@ -701,6 +701,48 @@ export default function AdminTournamentPage() {
     return contestants.find((c) => c.name === matchFormData.player2.name);
   }, [contestants, matchFormData?.player2?.name]);
 
+  const p1PreviousMatch = useMemo(() => {
+    if (!matchFormData?.player1?.name || !matchFormData?.player1?.topic) return null;
+    const currentMatchId = editingMatch?.id;
+    const norm = (matchFormData.player1.topic || "").trim().normalize("NFC").replace(/ซึบาสะ/g, "สึบาสะ").toLowerCase();
+    for (const md of (data?.matchdays || [])) {
+      for (const m of (md.matches || [])) {
+        if (m.id === currentMatchId) continue;
+        if (m.status !== "completed") continue;
+        const p1Norm = (m.player1?.topic || "").trim().normalize("NFC").replace(/ซึบาสะ/g, "สึบาสะ").toLowerCase();
+        const p2Norm = (m.player2?.topic || "").trim().normalize("NFC").replace(/ซึบาสะ/g, "สึบาสะ").toLowerCase();
+        if ((m.player1?.name === matchFormData.player1.name || (matchFormData.player1.nickname && m.player1?.nickname === matchFormData.player1.nickname)) && p1Norm === norm) {
+          return { match: m, mdName: md.name, sum: m.player1.sum, set: m.player1.set || "set1" };
+        }
+        if ((m.player2?.name === matchFormData.player1.name || (matchFormData.player1.nickname && m.player2?.nickname === matchFormData.player1.nickname)) && p2Norm === norm) {
+          return { match: m, mdName: md.name, sum: m.player2.sum, set: m.player2.set || "set1" };
+        }
+      }
+    }
+    return null;
+  }, [matchFormData?.player1?.name, matchFormData?.player1?.nickname, matchFormData?.player1?.topic, editingMatch?.id, data?.matchdays]);
+
+  const p2PreviousMatch = useMemo(() => {
+    if (!matchFormData?.player2?.name || !matchFormData?.player2?.topic) return null;
+    const currentMatchId = editingMatch?.id;
+    const norm = (matchFormData.player2.topic || "").trim().normalize("NFC").replace(/ซึบาสะ/g, "สึบาสะ").toLowerCase();
+    for (const md of (data?.matchdays || [])) {
+      for (const m of (md.matches || [])) {
+        if (m.id === currentMatchId) continue;
+        if (m.status !== "completed") continue;
+        const p1Norm = (m.player1?.topic || "").trim().normalize("NFC").replace(/ซึบาสะ/g, "สึบาสะ").toLowerCase();
+        const p2Norm = (m.player2?.topic || "").trim().normalize("NFC").replace(/ซึบาสะ/g, "สึบาสะ").toLowerCase();
+        if ((m.player1?.name === matchFormData.player2.name || (matchFormData.player2.nickname && m.player1?.nickname === matchFormData.player2.nickname)) && p1Norm === norm) {
+          return { match: m, mdName: md.name, sum: m.player1.sum, set: m.player1.set || "set1" };
+        }
+        if ((m.player2?.name === matchFormData.player2.name || (matchFormData.player2.nickname && m.player2?.nickname === matchFormData.player2.nickname)) && p2Norm === norm) {
+          return { match: m, mdName: md.name, sum: m.player2.sum, set: m.player2.set || "set1" };
+        }
+      }
+    }
+    return null;
+  }, [matchFormData?.player2?.name, matchFormData?.player2?.nickname, matchFormData?.player2?.topic, editingMatch?.id, data?.matchdays]);
+
   const currentMD = useMemo(() => {
     return matchdays.find((m) => m.id === selectedMatchday) || matchdays[0];
   }, [matchdays, selectedMatchday]);
@@ -730,6 +772,7 @@ export default function AdminTournamentPage() {
         name: match.player1?.name || "",
         nickname: match.player1?.nickname || "",
         topic: match.player1?.topic || "",
+        set: match.player1?.set || "auto",
         photo: match.player1?.photo || "",
         scores: {
           "3sec": match.player1?.scores?.["3sec"] ?? "",
@@ -745,6 +788,7 @@ export default function AdminTournamentPage() {
         name: match.player2?.name || "",
         nickname: match.player2?.nickname || "",
         topic: match.player2?.topic || "",
+        set: match.player2?.set || "auto",
         photo: match.player2?.photo || "",
         scores: {
           "3sec": match.player2?.scores?.["3sec"] ?? "",
@@ -869,6 +913,7 @@ export default function AdminTournamentPage() {
           ...matchFormData,
           player1: {
             ...matchFormData.player1,
+            set: matchFormData.player1.set || "auto",
             scores: {
               "3sec": parseScore(matchFormData.player1.scores["3sec"]),
               qa: parseScore(matchFormData.player1.scores.qa),
@@ -881,6 +926,7 @@ export default function AdminTournamentPage() {
           },
           player2: {
             ...matchFormData.player2,
+            set: matchFormData.player2.set || "auto",
             scores: {
               "3sec": parseScore(matchFormData.player2.scores["3sec"]),
               qa: parseScore(matchFormData.player2.scores.qa),
@@ -2190,6 +2236,68 @@ export default function AdminTournamentPage() {
                         title="พิมพ์แก้ไขชื่อหัวข้อตรงนี้ได้หากต้องการกำหนดเอง"
                       />
                     </div>
+                    {matchFormData.player1.topic && (
+                      <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                        {p1PreviousMatch ? (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              background: "rgba(168, 85, 247, 0.2)",
+                              border: "1px solid rgba(168, 85, 247, 0.4)",
+                              color: "#d8b4fe",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
+                            <span>⚡</span> เคยแข่งหัวข้อนี้ใน {p1PreviousMatch.mdName} ({p1PreviousMatch.sum} คะแนน) → บันทึกเป็น <strong>ชุด 2</strong>
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              background: "rgba(16, 185, 129, 0.15)",
+                              border: "1px solid rgba(16, 185, 129, 0.3)",
+                              color: "#86efac",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
+                            <span>🟢</span> แข่งครั้งแรกในหัวข้อนี้ → บันทึกเป็น <strong>ชุด 1</strong>
+                          </span>
+                        )}
+
+                        <select
+                          value={matchFormData.player1.set || "auto"}
+                          onChange={(e) =>
+                            setMatchFormData({
+                              ...matchFormData,
+                              player1: { ...matchFormData.player1, set: e.target.value },
+                            })
+                          }
+                          style={{
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            background: "rgba(15, 23, 42, 0.9)",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                            color: "#ffffff",
+                            fontSize: "10px",
+                          }}
+                          title="เลือกระบุชุดข้อสอบด้วยตัวเอง หรือปล่อยให้อัตโนมัติ"
+                        >
+                          <option value="auto">ตรวจจับอัตโนมัติ</option>
+                          <option value="set1">ชุด 1</option>
+                          <option value="set2">ชุด 2</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -2364,6 +2472,68 @@ export default function AdminTournamentPage() {
                         title="พิมพ์แก้ไขชื่อหัวข้อตรงนี้ได้หากต้องการกำหนดเอง"
                       />
                     </div>
+                    {matchFormData.player2.topic && (
+                      <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                        {p2PreviousMatch ? (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              background: "rgba(168, 85, 247, 0.2)",
+                              border: "1px solid rgba(168, 85, 247, 0.4)",
+                              color: "#d8b4fe",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
+                            <span>⚡</span> เคยแข่งหัวข้อนี้ใน {p2PreviousMatch.mdName} ({p2PreviousMatch.sum} คะแนน) → บันทึกเป็น <strong>ชุด 2</strong>
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              background: "rgba(16, 185, 129, 0.15)",
+                              border: "1px solid rgba(16, 185, 129, 0.3)",
+                              color: "#86efac",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
+                            <span>🟢</span> แข่งครั้งแรกในหัวข้อนี้ → บันทึกเป็น <strong>ชุด 1</strong>
+                          </span>
+                        )}
+
+                        <select
+                          value={matchFormData.player2.set || "auto"}
+                          onChange={(e) =>
+                            setMatchFormData({
+                              ...matchFormData,
+                              player2: { ...matchFormData.player2, set: e.target.value },
+                            })
+                          }
+                          style={{
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            background: "rgba(15, 23, 42, 0.9)",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                            color: "#ffffff",
+                            fontSize: "10px",
+                          }}
+                          title="เลือกระบุชุดข้อสอบด้วยตัวเอง หรือปล่อยให้อัตโนมัติ"
+                        >
+                          <option value="auto">ตรวจจับอัตโนมัติ</option>
+                          <option value="set1">ชุด 1</option>
+                          <option value="set2">ชุด 2</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
 

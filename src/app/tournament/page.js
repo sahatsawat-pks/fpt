@@ -1049,7 +1049,26 @@ export default function TournamentPage() {
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: "12px 16px", color: "#38bdf8", fontWeight: "700" }}>{item.topic}</td>
+                          <td style={{ padding: "12px 16px", color: "#38bdf8", fontWeight: "700" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span>{item.topic}</span>
+                              {item.set ? (
+                                <span
+                                  style={{
+                                    fontSize: "10px",
+                                    padding: "1px 6px",
+                                    borderRadius: "4px",
+                                    background: item.set === 2 ? "rgba(168, 85, 247, 0.2)" : "rgba(56, 189, 248, 0.15)",
+                                    color: item.set === 2 ? "#d8b4fe" : "#7dd3fc",
+                                    border: item.set === 2 ? "1px solid rgba(168, 85, 247, 0.4)" : "1px solid rgba(56, 189, 248, 0.3)",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  ชุด {item.set}
+                                </span>
+                              ) : null}
+                            </div>
+                          </td>
                           <td style={{ padding: "12px 12px", textAlign: "center", color: item.scores?.["3sec"] !== null ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
                             {item.scores?.["3sec"] ?? "-"}
                           </td>

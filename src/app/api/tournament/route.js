@@ -199,8 +199,167 @@ export function recalculateTournamentStandings(currentData) {
   };
 }
 
+function normalizeTopic(str) {
+  return (str || "")
+    .trim()
+    .normalize("NFC")
+    .replace(/ซึบาสะ/g, "สึบาสะ")
+    .toLowerCase();
+}
+
+// Synchronize all standings, contestant topic sets (set 1 & set 2), and topic rankings from completed matches
+export function syncTournamentData(currentData) {
+  if (!currentData) return currentData;
+
+  // 1. Recalculate standings from matchdays
+  const newStandings = recalculateTournamentStandings(currentData);
+  currentData.standings = newStandings;
+
+  // 2. Map all contestants & initialize topics template with set1 and set2
+  const contestantMap = {};
+
+  const ensureTopicsTemplate = (topicsList) => {
+    return (topicsList || []).map((top) => {
+      const topicName = typeof top === "string" ? top : top.topic;
+      return {
+        topic: topicName,
+        set1: { "3sec": null, qa: null, jigsaw: null, attribute: null, sum: 0, played: false },
+        set2: { "3sec": null, qa: null, jigsaw: null, attribute: null, sum: 0, played: false },
+      };
+    });
+  };
+
+  (currentData.contestants || []).forEach((c) => {
+    contestantMap[c.name] = { ...c, topics: ensureTopicsTemplate(c.topics) };
+    if (c.nickname) contestantMap[c.nickname] = contestantMap[c.name];
+  });
+
+  ["groupA", "groupB"].forEach((grp) => {
+    (currentData.standings?.[grp] || []).forEach((c) => {
+      if (!contestantMap[c.name]) {
+        contestantMap[c.name] = { ...c, topics: ensureTopicsTemplate(c.topics) };
+        if (c.nickname) contestantMap[c.nickname] = contestantMap[c.name];
+      }
+    });
+  });
+
+  // 3. Scan all completed matches in order across all matchdays
+  const allTopicPerformances = [];
+
+  (currentData.matchdays || []).forEach((md) => {
+    (md.matches || []).forEach((m) => {
+      if (m.status !== "completed") return;
+
+      [m.player1, m.player2].forEach((p) => {
+        if (!p || !p.name || !p.topic) return;
+        const c = contestantMap[p.name] || (p.nickname && contestantMap[p.nickname]);
+        if (!c) return;
+
+        const normMatchTopic = normalizeTopic(p.topic);
+        let topObj = c.topics.find((x) => normalizeTopic(x.topic) === normMatchTopic);
+
+        if (!topObj) {
+          topObj = {
+            topic: p.topic,
+            set1: { "3sec": null, qa: null, jigsaw: null, attribute: null, sum: 0, played: false },
+            set2: { "3sec": null, qa: null, jigsaw: null, attribute: null, sum: 0, played: false },
+          };
+          c.topics.push(topObj);
+        }
+
+        const scoreObj = {
+          "3sec": p.scores?.["3sec"] !== undefined && p.scores?.["3sec"] !== null ? Number(p.scores["3sec"]) : null,
+          qa: p.scores?.qa !== undefined && p.scores?.qa !== null ? Number(p.scores.qa) : null,
+          jigsaw: p.scores?.jigsaw !== undefined && p.scores?.jigsaw !== null ? Number(p.scores.jigsaw) : null,
+          attribute: p.scores?.attribute !== undefined && p.scores?.attribute !== null ? Number(p.scores.attribute) : null,
+          sum: Number(p.sum) || 0,
+          played: true,
+          matchId: m.id,
+          matchday: md.name || md.id,
+        };
+
+        let isSet2 = false;
+        if (p.set === "set2") {
+          topObj.set2 = scoreObj;
+          isSet2 = true;
+        } else if (p.set === "set1") {
+          topObj.set1 = scoreObj;
+          isSet2 = false;
+        } else if (!topObj.set1.played) {
+          topObj.set1 = scoreObj;
+          isSet2 = false;
+        } else {
+          // กรอกคะแนนซ้ำหัวข้อเดิม -> บันทึกเป็น ชุด 2 อัตโนมัติ!
+          topObj.set2 = scoreObj;
+          isSet2 = true;
+        }
+
+        allTopicPerformances.push({
+          name: c.name,
+          nickname: c.nickname || p.nickname || "",
+          photo: c.photo || p.photo || "",
+          topic: topObj.topic,
+          set: isSet2 ? 2 : 1,
+          scores: {
+            "3sec": scoreObj["3sec"],
+            qa: scoreObj.qa,
+            jigsaw: scoreObj.jigsaw,
+            attribute: scoreObj.attribute,
+          },
+          sum: scoreObj.sum,
+          matchId: m.id,
+          matchday: md.name || md.id,
+        });
+      });
+    });
+  });
+
+  // 4. Sync topics back to contestants and standings
+  (currentData.contestants || []).forEach((c) => {
+    const updated = contestantMap[c.name];
+    if (updated) {
+      c.topics = updated.topics;
+    }
+  });
+
+  ["groupA", "groupB"].forEach((grp) => {
+    (currentData.standings?.[grp] || []).forEach((c) => {
+      const updated = contestantMap[c.name];
+      if (updated) {
+        c.topics = updated.topics;
+      }
+    });
+  });
+
+  // 5. Update topicRankings sorted by sum descending (tie-breakers: attribute, jigsaw, qa, 3sec)
+  allTopicPerformances.sort((a, b) => {
+    if (b.sum !== a.sum) return b.sum - a.sum;
+    if ((b.scores.attribute ?? 0) !== (a.scores.attribute ?? 0)) return (b.scores.attribute ?? 0) - (a.scores.attribute ?? 0);
+    if ((b.scores.jigsaw ?? 0) !== (a.scores.jigsaw ?? 0)) return (b.scores.jigsaw ?? 0) - (a.scores.jigsaw ?? 0);
+    if ((b.scores.qa ?? 0) !== (a.scores.qa ?? 0)) return (b.scores.qa ?? 0) - (a.scores.qa ?? 0);
+    return (b.scores["3sec"] ?? 0) - (a.scores["3sec"] ?? 0);
+  });
+
+  currentData.topicRankings = allTopicPerformances.map((item, idx) => {
+    if (idx > 0 && allTopicPerformances[idx - 1].sum === item.sum) {
+      const prevRank = allTopicPerformances[idx - 1].rank || idx;
+      allTopicPerformances[idx].rank = prevRank;
+      return { ...item, rank: prevRank };
+    }
+    const r = idx + 1;
+    allTopicPerformances[idx].rank = r;
+    return { ...item, rank: r };
+  });
+
+  return currentData;
+}
+
 export async function GET() {
-  const data = await getKVData("fpt_tournament", readData);
+  let data = await getKVData("fpt_tournament", readData);
+  if (!data) data = readData();
+  if (data) {
+    data = syncTournamentData(data);
+  }
   return NextResponse.json({ success: true, data });
 }
 
@@ -216,14 +375,17 @@ export async function POST(request) {
 
     // Reset to local initial data
     if (action === "reset") {
-      const freshData = readData();
+      let freshData = readData();
+      if (freshData) {
+        freshData = syncTournamentData(freshData);
+      }
       await saveKVData("fpt_tournament", freshData, writeData);
       return NextResponse.json({ success: true, data: freshData });
     }
 
     // Save full tournament payload
     if (action === "save_all" && body.data) {
-      currentData = body.data;
+      currentData = syncTournamentData(body.data);
       currentData.updatedAt = new Date().toISOString();
       await saveKVData("fpt_tournament", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
@@ -255,9 +417,8 @@ export async function POST(request) {
 
       currentData.matchdays[mdIndex].matches[matchIndex] = updatedMatch;
 
-      // Recalculate standings
-      const newStandings = recalculateTournamentStandings(currentData);
-      currentData.standings = newStandings;
+      // Recalculate standings, contestant topic sets (set 1 & 2), and topic rankings
+      currentData = syncTournamentData(currentData);
       currentData.updatedAt = new Date().toISOString();
 
       await saveKVData("fpt_tournament", currentData, writeData);
@@ -345,6 +506,7 @@ export async function POST(request) {
         }
       } catch (e) {}
 
+      currentData = syncTournamentData(currentData);
       currentData.updatedAt = new Date().toISOString();
       await saveKVData("fpt_tournament", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
@@ -373,6 +535,7 @@ export async function POST(request) {
           if (incoming.dateRange !== undefined) md.dateRange = incoming.dateRange;
         }
       });
+      currentData = syncTournamentData(currentData);
       currentData.updatedAt = new Date().toISOString();
       await saveKVData("fpt_tournament", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
@@ -429,6 +592,7 @@ export async function POST(request) {
         } catch (e) {}
       });
 
+      currentData = syncTournamentData(currentData);
       currentData.updatedAt = new Date().toISOString();
       await saveKVData("fpt_tournament", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
@@ -436,7 +600,7 @@ export async function POST(request) {
 
     // Force recalculate standings
     if (action === "recalculate_standings") {
-      currentData.standings = recalculateTournamentStandings(currentData);
+      currentData = syncTournamentData(currentData);
       currentData.updatedAt = new Date().toISOString();
       await saveKVData("fpt_tournament", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });
