@@ -2570,7 +2570,7 @@ export default function MainPage() {
                                     color: "#ffd700",
                                     textShadow: "0 0 10px rgba(255, 215, 0, 0.7)"
                                   }}>
-                                    ⚡ เส้นตัดตัว 5 อันดับแรก (TOP 5 QUALIFYING CUTOFF{rank5Score ? `: ${rank5Score} คะแนน` : ""})
+                                    ⚡ เส้นคัดเข้ารอบ 5 อันดับแรก (TOP 5 QUALIFYING CUTOFF{rank5Score ? `: ${rank5Score} คะแนน` : ""})
                                   </span>
                                 </div>
                                 <div style={{
