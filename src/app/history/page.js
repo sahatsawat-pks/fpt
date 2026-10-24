@@ -107,20 +107,7 @@ function resolveContestantAvatar(item, year) {
     return CONTESTANT_GOOGLE_PHOTOS.get(nickname);
   }
 
-  // 3. In Season 2026, never use old local /img/history/ paths
-  if (String(year) === "2026") {
-    if (item.image && !item.image.startsWith("/img/history")) {
-      return item.image;
-    }
-    return "";
-  }
-
-  // 4. In Season 2021, valid local avatar images exist
-  if (String(year) === "2021" && item.image && item.image.startsWith("/img/history/2021/")) {
-    return item.image;
-  }
-
-  // 5. If item has an image property and not empty
+  // 3. If item has an image URL (Google Photos / Web URL)
   if (item.image) return item.image;
 
   return "";
