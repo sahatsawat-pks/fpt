@@ -1647,7 +1647,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
         border: "1.5px solid rgba(56, 189, 248, 0.4)",
         boxShadow: "0 18px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
         overflow: "hidden",
-        padding: "26px clamp(20px, 3.5vw, 36px)",
+        padding: "24px clamp(12px, 2.5vw, 28px)",
       }}
     >
       {/* Background SVG Radar / Concentric HUD Rings */}
@@ -1674,16 +1674,16 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
         <line x1="300" y1="10" x2="300" y2="590" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4 8" />
       </svg>
 
-      {/* Responsive Horizontal Scroll Container */}
-      <div style={{ position: "relative", zIndex: 2, overflowX: "auto", paddingBottom: "6px" }}>
-        <div style={{ minWidth: "560px", padding: "4px 8px" }}>
+      {/* Responsive Table Container (No horizontal scrollbar) */}
+      <div style={{ position: "relative", zIndex: 2, width: "100%", overflow: "hidden" }}>
+        <div style={{ width: "100%", padding: "4px 2px" }}>
           {/* Header Row: Title Banner (Left) & Floating Skewed Column Header Boxes (Right) */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "8px",
-              marginBottom: "12px",
+              gap: "clamp(4px, 0.9vw, 8px)",
+              marginBottom: "10px",
             }}
           >
             {/* Title Capsule (Skewed) */}
@@ -1698,7 +1698,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                 boxShadow: "0 6px 18px rgba(0, 0, 0, 0.6)",
                 display: "flex",
                 alignItems: "center",
-                padding: "0 18px",
+                padding: "0 clamp(10px, 1.5vw, 18px)",
                 minWidth: 0,
               }}
             >
@@ -1707,7 +1707,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   transform: "skewX(20deg)",
                   fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                   fontWeight: "700",
-                  fontSize: "clamp(14px, 1.6vw, 18px)",
+                  fontSize: "clamp(13px, 1.5vw, 18px)",
                   color: "#ffffff",
                   letterSpacing: "0.5px",
                   textTransform: "uppercase",
@@ -1724,7 +1724,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
             {/* W Header Capsule (Green) */}
             <div
               style={{
-                width: "52px",
+                width: "clamp(34px, 4.4vw, 48px)",
                 height: "44px",
                 borderRadius: "8px",
                 transform: "skewX(-20deg)",
@@ -1747,7 +1747,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
             {/* D Header Capsule (Silver) */}
             <div
               style={{
-                width: "52px",
+                width: "clamp(34px, 4.4vw, 48px)",
                 height: "44px",
                 borderRadius: "8px",
                 transform: "skewX(-20deg)",
@@ -1770,7 +1770,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
             {/* L Header Capsule (Red) */}
             <div
               style={{
-                width: "52px",
+                width: "clamp(34px, 4.4vw, 48px)",
                 height: "44px",
                 borderRadius: "8px",
                 transform: "skewX(-20deg)",
@@ -1793,7 +1793,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
             {/* DIFF Header Capsule (Blue) */}
             <div
               style={{
-                width: "58px",
+                width: "clamp(40px, 5vw, 54px)",
                 height: "44px",
                 borderRadius: "8px",
                 transform: "skewX(-20deg)",
@@ -1816,7 +1816,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
             {/* PTS Header Capsule (Gold) */}
             <div
               style={{
-                width: "62px",
+                width: "clamp(44px, 5.5vw, 60px)",
                 height: "44px",
                 borderRadius: "8px",
                 transform: "skewX(-20deg)",
@@ -1838,7 +1838,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
           </div>
 
           {/* Standings Rows */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             {list.map((c, idx) => {
               const isTop4 = idx < 4;
               const isRank1 = idx === 0;
@@ -1893,23 +1893,21 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
+                    gap: "clamp(4px, 0.9vw, 8px)",
                     cursor: "pointer",
-                    transition: "transform 0.15s ease, filter 0.15s ease",
+                    transition: "filter 0.15s ease",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.filter = "brightness(1.15)";
-                    e.currentTarget.style.transform = "translateX(3px)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.filter = "brightness(1)";
-                    e.currentTarget.style.transform = "translateX(0)";
                   }}
                 >
                   {/* 1. Rank Capsule */}
                   <div
                     style={{
-                      width: "58px",
+                      width: "clamp(40px, 5vw, 54px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -1931,7 +1929,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                         fontWeight: "600",
-                        fontSize: "18px",
+                        fontSize: "clamp(15px, 2vw, 18px)",
                         color: rankColor,
                         textShadow: isRank1 ? "0 0 10px rgba(255, 215, 0, 0.5)" : "0 2px 4px rgba(0,0,0,0.7)",
                       }}
@@ -1954,7 +1952,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         : "0 4px 12px rgba(0, 0, 0, 0.5)",
                       display: "flex",
                       alignItems: "center",
-                      padding: "0 14px",
+                      padding: "0 clamp(8px, 1.2vw, 14px)",
                       minWidth: 0,
                     }}
                   >
@@ -1963,7 +1961,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         transform: "skewX(20deg)",
                         display: "flex",
                         alignItems: "center",
-                        gap: "10px",
+                        gap: "clamp(6px, 1vw, 10px)",
                         minWidth: 0,
                         width: "100%",
                       }}
@@ -2020,7 +2018,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         style={{
                           fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
                           fontWeight: "500",
-                          fontSize: "15px",
+                          fontSize: "clamp(13px, 1.6vw, 15px)",
                           letterSpacing: "0.2px",
                           color: isRank1 ? "#ffd700" : "#ffffff",
                           whiteSpace: "nowrap",
@@ -2037,12 +2035,12 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         <span
                           style={{
                             marginLeft: "auto",
-                            padding: "2px 7px",
+                            padding: "2px clamp(4px, 0.6vw, 7px)",
                             borderRadius: "4px",
                             background: "rgba(255, 215, 0, 0.2)",
                             border: "1px solid #ffd700",
                             color: "#ffd700",
-                            fontSize: "10px",
+                            fontSize: "clamp(8px, 1vw, 10px)",
                             fontWeight: "800",
                             letterSpacing: "0.5px",
                             flexShrink: 0,
@@ -2055,12 +2053,12 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         <span
                           style={{
                             marginLeft: "auto",
-                            padding: "2px 7px",
+                            padding: "2px clamp(4px, 0.6vw, 7px)",
                             borderRadius: "4px",
                             background: "rgba(56, 189, 248, 0.15)",
                             border: "1px solid rgba(56, 189, 248, 0.4)",
                             color: "#7dd3fc",
-                            fontSize: "10px",
+                            fontSize: "clamp(8px, 1vw, 10px)",
                             fontWeight: "700",
                             letterSpacing: "0.5px",
                             flexShrink: 0,
@@ -2075,7 +2073,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 3. W (Win) Capsule */}
                   <div
                     style={{
-                      width: "52px",
+                      width: "clamp(34px, 4.4vw, 48px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2093,7 +2091,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                         fontWeight: "600",
-                        fontSize: "17px",
+                        fontSize: "clamp(14px, 1.8vw, 17px)",
                         color: "#ffffff",
                         textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
@@ -2105,7 +2103,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 4. D (Draw) Capsule */}
                   <div
                     style={{
-                      width: "52px",
+                      width: "clamp(34px, 4.4vw, 48px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2123,7 +2121,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                         fontWeight: "600",
-                        fontSize: "17px",
+                        fontSize: "clamp(14px, 1.8vw, 17px)",
                         color: "#ffffff",
                         textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
@@ -2135,7 +2133,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 5. L (Lose) Capsule */}
                   <div
                     style={{
-                      width: "52px",
+                      width: "clamp(34px, 4.4vw, 48px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2153,7 +2151,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                         fontWeight: "600",
-                        fontSize: "17px",
+                        fontSize: "clamp(14px, 1.8vw, 17px)",
                         color: "#ffffff",
                         textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
@@ -2165,7 +2163,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 6. DIFF Capsule */}
                   <div
                     style={{
-                      width: "58px",
+                      width: "clamp(40px, 5vw, 54px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2183,7 +2181,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                         fontWeight: "600",
-                        fontSize: "17px",
+                        fontSize: "clamp(14px, 1.8vw, 17px)",
                         color: "#ffffff",
                         textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
@@ -2195,7 +2193,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 7. PTS Capsule */}
                   <div
                     style={{
-                      width: "62px",
+                      width: "clamp(44px, 5.5vw, 60px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2213,7 +2211,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                         transform: "skewX(20deg)",
                         fontFamily: "var(--font-kanit), 'Kanit', 'Orbitron', sans-serif",
                         fontWeight: "600",
-                        fontSize: "18px",
+                        fontSize: "clamp(15px, 2vw, 18px)",
                         color: "#ffffff",
                         textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                       }}
