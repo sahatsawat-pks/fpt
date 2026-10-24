@@ -574,29 +574,6 @@ export default function TournamentPage() {
             />
           </div>
 
-          {/* Tag Pill */}
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "6px 20px",
-              borderRadius: "24px",
-              background: "linear-gradient(90deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 170, 0, 0.3) 100%)",
-              border: "1.5px solid #ffd700",
-              color: "#ffd700",
-              fontSize: "13px",
-              fontWeight: "900",
-              letterSpacing: "1px",
-              textTransform: "uppercase",
-              boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
-              marginBottom: "16px",
-              animation: "badgePulse 3.5s ease-in-out infinite",
-            }}
-          >
-            <span>⚔️</span> LEAGUE PHASE • 24 ยอดฝีมือแฟนพันธุ์แท้
-          </div>
-
           {/* Title */}
           <h1
             style={{
