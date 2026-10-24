@@ -228,6 +228,7 @@ export default function HistoryPage() {
   const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
   const [selectedSpotlight, setSelectedSpotlight] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showFinalsRules, setShowFinalsRules] = useState(false);
 
   // Auth state for history page protection
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -3401,7 +3402,123 @@ export default function HistoryPage() {
               TAB CONTENT 3: FINALS ROUNDS (รอบชิงชนะเลิศ)
              ======================================================== */}
           {activeTab === "finals" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              {/* Golden Finals Rules Plaque */}
+              <div style={{
+                background: "linear-gradient(135deg, rgba(30, 20, 0, 0.85) 0%, rgba(15, 10, 0, 0.95) 100%)",
+                border: "1.5px solid rgba(255, 215, 0, 0.5)",
+                borderRadius: "16px",
+                padding: "18px 22px",
+                boxShadow: "0 8px 30px rgba(255, 215, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+              }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    cursor: "pointer",
+                    userSelect: "none",
+                    flexWrap: "wrap",
+                    gap: "12px"
+                  }}
+                  onClick={() => setShowFinalsRules(!showFinalsRules)}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <span style={{ fontSize: "24px" }}>📜</span>
+                    <div>
+                      <h3 style={{
+                        fontSize: "17px",
+                        fontWeight: "900",
+                        color: "#ffd700",
+                        margin: 0,
+                        letterSpacing: "0.5px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px"
+                      }}>
+                        กติกาการแข่งขันรอบชิงชนะเลิศ (The Finals Rules)
+                      </h3>
+                      <span style={{ fontSize: "12px", color: "rgba(255, 215, 0, 0.7)" }}>
+                        การแข่งขันหมวดต่อหมวด • ระบบตัวตั้ง-ล้มตัวตั้ง • ชิงดำจนเหลือสุดยอดแฟนพันธุ์แท้หนึ่งเดียว
+                      </span>
+                    </div>
+                  </div>
+                  <span style={{
+                    fontSize: "12px",
+                    fontWeight: "800",
+                    color: "#ffd700",
+                    background: "rgba(255, 215, 0, 0.15)",
+                    border: "1px solid rgba(255, 215, 0, 0.4)",
+                    padding: "6px 14px",
+                    borderRadius: "20px"
+                  }}>
+                    {showFinalsRules ? "ซ่อนกติกา ▲" : "ดูกติกา ▼"}
+                  </span>
+                </div>
+
+                {showFinalsRules && (
+                  <div style={{
+                    marginTop: "16px",
+                    paddingTop: "16px",
+                    borderTop: "1px solid rgba(255, 215, 0, 0.25)",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                    gap: "12px"
+                  }}>
+                    <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "12px", padding: "14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "18px" }}>🎯</span>
+                        <strong style={{ color: "#ffd700", fontSize: "14px" }}>1. แข่งขันหมวดต่อหมวด</strong>
+                      </div>
+                      <p style={{ margin: 0, fontSize: "12.5px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.6" }}>
+                        ผู้เข้าแข่งขันรอบ FINAL จะแข่งขันทีละหมวด โดยเลือกเล่นได้จาก 4 หมวด ได้แก่
+                        <strong> 3 วินาที, ถาม-ตอบ, จิ๊กซอว์</strong> และ <strong>คุณสมบัติ</strong> (เต็ม 25 คะแนน)
+                      </p>
+                    </div>
+
+                    <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "12px", padding: "14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "18px" }}>👑</span>
+                        <strong style={{ color: "#ffd700", fontSize: "14px" }}>2. คนแรกเป็น "ตัวตั้ง" เสมอ</strong>
+                      </div>
+                      <p style={{ margin: 0, fontSize: "12.5px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.6" }}>
+                        ผู้เข้าแข่งขันคนแรกที่ลงเล่นในแต่ละรอบ จะเป็น <strong>"ตัวตั้ง"</strong> เสมอ โดยคะแนนของคนแรกจะเป็นเกณฑ์ที่ผู้เข้าแข่งขันคนถัดไปทุกคนต้องก้าวข้าม
+                      </p>
+                    </div>
+
+                    <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "12px", padding: "14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "18px" }}>⚔️</span>
+                        <strong style={{ color: "#ffd700", fontSize: "14px" }}>3. ล้มตัวตั้ง & การตกรอบ</strong>
+                      </div>
+                      <p style={{ margin: 0, fontSize: "12.5px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.6" }}>
+                        • ทำคะแนนได้ <strong>มากกว่าตัวตั้ง</strong>: ตัวตั้งเดิมจะ <span style={{ color: "#ff7875", fontWeight: "700" }}>ตกรอบทันที</span> และตนเองเป็น <strong>"ตัวตั้งใหม่"</strong><br />
+                        • ทำคะแนนได้ <strong>น้อยกว่าตัวตั้ง</strong>: ผู้เล่นนั้นจะ <span style={{ color: "#ff7875", fontWeight: "700" }}>ตกรอบทันที</span>
+                      </p>
+                    </div>
+
+                    <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "12px", padding: "14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "18px" }}>🤝</span>
+                        <strong style={{ color: "#ffd700", fontSize: "14px" }}>4. กรณีทำคะแนนเสมอกัน</strong>
+                      </div>
+                      <p style={{ margin: 0, fontSize: "12.5px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.6" }}>
+                        หากทำคะแนนเสมอกัน จะต้อง <strong>แข่งกันต่อในรอบถัดไป</strong> (Round 2, 3...) จนกว่าจะเหลือเพียงคนเดียว โดย <strong>ห้ามเลือกหมวดที่เล่นไปแล้ว</strong> (หมวดเดิมถูกล็อก X)
+                      </p>
+                    </div>
+
+                    <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 77, 79, 0.35)", borderRadius: "12px", padding: "14px", gridColumn: "1 / -1" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "18px" }}>⚠️</span>
+                        <strong style={{ color: "#ff7875", fontSize: "14px" }}>5. หากทุกคนตอบผิดหมด หรือได้ 0 ทั้งหมด</strong>
+                      </div>
+                      <p style={{ margin: 0, fontSize: "12.5px", color: "rgba(255, 255, 255, 0.85)", lineHeight: "1.6" }}>
+                        หากในรอบนั้นทุกคนตอบผิดหมด หรือทำคะแนนได้ <strong>0 คะแนนทุกคน</strong> การแข่งขันในปีนี้จะ <strong>ไม่มีผู้ชนะ (No Champion)</strong>
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
               {currentSeason?.finals && currentSeason.finals.length > 0 ? (
                 currentSeason.finals.map((rnd, rIdx) => (
                 <div

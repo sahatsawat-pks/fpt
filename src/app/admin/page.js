@@ -62,6 +62,15 @@ export default function AdminPage() {
   const [isArchiving, setIsArchiving] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
 
+  // Finals Tournament States
+  const [finalsRounds, setFinalsRounds] = useState([]);
+  const [selectedFinalsRoundIdx, setSelectedFinalsRoundIdx] = useState(0);
+  const [selectedFinalsPlayerOrder, setSelectedFinalsPlayerOrder] = useState("");
+  const [selectedFinalsCategory, setSelectedFinalsCategory] = useState("qa");
+  const [finalsInputScore, setFinalsInputScore] = useState("");
+  const [finalsSavingNotice, setFinalsSavingNotice] = useState("");
+  const [showFinalsRules, setShowFinalsRules] = useState(false);
+
   // Tab State: 'scoring', 'contestants', 'settings'
   const [activeTab, setActiveTab] = useState("scoring");
 
@@ -467,6 +476,9 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setContestants(data.data);
+      }
+      if (data.finals && Array.isArray(data.finals)) {
+        setFinalsRounds(data.finals);
       }
     } catch (err) {
       console.error("Failed to load contestants:", err);
@@ -1027,6 +1039,99 @@ export default function AdminPage() {
           : "📋 สลับกลับเป็นรอบคัดเลือกแล้ว! หน้าแรกจะแสดงตารางรอบคัดเลือกเป็นหลัก";
         showToast(msg, "success");
         await loadSettings();
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  const handleSaveFinalsPlayerScore = async () => {
+    if (!selectedFinalsPlayerOrder) {
+      showToast("กรุณาเลือกผู้เข้าแข่งขันที่ต้องการบันทึกคะแนน", "error");
+      return;
+    }
+    if (!selectedFinalsCategory) {
+      showToast("กรุณาเลือกหมวดที่แข่งขัน", "error");
+      return;
+    }
+    if (finalsInputScore === "" || isNaN(Number(finalsInputScore))) {
+      showToast("กรุณากรอกคะแนน (0 - 25)", "error");
+      return;
+    }
+
+    try {
+      setFinalsSavingNotice("⏳ กำลังบันทึกคะแนนรอบชิงชนะเลิศและคำนวณกติกา...");
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "save_finals_player",
+          roundIndex: selectedFinalsRoundIdx,
+          order: selectedFinalsPlayerOrder,
+          category: selectedFinalsCategory,
+          score: Number(finalsInputScore),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.finals) setFinalsRounds(data.finals);
+        setFinalsSavingNotice("✅ บันทึกคะแนนและคำนวณกติการอบชิงสำเร็จ!");
+        showToast("บันทึกคะแนนรอบชิงชนะเลิศเรียบร้อยแล้ว", "success");
+        setTimeout(() => setFinalsSavingNotice(""), 3500);
+      } else {
+        setFinalsSavingNotice("❌ " + (data.error || "เกิดข้อผิดพลาด"));
+        showToast(data.error || "เกิดข้อผิดพลาดในการบันทึก", "error");
+      }
+    } catch (err) {
+      setFinalsSavingNotice("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  const handleCreateNextFinalsRound = async () => {
+    if (!confirm("คุณต้องการสร้างรอบถัดไปสำหรับผู้เข้าแข่งขันที่เสมอกันใช่หรือไม่? (ระบบจะล็อกหมวดที่เคยเล่นไปแล้วเป็น X)")) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "create_finals_next_round" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.finals) {
+          setFinalsRounds(data.finals);
+          setSelectedFinalsRoundIdx(data.finals.length - 1);
+        }
+        showToast(data.message || "สร้างรอบถัดไปสำเร็จ!", "success");
+      } else {
+        showToast(data.error || "ไม่สามารถสร้างรอบถัดไปได้", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  const handleResetFinals = async () => {
+    if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตการแข่งขันรอบชิงชนะเลิศทั้งหมดกลับสู่ Round 1/4? คะแนนรอบชิงทั้งหมดจะถูกล้างใหม่")) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reset_finals" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.finals) {
+          setFinalsRounds(data.finals);
+          setSelectedFinalsRoundIdx(0);
+        }
+        showToast("รีเซ็ตรอบชิงชนะเลิศเรียบร้อยแล้ว", "success");
       } else {
         showToast(data.error || "เกิดข้อผิดพลาด", "error");
       }
@@ -1722,6 +1827,567 @@ export default function AdminPage() {
               </div>
             )}
 
+            {currentPhase === "finals" ? (
+              <div style={{ marginBottom: "32px" }}>
+                {/* Finals Header Card with Golden Accent */}
+                <div style={{
+                  background: "linear-gradient(145deg, rgba(30, 20, 0, 0.85) 0%, rgba(15, 10, 0, 0.95) 100%)",
+                  border: "1.5px solid rgba(255, 215, 0, 0.5)",
+                  borderRadius: "16px",
+                  padding: "24px",
+                  marginBottom: "20px",
+                  boxShadow: "0 8px 30px rgba(255, 215, 0, 0.15)"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
+                    <div>
+                      <h2 style={{ fontSize: "20px", fontWeight: "900", color: "#ffd700", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>👑</span> ระบบจัดการแข่งขันรอบชิงชนะเลิศ (The Finals Manager)
+                      </h2>
+                      <span style={{ fontSize: "13px", color: "rgba(255, 215, 0, 0.7)" }}>
+                        บันทึกคะแนนทีละหมวด • คำนวณสถานะตัวตั้ง / ล้มตัวตั้ง / เสมอ / ตกรอบ อัตโนมัติตามกติกาสากล
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowFinalsRules(!showFinalsRules)}
+                        style={{
+                          padding: "8px 14px",
+                          borderRadius: "10px",
+                          background: "rgba(255, 215, 0, 0.15)",
+                          border: "1px solid rgba(255, 215, 0, 0.4)",
+                          color: "#ffd700",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer"
+                        }}
+                      >
+                        {showFinalsRules ? "ซ่อนกติกา ▲" : "📜 ดูกติกาสากล ▼"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCreateNextFinalsRound}
+                        style={{
+                          padding: "8px 16px",
+                          borderRadius: "10px",
+                          background: "linear-gradient(90deg, #10b981 0%, #059669 100%)",
+                          border: "none",
+                          color: "#ffffff",
+                          fontSize: "13px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                          boxShadow: "0 0 12px rgba(16, 185, 129, 0.4)"
+                        }}
+                        title="สร้างรอบถัดไปสำหรับผู้เล่นที่เสมอกัน (จะล็อกหมวดที่เคยเล่นไปแล้วเป็น X)"
+                      >
+                        ➕ สร้างรอบถัดไป (สำหรับคนเสมอกัน)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleResetFinals}
+                        style={{
+                          padding: "8px 14px",
+                          borderRadius: "10px",
+                          background: "rgba(239, 68, 68, 0.15)",
+                          border: "1px solid rgba(239, 68, 68, 0.4)",
+                          color: "#fca5a5",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          cursor: "pointer"
+                        }}
+                      >
+                        🔄 รีเซ็ตรอบชิง
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Rules Explainer */}
+                  {showFinalsRules && (
+                    <div style={{
+                      marginBottom: "18px",
+                      padding: "14px 16px",
+                      borderRadius: "12px",
+                      background: "rgba(0, 0, 0, 0.4)",
+                      border: "1px solid rgba(255, 215, 0, 0.25)",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                      gap: "10px",
+                      fontSize: "12px"
+                    }}>
+                      <div>
+                        <strong style={{ color: "#ffd700" }}>1. 4 หมวด:</strong> 3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ (เต็ม 25)
+                      </div>
+                      <div>
+                        <strong style={{ color: "#ffd700" }}>2. ตัวตั้ง:</strong> คนแรกของรอบเป็นตัวตั้งเสมอ
+                      </div>
+                      <div>
+                        <strong style={{ color: "#ffd700" }}>3. ล้มตัวตั้ง:</strong> มากกว่า = ตัวตั้งเดิมตกรอบและเป็นตัวตั้งใหม่ / น้อยกว่า = ตกรอบ
+                      </div>
+                      <div>
+                        <strong style={{ color: "#ffd700" }}>4. เสมอกัน:</strong> แข่งต่อรอบถัดไป (ห้ามเลือกหมวดที่เล่นไปแล้ว)
+                      </div>
+                      <div>
+                        <strong style={{ color: "#ff7875" }}>5. ได้ 0 ทุกคน:</strong> ไม่มีผู้ชนะ
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Multi-Round Switcher Tabs */}
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
+                    {finalsRounds && finalsRounds.length > 0 ? (
+                      finalsRounds.map((rnd, rIdx) => {
+                        const isActive = selectedFinalsRoundIdx === rIdx;
+                        return (
+                          <button
+                            key={rIdx}
+                            type="button"
+                            onClick={() => {
+                              setSelectedFinalsRoundIdx(rIdx);
+                              setSelectedFinalsPlayerOrder("");
+                              setFinalsInputScore("");
+                            }}
+                            style={{
+                              padding: "8px 16px",
+                              borderRadius: "10px",
+                              background: isActive ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)" : "rgba(0, 15, 30, 0.7)",
+                              color: isActive ? "#030814" : "#ffd700",
+                              border: isActive ? "1px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.3)",
+                              fontSize: "13px",
+                              fontWeight: "800",
+                              cursor: "pointer",
+                              boxShadow: isActive ? "0 0 14px rgba(255, 215, 0, 0.4)" : "none"
+                            }}
+                          >
+                            👑 {rnd.roundName} ({rnd.players?.length || 0} คน)
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.5)" }}>ยังไม่มีรอบการแข่งขัน</span>
+                    )}
+                  </div>
+
+                  {(() => {
+                    const curRound = (finalsRounds && finalsRounds[selectedFinalsRoundIdx]) || (finalsRounds && finalsRounds[0]);
+                    const curPlayers = curRound?.players || [];
+                    const benchmark = curPlayers.find((p) => p.result && p.result.includes("ตัวตั้ง"));
+                    const selectedPlayer = curPlayers.find((p) => String(p.order) === String(selectedFinalsPlayerOrder));
+
+                    const isCatLocked = (cat) => selectedPlayer?.scores?.[cat] === "X";
+
+                    let predictionText = "";
+                    let predictionColor = "#ffd700";
+                    if (selectedPlayer && finalsInputScore !== "" && !isNaN(Number(finalsInputScore))) {
+                      const scoreNum = Number(finalsInputScore);
+                      if (!benchmark || benchmark === selectedPlayer) {
+                        predictionText = `🎯 คนนี้จะกลายเป็น "ตัวตั้ง" ของรอบนี้ด้วย ${scoreNum} คะแนน`;
+                        predictionColor = "#ffd700";
+                      } else {
+                        const bScore = Number(benchmark.totalScore) || 0;
+                        if (scoreNum > bScore) {
+                          predictionText = `🔥 จะล้มตัวตั้ง! คุณ ${benchmark.nickname || benchmark.name} จะตกรอบทันที และ ${selectedPlayer.nickname || selectedPlayer.name} จะกลายเป็น "ตัวตั้งใหม่" ด้วย ${scoreNum} คะแนน`;
+                          predictionColor = "#52c41a";
+                        } else if (scoreNum < bScore) {
+                          predictionText = `❌ จะตกรอบทันที (เนื่องจากได้ ${scoreNum} คะแนน ซึ่งน้อยกว่าตัวตั้ง ${bScore} คะแนน)`;
+                          predictionColor = "#ff7875";
+                        } else {
+                          predictionText = `🤝 จะเสมอกับตัวตั้ง (${bScore} คะแนน)! ทั้งคู่จะได้ "เข้ารอบ" เพื่อไปชิงต่อในรอบถัดไป`;
+                          predictionColor = "#38bdf8";
+                        }
+                      }
+                    }
+
+                    return (
+                      <div>
+                        {/* Benchmark Alert Box */}
+                        <div style={{
+                          background: benchmark ? "rgba(255, 215, 0, 0.12)" : "rgba(255, 255, 255, 0.05)",
+                          border: benchmark ? "1.5px solid #ffd700" : "1px dashed rgba(255, 255, 255, 0.2)",
+                          borderRadius: "12px",
+                          padding: "12px 18px",
+                          marginBottom: "18px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: "10px"
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <span style={{ fontSize: "22px" }}>👑</span>
+                            <div>
+                              <span style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700", textTransform: "uppercase" }}>
+                                สถานะตัวตั้งประจำรอบ ({curRound?.roundName || "Round 1/4"})
+                              </span>
+                              <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>
+                                {benchmark ? (
+                                  <>
+                                    ตัวตั้งปัจจุบัน: <span style={{ color: "#ffd700" }}>{benchmark.name} ({benchmark.nickname})</span> • {benchmark.topic}
+                                  </>
+                                ) : (
+                                  "ยังไม่มีตัวตั้งประจำรอบนี้ (ผู้เข้าแข่งขันคนแรกที่ลงเล่นจะเป็นตัวตั้งเสมอ)"
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          {benchmark && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>คะแนนที่เป็นเกณฑ์:</span>
+                              <span style={{ fontSize: "20px", fontWeight: "900", color: "#ffd700" }}>{benchmark.totalScore} คะแนน</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Turn & Score Input Form */}
+                        <div style={{
+                          background: "rgba(0, 15, 30, 0.8)",
+                          border: "1px solid rgba(255, 215, 0, 0.3)",
+                          borderRadius: "14px",
+                          padding: "18px",
+                          marginBottom: "20px"
+                        }}>
+                          <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#ffd700", margin: "0 0 14px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span>🎮</span> กรอกคะแนนผู้เข้าแข่งขันในรอบนี้
+                          </h3>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", marginBottom: "14px" }}>
+                            {/* 1. Select Contestant */}
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.7)", marginBottom: "6px", fontWeight: "700" }}>
+                                1. เลือกผู้เข้าแข่งขัน (เรียงตามลำดับ Order):
+                              </label>
+                              <select
+                                value={selectedFinalsPlayerOrder}
+                                onChange={(e) => {
+                                  setSelectedFinalsPlayerOrder(e.target.value);
+                                  const p = curPlayers.find((pl) => String(pl.order) === String(e.target.value));
+                                  if (p) {
+                                    const catKeys = ["3sec", "qa", "jigsaw", "attribute"];
+                                    for (const k of catKeys) {
+                                      const v = p.scores?.[k];
+                                      if (v !== null && v !== undefined && v !== "X") {
+                                        setSelectedFinalsCategory(k);
+                                        setFinalsInputScore(String(v));
+                                        break;
+                                      }
+                                    }
+                                  }
+                                }}
+                                style={{
+                                  width: "100%",
+                                  padding: "10px 12px",
+                                  borderRadius: "8px",
+                                  background: "rgba(0, 10, 20, 0.9)",
+                                  border: "1px solid rgba(255, 215, 0, 0.4)",
+                                  color: "#ffffff",
+                                  fontSize: "14px",
+                                  fontWeight: "700"
+                                }}
+                              >
+                                <option value="">-- กรุณาเลือกผู้เข้าแข่งขัน --</option>
+                                {curPlayers.map((p) => (
+                                  <option key={p.order} value={p.order}>
+                                    #{p.order} {p.name} ({p.nickname}) - {p.topic} [{p.result || "รอแข่ง"}]
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {/* 2. Select Category */}
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.7)", marginBottom: "6px", fontWeight: "700" }}>
+                                2. เลือกหมวดการแข่งขัน (เลือกได้ 1 หมวด):
+                              </label>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                {[
+                                  { key: "3sec", label: "⏱️ 3 วินาที" },
+                                  { key: "qa", label: "❓ ถาม-ตอบ" },
+                                  { key: "jigsaw", label: "🧩 จิ๊กซอว์" },
+                                  { key: "attribute", label: "🔍 คุณสมบัติ" },
+                                ].map((cat) => {
+                                  const locked = isCatLocked(cat.key);
+                                  const isSelected = selectedFinalsCategory === cat.key;
+                                  return (
+                                    <button
+                                      key={cat.key}
+                                      type="button"
+                                      disabled={locked}
+                                      onClick={() => setSelectedFinalsCategory(cat.key)}
+                                      style={{
+                                        padding: "8px 10px",
+                                        borderRadius: "8px",
+                                        background: locked
+                                          ? "rgba(40, 10, 15, 0.6)"
+                                          : isSelected
+                                          ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)"
+                                          : "rgba(0, 15, 30, 0.7)",
+                                        color: locked ? "#ff7875" : isSelected ? "#030814" : "#ffffff",
+                                        border: locked ? "1px solid rgba(255, 77, 79, 0.3)" : isSelected ? "1px solid #ffd700" : "1px solid rgba(255, 255, 255, 0.15)",
+                                        fontSize: "12px",
+                                        fontWeight: "700",
+                                        cursor: locked ? "not-allowed" : "pointer",
+                                        opacity: locked ? 0.6 : 1
+                                      }}
+                                    >
+                                      {cat.label} {locked && "(X ล็อก)"}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* 3. Input Score */}
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.7)", marginBottom: "6px", fontWeight: "700" }}>
+                                3. คะแนนที่ทำได้ (0 - 25 คะแนน):
+                              </label>
+                              <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="25"
+                                  placeholder="0-25"
+                                  value={finalsInputScore}
+                                  onChange={(e) => setFinalsInputScore(e.target.value)}
+                                  style={{
+                                    flex: 1,
+                                    padding: "10px 12px",
+                                    borderRadius: "8px",
+                                    background: "rgba(0, 10, 20, 0.9)",
+                                    border: "1px solid rgba(255, 215, 0, 0.4)",
+                                    color: "#ffd700",
+                                    fontSize: "16px",
+                                    fontWeight: "900",
+                                    textAlign: "center"
+                                  }}
+                                />
+                                {[0, 10, 20, 25].map((sc) => (
+                                  <button
+                                    key={sc}
+                                    type="button"
+                                    onClick={() => setFinalsInputScore(String(sc))}
+                                    style={{
+                                      padding: "10px 10px",
+                                      borderRadius: "8px",
+                                      background: "rgba(255, 215, 0, 0.15)",
+                                      border: "1px solid rgba(255, 215, 0, 0.3)",
+                                      color: "#ffd700",
+                                      fontSize: "12px",
+                                      fontWeight: "800",
+                                      cursor: "pointer"
+                                    }}
+                                  >
+                                    {sc}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Prediction Text Pill */}
+                          {predictionText && (
+                            <div style={{
+                              padding: "8px 14px",
+                              borderRadius: "8px",
+                              background: "rgba(0, 0, 0, 0.5)",
+                              border: `1.5px solid ${predictionColor}`,
+                              color: predictionColor,
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              marginBottom: "14px"
+                            }}>
+                              {predictionText}
+                            </div>
+                          )}
+
+                          {/* Save Button */}
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <button
+                              type="button"
+                              onClick={handleSaveFinalsPlayerScore}
+                              style={{
+                                padding: "12px 28px",
+                                borderRadius: "10px",
+                                background: "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)",
+                                color: "#030814",
+                                fontSize: "15px",
+                                fontWeight: "900",
+                                border: "none",
+                                cursor: "pointer",
+                                boxShadow: "0 0 15px rgba(255, 215, 0, 0.4)"
+                              }}
+                            >
+                              💾 บันทึกผลการแข่งขันคนนี้
+                            </button>
+                            {finalsSavingNotice && (
+                              <span style={{ fontSize: "13px", color: finalsSavingNotice.startsWith("✅") ? "#86efac" : "#ff7875", fontWeight: "700" }}>
+                                {finalsSavingNotice}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Standings Table for Current Round */}
+                        <div style={{ overflowX: "auto" }}>
+                          <div style={{ minWidth: "700px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", fontSize: "12px", color: "#ffd700", fontWeight: "800" }}>
+                              <div style={{ width: "50px", textAlign: "center" }}>Order</div>
+                              <div style={{ flex: 1, paddingLeft: "10px" }}>ผู้เข้าแข่งขัน</div>
+                              <div style={{ width: "60px", textAlign: "center" }}>3 วินาที</div>
+                              <div style={{ width: "60px", textAlign: "center" }}>ถาม-ตอบ</div>
+                              <div style={{ width: "60px", textAlign: "center" }}>จิ๊กซอว์</div>
+                              <div style={{ width: "60px", textAlign: "center" }}>คุณสมบัติ</div>
+                              <div style={{ width: "160px", textAlign: "center" }}>สถานะการแข่งขัน</div>
+                              <div style={{ width: "70px", textAlign: "center" }}>เลือก</div>
+                            </div>
+
+                            {curPlayers.map((p) => {
+                              const isCurrentBenchmark = p.result && p.result.includes("ตัวตั้ง");
+                              const isChamp = p.result && p.result.includes("FAN OF THE YEAR");
+                              const isDead = p.result === "ตกรอบ";
+                              const isAdv = p.result === "เข้ารอบ" || isChamp;
+
+                              return (
+                                <div
+                                  key={p.order}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    padding: "8px",
+                                    marginBottom: "6px",
+                                    borderRadius: "10px",
+                                    background: isChamp
+                                      ? "rgba(60, 45, 10, 0.7)"
+                                      : isCurrentBenchmark
+                                      ? "rgba(40, 30, 5, 0.6)"
+                                      : "rgba(0, 15, 30, 0.6)",
+                                    border: isChamp
+                                      ? "1.5px solid #ffd700"
+                                      : isCurrentBenchmark
+                                      ? "1.5px solid rgba(255, 215, 0, 0.6)"
+                                      : isDead
+                                      ? "1px solid rgba(255, 77, 79, 0.3)"
+                                      : "1px solid rgba(255, 255, 255, 0.1)"
+                                  }}
+                                >
+                                  <div style={{ width: "50px", textAlign: "center", fontWeight: "900", color: "#ffd700", fontSize: "15px" }}>
+                                    #{p.order}
+                                  </div>
+
+                                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", background: "#000", flexShrink: 0 }}>
+                                      {p.image ? (
+                                        <img src={p.image} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                      ) : (
+                                        <span>👤</span>
+                                      )}
+                                    </div>
+                                    <div>
+                                      <div style={{ fontWeight: "800", fontSize: "13px", color: isChamp ? "#ffd700" : "#ffffff" }}>
+                                        {p.nickname ? `${p.nickname} - ` : ""}{p.name}
+                                      </div>
+                                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>
+                                        {p.topic}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {["3sec", "qa", "jigsaw", "attribute"].map((k) => {
+                                    const val = p.scores?.[k];
+                                    const locked = val === "X";
+                                    const sc = typeof val === "number";
+                                    return (
+                                      <div
+                                        key={k}
+                                        style={{
+                                          width: "60px",
+                                          textAlign: "center",
+                                          fontWeight: "800",
+                                          fontSize: locked ? "14px" : sc ? "16px" : "13px",
+                                          color: locked ? "#ff7875" : sc ? "#52c41a" : "rgba(255,255,255,0.3)"
+                                        }}
+                                      >
+                                        {locked ? "X" : sc ? val : "-"}
+                                      </div>
+                                    );
+                                  })}
+
+                                  <div style={{ width: "160px", textAlign: "center" }}>
+                                    <span style={{
+                                      display: "inline-block",
+                                      padding: "3px 8px",
+                                      borderRadius: "6px",
+                                      fontSize: "11px",
+                                      fontWeight: "800",
+                                      background: isChamp
+                                        ? "rgba(255, 215, 0, 0.25)"
+                                        : isCurrentBenchmark
+                                        ? "rgba(255, 215, 0, 0.2)"
+                                        : isAdv
+                                        ? "rgba(34, 197, 94, 0.2)"
+                                        : isDead
+                                        ? "rgba(255, 77, 79, 0.2)"
+                                        : "rgba(255, 255, 255, 0.1)",
+                                      color: isChamp || isCurrentBenchmark
+                                        ? "#ffd700"
+                                        : isAdv
+                                        ? "#86efac"
+                                        : isDead
+                                        ? "#ff7875"
+                                        : "rgba(255,255,255,0.7)",
+                                      border: isChamp || isCurrentBenchmark
+                                        ? "1px solid #ffd700"
+                                        : isAdv
+                                        ? "1px solid #52c41a"
+                                        : isDead
+                                        ? "1px solid #ff4d4f"
+                                        : "1px solid rgba(255, 255, 255, 0.2)"
+                                    }}>
+                                      {p.result || "รอแข่ง"}
+                                    </span>
+                                  </div>
+
+                                  <div style={{ width: "70px", textAlign: "center" }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedFinalsPlayerOrder(String(p.order));
+                                        const catKeys = ["3sec", "qa", "jigsaw", "attribute"];
+                                        for (const k of catKeys) {
+                                          const v = p.scores?.[k];
+                                          if (v !== null && v !== undefined && v !== "X") {
+                                            setSelectedFinalsCategory(k);
+                                            setFinalsInputScore(String(v));
+                                            break;
+                                          }
+                                        }
+                                      }}
+                                      style={{
+                                        padding: "4px 8px",
+                                        borderRadius: "6px",
+                                        background: "rgba(255, 215, 0, 0.2)",
+                                        border: "1px solid rgba(255, 215, 0, 0.4)",
+                                        color: "#ffd700",
+                                        fontSize: "11px",
+                                        fontWeight: "700",
+                                        cursor: "pointer"
+                                      }}
+                                    >
+                                      แก้ไข
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            ) : (
+              <>
             {/* Step 1: Select Contestant */}
             <div style={{
               background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
@@ -2872,6 +3538,8 @@ export default function AdminPage() {
                   กรุณาเลือกผู้เข้าแข่งขันจากช่องด้านบน แล้วกด <strong>"ยืนยันเลือกคนนี้"</strong> เพื่อเริ่มใส่คะแนน
                 </p>
               </div>
+            )}
+              </>
             )}
           </div>
           );

@@ -59,6 +59,122 @@ function writeHistoryData(data) {
   }
 }
 
+function evaluateFinalsRound(round) {
+  if (!round || !Array.isArray(round.players)) return round;
+  const categoryKeys = ["3sec", "qa", "jigsaw", "attribute"];
+  const players = round.players.map((p) => ({
+    ...p,
+    scores: { ...(p.scores || {}) },
+  }));
+
+  // Sort by order so 1st player is first
+  players.sort((a, b) => (Number(a.order) || 999) - (Number(b.order) || 999));
+
+  let currentBenchmark = null;
+  let benchmarkScore = -1;
+  let tiedContestants = [];
+  let playedCount = 0;
+  let nonZeroCount = 0;
+
+  for (let i = 0; i < players.length; i++) {
+    const p = players[i];
+    let playedScore = null;
+    let playedCat = null;
+    for (const k of categoryKeys) {
+      const val = p.scores[k];
+      if (val !== null && val !== undefined && val !== "" && val !== "X" && !isNaN(Number(val))) {
+        playedScore = Number(val);
+        playedCat = k;
+        break;
+      }
+    }
+
+    if (playedScore === null) {
+      if (!p.result || p.result === "รอลุ้นผลรอบชิงชนะเลิศ") {
+        p.result = "รอการแข่งขัน";
+      }
+      p.rank = "-";
+      continue;
+    }
+
+    playedCount++;
+    if (playedScore > 0) nonZeroCount++;
+    p.totalScore = playedScore;
+
+    if (currentBenchmark === null) {
+      // First player to play is always benchmark ("คนแรกที่เล่นในแต่ละรอบ จะเป็นตัวตั้งเสมอ")
+      currentBenchmark = p;
+      benchmarkScore = playedScore;
+      tiedContestants = [p];
+      p.result = `ตัวตั้ง (${playedScore} คะแนน)`;
+    } else {
+      if (playedScore > benchmarkScore) {
+        // Challenger beats benchmark: previous benchmark eliminated, challenger becomes new benchmark
+        tiedContestants.forEach((prev) => {
+          prev.result = "ตกรอบ";
+        });
+        currentBenchmark = p;
+        benchmarkScore = playedScore;
+        tiedContestants = [p];
+        p.result = `ตัวตั้ง (${playedScore} คะแนน)`;
+      } else if (playedScore < benchmarkScore) {
+        // Scored less than benchmark: eliminated
+        p.result = "ตกรอบ";
+      } else {
+        // Tied with benchmark: both advance to next round
+        tiedContestants.push(p);
+        tiedContestants.forEach((tieP) => {
+          tieP.result = "เข้ารอบ";
+        });
+      }
+    }
+  }
+
+  // If all players in the round have played
+  if (playedCount === players.length && players.length > 0) {
+    if (nonZeroCount === 0) {
+      // Everyone got 0 -> No Champion
+      players.forEach((p) => {
+        p.result = "ไม่มีผู้ชนะ (ได้ 0 คะแนนทุกคน)";
+        p.rank = "-";
+      });
+    } else if (tiedContestants.length === 1) {
+      // 1 winner standing
+      const winner = tiedContestants[0];
+      winner.result = "FAN OF THE YEAR 2026";
+      winner.rank = "1";
+      const eliminated = players.filter((p) => p !== winner);
+      eliminated.sort((a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0));
+      let curRank = 2;
+      let lastSc = null;
+      eliminated.forEach((p, idx) => {
+        const sc = Number(p.totalScore) || 0;
+        if (lastSc !== null && sc !== lastSc) curRank = idx + 2;
+        lastSc = sc;
+        p.rank = String(curRank);
+      });
+    } else if (tiedContestants.length > 1) {
+      // Tied: advance to next round
+      tiedContestants.forEach((p) => {
+        p.result = "เข้ารอบ";
+        p.rank = "1";
+      });
+      const eliminated = players.filter((p) => !tiedContestants.includes(p));
+      eliminated.sort((a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0));
+      let curRank = tiedContestants.length + 1;
+      let lastSc = null;
+      eliminated.forEach((p, idx) => {
+        const sc = Number(p.totalScore) || 0;
+        if (lastSc !== null && sc !== lastSc) curRank = tiedContestants.length + idx + 1;
+        lastSc = sc;
+        p.rank = String(curRank);
+      });
+    }
+  }
+
+  return { ...round, players };
+}
+
 function readSettingsData() {
   try {
     if (!fs.existsSync(SETTINGS_FILE)) return null;
@@ -170,7 +286,10 @@ function writeData(data) {
 
 export async function GET() {
   const data = await getKVData("fpt_leaderboard", readData);
-  return NextResponse.json({ success: true, data });
+  let historyData = await getKVData("fpt_history", readHistoryData);
+  if (!historyData) historyData = readHistoryData();
+  const finals = historyData?.seasons?.["2026"]?.finals || [];
+  return NextResponse.json({ success: true, data, finals });
 }
 
 export async function POST(request) {
@@ -303,12 +422,14 @@ export async function POST(request) {
           championTopic: "รอการแข่งขันในรอบชิงชนะเลิศ",
         },
         qualifying: qualifyingList,
-        finals: [
-          {
-            roundName: "รอบชิงชนะเลิศ 2026 (Finals)",
-            players: finalistsList,
-          },
-        ],
+        finals: (historyData.seasons["2026"]?.finals && historyData.seasons["2026"].finals.length > 0)
+          ? historyData.seasons["2026"].finals
+          : [
+              {
+                roundName: "รอบชิงชนะเลิศ Round 1/4",
+                players: finalistsList,
+              },
+            ],
       };
 
       await saveKVData("fpt_history", historyData, writeHistoryData);
@@ -406,6 +527,212 @@ export async function POST(request) {
         message: "บันทึกคะแนนรอบชิงชนะเลิศเรียบร้อยแล้ว",
         data: currentData,
         record: currentData[existingIdx],
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // FINALS ACTION: Save Round Player Score with Rule Evaluation
+    // ------------------------------------------------------------------------
+    if (body.action === "save_finals_player" || body.action === "save_finals_round") {
+      let historyData = await getKVData("fpt_history", readHistoryData);
+      if (!historyData) historyData = readHistoryData();
+      if (!historyData.seasons) historyData.seasons = {};
+      if (!historyData.seasons["2026"]) historyData.seasons["2026"] = {};
+      if (!Array.isArray(historyData.seasons["2026"].finals) || historyData.seasons["2026"].finals.length === 0) {
+        const top5 = (historyData.seasons["2026"].qualifying || []).slice(0, 5);
+        historyData.seasons["2026"].finals = [
+          {
+            roundName: "รอบชิงชนะเลิศ Round 1/4",
+            players: top5.map((p, idx) => ({
+              date: "2026",
+              rank: "-",
+              order: idx + 1,
+              pollRank: p.pollRank,
+              nickname: p.nickname,
+              name: p.name,
+              topic: p.topic,
+              scores: { "3sec": null, qa: null, jigsaw: null, attribute: null },
+              totalScore: 0,
+              result: "รอการแข่งขัน",
+              image: p.image,
+            })),
+          },
+        ];
+      }
+
+      const roundIdx = typeof body.roundIndex === "number" ? body.roundIndex : (historyData.seasons["2026"].finals.length - 1);
+      const targetRound = historyData.seasons["2026"].finals[roundIdx] || historyData.seasons["2026"].finals[0];
+
+      if (body.action === "save_finals_round" && Array.isArray(body.players)) {
+        targetRound.players = body.players;
+        if (body.roundName) targetRound.roundName = body.roundName;
+      } else if (body.action === "save_finals_player") {
+        const pIdx = targetRound.players.findIndex(
+          (p) => String(p.order) === String(body.order) || p.name === body.name || p.nickname === body.nickname
+        );
+        if (pIdx !== -1) {
+          const targetP = targetRound.players[pIdx];
+          const newScores = { ...(targetP.scores || {}) };
+          if (body.category) {
+            newScores[body.category] = body.score !== null && body.score !== undefined && body.score !== "" ? Number(body.score) : null;
+          }
+          targetRound.players[pIdx] = {
+            ...targetP,
+            scores: newScores,
+            result: body.manualResult !== undefined ? body.manualResult : targetP.result,
+            rank: body.manualRank !== undefined ? body.manualRank : targetP.rank,
+          };
+        }
+      }
+
+      if (body.autoEvaluate !== false) {
+        historyData.seasons["2026"].finals[roundIdx] = evaluateFinalsRound(targetRound);
+      }
+
+      const evaluatedRound = historyData.seasons["2026"].finals[roundIdx];
+      const champ = evaluatedRound.players.find((p) => p.result && p.result.includes("FAN OF THE YEAR"));
+      if (champ) {
+        historyData.seasons["2026"].info.championName = champ.name;
+        historyData.seasons["2026"].info.championTopic = champ.topic;
+        const existingChampIdx = historyData.champions.findIndex((c) => Number(c.year) === 2026);
+        if (existingChampIdx !== -1) {
+          historyData.champions[existingChampIdx].name = champ.name;
+          historyData.champions[existingChampIdx].nickname = champ.nickname;
+          historyData.champions[existingChampIdx].topic = champ.topic;
+          historyData.champions[existingChampIdx].image = champ.image;
+          historyData.champions[existingChampIdx].isMystery = false;
+        }
+      }
+
+      await saveKVData("fpt_history", historyData, writeHistoryData);
+
+      return NextResponse.json({
+        success: true,
+        message: "บันทึกผลการแข่งขันรอบชิงชนะเลิศเรียบร้อยแล้ว",
+        finals: historyData.seasons["2026"].finals,
+        currentRound: historyData.seasons["2026"].finals[roundIdx],
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // FINALS ACTION: Create Next Round (Round 2/4, 3/4, 4/4) with surviving players
+    // ------------------------------------------------------------------------
+    if (body.action === "create_finals_next_round") {
+      let historyData = await getKVData("fpt_history", readHistoryData);
+      if (!historyData) historyData = readHistoryData();
+      const finalsList = historyData?.seasons?.["2026"]?.finals || [];
+      if (finalsList.length === 0) {
+        return NextResponse.json({ success: false, error: "ไม่มีข้อมูลรอบชิงชนะเลิศ" }, { status: 400 });
+      }
+
+      const lastRound = finalsList[finalsList.length - 1];
+      const advancing = lastRound.players.filter(
+        (p) => p.result === "เข้ารอบ" || p.result.includes("เสมอ") || (p.result.includes("ตัวตั้ง") && lastRound.players.some(o => o !== p && o.result === "เข้ารอบ"))
+      );
+
+      if (advancing.length < 2) {
+        return NextResponse.json({
+          success: false,
+          error: "มีผู้เล่นที่เสมอกันหรือเข้ารอบไม่ถึง 2 คน จึงไม่จำเป็นต้องสร้างรอบถัดไป",
+        }, { status: 400 });
+      }
+
+      const nextRoundNum = finalsList.length + 1;
+      const categoryKeys = ["3sec", "qa", "jigsaw", "attribute"];
+      const newRoundPlayers = advancing.map((p, idx) => {
+        const playedCategories = new Set();
+        finalsList.forEach((r) => {
+          const matchP = r.players.find((pl) => pl.name === p.name);
+          if (matchP && matchP.scores) {
+            categoryKeys.forEach((cat) => {
+              const val = matchP.scores[cat];
+              if (val !== null && val !== undefined && val !== "" && val !== "X") {
+                playedCategories.add(cat);
+              }
+            });
+          }
+        });
+
+        const newScores = {};
+        categoryKeys.forEach((cat) => {
+          newScores[cat] = playedCategories.has(cat) ? "X" : null;
+        });
+
+        return {
+          date: "2026",
+          rank: "-",
+          order: idx + 1,
+          pollRank: p.pollRank,
+          nickname: p.nickname,
+          name: p.name,
+          topic: p.topic,
+          scores: newScores,
+          totalScore: 0,
+          result: "รอการแข่งขัน",
+          image: p.image,
+        };
+      });
+
+      const newRound = {
+        roundName: `รอบชิงชนะเลิศ Round ${nextRoundNum}/4`,
+        players: newRoundPlayers,
+      };
+
+      finalsList.push(newRound);
+      historyData.seasons["2026"].finals = finalsList;
+      await saveKVData("fpt_history", historyData, writeHistoryData);
+
+      return NextResponse.json({
+        success: true,
+        message: `สร้าง ${newRound.roundName} เรียบร้อยแล้ว`,
+        finals: finalsList,
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // FINALS ACTION: Reset Finals to initial Round 1
+    // ------------------------------------------------------------------------
+    if (body.action === "reset_finals") {
+      let historyData = await getKVData("fpt_history", readHistoryData);
+      if (!historyData) historyData = readHistoryData();
+      const top5 = (historyData.seasons?.["2026"]?.qualifying || []).slice(0, 5);
+
+      historyData.seasons["2026"].finals = [
+        {
+          roundName: "รอบชิงชนะเลิศ Round 1/4",
+          players: top5.map((p, idx) => ({
+            date: "2026",
+            rank: "-",
+            order: idx + 1,
+            pollRank: p.pollRank,
+            nickname: p.nickname,
+            name: p.name,
+            topic: p.topic,
+            scores: { "3sec": null, qa: null, jigsaw: null, attribute: null },
+            totalScore: 0,
+            result: "รอการแข่งขัน",
+            image: p.image,
+          })),
+        },
+      ];
+
+      historyData.seasons["2026"].info.championName = "รอลุ้นแชมป์";
+      historyData.seasons["2026"].info.championTopic = "รอการแข่งขันในรอบชิงชนะเลิศ";
+
+      const champIdx = historyData.champions.findIndex((c) => Number(c.year) === 2026);
+      if (champIdx !== -1) {
+        historyData.champions[champIdx].name = "รอการแข่งขันในรอบชิงชนะเลิศ";
+        historyData.champions[champIdx].nickname = "?";
+        historyData.champions[champIdx].topic = "รอการแข่งขันในรอบชิงชนะเลิศ";
+        historyData.champions[champIdx].isMystery = true;
+      }
+
+      await saveKVData("fpt_history", historyData, writeHistoryData);
+
+      return NextResponse.json({
+        success: true,
+        message: "รีเซ็ตรอบชิงชนะเลิศกลับสู่ Round 1/4 เรียบร้อยแล้ว",
+        finals: historyData.seasons["2026"].finals,
       });
     }
 

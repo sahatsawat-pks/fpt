@@ -519,6 +519,9 @@ export default function MainPage() {
   const [isArchived, setIsArchived] = useState(false);
   const [currentPhase, setCurrentPhase] = useState("qualifying"); // 'qualifying' | 'finals'
   const [tablePhase, setTablePhase] = useState("auto"); // 'auto' | 'finals' | 'qualifying'
+  const [finalsRounds, setFinalsRounds] = useState([]);
+  const [activeFinalsRoundIdx, setActiveFinalsRoundIdx] = useState(0);
+  const [showFinalsRules, setShowFinalsRules] = useState(false);
 
   // Mobile Navigation Drawer State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -545,6 +548,9 @@ export default function MainPage() {
 
       if (scoresData.success && Array.isArray(scoresData.data)) {
         setLeaderboard(scoresData.data);
+      }
+      if (scoresData.finals && Array.isArray(scoresData.finals)) {
+        setFinalsRounds(scoresData.finals);
       }
       if (pollData.success && Array.isArray(pollData.data) && pollData.data.length > 0) {
         setPollList(pollData.data);
@@ -2082,291 +2088,523 @@ export default function MainPage() {
                             </h2>
                           </div>
                           <div style={{ transform: "skewX(16deg)", fontSize: "12px", color: "#ffd700", fontStyle: "italic", fontWeight: "700" }}>
-                            รอบชิงชนะเลิศ (Top 5 Finalists)
+                            รอบชิงชนะเลิศ (The Finals Tournament)
                           </div>
                         </div>
 
-                        {/* Column Headers Row */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-                          <div style={{
-                            width: "80px",
-                            height: "32px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)",
-                            border: "2px solid #ffd700",
-                            boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0
-                          }}>
-                            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                              อันดับ
-                            </span>
-                          </div>
-
-                          <div style={{
-                            flex: 1,
-                            height: "32px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
-                            border: "2px solid rgba(255, 255, 255, 0.4)",
-                            boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
-                            display: "flex",
-                            alignItems: "center",
-                            padding: "0 18px"
-                          }}>
-                            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "13px", color: "#ffffff", letterSpacing: "1px" }}>
-                              ผู้เข้ารอบชิงชนะเลิศ (ชื่อเล่น - ชื่อจริง)
-                            </span>
-                          </div>
-
-                          <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)", border: "2px solid #52c41a", boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#86efac" }}>3 วินาที</span>
-                          </div>
-                          <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #262c35 0%, #111418 100%)", border: "2px solid #e0e0e0", boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>ถาม-ตอบ</span>
-                          </div>
-                          <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #300f13 0%, #150507 100%)", border: "2px solid #ff4d4f", boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#fca5a5" }}>จิ๊กซอว์</span>
-                          </div>
-                          <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #092338 0%, #04101c 100%)", border: "2px solid #00e5ff", boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>คุณสมบัติ</span>
-                          </div>
-                          <div style={{ width: "86px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)", border: "2px solid #ffd700", boxShadow: "0 0 14px rgba(255, 215, 0, 0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>รวมรอบชิง</span>
-                          </div>
-                        </div>
-
-                        {/* Finals Rows */}
-                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                          {finalistsLeaderboard.map((item, idx) => {
-                            const rankNum = item.currentFinalRank || (idx + 1);
-                            const isRank1 = rankNum === 1;
-                            const hasAnyFinalScore = (Number(item.finalTotalScore) || 0) > 0;
-                            return (
-                              <div
-                                key={item.id}
-                                style={{
+                        {/* Golden Finals Rules Plaque */}
+                        <div style={{
+                          background: "linear-gradient(135deg, rgba(30, 20, 0, 0.85) 0%, rgba(15, 10, 0, 0.95) 100%)",
+                          border: "1.5px solid rgba(255, 215, 0, 0.5)",
+                          borderRadius: "14px",
+                          padding: "16px 20px",
+                          marginBottom: "18px",
+                          boxShadow: "0 8px 25px rgba(255, 215, 0, 0.15)"
+                        }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              cursor: "pointer",
+                              userSelect: "none",
+                              flexWrap: "wrap",
+                              gap: "10px"
+                            }}
+                            onClick={() => setShowFinalsRules(!showFinalsRules)}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                              <span style={{ fontSize: "22px" }}>📜</span>
+                              <div>
+                                <h3 style={{
+                                  fontSize: "16px",
+                                  fontWeight: "900",
+                                  color: "#ffd700",
+                                  margin: 0,
                                   display: "flex",
                                   alignItems: "center",
-                                  gap: "8px",
-                                  transition: "transform 0.15s ease",
-                                }}
-                              >
-                                {/* Rank Pill */}
-                                <div style={{
-                                  width: "80px",
-                                  height: "48px",
-                                  borderRadius: "8px",
-                                  transform: "skewX(-16deg)",
-                                  background: isRank1 ? "linear-gradient(180deg, #ffd700 0%, #ff9900 100%)" : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
-                                  border: isRank1 ? "2.5px solid #fff566" : "2px solid #ffd700",
-                                  boxShadow: isRank1 ? "0 0 20px rgba(255, 215, 0, 0.7)" : "0 0 10px rgba(255, 215, 0, 0.3)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexShrink: 0
+                                  gap: "8px"
                                 }}>
-                                  <span style={{
-                                    transform: "skewX(16deg)",
-                                    fontStyle: "italic",
-                                    fontWeight: "900",
-                                    fontSize: "20px",
-                                    color: isRank1 ? "#030814" : "#ffd700"
-                                  }}>
-                                    {rankNum === 1 ? "🥇 1" : rankNum === 2 ? "🥈 2" : rankNum === 3 ? "🥉 3" : rankNum}
-                                  </span>
-                                </div>
+                                  กติกาการแข่งขันรอบชิงชนะเลิศ (The Finals Rules)
+                                </h3>
+                                <span style={{ fontSize: "12px", color: "rgba(255, 215, 0, 0.7)" }}>
+                                  แข่งหมวดต่อหมวด • ระบบตัวตั้ง-ล้มตัวตั้ง • ชิงดำจนเหลือสุดยอดแฟนพันธุ์แท้หนึ่งเดียว
+                                </span>
+                              </div>
+                            </div>
+                            <span style={{
+                              fontSize: "12px",
+                              fontWeight: "800",
+                              color: "#ffd700",
+                              background: "rgba(255, 215, 0, 0.15)",
+                              border: "1px solid rgba(255, 215, 0, 0.4)",
+                              padding: "5px 12px",
+                              borderRadius: "20px"
+                            }}>
+                              {showFinalsRules ? "ซ่อนกติกา ▲" : "ดูกติกา ▼"}
+                            </span>
+                          </div>
 
-                                {/* Contestant Card Bar */}
+                          {showFinalsRules && (
+                            <div style={{
+                              marginTop: "14px",
+                              paddingTop: "14px",
+                              borderTop: "1px solid rgba(255, 215, 0, 0.25)",
+                              display: "grid",
+                              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                              gap: "12px"
+                            }}>
+                              <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "10px", padding: "12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                                  <span>🎯</span>
+                                  <strong style={{ color: "#ffd700", fontSize: "13px" }}>1. แข่งหมวดต่อหมวด</strong>
+                                </div>
+                                <p style={{ margin: 0, fontSize: "12px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.5" }}>
+                                  ผู้เข้ารอบ FINAL แข่งขันทีละหมวด (3 วินาที, คำถาม-คำตอบ, จิ๊กซอว์, คุณสมบัติ) เต็ม 25 คะแนน
+                                </p>
+                              </div>
+
+                              <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "10px", padding: "12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                                  <span>👑</span>
+                                  <strong style={{ color: "#ffd700", fontSize: "13px" }}>2. คนแรกเป็น \"ตัวตั้ง\"</strong>
+                                </div>
+                                <p style={{ margin: 0, fontSize: "12px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.5" }}>
+                                  คนแรกที่ลงเล่นในแต่ละรอบจะเป็น <strong>ตัวตั้ง</strong> เสมอ เป็นเกณฑ์คะแนนที่คนถัดไปต้องก้าวข้าม
+                                </p>
+                              </div>
+
+                              <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "10px", padding: "12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                                  <span>⚔️</span>
+                                  <strong style={{ color: "#ffd700", fontSize: "13px" }}>3. ล้มตัวตั้ง & ตกรอบ</strong>
+                                </div>
+                                <p style={{ margin: 0, fontSize: "12px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.5" }}>
+                                  • คะแนน <strong>มากกว่าตัวตั้ง</strong>: ตัวตั้งเดิมตกรอบทันที! ตัวเองเป็นตัวตั้งใหม่<br />
+                                  • คะแนน <strong>น้อยกว่าตัวตั้ง</strong>: ตกรอบทันที!
+                                </p>
+                              </div>
+
+                              <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "10px", padding: "12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                                  <span>🤝</span>
+                                  <strong style={{ color: "#ffd700", fontSize: "13px" }}>4. กรณีคะแนนเสมอกัน</strong>
+                                </div>
+                                <p style={{ margin: 0, fontSize: "12px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.5" }}>
+                                  หากเสมอกัน ต้องไปแข่งต่อในรอบถัดไป จนกว่าจะเหลือคนเดียว โดย <strong>ห้ามเลือกหมวดที่เล่นไปแล้ว</strong>
+                                </p>
+                              </div>
+
+                              <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 77, 79, 0.35)", borderRadius: "10px", padding: "12px", gridColumn: "1 / -1" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                                  <span>⚠️</span>
+                                  <strong style={{ color: "#ff7875", fontSize: "13px" }}>5. ตอบผิดหมด หรือ ได้ 0 ทุกคน</strong>
+                                </div>
+                                <p style={{ margin: 0, fontSize: "12px", color: "rgba(255, 255, 255, 0.85)", lineHeight: "1.5" }}>
+                                  หากในรอบนั้นทุกคนตอบผิดหมดหรือทำคะแนนได้ <strong>0 คะแนนทุกคน</strong> การแข่งขันในปีนี้จะ <strong>ไม่มีผู้ชนะ</strong>
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Multi-Round Switcher Tabs */}
+                        {finalsRounds && finalsRounds.length > 1 && (
+                          <div style={{ display: "flex", gap: "10px", marginBottom: "16px", flexWrap: "wrap" }}>
+                            {finalsRounds.map((rnd, rIdx) => {
+                              const isActive = (activeFinalsRoundIdx || 0) === rIdx;
+                              return (
+                                <button
+                                  key={rIdx}
+                                  type="button"
+                                  onClick={() => setActiveFinalsRoundIdx(rIdx)}
+                                  style={{
+                                    padding: "8px 18px",
+                                    borderRadius: "10px",
+                                    background: isActive
+                                      ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)"
+                                      : "rgba(0, 15, 30, 0.7)",
+                                    color: isActive ? "#030814" : "#ffd700",
+                                    border: isActive ? "1px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.3)",
+                                    fontSize: "13px",
+                                    fontWeight: "800",
+                                    cursor: "pointer",
+                                    boxShadow: isActive ? "0 0 14px rgba(255, 215, 0, 0.4)" : "none",
+                                    transition: "all 0.15s ease"
+                                  }}
+                                >
+                                  👑 {rnd.roundName} ({rnd.players?.length || 0} คน)
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {(() => {
+                          const activeRound = (finalsRounds && finalsRounds[activeFinalsRoundIdx || 0]) || (finalsRounds && finalsRounds[0]);
+                          const roundPlayers = activeRound?.players || [];
+                          const benchmarkPlayer = roundPlayers.find((p) => p.result && p.result.includes("ตัวตั้ง"));
+
+                          return (
+                            <div>
+                              {/* Current Active Benchmark Marquee */}
+                              {benchmarkPlayer && (
                                 <div style={{
-                                  flex: 1,
-                                  height: "48px",
-                                  borderRadius: "8px",
-                                  transform: "skewX(-16deg)",
-                                  background: isRank1 ? "linear-gradient(180deg, #1a2538 0%, #0d1522 100%)" : "linear-gradient(180deg, #121c2c 0%, #080e18 100%)",
-                                  border: isRank1 ? "2px solid #ffd700" : "1.5px solid rgba(255, 215, 0, 0.4)",
-                                  boxShadow: isRank1 ? "0 0 18px rgba(255, 215, 0, 0.35)" : "0 4px 15px rgba(0,0,0,0.4)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "space-between",
-                                  padding: "0 16px"
+                                  background: "linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 153, 0, 0.25) 100%)",
+                                  border: "2px solid #ffd700",
+                                  borderRadius: "12px",
+                                  padding: "10px 18px",
+                                  marginBottom: "14px",
+                                  boxShadow: "0 0 18px rgba(255, 215, 0, 0.3)",
+                                  flexWrap: "wrap",
+                                  gap: "8px"
                                 }}>
-                                  <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px", overflow: "hidden" }}>
-                                    <div style={{
-                                      width: "34px",
-                                      height: "34px",
-                                      borderRadius: "50%",
-                                      overflow: "hidden",
-                                      border: isRank1 ? "2px solid #ffd700" : "1.5px solid rgba(255, 215, 0, 0.5)",
-                                      background: "#081020",
-                                      flexShrink: 0,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center"
-                                    }}>
-                                      {item.image ? (
-                                        <img
-                                          src={getOptimizedImageUrl(item.image, 96)}
-                                          alt={item.name}
-                                          referrerPolicy="no-referrer"
-                                          loading="lazy"
-                                          decoding="async"
-                                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                        />
-                                      ) : (
-                                        <span style={{ fontSize: "16px" }}>👤</span>
-                                      )}
-                                    </div>
-                                    <div style={{ display: "flex", alignItems: "baseline", gap: "6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                      <span style={{ fontStyle: "italic", fontWeight: "900", fontSize: "18px", color: isRank1 ? "#ffd700" : "#ffffff" }}>
-                                        {item.nickname || item.name.split(" ")[0]}
-                                      </span>
-                                      <span style={{ fontStyle: "italic", fontWeight: "700", fontSize: "14px", color: "rgba(255, 255, 255, 0.85)" }}>
-                                        {item.name}
-                                      </span>
-                                      <span style={{ fontSize: "11px", color: "#80d0ff", marginLeft: "4px" }}>
-                                        • {item.topic}
-                                      </span>
-                                    </div>
-                                  </div>
-
-                                  <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-                                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", background: "rgba(0, 229, 255, 0.1)", padding: "2px 8px", borderRadius: "6px", border: "1px solid rgba(0, 229, 255, 0.25)" }}>
-                                      รอบคัดเลือก: {item.totalScore} คะแนน
+                                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <span style={{ fontSize: "20px" }}>👑</span>
+                                    <span style={{ fontSize: "13px", fontWeight: "800", color: "#ffd700" }}>
+                                      ตัวตั้งปัจจุบันของรอบ:
                                     </span>
-                                    {isRank1 && hasAnyFinalScore && (
-                                      <span style={{ fontSize: "11px", fontWeight: "900", color: "#030814", background: "#ffd700", padding: "2px 8px", borderRadius: "6px" }}>
-                                        👑 ผู้นำรอบชิง
-                                      </span>
-                                    )}
+                                    <span style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff" }}>
+                                      {benchmarkPlayer.name} {benchmarkPlayer.nickname ? `(${benchmarkPlayer.nickname})` : ""}
+                                    </span>
+                                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>
+                                      • {benchmarkPlayer.topic}
+                                    </span>
+                                  </div>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.8)" }}>คะแนนเกณฑ์:</span>
+                                    <span style={{ fontSize: "18px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>
+                                      {benchmarkPlayer.totalScore} คะแนน
+                                    </span>
                                   </div>
                                 </div>
+                              )}
 
-                                {/* Score 1: 3 วินาที */}
-                                {(() => {
-                                  const sc = item.finalScores?.["3sec"];
-                                  const pill = getScorePillStyle(sc, "3sec");
-                                  return (
-                                    <div style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...pill.container,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0
-                                    }}>
-                                      <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
-                                        {sc ?? "-"}
-                                      </span>
-                                    </div>
-                                  );
-                                })()}
-
-                                {/* Score 2: ถาม-ตอบ */}
-                                {(() => {
-                                  const sc = item.finalScores?.qa;
-                                  const pill = getScorePillStyle(sc, "qa");
-                                  return (
-                                    <div style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...pill.container,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0
-                                    }}>
-                                      <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
-                                        {sc ?? "-"}
-                                      </span>
-                                    </div>
-                                  );
-                                })()}
-
-                                {/* Score 3: จิ๊กซอว์ */}
-                                {(() => {
-                                  const sc = item.finalScores?.jigsaw;
-                                  const pill = getScorePillStyle(sc, "jigsaw");
-                                  return (
-                                    <div style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...pill.container,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0
-                                    }}>
-                                      <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
-                                        {sc ?? "-"}
-                                      </span>
-                                    </div>
-                                  );
-                                })()}
-
-                                {/* Score 4: คุณสมบัติ */}
-                                {(() => {
-                                  const sc = item.finalScores?.attribute;
-                                  const pill = getScorePillStyle(sc, "attribute");
-                                  return (
-                                    <div style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...pill.container,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0
-                                    }}>
-                                      <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "22px", ...pill.text }}>
-                                        {sc ?? "-"}
-                                      </span>
-                                    </div>
-                                  );
-                                })()}
-
-                                {/* Score 5: คะแนนรวมรอบชิง */}
+                              {/* Column Headers Row */}
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
                                 <div style={{
-                                  width: "86px",
-                                  height: "48px",
+                                  width: "70px",
+                                  height: "32px",
                                   borderRadius: "8px",
                                   transform: "skewX(-16deg)",
                                   background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)",
-                                  border: "3px solid #ffd700",
-                                  boxShadow: isRank1 ? "0 0 22px rgba(255, 215, 0, 0.75)" : "0 0 14px rgba(255, 215, 0, 0.4)",
+                                  border: "2px solid #ffd700",
+                                  boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
                                   flexShrink: 0
                                 }}>
-                                  <span style={{
-                                    transform: "skewX(16deg)",
-                                    fontStyle: "italic",
-                                    fontWeight: "900",
-                                    fontSize: "26px",
-                                    color: "#ffd700",
-                                    textShadow: "0 0 12px rgba(255, 215, 0, 0.8)"
-                                  }}>
-                                    {item.finalTotalScore ?? 0}
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
+                                    ลำดับ
                                   </span>
                                 </div>
+
+                                <div style={{
+                                  flex: 1,
+                                  height: "32px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
+                                  border: "2px solid rgba(255, 255, 255, 0.4)",
+                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  padding: "0 18px"
+                                }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "13px", color: "#ffffff", letterSpacing: "1px" }}>
+                                    ผู้เข้ารอบชิงชนะเลิศ (ชื่อเล่น - ชื่อจริง)
+                                  </span>
+                                </div>
+
+                                <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)", border: "2px solid #52c41a", boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#86efac" }}>3 วินาที</span>
+                                </div>
+                                <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #262c35 0%, #111418 100%)", border: "2px solid #e0e0e0", boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>ถาม-ตอบ</span>
+                                </div>
+                                <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #300f13 0%, #150507 100%)", border: "2px solid #ff4d4f", boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#fca5a5" }}>จิ๊กซอว์</span>
+                                </div>
+                                <div style={{ width: "74px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #092338 0%, #04101c 100%)", border: "2px solid #00e5ff", boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>คุณสมบัติ</span>
+                                </div>
+                                <div style={{ width: "160px", height: "32px", borderRadius: "8px", transform: "skewX(-16deg)", background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)", border: "2px solid #ffd700", boxShadow: "0 0 14px rgba(255, 215, 0, 0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>ผลการแข่งขันรอบนี้</span>
+                                </div>
                               </div>
-                            );
-                          })}
-                        </div>
+
+                              {/* Round Player Rows */}
+                              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                {roundPlayers.map((item, pIdx) => {
+                                  const isWinner = item.result && item.result.includes("FAN OF THE YEAR");
+                                  const isBenchmark = item.result && item.result.includes("ตัวตั้ง");
+                                  const isQualified = item.result === "เข้ารอบ" || isWinner;
+                                  const isEliminated = item.result === "ตกรอบ";
+                                  const isNoWinner = item.result && item.result.includes("ไม่มีผู้ชนะ");
+
+                                  return (
+                                    <div
+                                      key={pIdx}
+                                      onClick={() => setSelectedSpotlight(item)}
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px",
+                                        cursor: "pointer",
+                                        transition: "transform 0.15s ease",
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = "translateX(4px)";
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = "translateX(0px)";
+                                      }}
+                                    >
+                                      {/* Play Order Pill */}
+                                      <div style={{
+                                        width: "70px",
+                                        height: "48px",
+                                        borderRadius: "8px",
+                                        transform: "skewX(-16deg)",
+                                        background: isWinner
+                                          ? "linear-gradient(180deg, #332608 0%, #140e02 100%)"
+                                          : isBenchmark
+                                          ? "linear-gradient(180deg, #261f05 0%, #140e02 100%)"
+                                          : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                                        border: isWinner
+                                          ? "2.5px solid #ffd700"
+                                          : isBenchmark
+                                          ? "2px solid #ffd700"
+                                          : isQualified
+                                          ? "2px solid #52c41a"
+                                          : isEliminated
+                                          ? "2px solid rgba(255, 77, 79, 0.4)"
+                                          : "2px solid rgba(255, 255, 255, 0.2)",
+                                        boxShadow: isWinner
+                                          ? "0 0 16px rgba(255, 215, 0, 0.6)"
+                                          : isBenchmark
+                                          ? "0 0 12px rgba(255, 215, 0, 0.4)"
+                                          : "none",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        flexShrink: 0
+                                      }}>
+                                        <span style={{
+                                          transform: "skewX(16deg)",
+                                          fontWeight: "900",
+                                          fontSize: "17px",
+                                          fontStyle: "italic",
+                                          color: isWinner || isBenchmark ? "#ffd700" : isQualified ? "#86efac" : isEliminated ? "#ff7875" : "#fff"
+                                        }}>
+                                          #{item.order || pIdx + 1}
+                                        </span>
+                                      </div>
+
+                                      {/* Finalist Info Box */}
+                                      <div style={{
+                                        flex: 1,
+                                        height: "48px",
+                                        borderRadius: "8px",
+                                        transform: "skewX(-16deg)",
+                                        background: isWinner
+                                          ? "linear-gradient(90deg, rgba(60, 45, 10, 0.85) 0%, rgba(20, 15, 5, 0.9) 100%)"
+                                          : isBenchmark
+                                          ? "linear-gradient(90deg, rgba(50, 38, 5, 0.75) 0%, rgba(15, 12, 3, 0.85) 100%)"
+                                          : "linear-gradient(90deg, rgba(16, 32, 60, 0.75) 0%, rgba(10, 20, 40, 0.85) 100%)",
+                                        border: isWinner
+                                          ? "2px solid #ffd700"
+                                          : isBenchmark
+                                          ? "1.5px solid rgba(255, 215, 0, 0.6)"
+                                          : "1px solid rgba(255, 255, 255, 0.2)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        padding: "0 14px",
+                                        gap: "10px",
+                                        overflow: "hidden"
+                                      }}>
+                                        <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+                                          {/* Photo Avatar */}
+                                          <div style={{
+                                            width: "36px",
+                                            height: "36px",
+                                            borderRadius: "50%",
+                                            overflow: "hidden",
+                                            background: "rgba(0, 229, 255, 0.1)",
+                                            border: isWinner ? "2px solid #ffd700" : "1.5px solid rgba(255, 255, 255, 0.3)",
+                                            flexShrink: 0,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center"
+                                          }}>
+                                            {item.image ? (
+                                              <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                            ) : (
+                                              <span style={{ fontSize: "16px" }}>👤</span>
+                                            )}
+                                          </div>
+
+                                          <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                              <span style={{
+                                                fontWeight: "800",
+                                                fontSize: "14px",
+                                                color: isWinner ? "#ffd700" : "#ffffff",
+                                                whiteSpace: "nowrap",
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis"
+                                              }}>
+                                                {item.nickname ? `${item.nickname} - ` : ""}{item.name}
+                                              </span>
+                                              {item.pollRank && (
+                                                <span style={{
+                                                  fontSize: "10px",
+                                                  padding: "1px 6px",
+                                                  borderRadius: "4px",
+                                                  background: "rgba(0, 229, 255, 0.15)",
+                                                  color: "#67e8f9",
+                                                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                                                  fontWeight: "700"
+                                                }}>
+                                                  โพล: #{item.pollRank}
+                                                </span>
+                                              )}
+                                            </div>
+                                            <div style={{
+                                              fontSize: "11px",
+                                              color: "rgba(255, 255, 255, 0.6)",
+                                              whiteSpace: "nowrap",
+                                              overflow: "hidden",
+                                              textOverflow: "ellipsis"
+                                            }}>
+                                              แฟนพันธุ์แท้ {item.topic}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* 4 Category Capsules */}
+                                      {["3sec", "qa", "jigsaw", "attribute"].map((catKey) => {
+                                        const val = item.scores?.[catKey];
+                                        const isLocked = val === "X";
+                                        const hasScore = typeof val === "number";
+
+                                        let bg = "rgba(0, 15, 30, 0.6)";
+                                        let border = "1px solid rgba(255, 255, 255, 0.1)";
+                                        let textColor = "rgba(255, 255, 255, 0.3)";
+
+                                        if (isLocked) {
+                                          bg = "linear-gradient(180deg, #2b1115 0%, #150608 100%)";
+                                          border = "1.5px solid rgba(255, 77, 79, 0.5)";
+                                          textColor = "#ff7875";
+                                        } else if (hasScore) {
+                                          if (catKey === "3sec") {
+                                            bg = "linear-gradient(180deg, #0f2e18 0%, #05140a 100%)";
+                                            border = "2px solid #52c41a";
+                                            textColor = "#86efac";
+                                          } else if (catKey === "qa") {
+                                            bg = "linear-gradient(180deg, #262c35 0%, #111418 100%)";
+                                            border = "2px solid #ffffff";
+                                            textColor = "#ffffff";
+                                          } else if (catKey === "jigsaw") {
+                                            bg = "linear-gradient(180deg, #300f13 0%, #150507 100%)";
+                                            border = "2px solid #ff4d4f";
+                                            textColor = "#fca5a5";
+                                          } else {
+                                            bg = "linear-gradient(180deg, #092338 0%, #04101c 100%)";
+                                            border = "2px solid #00e5ff";
+                                            textColor = "#67e8f9";
+                                          }
+                                        }
+
+                                        return (
+                                          <div
+                                            key={catKey}
+                                            style={{
+                                              width: "74px",
+                                              height: "48px",
+                                              borderRadius: "8px",
+                                              transform: "skewX(-16deg)",
+                                              background: bg,
+                                              border: border,
+                                              display: "flex",
+                                              alignItems: "center",
+                                              justifyContent: "center",
+                                              flexShrink: 0
+                                            }}
+                                            title={isLocked ? "หมวดนี้เคยเล่นไปแล้วในรอบก่อนหน้า" : hasScore ? `${val} คะแนน` : "ยังไม่ได้เลือกเล่น"}
+                                          >
+                                            <span style={{
+                                              transform: "skewX(16deg)",
+                                              fontStyle: "italic",
+                                              fontWeight: "900",
+                                              fontSize: isLocked ? "18px" : hasScore ? "20px" : "15px",
+                                              color: textColor,
+                                            }}>
+                                              {isLocked ? "X" : hasScore ? val : "-"}
+                                            </span>
+                                          </div>
+                                        );
+                                      })}
+
+                                      {/* Result Capsule */}
+                                      <div style={{
+                                        width: "160px",
+                                        height: "48px",
+                                        borderRadius: "8px",
+                                        transform: "skewX(-16deg)",
+                                        background: isWinner
+                                          ? "linear-gradient(180deg, #332608 0%, #140e02 100%)"
+                                          : isBenchmark
+                                          ? "linear-gradient(180deg, #2c2007 0%, #130d02 100%)"
+                                          : isQualified
+                                          ? "linear-gradient(180deg, #0e2917 0%, #041208 100%)"
+                                          : isEliminated
+                                          ? "linear-gradient(180deg, #2b0e12 0%, #120406 100%)"
+                                          : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                                        border: isWinner
+                                          ? "2.5px solid #ffd700"
+                                          : isBenchmark
+                                          ? "2px solid #ffd700"
+                                          : isQualified
+                                          ? "2px solid #52c41a"
+                                          : isEliminated
+                                          ? "2px solid #ff4d4f"
+                                          : "1.5px solid rgba(255, 255, 255, 0.2)",
+                                        boxShadow: isWinner
+                                          ? "0 0 16px rgba(255, 215, 0, 0.6)"
+                                          : isBenchmark
+                                          ? "0 0 12px rgba(255, 215, 0, 0.4)"
+                                          : "none",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        padding: "0 10px",
+                                        flexShrink: 0
+                                      }}>
+                                        <span style={{
+                                          transform: "skewX(16deg)",
+                                          fontStyle: "italic",
+                                          fontWeight: "900",
+                                          fontSize: isWinner ? "13px" : "12px",
+                                          color: isWinner || isBenchmark ? "#ffd700" : isQualified ? "#86efac" : isEliminated ? "#ff7875" : isNoWinner ? "#ff7875" : "rgba(255,255,255,0.7)",
+                                          textAlign: "center",
+                                          lineHeight: 1.2
+                                        }}>
+                                          {isWinner ? "👑 FAN OF THE YEAR 2026" : (item.result || "รอการแข่งขัน")}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     ) : (
                       /* ========================================================

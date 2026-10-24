@@ -5782,7 +5782,103 @@
           "image": "https://lh3.googleusercontent.com/pw/AP1GczOXZ7x2lelKztH88AKbMMCOY3kEca65A0ke-9gVHZ3bjA-US37R2F-PQKOztqpRzHcmQaRfen2rY6jE26F4GPby3gG8o1ZdVfsxbzB6g0N6Cz6epHSO57s17ofVHCodPHJfdyQdTt-mjTc_M9i6bKKq=w1117-h1117-s-no-gm"
         }
       ],
-      "finals": []
+      "finals": [
+        {
+          "roundName": "รอบชิงชนะเลิศ Round 1/4",
+          "players": [
+            {
+              "date": "2026",
+              "rank": "-",
+              "order": 1,
+              "pollRank": 10,
+              "nickname": "นนท์",
+              "name": "นัทธภพ ธนวัฒนาเจริญ",
+              "topic": "Battle Spirits",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "totalScore": 0,
+              "result": "รอการแข่งขัน",
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm"
+            },
+            {
+              "date": "2026",
+              "rank": "-",
+              "order": 2,
+              "pollRank": 7,
+              "nickname": "ก๊อง",
+              "name": "เชาว์วรรธน์ จันทร์สุข",
+              "topic": "Workpoint",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "totalScore": 0,
+              "result": "รอการแข่งขัน",
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm"
+            },
+            {
+              "date": "2026",
+              "rank": "-",
+              "order": 3,
+              "pollRank": 17,
+              "nickname": "ตฤณ",
+              "name": "ณฤกร วงศบูรณะ",
+              "topic": "Tattoo Colour",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "totalScore": 0,
+              "result": "รอการแข่งขัน",
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm"
+            },
+            {
+              "date": "2026",
+              "rank": "-",
+              "order": 4,
+              "pollRank": 18,
+              "nickname": "ศีล",
+              "name": "พัทธ์ศีล ปุญศิริ",
+              "topic": "บอร์ดเกม",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "totalScore": 0,
+              "result": "รอการแข่งขัน",
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm"
+            },
+            {
+              "date": "2026",
+              "rank": "-",
+              "order": 5,
+              "pollRank": 5,
+              "nickname": "อินทร์",
+              "name": "คุณอินทร์ บุญสิน",
+              "topic": "วง Queen",
+              "scores": {
+                "3sec": null,
+                "qa": null,
+                "jigsaw": null,
+                "attribute": null
+              },
+              "totalScore": 0,
+              "result": "รอการแข่งขัน",
+              "image": "https://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm"
+            }
+          ]
+        }
+      ]
     }
   }
 }
