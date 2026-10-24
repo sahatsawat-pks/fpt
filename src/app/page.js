@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
+import heroContestants from "./data/heroContestants.json";
 
 function getScorePillStyle(score, categoryKey) {
   const is25 = score !== null && score !== undefined && score !== "" && score !== "-" && Number(score) === 25;
@@ -718,6 +719,15 @@ export default function MainPage() {
     });
   }, [leaderboard, pollList]);
 
+  // 6 columns of 5 contestant photos for the hero background wall (30 items total)
+  const heroColumns = useMemo(() => {
+    const cols = [[], [], [], [], [], []];
+    heroContestants.forEach((c, idx) => {
+      cols[idx % 6].push(c);
+    });
+    return cols;
+  }, []);
+
   const filteredStandings = useMemo(() => {
     // When sorting by poll, also include unplayed contestants in their poll ranking position
     let sourceList = denseRankedLeaderboard;
@@ -1255,10 +1265,129 @@ export default function MainPage() {
           pointerEvents: "none"
         }}></div>
 
+        {/* ========================================================
+            6 Vertical Floating Columns of Contestant Photos (Background Wall)
+            27 Weekly 2026 Contestants (excl. วชิรวิทย์) + 3 Extras (นัทธภพ/ศุภกร/พัชราภรณ์)
+            Odd columns (1,3,5): Scroll Down-Up | Even columns (2,4,6): Scroll Up-Down
+           ======================================================== */}
+        <div style={{
+          position: "absolute",
+          inset: "-50px -15px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          opacity: 0.28,
+          pointerEvents: "none",
+          zIndex: 1,
+          filter: "contrast(1.1) saturate(0.92)",
+          maskImage: "linear-gradient(180deg, transparent 0%, black 12%, black 88%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 12%, black 88%, transparent 100%)"
+        }}>
+          {heroColumns.map((col, cIdx) => {
+            const isOdd = cIdx % 2 === 0; // 0, 2, 4 = Columns 1, 3, 5 (Odd: Down-Up)
+            const animClass = isOdd ? "hero-col-odd" : "hero-col-even";
+            const animDelay = `${-(cIdx * 3.5)}s`;
+
+            return (
+              <div
+                key={cIdx}
+                className={animClass}
+                style={{
+                  flex: "1 1 0",
+                  maxWidth: "145px",
+                  minWidth: "60px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  animationDelay: animDelay
+                }}
+              >
+                {col.map((c, rIdx) => (
+                  <div
+                    key={rIdx}
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      height: "clamp(80px, 12vw, 110px)",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      background: "rgba(10, 22, 42, 0.8)",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      boxShadow: "0 6px 16px rgba(0, 0, 0, 0.65)",
+                      flexShrink: 0
+                    }}
+                  >
+                    <img
+                      src={getOptimizedImageUrl(c.image, 240)}
+                      alt={c.nickname || c.name}
+                      loading="lazy"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block"
+                      }}
+                    />
+                    <div style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to top, rgba(2, 7, 18, 0.94) 0%, rgba(2, 7, 18, 0.35) 55%, transparent 100%)",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-end",
+                      padding: "6px 7px"
+                    }}>
+                      <div style={{
+                        fontSize: "11px",
+                        fontWeight: "900",
+                        color: "#ffffff",
+                        lineHeight: 1.2,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        textShadow: "0 1px 4px rgba(0,0,0,0.9)"
+                      }}>
+                        {c.nickname || c.name}
+                      </div>
+                      <div style={{
+                        fontSize: "9px",
+                        color: "#67e8f9",
+                        fontWeight: "700",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        opacity: 0.95
+                      }}>
+                        {c.topic}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Central Dark Vignette Overlay to ensure Logo & CTA stand out with maximum clarity */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: "radial-gradient(ellipse at 50% 45%, rgba(2, 7, 18, 0.45) 0%, rgba(2, 7, 18, 0.78) 55%, rgba(2, 7, 18, 0.96) 95%)",
+          pointerEvents: "none",
+          zIndex: 2
+        }} />
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(180deg, rgba(2, 7, 18, 0.85) 0%, transparent 20%, transparent 80%, rgba(2, 7, 18, 0.98) 100%)",
+          pointerEvents: "none",
+          zIndex: 2
+        }} />
+
         {/* Hero Content Container */}
         <div style={{
           position: "relative",
-          zIndex: 2,
+          zIndex: 3,
           maxWidth: "960px",
           width: "100%",
           display: "flex",
