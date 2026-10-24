@@ -104,6 +104,11 @@ export default function AdminPage() {
   const [dropdownSearch, setDropdownSearch] = useState("");
   const dropdownRef = useRef(null);
 
+  // Custom Finals Player Dropdown State
+  const [isFinalsDropdownOpen, setIsFinalsDropdownOpen] = useState(false);
+  const [finalsDropdownSearch, setFinalsDropdownSearch] = useState("");
+  const finalsDropdownRef = useRef(null);
+
   // Add Scoreboard Slot Modal State
   const [showAddSlotModal, setShowAddSlotModal] = useState(false);
   const [slotModalSearch, setSlotModalSearch] = useState("");
@@ -507,6 +512,9 @@ export default function AdminPage() {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsDropdownOpen(false);
+      }
+      if (finalsDropdownRef.current && !finalsDropdownRef.current.contains(e.target)) {
+        setIsFinalsDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -2051,45 +2059,191 @@ export default function AdminPage() {
 
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", marginBottom: "14px" }}>
                             {/* 1. Select Contestant */}
-                            <div>
+                            <div style={{ gridColumn: "1 / -1" }}>
                               <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.7)", marginBottom: "6px", fontWeight: "700" }}>
                                 1. เลือกผู้เข้าแข่งขัน (เรียงตามลำดับ Order):
                               </label>
-                              <select
-                                value={selectedFinalsPlayerOrder}
-                                onChange={(e) => {
-                                  setSelectedFinalsPlayerOrder(e.target.value);
-                                  const p = curPlayers.find((pl) => String(pl.order) === String(e.target.value));
-                                  if (p) {
-                                    const catKeys = ["3sec", "qa", "jigsaw", "attribute"];
-                                    for (const k of catKeys) {
-                                      const v = p.scores?.[k];
-                                      if (v !== null && v !== undefined && v !== "X") {
-                                        setSelectedFinalsCategory(k);
-                                        setFinalsInputScore(String(v));
-                                        break;
-                                      }
+                              {/* Custom Rich Finals Dropdown */}
+                              <div ref={finalsDropdownRef} style={{ position: "relative" }}>
+                                {/* Trigger Box */}
+                                <div
+                                  onClick={() => {
+                                    setIsFinalsDropdownOpen(!isFinalsDropdownOpen);
+                                    setFinalsDropdownSearch("");
+                                  }}
+                                  style={{
+                                    padding: "8px 14px",
+                                    borderRadius: "10px",
+                                    background: "rgba(0, 15, 30, 0.9)",
+                                    border: isFinalsDropdownOpen ? "1.5px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.4)",
+                                    boxShadow: isFinalsDropdownOpen ? "0 0 16px rgba(255, 215, 0, 0.25)" : "none",
+                                    color: "#ffffff",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    gap: "12px",
+                                    minHeight: "56px",
+                                    transition: "all 0.2s ease"
+                                  }}
+                                >
+                                  {(() => {
+                                    const selP = curPlayers.find((pl) => String(pl.order) === String(selectedFinalsPlayerOrder));
+                                    if (!selP) {
+                                      return (
+                                        <span style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "15px" }}>
+                                          -- กรุณาเลือกผู้เข้าแข่งขัน --
+                                        </span>
+                                      );
                                     }
-                                  }
-                                }}
-                                style={{
-                                  width: "100%",
-                                  padding: "10px 12px",
-                                  borderRadius: "8px",
-                                  background: "rgba(0, 10, 20, 0.9)",
-                                  border: "1px solid rgba(255, 215, 0, 0.4)",
-                                  color: "#ffffff",
-                                  fontSize: "14px",
-                                  fontWeight: "700"
-                                }}
-                              >
-                                <option value="">-- กรุณาเลือกผู้เข้าแข่งขัน --</option>
-                                {curPlayers.map((p) => (
-                                  <option key={p.order} value={p.order}>
-                                    #{p.order} {p.name} ({p.nickname}) - {p.topic} [{p.result || "รอแข่ง"}]
-                                  </option>
-                                ))}
-                              </select>
+                                    const resultColor = selP.result?.includes("ตัวตั้ง") ? "#ffd700" : selP.result?.includes("เข้ารอบ") ? "#52c41a" : selP.result?.includes("ตกรอบ") ? "#ff7875" : "rgba(255,255,255,0.6)";
+                                    return (
+                                      <div style={{ display: "flex", alignItems: "center", gap: "12px", overflow: "hidden", flex: 1 }}>
+                                        {/* Order badge */}
+                                        <span style={{
+                                          display: "inline-block", padding: "3px 8px", borderRadius: "6px",
+                                          fontWeight: "900", fontSize: "12px",
+                                          background: "rgba(255, 215, 0, 0.2)", color: "#ffd700", border: "1px solid rgba(255,215,0,0.5)",
+                                          flexShrink: 0
+                                        }}>
+                                          #{selP.order}
+                                        </span>
+                                        {/* Photo */}
+                                        <div style={{
+                                          width: "38px", height: "38px", borderRadius: "50%", overflow: "hidden",
+                                          background: "rgba(255,215,0,0.1)", border: "2px solid #ffd700",
+                                          flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center"
+                                        }}>
+                                          {selP.image ? (
+                                            <img src={selP.image} alt={selP.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                          ) : (
+                                            <span style={{ fontSize: "18px" }}>👤</span>
+                                          )}
+                                        </div>
+                                        {/* Name & topic */}
+                                        <div style={{ display: "flex", flexDirection: "column", textAlign: "left", overflow: "hidden", flex: 1 }}>
+                                          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                                            <span style={{ fontWeight: "800", fontSize: "15px", color: "#ffffff" }}>{selP.name}</span>
+                                            {selP.nickname && <span style={{ color: "#ffd700", fontWeight: "700", fontSize: "13px" }}>({selP.nickname})</span>}
+                                          </div>
+                                          <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                            หัวข้อ: {selP.topic}
+                                          </span>
+                                        </div>
+                                        {/* Result badge */}
+                                        <span style={{
+                                          marginLeft: "auto", padding: "3px 10px", borderRadius: "8px",
+                                          background: "rgba(255,215,0,0.1)", color: resultColor,
+                                          fontSize: "12px", fontWeight: "800", flexShrink: 0, border: `1px solid ${resultColor}`
+                                        }}>
+                                          {selP.result || "รอแข่ง"} · {selP.totalScore ?? 0} คะแนน
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
+                                  <span style={{
+                                    fontSize: "12px", color: "#ffd700",
+                                    transform: isFinalsDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                                    transition: "transform 0.2s ease", flexShrink: 0
+                                  }}>▼</span>
+                                </div>
+
+                                {/* Dropdown List */}
+                                {isFinalsDropdownOpen && (
+                                  <div style={{
+                                    position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 1000,
+                                    background: "linear-gradient(160deg, #0d1f0a 0%, #030a04 100%)",
+                                    border: "1.5px solid #ffd700", borderRadius: "12px",
+                                    boxShadow: "0 14px 40px rgba(0,0,0,0.85), 0 0 25px rgba(255,215,0,0.2)",
+                                    maxHeight: "340px", overflowY: "auto", backdropFilter: "blur(12px)"
+                                  }}>
+                                    {/* Search */}
+                                    <div style={{ position: "sticky", top: 0, zIndex: 10, background: "#0d1f0a", padding: "10px 12px", borderBottom: "1px solid rgba(255,215,0,0.25)" }}>
+                                      <input
+                                        type="text"
+                                        value={finalsDropdownSearch}
+                                        onChange={(e) => setFinalsDropdownSearch(e.target.value)}
+                                        placeholder="🔍 ค้นหาชื่อเล่น, ชื่อจริง หรือ หัวข้อ..."
+                                        autoFocus
+                                        style={{
+                                          width: "100%", padding: "8px 12px", borderRadius: "8px",
+                                          background: "#030a04", border: "1px solid rgba(255,215,0,0.4)",
+                                          color: "#ffffff", fontSize: "13px", outline: "none"
+                                        }}
+                                      />
+                                    </div>
+                                    {/* Items */}
+                                    {(() => {
+                                      const q = finalsDropdownSearch.trim().toLowerCase();
+                                      const filtered = curPlayers.filter((p) => {
+                                        if (!q) return true;
+                                        return p.name?.toLowerCase().includes(q) || p.nickname?.toLowerCase().includes(q) || p.topic?.toLowerCase().includes(q);
+                                      });
+                                      if (filtered.length === 0) {
+                                        return <div style={{ padding: "20px", textAlign: "center", color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>ไม่พบผู้เข้าแข่งขัน</div>;
+                                      }
+                                      return filtered.map((p) => {
+                                        const isSel = String(p.order) === String(selectedFinalsPlayerOrder);
+                                        const resultColor = p.result?.includes("ตัวตั้ง") ? "#ffd700" : p.result?.includes("เข้ารอบ") ? "#52c41a" : p.result?.includes("ตกรอบ") ? "#ff7875" : "rgba(255,255,255,0.5)";
+                                        return (
+                                          <div
+                                            key={p.order}
+                                            onClick={() => {
+                                              setSelectedFinalsPlayerOrder(String(p.order));
+                                              setIsFinalsDropdownOpen(false);
+                                              const catKeys = ["3sec", "qa", "jigsaw", "attribute"];
+                                              for (const k of catKeys) {
+                                                const v = p.scores?.[k];
+                                                if (v !== null && v !== undefined && v !== "X") {
+                                                  setSelectedFinalsCategory(k);
+                                                  setFinalsInputScore(String(v));
+                                                  break;
+                                                }
+                                              }
+                                            }}
+                                            style={{
+                                              display: "flex", alignItems: "center", gap: "12px", padding: "10px 14px",
+                                              borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                              background: isSel ? "rgba(255,215,0,0.15)" : "transparent",
+                                              cursor: "pointer", transition: "background 0.15s ease"
+                                            }}
+                                            onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.background = "rgba(255,215,0,0.08)"; }}
+                                            onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.background = "transparent"; }}
+                                          >
+                                            {/* Order badge */}
+                                            <span style={{
+                                              display: "inline-block", minWidth: "34px", textAlign: "center", padding: "3px 6px", borderRadius: "6px",
+                                              fontWeight: "900", fontSize: "11px", background: "rgba(255,215,0,0.2)", color: "#ffd700", border: "1px solid rgba(255,215,0,0.4)", flexShrink: 0
+                                            }}>#{p.order}</span>
+                                            {/* Photo */}
+                                            <div style={{
+                                              width: "36px", height: "36px", borderRadius: "50%", overflow: "hidden",
+                                              background: "rgba(255,215,0,0.1)", border: "2px solid #ffd700",
+                                              flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center"
+                                            }}>
+                                              {p.image ? <img src={p.image} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: "16px" }}>👤</span>}
+                                            </div>
+                                            {/* Name & topic */}
+                                            <div style={{ flex: 1, overflow: "hidden" }}>
+                                              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                                                <span style={{ fontWeight: "700", fontSize: "14px", color: "#ffffff" }}>{p.name}</span>
+                                                {p.nickname && <span style={{ color: "#ffd700", fontSize: "12px", fontWeight: "700" }}>({p.nickname})</span>}
+                                              </div>
+                                              <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }}>
+                                                {p.topic}
+                                              </span>
+                                            </div>
+                                            {/* Status */}
+                                            <span style={{ fontSize: "11px", fontWeight: "800", color: resultColor, flexShrink: 0, textAlign: "right" }}>
+                                              {p.result || "รอแข่ง"}<br />{p.totalScore ?? 0} คะแนน
+                                            </span>
+                                          </div>
+                                        );
+                                      });
+                                    })()}
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
                             {/* 2. Select Category */}
