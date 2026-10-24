@@ -3815,12 +3815,12 @@ main {
 }
 
 .hero-col-odd {
-    animation: heroFloatDownUp 20s ease-in-out infinite;
+    animation: heroFloatDownUp 18s ease-in-out infinite;
     will-change: transform;
 }
 
 .hero-col-even {
-    animation: heroFloatUpDown 22s ease-in-out infinite;
+    animation: heroFloatUpDown 18s ease-in-out infinite;
     will-change: transform;
 }
 

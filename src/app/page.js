@@ -1268,38 +1268,37 @@ export default function MainPage() {
         {/* ========================================================
             6 Vertical Floating Columns of Contestant Photos (Background Wall)
             27 Weekly 2026 Contestants (excl. วชิรวิทย์) + 3 Extras (นัทธภพ/ศุภกร/พัชราภรณ์)
-            Odd columns (1,3,5): Scroll Down-Up | Even columns (2,4,6): Scroll Up-Down
+            Odd columns (1,3,5): Scroll Down-Up in sync | Even columns (2,4,6): Scroll Up-Down in sync
            ======================================================== */}
         <div style={{
           position: "absolute",
-          inset: "-50px -15px",
-          display: "flex",
-          justifyContent: "center",
+          inset: "-45px 0",
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "repeat(6, 1fr)",
           gap: "10px",
-          opacity: 0.28,
+          padding: "0 14px",
+          opacity: 0.2,
           pointerEvents: "none",
           zIndex: 1,
-          filter: "contrast(1.1) saturate(0.92)",
-          maskImage: "linear-gradient(180deg, transparent 0%, black 12%, black 88%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 12%, black 88%, transparent 100%)"
+          filter: "contrast(1.05) saturate(0.85)",
+          maskImage: "linear-gradient(180deg, transparent 0%, black 15%, black 85%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 15%, black 85%, transparent 100%)"
         }}>
           {heroColumns.map((col, cIdx) => {
             const isOdd = cIdx % 2 === 0; // 0, 2, 4 = Columns 1, 3, 5 (Odd: Down-Up)
             const animClass = isOdd ? "hero-col-odd" : "hero-col-even";
-            const animDelay = `${-(cIdx * 3.5)}s`;
 
             return (
               <div
                 key={cIdx}
                 className={animClass}
                 style={{
-                  flex: "1 1 0",
-                  maxWidth: "145px",
-                  minWidth: "60px",
                   display: "flex",
                   flexDirection: "column",
                   gap: "10px",
-                  animationDelay: animDelay
+                  height: "100%",
+                  justifyContent: "space-between"
                 }}
               >
                 {col.map((c, rIdx) => (
@@ -1308,13 +1307,13 @@ export default function MainPage() {
                     style={{
                       position: "relative",
                       width: "100%",
-                      height: "clamp(80px, 12vw, 110px)",
-                      borderRadius: "12px",
+                      flex: "1 1 0",
+                      minHeight: "75px",
+                      borderRadius: "10px",
                       overflow: "hidden",
-                      background: "rgba(10, 22, 42, 0.8)",
-                      border: "1px solid rgba(0, 229, 255, 0.25)",
-                      boxShadow: "0 6px 16px rgba(0, 0, 0, 0.65)",
-                      flexShrink: 0
+                      background: "rgba(10, 25, 48, 0.6)",
+                      border: "1px solid rgba(0, 229, 255, 0.2)",
+                      boxShadow: "0 4px 14px rgba(0, 0, 0, 0.5)"
                     }}
                   >
                     <img
@@ -1328,39 +1327,6 @@ export default function MainPage() {
                         display: "block"
                       }}
                     />
-                    <div style={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "linear-gradient(to top, rgba(2, 7, 18, 0.94) 0%, rgba(2, 7, 18, 0.35) 55%, transparent 100%)",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "flex-end",
-                      padding: "6px 7px"
-                    }}>
-                      <div style={{
-                        fontSize: "11px",
-                        fontWeight: "900",
-                        color: "#ffffff",
-                        lineHeight: 1.2,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        textShadow: "0 1px 4px rgba(0,0,0,0.9)"
-                      }}>
-                        {c.nickname || c.name}
-                      </div>
-                      <div style={{
-                        fontSize: "9px",
-                        color: "#67e8f9",
-                        fontWeight: "700",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        opacity: 0.95
-                      }}>
-                        {c.topic}
-                      </div>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -1368,18 +1334,11 @@ export default function MainPage() {
           })}
         </div>
 
-        {/* Central Dark Vignette Overlay to ensure Logo & CTA stand out with maximum clarity */}
+        {/* Soft Vignette Overlay keeping original blue gradient & glowing rays prominent */}
         <div style={{
           position: "absolute",
           inset: 0,
-          background: "radial-gradient(ellipse at 50% 45%, rgba(2, 7, 18, 0.45) 0%, rgba(2, 7, 18, 0.78) 55%, rgba(2, 7, 18, 0.96) 95%)",
-          pointerEvents: "none",
-          zIndex: 2
-        }} />
-        <div style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(180deg, rgba(2, 7, 18, 0.85) 0%, transparent 20%, transparent 80%, rgba(2, 7, 18, 0.98) 100%)",
+          background: "radial-gradient(ellipse at 50% 40%, rgba(12, 45, 94, 0.25) 0%, rgba(6, 22, 51, 0.55) 50%, rgba(2, 7, 18, 0.85) 100%)",
           pointerEvents: "none",
           zIndex: 2
         }} />
