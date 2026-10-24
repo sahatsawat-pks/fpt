@@ -234,15 +234,26 @@ export default function TournamentPage() {
           }}
         >
           {/* Logo / Brand */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
             <img
               src="/img/logo.png"
-              alt="FANPANTAE 2026"
+              alt="FANPANTAE"
               style={{
-                height: "42px",
+                height: "36px",
                 width: "auto",
                 objectFit: "contain",
-                filter: "drop-shadow(0 0 12px rgba(0, 229, 255, 0.7))",
+                filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.7))",
+              }}
+            />
+            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "18px" }}>|</span>
+            <img
+              src="/img/tournament_logo_cropped.png"
+              alt="FANPANTAE TOURNAMENT 2026/27"
+              style={{
+                height: "32px",
+                width: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
               }}
             />
           </Link>
@@ -548,6 +559,21 @@ export default function TournamentPage() {
         ></div>
 
         <div style={{ position: "relative", zIndex: 10, maxWidth: "1100px", width: "100%", textAlign: "center" }}>
+          {/* Official Tournament Logo Emblem */}
+          <div style={{ maxWidth: "420px", width: "85%", margin: "0 auto 18px" }}>
+            <img
+              src="/img/tournament_logo_cropped.png"
+              alt="FANPANTAE TOURNAMENT 2026/27"
+              style={{
+                width: "100%",
+                height: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 25px rgba(0, 229, 255, 0.75)) drop-shadow(0 0 50px rgba(0, 119, 182, 0.4))",
+                animation: "heroGlowPulse 4s ease-in-out infinite",
+              }}
+            />
+          </div>
+
           {/* Tag Pill */}
           <div
             style={{
@@ -568,7 +594,7 @@ export default function TournamentPage() {
               animation: "badgePulse 3.5s ease-in-out infinite",
             }}
           >
-            <span>⚔️</span> FANPANTAE TOURNAMENT 2026 - 27
+            <span>⚔️</span> LEAGUE PHASE • 24 ยอดฝีมือแฟนพันธุ์แท้
           </div>
 
           {/* Title */}
@@ -1584,8 +1610,12 @@ export default function TournamentPage() {
           color: "rgba(255,255,255,0.5)",
         }}
       >
-        <div style={{ maxWidth: "160px", margin: "0 auto 12px" }}>
-          <img src="/img/logo.png" alt="FANPANTAE 2026" style={{ width: "100%", height: "auto", opacity: 0.7 }} />
+        <div style={{ maxWidth: "220px", margin: "0 auto 14px" }}>
+          <img
+            src="/img/tournament_logo_cropped.png"
+            alt="FANPANTAE TOURNAMENT 2026/27"
+            style={{ width: "100%", height: "auto", opacity: 0.9, filter: "drop-shadow(0 0 12px rgba(0,229,255,0.4))" }}
+          />
         </div>
         <p style={{ margin: "0 0 8px 0", color: "rgba(255,255,255,0.8)", fontWeight: "600" }}>
           แฟนพันธุ์แท้ทัวร์นาเมนต์ 2026 - 27 (FANPANTAE TOURNAMENT)

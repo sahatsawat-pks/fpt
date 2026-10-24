@@ -1122,11 +1122,11 @@ export default function AdminTournamentPage() {
             textAlign: "center",
           }}
         >
-          <div style={{ maxWidth: "260px", margin: "0 auto 16px" }}>
+          <div style={{ maxWidth: "290px", margin: "0 auto 18px" }}>
             <img
-              src="/img/logo.png"
-              alt="Fanpantae 2026"
-              style={{ width: "100%", height: "auto", filter: "drop-shadow(0 0 16px rgba(0,229,255,0.5))" }}
+              src="/img/tournament_logo_cropped.png"
+              alt="FANPANTAE TOURNAMENT 2026/27"
+              style={{ width: "100%", height: "auto", filter: "drop-shadow(0 0 20px rgba(0,229,255,0.7))" }}
             />
           </div>
           <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#00e5ff", marginBottom: "8px" }}>
@@ -1292,12 +1292,23 @@ export default function AdminTournamentPage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-          <Link href="/" title="กลับหน้าหลัก">
+          <Link href="/tournament" title="ไปหน้า Tournament" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
             <img
               src="/img/logo.png"
               alt="Fanpantae 2026"
               style={{
-                height: "36px",
+                height: "32px",
+                width: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
+              }}
+            />
+            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "16px" }}>|</span>
+            <img
+              src="/img/tournament_logo_cropped.png"
+              alt="FANPANTAE TOURNAMENT 2026/27"
+              style={{
+                height: "30px",
                 width: "auto",
                 objectFit: "contain",
                 filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",

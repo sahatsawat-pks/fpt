@@ -305,8 +305,10 @@ export default function TournamentPhotosPage() {
       <header style={{ background: "#0d1b2a", borderBottom: "2px solid #00e5ff", padding: "16px 24px", position: "sticky", top: 0, zIndex: 40, boxShadow: "0 4px 20px rgba(0, 229, 255, 0.2)" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <Link href="/" title="กลับหน้าหลัก">
-              <img src="/img/logo.png" alt="Fanpantae 2026" style={{ height: "36px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))" }} />
+            <Link href="/tournament" title="ไปหน้า Tournament" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+              <img src="/img/logo.png" alt="Fanpantae 2026" style={{ height: "32px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))" }} />
+              <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "16px" }}>|</span>
+              <img src="/img/tournament_logo_cropped.png" alt="FANPANTAE TOURNAMENT 2026/27" style={{ height: "30px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))" }} />
             </Link>
             <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "12px" }}>
               <h1 style={{ fontSize: "16px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
