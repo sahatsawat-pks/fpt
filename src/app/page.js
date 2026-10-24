@@ -720,13 +720,13 @@ export default function MainPage() {
   }, [leaderboard, pollList]);
 
   // 6 columns of contestant photos for the hero background wall
-  // 5 repetitions (25 items per column) so columns can traverse the full vertical range from top to bottom
+  // 4 repetitions (20 items per column) so columns can traverse the full vertical range with zero blank gaps
   const heroColumns = useMemo(() => {
     const cols = [[], [], [], [], [], []];
     heroContestants.forEach((c, idx) => {
       cols[idx % 6].push(c);
     });
-    return cols.map((col) => [...col, ...col, ...col, ...col, ...col]);
+    return cols.map((col) => [...col, ...col, ...col, ...col]);
   }, []);
 
   const filteredStandings = useMemo(() => {
@@ -1298,7 +1298,6 @@ export default function MainPage() {
                   display: "flex",
                   flexDirection: "column",
                   gap: "10px",
-                  marginTop: "-40%",
                   willChange: "transform"
                 }}
               >

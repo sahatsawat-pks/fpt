@@ -3792,35 +3792,35 @@ main {
 /* --- Hero Contestants Background Floating Columns --- */
 @keyframes heroFloatDownUp {
     0% {
-        transform: translateY(-20%);
+        transform: translateY(-25%);
     }
     50% {
-        transform: translateY(20%);
+        transform: translateY(-50%);
     }
     100% {
-        transform: translateY(-20%);
+        transform: translateY(-25%);
     }
 }
 
 @keyframes heroFloatUpDown {
     0% {
-        transform: translateY(20%);
+        transform: translateY(-50%);
     }
     50% {
-        transform: translateY(-20%);
+        transform: translateY(-25%);
     }
     100% {
-        transform: translateY(20%);
+        transform: translateY(-50%);
     }
 }
 
 .hero-col-odd {
-    animation: heroFloatDownUp 26s ease-in-out infinite;
+    animation: heroFloatDownUp 24s ease-in-out infinite;
     will-change: transform;
 }
 
 .hero-col-even {
-    animation: heroFloatUpDown 26s ease-in-out infinite;
+    animation: heroFloatUpDown 24s ease-in-out infinite;
     will-change: transform;
 }
 
