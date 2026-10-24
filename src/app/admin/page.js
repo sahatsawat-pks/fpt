@@ -1148,9 +1148,28 @@ export default function AdminPage() {
     }
   };
 
-  // Unlock qualifying if needed
-  const handleUnlockQualifying = async () => {
+  // Force-sync history.json → KV
+  const handleSyncHistoryToKV = async () => {
+    if (!confirm("🔄 Sync history.json ขึ้น KV?\n\nจะบังคับเขียนข้อมูลจาก JSON ไฟล์ล่าสุดทับ KV store (ใช้เมื่อแก้ JSON แล้วต้องการให้ production รับรู้)")) return;
     try {
+      const res = await fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync_history_to_kv" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`✅ Sync KV สำเร็จ! Qualifying ${data.qualifyingCount} คน · Finalists ${data.finalistsCount} คน`, "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  // Unlock qualifying if needed
+  const handleUnlockQualifying = async () => {    try {
       const res = await fetch("/api/scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1905,6 +1924,23 @@ export default function AdminPage() {
                         }}
                       >
                         🔄 รีเซ็ตรอบชิง
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSyncHistoryToKV}
+                        style={{
+                          padding: "8px 14px",
+                          borderRadius: "10px",
+                          background: "rgba(251, 191, 36, 0.12)",
+                          border: "1px solid rgba(251, 191, 36, 0.4)",
+                          color: "#fbbf24",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          cursor: "pointer"
+                        }}
+                        title="บังคับ sync history.json ขึ้น KV (ใช้หลังแก้ JSON ไฟล์)"
+                      >
+                        📤 Sync JSON → KV
                       </button>
                     </div>
                   </div>

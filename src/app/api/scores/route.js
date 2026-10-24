@@ -696,13 +696,31 @@ export async function POST(request) {
       let historyData = await getKVData("fpt_history", readHistoryData);
       if (!historyData) historyData = readHistoryData();
       const allQualifying = historyData.seasons?.["2026"]?.qualifying || [];
-      const top5 = allQualifying
-         .filter((p) => p.isFinalist === true)
-         .sort((a, b) => {
-           if ((a.qualifyingRank || 99) !== (b.qualifyingRank || 99))
-             return (a.qualifyingRank || 99) - (b.qualifyingRank || 99);
-           return (b.totalScore || 0) - (a.totalScore || 0);
-         });
+
+      // Try isFinalist flag first; if none marked, compute dense rank from totalScore
+      let finalists = allQualifying.filter((p) => p.isFinalist === true);
+      if (finalists.length === 0) {
+        // Dense ranking: rank by totalScore desc, rank increments only when score changes
+        const sorted = [...allQualifying]
+          .filter((p) => (p.totalScore || 0) > 0)
+          .sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+        let rank = 0, prevScore = null;
+        for (const p of sorted) {
+          if (p.totalScore !== prevScore) { rank++; prevScore = p.totalScore; }
+          p._denseRank = rank;
+        }
+        const maxRank = sorted.find((p) => p._denseRank)
+          ? Math.min(...sorted.filter((p) => p._denseRank <= 5).map((p) => p._denseRank))
+          : 5;
+        finalists = sorted.filter((p) => (p._denseRank || 99) <= 5);
+      }
+
+      const top5 = finalists.sort((a, b) => {
+        const ra = a.qualifyingRank || a._denseRank || 99;
+        const rb = b.qualifyingRank || b._denseRank || 99;
+        if (ra !== rb) return ra - rb;
+        return (b.totalScore || 0) - (a.totalScore || 0);
+      });
 
       historyData.seasons["2026"].finals = [
         {
@@ -743,9 +761,23 @@ export async function POST(request) {
       });
     }
 
+    // Force-push local history.json into KV (use when JSON was updated but KV is stale)
+    if (body.action === "sync_history_to_kv") {
+      const freshData = readHistoryData();
+      if (!freshData) {
+        return NextResponse.json({ success: false, error: "ไม่พบไฟล์ history.json" }, { status: 404 });
+      }
+      await saveKVData("fpt_history", freshData, writeHistoryData);
+      return NextResponse.json({
+        success: true,
+        message: "Sync history.json → KV สำเร็จแล้ว",
+        qualifyingCount: freshData.seasons?.["2026"]?.qualifying?.length || 0,
+        finalistsCount: (freshData.seasons?.["2026"]?.qualifying || []).filter((p) => p.isFinalist).length,
+      });
+    }
+
     // Unlock or unarchive qualifying round if admin needs to make adjustments
-    if (body.action === "unlock_qualifying") {
-      let settings = await getKVData("fpt_settings", readSettingsData);
+    if (body.action === "unlock_qualifying") {      let settings = await getKVData("fpt_settings", readSettingsData);
       if (!settings) settings = readSettingsData() || {};
       const newSettings = {
         ...settings,
