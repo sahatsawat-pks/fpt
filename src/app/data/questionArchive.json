@@ -1,0 +1,321 @@
+[
+  {
+    "id": "2026_weekly_pete",
+    "year": "2026",
+    "round": "weekly",
+    "roundName": "รอบประจำสัปดาห์ (Episode 1)",
+    "contestantName": "สหัสวรรษ นิจพันธ์",
+    "contestantNickname": "พีท",
+    "topic": "รถไฟฟ้าไทย",
+    "contestantImage": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm",
+    "topicImage": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80",
+    "scores": {
+      "3sec": 11,
+      "qa": 0,
+      "jigsaw": 0,
+      "attribute": 20,
+      "total": 31
+    },
+    "games": {
+      "threeSeconds": {
+        "type": "typeB",
+        "sets": [
+          {
+            "setName": "ชุดที่ 1 (10 ข้อ)",
+            "questions": [
+              {
+                "id": 1,
+                "question": "สถานีต้นทางของรถไฟฟ้าสายสีลมคือสถานีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "สนามกีฬาแห่งชาติ",
+                "result": "correct",
+                "hostRemark": "ถูกต้องครับ"
+              },
+              {
+                "id": 2,
+                "question": "รถไฟฟ้าสายสีทองเชื่อมต่อกับสายสีเขียวที่สถานีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "กรุงธนบุรี",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 3,
+                "question": "รถไฟฟ้ามหานครสายสีน้ำเงินเปิดให้บริการเชิงพาณิชย์ครั้งแรกในปีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "พ.ศ. 2547",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 4,
+                "question": "สถานีวัดมังกรเป็นสถานีของรถไฟฟ้าสายสีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "สายสีน้ำเงิน",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 5,
+                "question": "เสียงประกาศบนบีทีเอสเป็นเสียงของใคร",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "รัดเกล้า อามระดิษ",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 6,
+                "question": "รถไฟฟ้าโมโนเรลสายแรกของประเทศไทยคือสายสีอะไร",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "สายสีเหลือง",
+                "result": "wrong",
+                "hostRemark": "ผิดครับ"
+              },
+              {
+                "id": 7,
+                "question": "สถานีรถไฟฟ้าที่อยู่ลึกที่สุดในกรุงเทพฯ คือสถานีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "สถานีสีลม",
+                "result": "pass",
+                "hostRemark": "ข้ามครับ"
+              },
+              {
+                "id": 8,
+                "question": "บัตรโดยสารของ MRT เรียกว่าบัตรอะไร",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "บัตร MRT Plus",
+                "result": "wrong",
+                "hostRemark": "ผิดครับ"
+              },
+              {
+                "id": 9,
+                "question": "สถานีกลางกรุงเทพอภิวัฒน์เดิมมีชื่อเรียกว่าสถานีอะไร",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "สถานีกลางบางซื่อ",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 10,
+                "question": "ศูนย์ซ่อมบำรุงรถไฟฟ้าบีทีเอสแห่งแรกตั้งอยู่ที่ใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "หมอชิต",
+                "result": "correct",
+                "hostRemark": ""
+              }
+            ]
+          },
+          {
+            "setName": "ชุดที่ 2 (10 ข้อ)",
+            "questions": [
+              {
+                "id": 11,
+                "question": "ขบวนรถไฟฟ้าสายสีม่วงผลิตจากประเทศใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "ญี่ปุ่น (J-TREC)",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 12,
+                "question": "รถไฟฟ้าสายสีชมพูเชื่อมต่อกับสายสีเขียวที่สถานีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "วัดพระศรีมหาธาตุ",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 13,
+                "question": "สะพานข้ามแม่น้ำเจ้าพระยาของรถไฟฟ้าสายสีน้ำเงินมีกี่แห่ง",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "2 แห่ง",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 14,
+                "question": "สถานีสุดท้ายของสายสีลมฝั่งใต้คือสถานีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "บางหว้า",
+                "result": "wrong",
+                "hostRemark": ""
+              },
+              {
+                "id": 15,
+                "question": "ระบบอาณัติสัญญาณของสายสีเขียวในปัจจุบันใช้ของบริษัทใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "Bombardier (Alstom)",
+                "result": "pass",
+                "hostRemark": ""
+              },
+              {
+                "id": 16,
+                "question": "รถไฟฟ้าแอร์พอร์ต เรล ลิงก์ มีกี่สถานี",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "8 สถานี",
+                "result": "wrong",
+                "hostRemark": ""
+              },
+              {
+                "id": 17,
+                "question": "สถานีรถไฟฟ้าใดตั้งอยู่ใต้อุโมงค์ลอดแม่น้ำเจ้าพระยา",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "สนามไชย - อิสรภาพ",
+                "result": "pass",
+                "hostRemark": ""
+              },
+              {
+                "id": 18,
+                "question": "บริษัทผู้ให้บริการรถไฟฟ้า MRT สายสีน้ำเงินคือบริษัทใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "BEM",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 19,
+                "question": "รถไฟฟ้าสายสีแดงมีขบวนรถกี่ตู้ต่อ 1 ขบวน",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "4 ตู้ และ 6 ตู้",
+                "result": "wrong",
+                "hostRemark": ""
+              },
+              {
+                "id": 20,
+                "question": "สถานีรถไฟฟ้าสายสีส้มตะวันออกเริ่มจากสถานีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "ศูนย์วัฒนธรรมแห่งประเทศไทย",
+                "result": "wrong",
+                "hostRemark": ""
+              }
+            ]
+          },
+          {
+            "setName": "ชุดที่ 3 (5 ข้อ)",
+            "questions": [
+              {
+                "id": 21,
+                "question": "อาคารสำนักงานใหญ่ของ รฟม. ตั้งอยู่ใกล้สถานีใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "พระราม 9",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 22,
+                "question": "รถไฟฟ้าสายสีเทาเป็นระบบรถไฟฟ้ารูปแบบใดตามแผนงาน",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "โมโนเรล",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 23,
+                "question": "สถานีสยามเปิดให้บริการครั้งแรกเมื่อวันที่เท่าใด",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "5 ธันวาคม 2542",
+                "result": "correct",
+                "hostRemark": ""
+              },
+              {
+                "id": 24,
+                "question": "ตัวย่อภาษาอังกฤษของรถไฟฟ้าบีทีเอสคืออะไร",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "BTS",
+                "result": "wrong",
+                "hostRemark": ""
+              },
+              {
+                "id": 25,
+                "question": "ทางเดินยกระดับเชื่อมต่อสถานีบีทีเอสเรียกว่าอะไร",
+                "mediaType": "text",
+                "mediaUrl": "",
+                "answer": "Skywalk",
+                "result": "wrong",
+                "hostRemark": ""
+              }
+            ]
+          }
+        ]
+      },
+      "qa": {
+        "intro": "เรื่องราวของสถานีรถไฟฟ้าใต้ดินที่มีความงดงามทางสถาปัตยกรรมระดับโลก",
+        "question": "สถานีรถไฟฟ้าสนามไชย ได้รับการออกแบบตกแต่งภายในด้วยสถาปัตยกรรมแบบใด และผู้ออกแบบหลักคือศิลปินแห่งชาติท่านใด",
+        "mediaType": "text",
+        "mediaUrl": "",
+        "questionType": "quality",
+        "choices": [
+          "สถาปัตยกรรมแบบรัตนโกสินทร์ตอนต้น โดย น.อ. อาวุธ เงินชูกลิ่น",
+          "สถาปัตยกรรมท้องพระโรงสมัยรัตนโกสินทร์ โดย รศ.ดร. ภิญโญ สุวรรณคีรี",
+          "สถาปัตยกรรมอยุธยา โดย ศ. ม.จ. สุภัทรดิศ ดิศกุล",
+          "สถาปัตยกรรมนีโอคลาสสิก โดย ศ. ศิลป์ พีระศรี",
+          "สถาปัตยกรรมสุโขทัย โดย อ. เฉลิมชัย โฆษิตพิพัฒน์"
+        ],
+        "correctAnswer": "สถาปัตยกรรมท้องพระโรงสมัยรัตนโกสินทร์ โดย รศ.ดร. ภิญโญ สุวรรณคีรี",
+        "explanation": "สถานีสนามไชยได้รับการขนานนามว่าเป็นสถานีรถไฟฟ้าที่สวยที่สุดในประเทศไทย ออกแบบโดย รศ.ดร. ภิญโญ สุวรรณคีรี ศิลปินแห่งชาติ สาขาทัศนศิลป์ (สถาปัตยกรรม) จำลองบรรยากาศเสมือนท้องพระโรงในสมัยรัตนโกสินทร์",
+        "score": 0,
+        "isCorrect": false
+      },
+      "jigsaw": {
+        "jigsawType": "square",
+        "question": "ภาพจิ๊กซอว์ปริศนาต่อไปนี้ คือขบวนรถไฟฟ้าสายใด และผลิตจากบริษัทใด",
+        "fullImage": "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=800&q=80",
+        "openedTiles": [
+          13,
+          8,
+          18,
+          4
+        ],
+        "scoreTier": 0,
+        "answer": "รถไฟฟ้าสายสีทอง รุ่น Bombardier Innovia APM 300",
+        "source": "ภาพถ่ายขบวนรถไฟฟ้าโมโนเรลไร้คนขับ ณ ศูนย์ซ่อมบำรุงกรุงธนบุรี",
+        "isCorrect": false
+      },
+      "properties": {
+        "propType": "2clues",
+        "intro": "จากคุณสมบัติต่อไปนี้ คือบุคคลหรือองค์กรใดในประวัติศาสตร์รถไฟฟ้าไทย",
+        "clues": [
+          "คุณสมบัติที่ 1: ก่อตั้งขึ้นตามพระราชกฤษฎีกาในปี พ.ศ. 2535 ภายใต้ชื่อเดิมที่มีคำว่า รถไฟฟ้ามหานคร",
+          "คุณสมบัติที่ 2: ปัจจุบันกำกับดูแลโครงการรถไฟฟ้าสายสีน้ำเงิน สีม่วง สีส้ม สีเหลือง และสีชมพู",
+          "คุณสมบัติที่ 3: มีตราสัญลักษณ์เป็นรูปวงกลมซ้อนสามเหลี่ยมลายกนกสีน้ำเงินและส้ม",
+          "คุณสมบัติที่ 4: มีสำนักงานใหญ่อยู่บนถนนพระราม 9 เขตห้วยขวาง กรุงเทพฯ",
+          "คุณสมบัติที่ 5: มีชื่อย่อภาษาไทย 3 พยางค์ และตัวย่อภาษาอังกฤษ 4 ตัวอักษร"
+        ],
+        "openedClues": [
+          2,
+          1
+        ],
+        "scoreTier": 20,
+        "answer": "การรถไฟฟ้าขนส่งมวลชนแห่งประเทศไทย (รฟม. / MRTA)",
+        "explanation": "รฟม. จัดตั้งขึ้นเพื่อพัฒนาระบบรถไฟฟ้ามหานครในกรุงเทพฯ และปริมณฑล เปิดใบที่ 2 และตอบถูกทันที ได้ 20 คะแนนเต็มในหมวดนี้",
+        "isCorrect": true
+      }
+    },
+    "createdAt": "2026-10-24T10:33:55.378Z",
+    "updatedAt": "2026-10-24T10:33:55.384Z"
+  }
+]
