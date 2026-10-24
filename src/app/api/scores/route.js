@@ -695,7 +695,14 @@ export async function POST(request) {
     if (body.action === "reset_finals") {
       let historyData = await getKVData("fpt_history", readHistoryData);
       if (!historyData) historyData = readHistoryData();
-      const top5 = (historyData.seasons?.["2026"]?.qualifying || []).slice(0, 5);
+      const allQualifying = historyData.seasons?.["2026"]?.qualifying || [];
+      const top5 = allQualifying
+         .filter((p) => p.isFinalist === true)
+         .sort((a, b) => {
+           if ((a.qualifyingRank || 99) !== (b.qualifyingRank || 99))
+             return (a.qualifyingRank || 99) - (b.qualifyingRank || 99);
+           return (b.totalScore || 0) - (a.totalScore || 0);
+         });
 
       historyData.seasons["2026"].finals = [
         {
