@@ -1624,7 +1624,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
         border: "1.5px solid rgba(56, 189, 248, 0.4)",
         boxShadow: "0 18px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
         overflow: "hidden",
-        padding: "24px clamp(12px, 2.5vw, 28px)",
+        padding: "24px clamp(14px, 2.8vw, 30px)",
       }}
     >
       {/* Background SVG Radar / Concentric HUD Rings */}
@@ -1651,15 +1651,15 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
         <line x1="300" y1="10" x2="300" y2="590" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4 8" />
       </svg>
 
-      {/* Responsive Table Container (No horizontal scrollbar) */}
-      <div style={{ position: "relative", zIndex: 2, width: "100%", overflow: "hidden" }}>
-        <div style={{ width: "100%", padding: "4px 2px" }}>
+      {/* Responsive Table Container (No horizontal scrollbar & full corner clearance) */}
+      <div style={{ position: "relative", zIndex: 2, width: "100%", boxSizing: "border-box" }}>
+        <div style={{ width: "100%", padding: "4px clamp(8px, 1.5vw, 14px)", boxSizing: "border-box" }}>
           {/* Header Row: Title Banner (Left) & Floating Skewed Column Header Boxes (Right) */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "clamp(4px, 0.9vw, 8px)",
+              gap: "clamp(4px, 0.8vw, 8px)",
               marginBottom: "10px",
             }}
           >
@@ -1692,9 +1692,29 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   textShadow: "0 2px 6px rgba(0,0,0,0.7)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  minWidth: 0,
                 }}
               >
-                {titleText}
+                <img
+                  src="/img/tournament_logo.png"
+                  alt="Tournament Logo"
+                  style={{
+                    width: "22px",
+                    height: "22px",
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 0 6px rgba(0, 229, 255, 0.6))",
+                    flexShrink: 0,
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {titleText}
+                </span>
               </div>
             </div>
 
@@ -1854,11 +1874,10 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                 ? "linear-gradient(180deg, #220b10 0%, #0a0305 100%)"
                 : "linear-gradient(180deg, #152238 0%, #09101d 100%)";
 
-              // Clean formatted display name: [Nickname] [First Name] (e.g. "ปาร์ค พศวัต")
-              const firstName = c.name ? c.name.split(" ")[0] : "";
+              // Formatted display name (shows full name, with ellipsis if container narrows)
               const displayName = c.nickname
-                ? `${c.nickname} ${firstName}`
-                : firstName || c.name || "ผู้เข้าแข่งขัน";
+                ? `${c.nickname} • ${c.name}`
+                : c.name || "ผู้เข้าแข่งขัน";
 
               // Clean diff number (strip '+' sign if present to match TV graphic: 7, 8, 3, 0, 1)
               const cleanDiff = String(c.scoreDiff ?? 0).replace(/^\+/, "");
@@ -1870,7 +1889,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "clamp(4px, 0.9vw, 8px)",
+                    gap: "clamp(4px, 0.8vw, 8px)",
                     cursor: "pointer",
                     transition: "filter 0.15s ease",
                   }}
@@ -1884,7 +1903,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 1. Rank Capsule */}
                   <div
                     style={{
-                      width: "clamp(40px, 5vw, 54px)",
+                      width: "clamp(38px, 4.8vw, 52px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2050,7 +2069,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 3. W (Win) Capsule */}
                   <div
                     style={{
-                      width: "clamp(34px, 4.4vw, 48px)",
+                      width: "clamp(30px, 4.2vw, 48px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2080,7 +2099,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 4. D (Draw) Capsule */}
                   <div
                     style={{
-                      width: "clamp(34px, 4.4vw, 48px)",
+                      width: "clamp(30px, 4.2vw, 48px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2110,7 +2129,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 5. L (Lose) Capsule */}
                   <div
                     style={{
-                      width: "clamp(34px, 4.4vw, 48px)",
+                      width: "clamp(30px, 4.2vw, 48px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2140,7 +2159,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 6. DIFF Capsule */}
                   <div
                     style={{
-                      width: "clamp(40px, 5vw, 54px)",
+                      width: "clamp(38px, 4.8vw, 54px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
@@ -2170,7 +2189,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
                   {/* 7. PTS Capsule */}
                   <div
                     style={{
-                      width: "clamp(44px, 5.5vw, 60px)",
+                      width: "clamp(42px, 5.2vw, 60px)",
                       height: "44px",
                       borderRadius: "8px",
                       transform: "skewX(-20deg)",
