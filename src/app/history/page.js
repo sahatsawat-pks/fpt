@@ -4,9 +4,33 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import historyData from "../data/history.json";
 import leaderboardData from "../data/leaderboard.json";
+import pollData from "../data/poll.json";
 
 // Contestant Google Photos lookup map from leaderboard and history data
 const CONTESTANT_GOOGLE_PHOTOS = new Map();
+
+function getContestantPollRank(item, list) {
+  if (!item) return null;
+  if (item.pollRank !== undefined && item.pollRank !== null && item.pollRank !== "") {
+    return Number(item.pollRank);
+  }
+  const searchList = Array.isArray(list) && list.length > 0 ? list : pollData;
+  if (!Array.isArray(searchList)) return null;
+  const found = searchList.find((p) => {
+    const pName = (p.name || "").trim().toLowerCase();
+    const iName = (item.name || "").trim().toLowerCase();
+    const pNick = (p.nickname || "").trim().toLowerCase();
+    const iNick = (item.nickname || "").trim().toLowerCase();
+    const pTopic = (p.topic || "").trim().toLowerCase();
+    const iTopic = (item.topic || "").trim().toLowerCase();
+
+    if (pName && iName && (pName === iName || pName.includes(iName) || iName.includes(pName))) return true;
+    if (pNick && iNick && pNick === iNick) return true;
+    if (pTopic && iTopic && (pTopic === iTopic || pTopic.includes(iTopic) || iTopic.includes(pTopic))) return true;
+    return false;
+  });
+  return found ? Number(found.pollRank) : null;
+}
 
 function registerPhoto(name, nickname, img) {
   if (!img || (!img.startsWith("http://") && !img.startsWith("https://"))) return;
@@ -197,6 +221,7 @@ function getScorePillStyle(score, categoryKey) {
 
 export default function HistoryPage() {
   const [data, setData] = useState(historyData);
+  const [pollList, setPollList] = useState(pollData || []);
   const [activeYear, setActiveYear] = useState("2024");
   const [activeTab, setActiveTab] = useState("qualifying"); // 'qualifying' | 'playoffs' | 'finals' | 'info'
   const [searchQuery, setSearchQuery] = useState("");
@@ -279,6 +304,15 @@ export default function HistoryPage() {
         }
       })
       .catch((err) => console.error("Error loading history from API:", err));
+
+    fetch("/api/poll")
+      .then((res) => res.json())
+      .then((pData) => {
+        if (pData.success && Array.isArray(pData.data)) {
+          setPollList(pData.data);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const enabledYears = data?.enabledYears || {
@@ -330,8 +364,15 @@ export default function HistoryPage() {
 
   // Filter and sort qualifying contestants
   const filteredQualifying = useMemo(() => {
-    if (!currentSeason || !currentSeason.qualifying) return [];
-    let list = [...currentSeason.qualifying];
+    let sourceList = currentSeason?.qualifying;
+    if ((!sourceList || sourceList.length === 0) && String(activeYear) === "2026") {
+      sourceList = Array.isArray(leaderboardData) ? leaderboardData : [];
+    }
+    if (!sourceList) return [];
+    let list = sourceList.map((item) => ({
+      ...item,
+      pollRank: item.pollRank ?? getContestantPollRank(item, pollList),
+    }));
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -347,8 +388,8 @@ export default function HistoryPage() {
       list.sort((a, b) => (Number(a.order) || 999) - (Number(b.order) || 999));
     } else if (sortBy === "poll") {
       list.sort((a, b) => {
-        const pA = Number(a.pollRank) || 999;
-        const pB = Number(b.pollRank) || 999;
+        const pA = Number(a.pollRank ?? getContestantPollRank(a, pollList)) || 999;
+        const pB = Number(b.pollRank ?? getContestantPollRank(b, pollList)) || 999;
         if (pA !== pB) return pA - pB;
         return parseNumericRank(a.rank) - parseNumericRank(b.rank);
       });
@@ -366,7 +407,7 @@ export default function HistoryPage() {
     }
 
     return list;
-  }, [currentSeason, searchQuery, sortBy]);
+  }, [currentSeason, activeYear, searchQuery, sortBy, pollList]);
 
   // Auto-switch tab if current activeTab is not available for this season
   useEffect(() => {
@@ -1293,7 +1334,7 @@ export default function HistoryPage() {
               </button>
             )}
 
-            {currentSeason?.qualifying && currentSeason.qualifying.length > 0 && (
+            {((currentSeason?.qualifying && currentSeason.qualifying.length > 0) || String(activeYear) === "2026") && (
               <button
                 onClick={() => setActiveTab("qualifying")}
                 style={{
@@ -1308,7 +1349,7 @@ export default function HistoryPage() {
                   boxShadow: activeTab === "qualifying" ? "0 0 12px rgba(0, 229, 255, 0.3)" : "none"
                 }}
               >
-                📋 รอบคัดเลือกแห่งปี (Qualifying) • {currentSeason.qualifying.length} คน
+                📋 รอบคัดเลือกแห่งปี (Qualifying) • {currentSeason?.qualifying?.length || 22} คน
               </button>
             )}
 
@@ -2508,7 +2549,7 @@ export default function HistoryPage() {
 {/* ========================================================
               TAB CONTENT 1: QUALIFYING ROUND
              ======================================================== */}
-          {activeTab === "qualifying" && currentSeason?.qualifying && currentSeason.qualifying.length > 0 && (
+          {activeTab === "qualifying" && ((currentSeason?.qualifying && currentSeason.qualifying.length > 0) || String(activeYear) === "2026") && (
             <div>
               {/* Search & Sort Controls Bar */}
               <div style={{
@@ -4602,7 +4643,9 @@ export default function HistoryPage() {
                 color: "rgba(255,255,255,0.6)"
               }}>
                 {selectedSpotlight.order && <span>ลำดับแข่งขัน: #{selectedSpotlight.order}</span>}
-                {selectedSpotlight.pollRank && <span>อันดับผลโพล: #{selectedSpotlight.pollRank}</span>}
+                {(selectedSpotlight.pollRank || getContestantPollRank(selectedSpotlight, pollList)) && (
+                  <span>อันดับผลโพล: #{selectedSpotlight.pollRank || getContestantPollRank(selectedSpotlight, pollList)}</span>
+                )}
                 {selectedSpotlight.episode && <span>EP.{selectedSpotlight.episode}</span>}
                 {selectedSpotlight.date && <span>วันที่แข่ง: {selectedSpotlight.date}</span>}
               </div>

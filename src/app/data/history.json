@@ -5406,7 +5406,382 @@
           "image": ""
         }
       ],
-      "qualifying": [],
+      "qualifying": [
+        {
+          "date": "2026",
+          "rank": "1",
+          "order": 4,
+          "pollRank": 10,
+          "nickname": "นนท์",
+          "name": "นัทธภพ ธนวัฒนาเจริญ",
+          "topic": "Battle Spirits",
+          "scores": {
+            "3sec": 17,
+            "qa": 25,
+            "jigsaw": 25,
+            "attribute": 5
+          },
+          "totalScore": 72,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOgKXzH5BJc9GwgKBg3gIZ1ekUk38RpaARnGf8zC_NwDuqmYOSsCntV_K4bJa9OLVkkvNdthXDkhyARJ3lD8T8XmG2MS52Iv0E62V8-G0LUE8WN14d-ppvq0u2qiTZW18I6EDH93za3R3WKie2fpw2p=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "2",
+          "order": 7,
+          "pollRank": 7,
+          "nickname": "ก๊อง",
+          "name": "เชาว์วรรธน์ จันทร์สุข",
+          "topic": "Workpoint",
+          "scores": {
+            "3sec": 21,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 15
+          },
+          "totalScore": 71,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOcbsPyeZOJXpxsh76YTu02JkdpT0l_XZN1g8UmY4RAMt56aZqkXaz6hE3eMSBgxLgFg_vhX-LAbjxMrP_ymdYhFsmKt3zOTma2PGPXNrgWg2cTyCjHz4JhqCo9NJ30zdhQvXRNm6vaZqQBg63gvX90=w1143-h1134-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "2",
+          "order": 6,
+          "pollRank": 17,
+          "nickname": "ตฤณ",
+          "name": "ณฤกร วงศบูรณะ",
+          "topic": "Tattoo Colour",
+          "scores": {
+            "3sec": 16,
+            "qa": 15,
+            "jigsaw": 20,
+            "attribute": 20
+          },
+          "totalScore": 71,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczM2KXOUWmWDd7gii36UEkW1qKHzPm5xtKyhUjHJWpqySdf3Hx26Fx_eoOOi62fCRyDVzvE8bXf59xvOtQP762it8kBb2hA39Eau8OVDLzV_j46SURDPFv6cE5jJWPaiu_tXugYONINjnwQBasUzwJld=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "3",
+          "order": 8,
+          "pollRank": 18,
+          "nickname": "ศีล",
+          "name": "พัทธ์ศีล ปุญศิริ",
+          "topic": "บอร์ดเกม",
+          "scores": {
+            "3sec": 19,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 10
+          },
+          "totalScore": 64,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNpV79cKLFfYqYmqXTfd6i7A7vbd-fRdOyJeNgGxgt4UNnBVdFGrdw3MqdlW1rL1CYbSK4pTmlHTCp1YRVdBsSz-XqfpfYpQJNquF66wFDTOQtpGcAKlYv5G0db4577aq35S3FqNdhie4mS2SZyTvkD=w1117-h1120-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "4",
+          "order": 5,
+          "pollRank": 5,
+          "nickname": "อินทร์",
+          "name": "คุณอินทร์ บุญสิน",
+          "topic": "วง Queen",
+          "scores": {
+            "3sec": 21,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 20
+          },
+          "totalScore": 61,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMIYh4f5qAuyFXPce7exy9Eb98A3VF_EinJhNlAt85BnjG7zs5CBl9C1nDUkw5hGm5ShmIqcPRoog_Lm5CwnBGd6uSbw4ENIvhsKWGS9vqNfEyVO_Vp1Q1TMjjmJaaIke0AjIWAhvbtSF-Tl8xl5zg5=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "5",
+          "order": 1,
+          "pollRank": 8,
+          "nickname": "ปืน",
+          "name": "ธวัชชัย แสงสว่าง",
+          "topic": "ไอ้มดแดง (Kamen Rider)",
+          "scores": {
+            "3sec": 15,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 10
+          },
+          "totalScore": 60,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOBBW412A6o3q8m8jpCV4GQGf950z__lIFfIeCe5C2S5Czet7-xK5sxHDzR_tHJ-gulxlBel1bbfc-MCgUpVz8EfOUE1j357cl5GRj0DwjOvhTDG__oQdipozW_e8qklM9jgx_jHXZW72kVH0AVya_1=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "6",
+          "order": 2,
+          "pollRank": 20,
+          "nickname": "แบงค์",
+          "name": "ธนพัฒน์ สง่าแสง",
+          "topic": "48Group Thailand",
+          "scores": {
+            "3sec": 13,
+            "qa": 10,
+            "jigsaw": 25,
+            "attribute": 10
+          },
+          "totalScore": 58,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMFvxYxB3ehwwae1-G0ILsbuksEOGJ0udwMz2Sc5cysUDS_u_QFO--77yjiF-LkUQhvA2RlpGnMJhkIBB6dTULsnT35EFMvZc81ZN0cX-iKNs4VAkdM50ExYvdgNeiC4eRkQq6ohOLhFmJUZ3B9ryo9=w1117-h1116-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "7",
+          "order": 3,
+          "pollRank": 21,
+          "nickname": "ริท",
+          "name": "ฤทธิชัย ภูสิญามณี",
+          "topic": "Serious Bacon",
+          "scores": {
+            "3sec": 13,
+            "qa": 20,
+            "jigsaw": 0,
+            "attribute": 15
+          },
+          "totalScore": 48,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNeiaI5x9UOTAd1mZs6eQwz4dfITYJ2LTvRNajTb9NETXDoLsEX8MOpPKcDeK05W9X6AQ25GHaxkurniE8uD4uk2wbrg_CAH32ad2Z3awUGIj5HVtR3GUJbTkfxET18SNvT_XuYQ_kOMnbQx-7mqDUm=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 9,
+          "pollRank": 4,
+          "nickname": "กัส",
+          "name": "สิปโปทัย ศรีบุญเรือง",
+          "topic": "ประวัติศาสตร์กรุงรัตนโกสินทร์",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMpg3NPj_C_0lXZ55wQnYy3uBdKxWYsCYSfNyh4TC5T802iCIilGvzTZVtTYlKpVFkdWWLlSt8RBq0gHtckzQclQUElkO3nXjkdK5DiMl1uuIvbX6cmoWVgZwoCDs0MhqBpyEULkO1DERQqMl5I6lxJ=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 10,
+          "pollRank": 16,
+          "nickname": "แสตมป์",
+          "name": "ณัฐวุฒิ โนรี",
+          "topic": "Thai BL Series",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPioiz5362-yx4IyFh5ujVIiP8u9T9HO9Szx73eo7RNgAv1vpU_NXF4AhPHts5qXPf0-Tc-FDkoC--krXYTr5CpHbd2alN0a3Mvv0qG_WLVqHKcs79yVOctUXLqdqw1J-1Yv1hIYaMBr61YOXK2oRaJ=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 11,
+          "pollRank": 22,
+          "nickname": "ก๊อปปี้",
+          "name": "นิธิกร วิชัยวงศ์",
+          "topic": "ขบวนการ 5 สี",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNGXiRybdHr50jnZ5cSGVWylSyacpr0_lKea-J997YP8DTnyd2LSErW43LVIV1jv05TzvFz9X3BwyMZ1NDAk0AFH9d5tlu-9ZBq54sW8LK3wfGKAH6cdN-Y2BS3jHh4jxLuJIsoSxuhPwbvBALA7kO_=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 12,
+          "pollRank": 9,
+          "nickname": "ออม",
+          "name": "ธนกร สุขปาน",
+          "topic": "เพลงลูกทุ่ง",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPP8nZ07EZHdzSIrVCyY_JJVLoAVFwc5nWH4E4FzJRHd5UckRRz9r4TGQSJQTK4G0Rff5XYSUMNfr4hsnds_foBX_6RMxRhCfoHUKdVPhK7MqOh9VpytXXVd-pLYaFTHr9xw0QM5q7T2VZahmTWhEtl=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 13,
+          "pollRank": 12,
+          "nickname": "นที",
+          "name": "ณัฐภัทร แก้วสินธุ์",
+          "topic": "Masterchef Thailand",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN8o5FXqfPvxqOJs1do7f6f9mxT29Uah3nW-H2erXV1B5DsWhlnT2Acsq2rLJsMW-7g61ODyOzeSNohiJcv7AcIr-bM0JJPltRCNxrKU_qX_fqhdFIvEGOb-jJfe3CUI_FByhfFMQ9Dr7cPChdMDL4-=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 14,
+          "pollRank": 1,
+          "nickname": "หมี",
+          "name": "ศุภกร นิลสุวรรณ",
+          "topic": "Coldplay",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczNZoycybKH_JLe3sadOjWqcKYB6T7gla157eLfhpdmiqjreEQXzlWy3N6MNXuZ3j5jwymUTuHtcmTWj4dwZFDRL476koalvo2o0X5Uefh2H-jeCkCkS6ktiFu-JJ3X_G_oWt2Aq5AHSQCXzNCxoOyn_=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 15,
+          "pollRank": 2,
+          "nickname": "พีท",
+          "name": "สหัสวรรษ นิจพันธ์",
+          "topic": "รถไฟฟ้าไทย",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczMEYvUbK3Fml3k5TqHLFhjZ6m1o7d4YvgVs3xTS2a0zdl0sRuiEHoeJ2T2OiFQc4LIAA35_C1iCbw0r_8wxasQopczVJsN0e8SRAnpDU-okrMaZ7PDp4g6Pik35x0YtpxaAiuddaaPsuFyID5pnfd0w=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 9,
+          "pollRank": 3,
+          "nickname": "กัปตัน",
+          "name": "กันตชาติ ศรีเพ็ชร",
+          "topic": "Liverpool FC",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczN87yq_9fWf_gMlAfHPx8yOsf9f-mRbrZCwTaV4V7aq6SLANnCPC_cq9JJVbxc7S3AoEHO_BkvDvAUITPLwERz7ljkkRrvhvUST-t1T7gDTOdR5AmHLVS4keFuhyrb7ZXkd-RU5i3kj_vTs8ANcAIDy=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 17,
+          "pollRank": 13,
+          "nickname": "แฟรงค์",
+          "name": "ณัฐดนัย วงศ์ปัญญา",
+          "topic": "Honkai: Star Rail",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPdtNTPyZUoF5ENBFlimqEeER15COq2o1DZ9RiVzOPO2DPacGB0qfbeIommu9KETd8EeaQyY4oLp35WOHayLp6myeBiSLfIELYwiWL-gL_g9XzCPEI3Ms3JJ0HkXRBfb1QDGqLx-nyVP4fqfa8mMFhX=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 18,
+          "pollRank": 14,
+          "nickname": "พีม",
+          "name": "พีรภัทร หมื่นหาญ",
+          "topic": "Club Friday the Series",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPUvYTkriw4nm8IBUTBQfSGiB9shj-M11SAsMZ9Z7veQZdp5F6Uld3ScEfo9UbeSXNvbSENSvBHtyTLjazizCRlAqKrKD8P_7XcgMHx6aOWGO5S_HC4Ov4plw1DonR0WD7ruWyQCGEnrnLtJn1-W2lZ=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 19,
+          "pollRank": 19,
+          "nickname": "นิว",
+          "name": "รติพงษ์ กมลเกียรติพัฒน์",
+          "topic": "ไพ่ทาโร่ต์",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczPalqWB79ObwsPqJVjlBoLGr-31QtzntceySm9B0TC7LItpwpfkpXmrZNUof2TKuOv2dBhk1KbQAGS_TBEt-AwfqtpiPmaoN_DURhOEGoA3R4T7NHbgYP_4-B69D2xS01de-BWLa3YFQo5QtBiLpQgC=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 20,
+          "pollRank": 11,
+          "nickname": "เอิร์น",
+          "name": "พัชราภรณ์ ขวัญพรมสี",
+          "topic": "Honkai Impact 3rd",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOkN98O0LDhBcQhE4X4iE67B322lQ1L3iZKvqZyP5LXaH37LibFcH26AbonLsUzAkxKXARjmy2s0hT7n83PQ0_hiVbM8TUigd-_RRr_9wH5bI8GUXg93DH5tmYRC7yNHrzFxoPMhtp7n7WE7JzTSgk9=w1125-h1125-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 21,
+          "pollRank": 15,
+          "nickname": "ป๊ะ",
+          "name": "ปวัน ธนพรพันธ์",
+          "topic": "Taskmaster",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczO-YpFN5q79SsyFUxl5MQ3agmPlDe6UWUcCwudDt4eidO1Z1-o9Acx5WZpy5T6KURHpit0PdLvVpIT09QiDHNoYHmHUIYgoIrHlLfA_dxi3pXbx0AjAzSunbslVKnc6B6526DOPP0XwwFmb7SHmNjES=w1117-h1117-s-no-gm"
+        },
+        {
+          "date": "2026",
+          "rank": "8",
+          "order": 22,
+          "pollRank": 6,
+          "nickname": "อาร์ม",
+          "name": "ภควัต ศรสุกลรัตน์",
+          "topic": "การเมืองไทย",
+          "scores": {
+            "3sec": 0,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 0
+          },
+          "totalScore": 0,
+          "image": "https://lh3.googleusercontent.com/pw/AP1GczOXZ7x2lelKztH88AKbMMCOY3kEca65A0ke-9gVHZ3bjA-US37R2F-PQKOztqpRzHcmQaRfen2rY6jE26F4GPby3gG8o1ZdVfsxbzB6g0N6Cz6epHSO57s17ofVHCodPHJfdyQdTt-mjTc_M9i6bKKq=w1117-h1117-s-no-gm"
+        }
+      ],
       "finals": []
     }
   }

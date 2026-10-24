@@ -6,6 +6,39 @@ import { getKVData, saveKVData } from "@/lib/kv";
 const DATA_FILE = path.join(process.cwd(), "src/app/data/leaderboard.json");
 const HISTORY_FILE = path.join(process.cwd(), "src/app/data/history.json");
 const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
+const POLL_FILE = path.join(process.cwd(), "src/app/data/poll.json");
+
+function readPollData() {
+  try {
+    if (!fs.existsSync(POLL_FILE)) return [];
+    return JSON.parse(fs.readFileSync(POLL_FILE, "utf-8"));
+  } catch (err) {
+    console.error("Error reading poll in scores API:", err);
+    return [];
+  }
+}
+
+function getContestantPollRank(item, pollList) {
+  if (!item) return null;
+  if (item.pollRank !== undefined && item.pollRank !== null && item.pollRank !== "") {
+    return Number(item.pollRank);
+  }
+  if (!Array.isArray(pollList)) return null;
+  const found = pollList.find((p) => {
+    const pName = (p.name || "").trim().toLowerCase();
+    const iName = (item.name || "").trim().toLowerCase();
+    const pNick = (p.nickname || "").trim().toLowerCase();
+    const iNick = (item.nickname || "").trim().toLowerCase();
+    const pTopic = (p.topic || "").trim().toLowerCase();
+    const iTopic = (item.topic || "").trim().toLowerCase();
+
+    if (pName && iName && (pName === iName || pName.includes(iName) || iName.includes(pName))) return true;
+    if (pNick && iNick && pNick === iNick) return true;
+    if (pTopic && iTopic && (pTopic === iTopic || pTopic.includes(iTopic) || iTopic.includes(pTopic))) return true;
+    return false;
+  });
+  return found ? Number(found.pollRank) : null;
+}
 
 function readHistoryData() {
   try {
@@ -194,6 +227,8 @@ export async function POST(request) {
 
       historyData.enabledYears["2026"] = true;
 
+      const pollList = (await getKVData("fpt_poll", readPollData)) || readPollData() || [];
+
       // Ensure 2026 Mystery Champion in champions array
       const existingChampIdx = historyData.champions.findIndex((c) => Number(c.year) === 2026);
       const mysteryChamp = {
@@ -222,7 +257,7 @@ export async function POST(request) {
         date: "2026",
         rank: String(item.calculatedRank),
         order: Number(item.order) || (idx + 1),
-        pollRank: item.pollRank ? Number(item.pollRank) : null,
+        pollRank: item.pollRank ? Number(item.pollRank) : getContestantPollRank(item, pollList),
         nickname: item.nickname || "",
         name: item.name,
         topic: item.topic,
@@ -243,7 +278,7 @@ export async function POST(request) {
           date: "2026",
           rank: "-",
           order: fIdx + 1,
-          pollRank: f.pollRank ? Number(f.pollRank) : null,
+          pollRank: f.pollRank ? Number(f.pollRank) : getContestantPollRank(f, pollList),
           nickname: f.nickname || "",
           name: f.name,
           topic: f.topic,
