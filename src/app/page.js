@@ -1296,9 +1296,7 @@ export default function MainPage() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "10px",
-                  height: "100%",
-                  justifyContent: "space-between"
+                  gap: "10px"
                 }}
               >
                 {col.map((c, rIdx) => (
@@ -1307,13 +1305,13 @@ export default function MainPage() {
                     style={{
                       position: "relative",
                       width: "100%",
-                      flex: "1 1 0",
-                      minHeight: "75px",
+                      aspectRatio: "1 / 1",
                       borderRadius: "10px",
                       overflow: "hidden",
                       background: "rgba(10, 25, 48, 0.6)",
                       border: "1px solid rgba(0, 229, 255, 0.2)",
-                      boxShadow: "0 4px 14px rgba(0, 0, 0, 0.5)"
+                      boxShadow: "0 4px 14px rgba(0, 0, 0, 0.5)",
+                      flexShrink: 0
                     }}
                   >
                     <img
