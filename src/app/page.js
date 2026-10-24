@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
 
 function getScorePillStyle(score, categoryKey) {
@@ -157,19 +157,33 @@ function calculateDenseRanks(items) {
     playOrder: Number(item.order) || (idx + 1),
   }));
 
-  const sortedPlayed = [...playedWithOrder].sort(
+  // Separate completed static players from active/waiting players
+  const completed = [];
+  const activeOrWaiting = [];
+
+  for (const item of playedWithOrder) {
+    const s = item.scores || {};
+    const isFullPlayed = ["3sec", "qa", "jigsaw", "attribute"].every(
+      (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+    );
+    const isPlaying = Boolean(item.isPlaying);
+    const isWaiting = Boolean(item.waitingNextMatch);
+
+    if (isPlaying || isWaiting || !isFullPlayed) {
+      activeOrWaiting.push(item);
+    } else {
+      completed.push(item);
+    }
+  }
+
+  // Sort completed contestants descending by totalScore
+  const sortedCompleted = [...completed].sort(
     (a, b) => (Number(b.totalScore) || 0) - (Number(a.totalScore) || 0)
   );
 
   let currentRank = 0;
   let lastScore = null;
-  const rankedPlayed = sortedPlayed.map((item) => {
-    if (item.waitingNextMatch) {
-      return {
-        ...item,
-        rank: null,
-      };
-    }
+  const rankedCompleted = sortedCompleted.map((item) => {
     const scoreVal = Number(item.totalScore) || 0;
     if (lastScore === null || scoreVal !== lastScore) {
       currentRank += 1;
@@ -178,15 +192,38 @@ function calculateDenseRanks(items) {
     return {
       ...item,
       rank: currentRank,
+      tableOrder: currentRank,
     };
   });
 
-  return rankedPlayed;
+  // Sort active/waiting: isPlaying first, then by playOrder
+  activeOrWaiting.sort((a, b) => {
+    if (Boolean(a.isPlaying) !== Boolean(b.isPlaying)) {
+      return a.isPlaying ? -1 : 1;
+    }
+    return (Number(a.playOrder) || 999) - (Number(b.playOrder) || 999);
+  });
+
+  // Assign tableOrder for activeOrWaiting right after rank 5 (e.g. 5.01, 5.02, ...)
+  // If fewer than 5 completed ranks exist, place after currentRank
+  const cutoffRank = currentRank >= 5 ? 5 : (currentRank > 0 ? currentRank : 5);
+  const rankedActiveOrWaiting = activeOrWaiting.map((item, idx) => ({
+    ...item,
+    rank: null,
+    tableOrder: cutoffRank + 0.01 * (idx + 1),
+  }));
+
+  const allCombined = [...rankedCompleted, ...rankedActiveOrWaiting].sort(
+    (a, b) => (a.tableOrder ?? 999) - (b.tableOrder ?? 999)
+  );
+
+  return allCombined;
 }
 
 function getRank5Info(allRankedPlayers) {
   if (!Array.isArray(allRankedPlayers) || allRankedPlayers.length === 0) return null;
   const completed = allRankedPlayers.filter((p) => {
+    if (Boolean(p.isPlaying) || Boolean(p.waitingNextMatch)) return false;
     const s = p.scores || {};
     return ["3sec", "qa", "jigsaw", "attribute"].every(
       (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
@@ -372,7 +409,7 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23) {
     statusText = "⏳ รอลุ้นผล";
     statusClass = "status-pending";
     reason = "รอลุ้นผลการแข่งขันในวันแข่งขันถัดไป (ยังไม่เปิดเผยข้อมูล)";
-  } else if (Boolean(item.isPlaying) && !isCompleted) {
+  } else if (Boolean(item.isPlaying)) {
     statusText = "🔴 กำลังแข่ง";
     statusClass = "status-playing";
     reason = "กำลังแข่งขันอยู่บนเวทีในขณะนี้";
@@ -732,9 +769,9 @@ export default function MainPage() {
           const prA = getContestantPollRank(a, pollList) ?? 999;
           const prB = getContestantPollRank(b, pollList) ?? 999;
           if (prA !== prB) return prA - prB;
-          return (Number(a.rank) || 999) - (Number(b.rank) || 999);
+          return (Number(a.tableOrder ?? a.rank) || 999) - (Number(b.tableOrder ?? b.rank) || 999);
         }
-        return (Number(a.rank) || 999) - (Number(b.rank) || 999);
+        return (Number(a.tableOrder ?? a.rank) || 999) - (Number(b.tableOrder ?? b.rank) || 999);
       });
   }, [denseRankedLeaderboard, unplayedContestants, sortBy, searchQuery, statusFilter, targetN, pollList]);
 
@@ -2455,7 +2492,7 @@ export default function MainPage() {
                         {searchQuery || statusFilter !== "all" ? "ไม่พบข้อมูลผู้เข้าแข่งขันที่ตรงกับเงื่อนไขการค้นหา" : "ยังไม่มีข้อมูลผู้เข้าแข่งขันที่มีคะแนนในระบบ"}
                       </div>
                     ) : (
-                      filteredStandings.map((item) => {
+                      filteredStandings.map((item, index) => {
                         const evalStatus = item.isUnplayed
                           ? {
                               isGuaranteedQualified: false,
@@ -2488,51 +2525,106 @@ export default function MainPage() {
                           ? "0 0 14px rgba(255, 77, 79, 0.45)"
                           : "0 0 8px rgba(0, 0, 0, 0.5)";
 
-                        return (
-                          <div
-                            key={item.id}
-                            onClick={() => {
-                              if (!item.waitingNextMatch) {
-                                setSelectedSpotlight(item);
-                              }
-                            }}
-                            title={item.waitingNextMatch ? "รอลุ้นผลในวันแข่งขันถัดไป" : "คลิกเพื่อดูสถิติและคะแนนเจาะลึก"}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              marginBottom: "8px",
-                              cursor: item.waitingNextMatch ? "default" : "pointer",
-                              transition: "transform 0.15s ease, filter 0.15s ease"
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!item.waitingNextMatch) {
-                                e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
-                                e.currentTarget.style.filter = "brightness(1.15)";
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!item.waitingNextMatch) {
-                                e.currentTarget.style.transform = "scale(1) translateX(0)";
-                                e.currentTarget.style.filter = "brightness(1)";
-                              }
-                            }}
-                          >
-                            {/* 1. Dynamic Leftmost Slanted Box (matching sortBy) */}
-                            {(() => {
-                              let displayNum = item.waitingNextMatch ? "-" : item.rank;
-                              let numColor = isPlaying ? "#00e5ff" : isTopSafe ? "#ffd700" : "#ffffff";
-                              let numShadow = isPlaying ? "0 0 14px rgba(0, 229, 255, 0.85)" : isTopSafe ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)";
+                        const prevItem = index > 0 ? filteredStandings[index - 1] : null;
+                        const showCutoffLine =
+                          sortBy === "rank" &&
+                          prevItem &&
+                          Number(prevItem.rank) <= 5 &&
+                          prevItem.rank !== null &&
+                          (item.rank === null || Number(item.rank) > 5 || Number(item.tableOrder) > 5);
 
-                              if (sortBy === "order") {
-                                displayNum = item.playOrder ?? "-";
-                                numColor = "#00e5ff";
-                                numShadow = "0 0 12px rgba(0, 229, 255, 0.6)";
-                              } else if (sortBy === "poll") {
-                                displayNum = item.waitingNextMatch ? "-" : (pollRank ?? "-");
-                                numColor = pollRank && pollRank <= 5 ? "#ffd700" : "#38bdf8";
-                                numShadow = pollRank && pollRank <= 5 ? "0 0 12px rgba(255, 215, 0, 0.6)" : "0 0 10px rgba(56, 189, 248, 0.5)";
-                              }
+                        return (
+                          <Fragment key={item.id}>
+                            {showCutoffLine && (
+                              <div style={{
+                                margin: "14px 0 10px 0",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                                position: "relative"
+                              }}>
+                                <div style={{
+                                  flex: 1,
+                                  height: "2px",
+                                  background: "linear-gradient(90deg, rgba(255, 215, 0, 0) 0%, #ffd700 100%)",
+                                  boxShadow: "0 0 10px rgba(255, 215, 0, 0.8)"
+                                }} />
+                                <div style={{
+                                  transform: "skewX(-16deg)",
+                                  background: "linear-gradient(135deg, #2b1f06 0%, #0d0901 100%)",
+                                  border: "1.5px solid #ffd700",
+                                  boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
+                                  padding: "4px 16px",
+                                  borderRadius: "8px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  flexShrink: 0
+                                }}>
+                                  <span style={{
+                                    transform: "skewX(16deg)",
+                                    fontSize: "12px",
+                                    fontWeight: "900",
+                                    fontStyle: "italic",
+                                    letterSpacing: "0.8px",
+                                    color: "#ffd700",
+                                    textShadow: "0 0 10px rgba(255, 215, 0, 0.7)"
+                                  }}>
+                                    ⚡ เส้นตัดตัว 5 อันดับแรก (TOP 5 QUALIFYING CUTOFF{rank5Score ? `: ${rank5Score} คะแนน` : ""})
+                                  </span>
+                                </div>
+                                <div style={{
+                                  flex: 1,
+                                  height: "2px",
+                                  background: "linear-gradient(90deg, #ffd700 0%, rgba(255, 215, 0, 0) 100%)",
+                                  boxShadow: "0 0 10px rgba(255, 215, 0, 0.8)"
+                                }} />
+                              </div>
+                            )}
+
+                            <div
+                              onClick={() => {
+                                if (!item.waitingNextMatch) {
+                                  setSelectedSpotlight(item);
+                                }
+                              }}
+                              title={item.waitingNextMatch ? "รอลุ้นผลในวันแข่งขันถัดไป" : "คลิกเพื่อดูสถิติและคะแนนเจาะลึก"}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                marginBottom: "8px",
+                                cursor: item.waitingNextMatch ? "default" : "pointer",
+                                transition: "transform 0.15s ease, filter 0.15s ease"
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!item.waitingNextMatch) {
+                                  e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
+                                  e.currentTarget.style.filter = "brightness(1.15)";
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!item.waitingNextMatch) {
+                                  e.currentTarget.style.transform = "scale(1) translateX(0)";
+                                  e.currentTarget.style.filter = "brightness(1)";
+                                }
+                              }}
+                            >
+                              {/* 1. Dynamic Leftmost Slanted Box (matching sortBy) */}
+                              {(() => {
+                                let displayNum = item.waitingNextMatch ? "-" : isPlaying ? "LIVE" : (item.rank ?? "-");
+                                let numColor = isPlaying ? "#00e5ff" : isTopSafe ? "#ffd700" : "#ffffff";
+                                let numShadow = isPlaying ? "0 0 14px rgba(0, 229, 255, 0.85)" : isTopSafe ? "0 0 12px rgba(255, 215, 0, 0.7)" : "0 2px 6px rgba(0,0,0,0.8)";
+
+                                if (sortBy === "order") {
+                                  displayNum = item.playOrder ?? "-";
+                                  numColor = "#00e5ff";
+                                  numShadow = "0 0 12px rgba(0, 229, 255, 0.6)";
+                                } else if (sortBy === "poll") {
+                                  displayNum = item.waitingNextMatch ? "-" : (pollRank ?? "-");
+                                  numColor = pollRank && pollRank <= 5 ? "#ffd700" : "#38bdf8";
+                                  numShadow = pollRank && pollRank <= 5 ? "0 0 12px rgba(255, 215, 0, 0.6)" : "0 0 10px rgba(56, 189, 248, 0.5)";
+                                }
 
                               return (
                                 <div style={{
@@ -2879,7 +2971,8 @@ export default function MainPage() {
                               </span>
                             </div>
                           </div>
-                        );
+                        </Fragment>
+                      );
                       })
                     )}
                   </div>
