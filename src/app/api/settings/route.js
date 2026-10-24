@@ -15,6 +15,8 @@ const DEFAULT_SETTINGS = {
   drawPassword: "",
   protectHistory: false,
   historyPassword: "",
+  protectRestrict: false,
+  restrictPassword: "",
   isArchived: false,
   archivedAt: null,
   currentPhase: "qualifying", // 'qualifying' | 'finals'
@@ -67,6 +69,8 @@ export async function GET(request) {
       drawPassword: settings.drawPassword || "",
       protectHistory: Boolean(settings.protectHistory),
       historyPassword: settings.historyPassword || "",
+      protectRestrict: Boolean(settings.protectRestrict),
+      restrictPassword: settings.restrictPassword || "",
       isArchived: Boolean(settings.isArchived),
       archivedAt: settings.archivedAt || null,
       currentPhase: settings.currentPhase || "qualifying",
@@ -82,6 +86,7 @@ export async function GET(request) {
     protectHome: Boolean(settings.protectHome),
     protectDraw: Boolean(settings.protectDraw),
     protectHistory: Boolean(settings.protectHistory),
+    protectRestrict: Boolean(settings.protectRestrict),
     isArchived: Boolean(settings.isArchived),
     archivedAt: settings.archivedAt || null,
     currentPhase: settings.currentPhase || "qualifying",
@@ -134,6 +139,15 @@ export async function POST(request) {
       return NextResponse.json({ success: true, valid: match });
     }
 
+    // Verify restrict/question-archive password action
+    if (body.action === "verify_restrict") {
+      if (!current.protectRestrict) {
+        return NextResponse.json({ success: true, valid: true });
+      }
+      const match = String(body.password || "").trim() === String(current.restrictPassword || "").trim();
+      return NextResponse.json({ success: true, valid: match });
+    }
+
     // Update settings (only when admin verified or updating settings)
     if (body.action === "update") {
       const newSettings = { ...current };
@@ -170,6 +184,13 @@ export async function POST(request) {
         newSettings.historyPassword = String(body.historyPassword || "").trim();
       }
 
+      if (body.protectRestrict !== undefined) {
+        newSettings.protectRestrict = Boolean(body.protectRestrict);
+      }
+      if (body.restrictPassword !== undefined) {
+        newSettings.restrictPassword = String(body.restrictPassword || "").trim();
+      }
+
       if (body.currentPhase !== undefined) {
         newSettings.currentPhase = body.currentPhase === "finals" ? "finals" : "qualifying";
       }
@@ -197,6 +218,8 @@ export async function POST(request) {
           drawPassword: newSettings.drawPassword,
           protectHistory: newSettings.protectHistory,
           historyPassword: newSettings.historyPassword,
+          protectRestrict: newSettings.protectRestrict,
+          restrictPassword: newSettings.restrictPassword,
           isArchived: newSettings.isArchived,
           archivedAt: newSettings.archivedAt,
           currentPhase: newSettings.currentPhase,

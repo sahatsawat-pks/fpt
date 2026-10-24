@@ -37,13 +37,15 @@ export default function QuestionArchiveAdmin() {
   });
 
   // Game 1: 3 Seconds State
-  const [threeSecType, setThreeSecType] = useState("typeA"); // "typeA" (1 ชุด 25 ข้อ), "typeB" (3 ชุด 10/10/5 ข้อ)
+  const [threeSecType, setThreeSecType] = useState("typeA"); // "typeA" (1 ชุด 25 ข้อ), "typeB" (คำถามใหญ่ 3 ข้อ ข้อละ 10 ข้อย่อย)
   const [threeSecActiveSet, setThreeSecActiveSet] = useState(0); // 0, 1, 2 for sets
   const [threeSecSets, setThreeSecSets] = useState([
     {
-      setName: "ชุดที่ 1 (25 ข้อ)",
+      setName: "ชุดคำถาม (25 ข้อ)",
+      mainQuestion: "",
       questions: Array.from({ length: 25 }, (_, i) => ({
         id: i + 1,
+        subNumber: i + 1,
         question: "",
         mediaType: "text", // "text", "image", "audio"
         mediaUrl: "",
@@ -150,7 +152,7 @@ export default function QuestionArchiveAdmin() {
     return catalog[selectedYear][selectedRound] || [];
   }, [catalog, selectedYear, selectedRound]);
 
-  // When changing 3-second mode (1 set 25 questions vs 3 sets 10/10/5)
+  // When changing 3-second mode (1 set 25 questions vs 3 big questions with 10 sub-questions each)
   const handleSwitchThreeSecType = (type) => {
     setThreeSecType(type);
     setThreeSecActiveSet(0);
@@ -159,6 +161,7 @@ export default function QuestionArchiveAdmin() {
       const existingQs = threeSecSets[0]?.questions || [];
       const newQs = Array.from({ length: 25 }, (_, i) => existingQs[i] || {
         id: i + 1,
+        subNumber: i + 1,
         question: "",
         mediaType: "text",
         mediaUrl: "",
@@ -166,11 +169,12 @@ export default function QuestionArchiveAdmin() {
         result: "none",
         hostRemark: ""
       });
-      setThreeSecSets([{ setName: "ชุดคำถาม (25 ข้อ)", questions: newQs }]);
+      setThreeSecSets([{ setName: "ชุดคำถาม (25 ข้อ)", mainQuestion: "", questions: newQs }]);
     } else {
-      // 3 sets (10, 10, 5)
-      const q1 = Array.from({ length: 10 }, (_, i) => ({
-        id: i + 1,
+      // 3 Big Questions (คำถามใหญ่ 3 ข้อ แต่ละข้อมีคำถามย่อย 10 ข้อ)
+      const createTenQuestions = (startId) => Array.from({ length: 10 }, (_, i) => ({
+        id: startId + i,
+        subNumber: i + 1,
         question: "",
         mediaType: "text",
         mediaUrl: "",
@@ -178,28 +182,23 @@ export default function QuestionArchiveAdmin() {
         result: "none",
         hostRemark: ""
       }));
-      const q2 = Array.from({ length: 10 }, (_, i) => ({
-        id: i + 11,
-        question: "",
-        mediaType: "text",
-        mediaUrl: "",
-        answer: "",
-        result: "none",
-        hostRemark: ""
-      }));
-      const q3 = Array.from({ length: 5 }, (_, i) => ({
-        id: i + 21,
-        question: "",
-        mediaType: "text",
-        mediaUrl: "",
-        answer: "",
-        result: "none",
-        hostRemark: ""
-      }));
+
       setThreeSecSets([
-        { setName: "ชุดที่ 1 (10 ข้อ)", questions: q1 },
-        { setName: "ชุดที่ 2 (10 ข้อ)", questions: q2 },
-        { setName: "ชุดที่ 3 (5 ข้อ)", questions: q3 }
+        {
+          setName: "คำถามใหญ่ข้อที่ 1",
+          mainQuestion: "",
+          questions: createTenQuestions(1)
+        },
+        {
+          setName: "คำถามใหญ่ข้อที่ 2",
+          mainQuestion: "",
+          questions: createTenQuestions(11)
+        },
+        {
+          setName: "คำถามใหญ่ข้อที่ 3",
+          mainQuestion: "",
+          questions: createTenQuestions(21)
+        }
       ]);
     }
   };
@@ -981,7 +980,7 @@ export default function QuestionArchiveAdmin() {
                   <span>🕒</span> หมวด 1: 3 วินาที (3 Seconds)
                 </h2>
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", margin: 0 }}>
-                  เลือกระหว่างแบบ 1 ชุด 25 ข้อ หรือ 3 ชุด (10/10/5 ข้อ) และสามารถแนบรูปภาพหรือไฟล์เสียงสำหรับคำถามภาพ-เสียงได้
+                  เลือกระหว่างแบบ 1 ชุด (25 ข้อ) หรือแบบ 3 ชุด (คำถามใหญ่ 3 ข้อ แต่ละข้อมีคำถามย่อย 10 ข้อ) พร้อมแนบรูปภาพหรือไฟล์เสียงได้
                 </p>
               </div>
 
@@ -1018,33 +1017,84 @@ export default function QuestionArchiveAdmin() {
                     cursor: "pointer"
                   }}
                 >
-                  🔢 แบบ 3 ชุด (10/10/5 ข้อ)
+                  🔢 แบบ 3 ชุด (3 ข้อใหญ่ × 10 ข้อย่อย)
                 </button>
               </div>
             </div>
 
-            {/* Set Tabs if Type B */}
+            {/* Set Tabs if Type B (3 Big Questions) */}
             {threeSecType === "typeB" && (
-              <div style={{ display: "flex", gap: "8px", marginBottom: "18px" }}>
+              <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
                 {threeSecSets.map((st, sIdx) => (
                   <button
                     key={sIdx}
                     type="button"
                     onClick={() => setThreeSecActiveSet(sIdx)}
                     style={{
-                      padding: "8px 16px",
+                      padding: "10px 18px",
                       borderRadius: "8px",
                       background: threeSecActiveSet === sIdx ? "rgba(0, 229, 255, 0.25)" : "rgba(255,255,255,0.05)",
-                      border: threeSecActiveSet === sIdx ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                      border: threeSecActiveSet === sIdx ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
                       color: threeSecActiveSet === sIdx ? "#00e5ff" : "rgba(255,255,255,0.7)",
                       fontSize: "13px",
                       fontWeight: "800",
-                      cursor: "pointer"
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
                     }}
                   >
-                    {st.setName} ({st.questions.length} ข้อ)
+                    <span>{sIdx === 0 ? "🥇" : sIdx === 1 ? "🥈" : "🥉"}</span>
+                    {st.setName} (10 ข้อย่อย)
                   </button>
                 ))}
+              </div>
+            )}
+
+            {/* Big Question Prompt Header (Type B only) */}
+            {threeSecType === "typeB" && (
+              <div style={{
+                background: "rgba(0, 229, 255, 0.08)",
+                border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                borderRadius: "12px",
+                padding: "14px 18px",
+                marginBottom: "16px"
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                  <label style={{ fontSize: "14px", fontWeight: "900", color: "#00e5ff", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>🎯</span> โจทย์คำถามใหญ่ ({threeSecSets[threeSecActiveSet]?.setName || `คำถามใหญ่ข้อที่ ${threeSecActiveSet + 1}`})
+                  </label>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", background: "rgba(0,0,0,0.4)", padding: "2px 8px", borderRadius: "4px" }}>
+                    มีคำถามย่อย 10 ข้อด้านล่าง
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  value={threeSecSets[threeSecActiveSet]?.mainQuestion || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setThreeSecSets((prev) => {
+                      const updated = [...prev];
+                      if (!updated[threeSecActiveSet]) return prev;
+                      updated[threeSecActiveSet] = {
+                        ...updated[threeSecActiveSet],
+                        mainQuestion: val
+                      };
+                      return updated;
+                    });
+                  }}
+                  placeholder="พิมพ์โจทย์คำถามใหญ่ของชุดนี้ เช่น จากภาพต่อไปนี้ คือใคร / จากเสียงต่อไปนี้ คือเพลงอะไร..."
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    background: "rgba(0, 15, 30, 0.85)",
+                    border: "1px solid rgba(0, 229, 255, 0.5)",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    fontWeight: "700"
+                  }}
+                />
               </div>
             )}
 
@@ -1059,14 +1109,14 @@ export default function QuestionArchiveAdmin() {
                     borderRadius: "10px",
                     padding: "12px 16px",
                     display: "grid",
-                    gridTemplateColumns: "40px 1.5fr 1fr 1fr auto",
+                    gridTemplateColumns: "48px 1.5fr 1fr 1fr auto",
                     gap: "12px",
                     alignItems: "center"
                   }}
                 >
                   {/* Number */}
                   <div style={{
-                    width: "36px",
+                    width: "44px",
                     height: "36px",
                     borderRadius: "8px",
                     background: "rgba(0, 229, 255, 0.15)",
@@ -1076,9 +1126,9 @@ export default function QuestionArchiveAdmin() {
                     alignItems: "center",
                     justifyContent: "center",
                     fontWeight: "900",
-                    fontSize: "15px"
+                    fontSize: threeSecType === "typeB" ? "13px" : "15px"
                   }}>
-                    {q.id}
+                    {threeSecType === "typeB" ? `${threeSecActiveSet + 1}.${q.subNumber || qIdx + 1}` : q.id}
                   </div>
 
                   {/* Question */}
@@ -1094,7 +1144,7 @@ export default function QuestionArchiveAdmin() {
                           return updated;
                         });
                       }}
-                      placeholder={`โจทย์คำถามข้อที่ ${q.id}...`}
+                      placeholder={threeSecType === "typeB" ? `คำถามย่อยข้อที่ ${q.subNumber || qIdx + 1}...` : `โจทย์คำถามข้อที่ ${q.id}...`}
                       style={{
                         width: "100%",
                         padding: "8px 10px",

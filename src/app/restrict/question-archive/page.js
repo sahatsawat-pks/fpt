@@ -19,6 +19,70 @@ function QuestionArchiveViewerContent() {
   const [activeThreeSecSet, setActiveThreeSecSet] = useState(0);
   const [revealedAnswers, setRevealedAnswers] = useState({}); // track revealed answers
 
+  // Protection & Authentication States
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [protectRestrict, setProtectRestrict] = useState(false);
+  const [restrictPasswordInput, setRestrictPasswordInput] = useState("");
+  const [restrictAuthError, setRestrictAuthError] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
+
+  // Check protection & auth on mount
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const settingsRes = await fetch("/api/settings");
+        const settingsData = await settingsRes.json();
+        const isProtected = Boolean(settingsData.protectRestrict);
+        setProtectRestrict(isProtected);
+
+        if (!isProtected) {
+          setIsAuthenticated(true);
+        } else {
+          const stored = sessionStorage.getItem("fpt_restrict_auth");
+          if (stored === "true") {
+            setIsAuthenticated(true);
+          } else {
+            setIsAuthenticated(false);
+          }
+        }
+      } catch (err) {
+        setIsAuthenticated(true);
+      } finally {
+        setAuthChecking(false);
+      }
+    }
+    checkAuth();
+  }, []);
+
+  const handleRestrictLogin = async (e) => {
+    if (e) e.preventDefault();
+    if (!restrictPasswordInput.trim()) {
+      setRestrictAuthError("กรุณากรอกรหัสผ่านเพื่อเข้าชมคลังคำถาม");
+      return;
+    }
+    setIsVerifying(true);
+    setRestrictAuthError("");
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify_restrict", password: restrictPasswordInput.trim() }),
+      });
+      const resJson = await res.json();
+      if (resJson.valid) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("fpt_restrict_auth", "true");
+      } else {
+        setRestrictAuthError("❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
+      }
+    } catch (err) {
+      setRestrictAuthError("เกิดข้อผิดพลาดในการตรวจสอบรหัสผ่าน");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   // Fetch archives
   useEffect(() => {
     async function loadArchives() {
@@ -75,6 +139,143 @@ function QuestionArchiveViewerContent() {
   const toggleReveal = (key) => {
     setRevealedAnswers((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  if (authChecking) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "#030814",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#00e5ff",
+        fontSize: "18px",
+        fontFamily: "var(--font-th, sans-serif)",
+        fontWeight: "700"
+      }}>
+        ⏳ กำลังตรวจสอบสิทธิ์การเข้าถึง...
+      </div>
+    );
+  }
+
+  if (protectRestrict && !isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: "radial-gradient(ellipse at top center, #0e1e38 0%, #060e1a 50%, #02060d 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', sans-serif)",
+        color: "#ffffff"
+      }}>
+        <div style={{
+          maxWidth: "440px",
+          width: "100%",
+          background: "linear-gradient(150deg, rgba(14, 24, 46, 0.95) 0%, rgba(6, 12, 24, 0.98) 100%)",
+          border: "2px solid rgba(0, 229, 255, 0.5)",
+          borderRadius: "20px",
+          padding: "36px 28px",
+          textAlign: "center",
+          boxShadow: "0 0 50px rgba(0, 229, 255, 0.2)"
+        }}>
+          <div style={{ maxWidth: "200px", margin: "0 auto 16px" }}>
+            <img src="/img/logo.png" alt="Fanpantae 2026" style={{ width: "100%", height: "auto", filter: "drop-shadow(0 0 16px rgba(0, 229, 255, 0.5))" }} />
+          </div>
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "rgba(0, 229, 255, 0.15)",
+            border: "1px solid #00e5ff",
+            borderRadius: "999px",
+            padding: "4px 16px",
+            fontSize: "13px",
+            fontWeight: "800",
+            color: "#00e5ff",
+            marginBottom: "14px"
+          }}>
+            🔒 RESTRICTED ARCHIVE
+          </div>
+          <h2 style={{ fontSize: "22px", fontWeight: "900", color: "#00e5ff", marginBottom: "6px" }}>
+            คลังข้อสอบ & คำถามย้อนหลัง
+          </h2>
+          <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "24px", lineHeight: "1.6" }}>
+            หน้านี้ได้รับการป้องกันด้วยรหัสผ่าน กรุณากรอกรหัสผ่านเพื่อเข้าดูข้อสอบและคำถามย้อนหลัง
+          </p>
+
+          <form onSubmit={handleRestrictLogin}>
+            <div style={{ marginBottom: "18px" }}>
+              <input
+                type="password"
+                value={restrictPasswordInput}
+                onChange={(e) => setRestrictPasswordInput(e.target.value)}
+                placeholder="กรอกรหัสผ่านเข้าชมคลังคำถาม..."
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  background: "#050b14",
+                  border: "1px solid rgba(0, 229, 255, 0.5)",
+                  color: "#ffffff",
+                  fontSize: "16px",
+                  textAlign: "center",
+                  outline: "none"
+                }}
+                autoFocus
+              />
+            </div>
+
+            {restrictAuthError && (
+              <div style={{
+                color: "#ff7875",
+                fontSize: "13px",
+                marginBottom: "16px",
+                padding: "8px 12px",
+                borderRadius: "6px",
+                background: "rgba(255, 77, 79, 0.15)",
+                border: "1px solid rgba(255, 77, 79, 0.3)"
+              }}>
+                {restrictAuthError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isVerifying}
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "10px",
+                background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)",
+                border: "none",
+                color: "#030814",
+                fontWeight: "900",
+                fontSize: "16px",
+                cursor: isVerifying ? "not-allowed" : "pointer",
+                boxShadow: "0 0 20px rgba(0, 229, 255, 0.4)",
+                marginBottom: "16px"
+              }}
+            >
+              {isVerifying ? "⏳ กำลังตรวจสอบ..." : "🔓 ยืนยันรหัสผ่าน"}
+            </button>
+          </form>
+
+          <Link href="/" style={{
+            fontSize: "13px",
+            color: "rgba(255, 255, 255, 0.6)",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px"
+          }}>
+            ← กลับหน้าหลัก
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -487,7 +688,7 @@ function QuestionArchiveViewerContent() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
                   <div>
                     <h3 style={{ fontSize: "18px", fontWeight: "900", color: "#00e5ff", margin: "0 0 4px 0" }}>
-                      🕒 หมวด 3 วินาที ({currentArchive.games?.threeSeconds?.type === "typeB" ? "แบบ 3 ชุด 10/10/5 ข้อ" : "แบบ 1 ชุด 25 ข้อ"})
+                      🕒 หมวด 3 วินาที ({currentArchive.games?.threeSeconds?.type === "typeB" ? "แบบ 3 คำถามใหญ่ (ข้อละ 10 ข้อย่อย)" : "แบบ 1 ชุด 25 ข้อ"})
                     </h3>
                     <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>
                       คลิกปุ่ม &quot;👁️ เฉลย&quot; เพื่อดูคำตอบของแต่ละข้อ
@@ -510,15 +711,43 @@ function QuestionArchiveViewerContent() {
                             color: activeThreeSecSet === sIdx ? "#00e5ff" : "#e2e8f0",
                             fontWeight: "800",
                             fontSize: "12px",
-                            cursor: "pointer"
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px"
                           }}
                         >
-                          {st.setName}
+                          <span>{sIdx === 0 ? "🥇" : sIdx === 1 ? "🥈" : "🥉"}</span>
+                          {st.setName || `คำถามใหญ่ข้อที่ ${sIdx + 1}`}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
+
+                {/* Big Question Prompt Banner (Type B only) */}
+                {currentArchive.games?.threeSeconds?.type === "typeB" && (() => {
+                  const sets = currentArchive.games?.threeSeconds?.sets || [];
+                  const activeSetObj = sets[activeThreeSecSet] || sets[0] || {};
+                  if (!activeSetObj.mainQuestion) return null;
+                  return (
+                    <div style={{
+                      background: "rgba(0, 229, 255, 0.08)",
+                      border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                      borderRadius: "12px",
+                      padding: "14px 18px",
+                      marginBottom: "16px",
+                      boxShadow: "0 4px 16px rgba(0, 229, 255, 0.1)"
+                    }}>
+                      <div style={{ fontSize: "12px", fontWeight: "800", color: "#00e5ff", marginBottom: "4px" }}>
+                        🎯 โจทย์คำถามใหญ่ ({activeSetObj.setName || `คำถามใหญ่ข้อที่ ${activeThreeSecSet + 1}`})
+                      </div>
+                      <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", lineHeight: "1.5" }}>
+                        {activeSetObj.mainQuestion}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Questions Grid */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -535,8 +764,11 @@ function QuestionArchiveViewerContent() {
                       );
                     }
 
-                    return questions.map((q) => {
+                    return questions.map((q, qIdx) => {
                       const isRevealed = revealedAnswers[`3sec_${q.id}`];
+                      const isTypeB = currentArchive.games?.threeSeconds?.type === "typeB";
+                      const questionNumLabel = isTypeB ? `${activeThreeSecSet + 1}.${q.subNumber || qIdx + 1}` : q.id;
+
                       return (
                         <div
                           key={q.id}
@@ -546,13 +778,13 @@ function QuestionArchiveViewerContent() {
                             borderRadius: "10px",
                             padding: "12px 16px",
                             display: "grid",
-                            gridTemplateColumns: "36px 1fr auto auto",
+                            gridTemplateColumns: "44px 1fr auto auto",
                             gap: "14px",
                             alignItems: "center"
                           }}
                         >
                           <div style={{
-                            width: "34px",
+                            width: "42px",
                             height: "34px",
                             borderRadius: "8px",
                             background: "rgba(0, 229, 255, 0.15)",
@@ -562,9 +794,9 @@ function QuestionArchiveViewerContent() {
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: "900",
-                            fontSize: "14px"
+                            fontSize: isTypeB ? "12px" : "14px"
                           }}>
-                            {q.id}
+                            {questionNumLabel}
                           </div>
 
                           <div>

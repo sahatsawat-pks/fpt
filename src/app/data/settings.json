@@ -7,5 +7,7 @@
   "protectDraw": false,
   "drawPassword": "fanoftheyear2026",
   "protectHistory": false,
-  "historyPassword": "fanoftheyear2026"
+  "historyPassword": "fanoftheyear2026",
+  "protectRestrict": false,
+  "restrictPassword": "fanoftheyear2026"
 }

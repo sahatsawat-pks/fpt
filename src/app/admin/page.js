@@ -49,6 +49,8 @@ export default function AdminPage() {
   const [drawPassword, setDrawPassword] = useState("");
   const [protectHistory, setProtectHistory] = useState(false);
   const [historyPassword, setHistoryPassword] = useState("");
+  const [protectRestrict, setProtectRestrict] = useState(false);
+  const [restrictPassword, setRestrictPassword] = useState("");
   const [settingsNotice, setSettingsNotice] = useState("");
 
   // Archive & Tournament Phase States
@@ -446,6 +448,8 @@ export default function AdminPage() {
         setDrawPassword(data.drawPassword || "");
         setProtectHistory(Boolean(data.protectHistory));
         setHistoryPassword(data.historyPassword || "");
+        setProtectRestrict(Boolean(data.protectRestrict));
+        setRestrictPassword(data.restrictPassword || "");
         setIsArchived(Boolean(data.isArchived));
         setArchivedAt(data.archivedAt || null);
         setCurrentPhase(data.currentPhase || "qualifying");
@@ -663,6 +667,8 @@ export default function AdminPage() {
           drawPassword,
           protectHistory,
           historyPassword,
+          protectRestrict,
+          restrictPassword,
         }),
       });
       const data = await res.json();
@@ -3738,6 +3744,47 @@ export default function AdminPage() {
                         background: "#050b14",
                         border: "1px solid rgba(255, 215, 0, 0.5)",
                         color: "#ffd700",
+                        fontSize: "14px"
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Restrict / Question Archive Protection */}
+              <div style={{
+                background: "rgba(0, 229, 255, 0.05)",
+                border: "1px solid rgba(0, 229, 255, 0.3)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "22px"
+              }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: "#00e5ff" }}>
+                  <input
+                    type="checkbox"
+                    checked={protectRestrict}
+                    onChange={(e) => setProtectRestrict(e.target.checked)}
+                    style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
+                  />
+                  🔒 เปิดระบบรหัสผ่านสำหรับหน้าคลังคำถาม (/restrict, /restrict/question-archive)
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 10px 28px" }}>
+                  เมื่อเปิดใช้งาน ผู้เข้าชมหน้าคลังคำถามและข้อสอบย้อนหลังจะต้องกรอกรหัสผ่านก่อนเข้าดูข้อมูล
+                </p>
+                {protectRestrict && (
+                  <div style={{ marginLeft: "28px" }}>
+                    <input
+                      type="text"
+                      value={restrictPassword}
+                      onChange={(e) => setRestrictPassword(e.target.value)}
+                      placeholder="กำหนดรหัสผ่านสำหรับหน้าคลังคำถาม (/restrict)..."
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0, 229, 255, 0.5)",
+                        color: "#00e5ff",
                         fontSize: "14px"
                       }}
                     />
