@@ -2167,7 +2167,7 @@ export default function MainPage() {
                               <div style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 215, 0, 0.2)", borderRadius: "10px", padding: "12px" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
                                   <span>👑</span>
-                                  <strong style={{ color: "#ffd700", fontSize: "13px" }}>2. คนแรกเป็น \"ตัวตั้ง\"</strong>
+                                  <strong style={{ color: "#ffd700", fontSize: "13px" }}>2. คนแรกเป็น "ตัวตั้ง"</strong>
                                 </div>
                                 <p style={{ margin: 0, fontSize: "12px", color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.5" }}>
                                   คนแรกที่ลงเล่นในแต่ละรอบจะเป็น <strong>ตัวตั้ง</strong> เสมอ เป็นเกณฑ์คะแนนที่คนถัดไปต้องก้าวข้าม
