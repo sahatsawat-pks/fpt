@@ -928,7 +928,7 @@ export default function TournamentPage() {
                   สถิติคะแนนรายหัวข้อ (Top Topic Records)
                 </h2>
                 <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
-                  อันดับผลงานที่ทำคะแนนสูงสุดในแต่ละหัวข้อ รวม 96 สถิติ
+                  อันดับผลงานที่ทำคะแนนสูงสุดในแต่ละหัวข้อ รวม 96 หัวข้อ
                 </div>
               </div>
 
