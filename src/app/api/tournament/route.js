@@ -177,6 +177,9 @@ export function recalculateTournamentStandings(currentData) {
       const diffB = b.categoriesWon - b.categoriesLost;
       const diffA = a.categoriesWon - a.categoriesLost;
       if (diffB !== diffA) return diffB - diffA;
+      if (a.categoriesWon !== b.categoriesWon) return b.categoriesWon - a.categoriesWon;
+      if (a.categoriesLost !== b.categoriesLost) return b.categoriesLost - a.categoriesLost;
+      if (a.draw !== b.draw) return b.draw - a.draw;
       return b.totalScore - a.totalScore;
     });
 
