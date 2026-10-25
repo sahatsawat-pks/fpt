@@ -675,7 +675,7 @@ export default function TournamentPage() {
           {[
             { id: "standings", label: "📊 ตารางคะแนน (Standings)" },
             { id: "matches", label: "⚔️ ตารางการแข่งขัน (Matches & Fixtures)" },
-            { id: "topics", label: "🏅 สถิติคลิปคะแนนรายหัวข้อ (Top Records)" },
+            { id: "topics", label: "🏅 สถิติคะแนนรายหัวข้อ (Top Records)" },
             { id: "checklist", label: "📋 ผังหัวข้อที่ลงทะเบียน (Topics Checklist)" },
           ].map((tab) => (
             <button
@@ -925,7 +925,7 @@ export default function TournamentPage() {
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
               <div>
                 <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", margin: 0 }}>
-                  สถิติคลิปคะแนนรายหัวข้อ (Top Topic Records)
+                  สถิติคะแนนรายหัวข้อ (Top Topic Records)
                 </h2>
                 <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
                   อันดับผลงานที่ทำคะแนนสูงสุดในแต่ละหัวข้อ รวม 96 สถิติ
