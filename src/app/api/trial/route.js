@@ -121,6 +121,35 @@ export async function POST(req) {
       return NextResponse.json({ success: true, data, message: "รีเซ็ตคะแนนทั้งหมดเรียบร้อยแล้ว" });
     }
 
+    // 6.1 Reload contestants from Tournament (24 contestants with HD photos)
+    if (body.action === "reload_tournament_contestants" || body.action === "reset_to_tournament") {
+      try {
+        const tournamentPath = path.join(process.cwd(), "src/app/data/tournament.json");
+        if (fs.existsSync(tournamentPath)) {
+          const t = JSON.parse(fs.readFileSync(tournamentPath, "utf-8"));
+          const list = (t.contestants || []).map((c, idx) => ({
+            id: String(idx + 1),
+            name: c.name,
+            nickname: c.nickname,
+            topic: (c.topics && c.topics[0]?.topic) || "ไม่ระบุหัวข้อ",
+            image: c.photo || "",
+            scores: { "3sec": null, "qa": null, "jigsaw": null, "attribute": null },
+            totalScore: 0,
+            order: null,
+            isPlaying: false,
+            waitingNextMatch: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }));
+          data = list;
+          await saveKVData("fpt_trial", data, writeData);
+          return NextResponse.json({ success: true, data, message: "รีโหลดรายชื่อผู้เข้าแข่งขันจาก Tournament เรียบร้อยแล้ว (24 คน)" });
+        }
+      } catch (err) {
+        return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+      }
+    }
+
     // 7. Save / update contestant score (both action-based and direct payload)
     const targetId = body.id;
     if (!targetId) {

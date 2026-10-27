@@ -172,7 +172,7 @@ function calculateDenseRanks(items) {
 
 // ─── Mathematical Qualification Evaluator matching page.js ───────────────────
 
-function evaluatePlayerStatus(player, denseLeaderboard, targetTotalPlayers = 22) {
+function evaluatePlayerStatus(player, denseLeaderboard, targetTotalPlayers = 24) {
   if (player.isPlaying) {
     return {
       statusClass: "status-playing",
@@ -363,7 +363,7 @@ export default function TrialFOTYPage() {
   }, [pollList, pollSearchQuery]);
 
   // Stats for HUD Ticker
-  const targetN = 22;
+  const targetN = contestants.length || 24;
   const currentN = denseRankedLeaderboard.filter((p) => p.rank !== null && !p.isPlaying && !p.waitingNextMatch).length;
   const qualifiedCount = denseRankedLeaderboard.filter(
     (p) => evaluatePlayerStatus(p, denseRankedLeaderboard, targetN).isGuaranteedQualified

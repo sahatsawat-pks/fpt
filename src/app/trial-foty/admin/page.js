@@ -186,6 +186,34 @@ export default function TrialAdminPage() {
     }
   };
 
+  // Reload Contestants from Tournament (24 contestants with Google Photos)
+  const handleReloadTournamentContestants = async () => {
+    if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการรีโหลดรายชื่อผู้เข้าแข่งขันชุดใหม่จาก Tournament?\n\nระบบจะแทนที่ผู้เข้าแข่งขัน 24 คนจาก Tournament (คนละชุดกับหน้าหลัก) พร้อมรูปภาพ Google Photos ครบทุกคน")) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reload_tournament_contestants" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        setSelectedContestantId("");
+        setActiveScores({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
+        setOrderInput("");
+        setIsPlayingInput(false);
+        setWaitingInput(false);
+        showToast("รีโหลดรายชื่อผู้เข้าแข่งขันจาก Tournament เรียบร้อยแล้ว (24 คน)", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
   // Save Contestant Edit
   const handleSaveEditContestant = async (e) => {
     e.preventDefault();
@@ -1432,6 +1460,39 @@ export default function TrialAdminPage() {
                 }}
               >
                 🔄 ยืนยันการรีเซ็ตคะแนนทั้งหมด
+              </button>
+            </div>
+
+            {/* Reload from Tournament Box */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(10, 25, 47, 0.6) 100%)",
+              border: "1px solid rgba(0, 229, 255, 0.35)",
+              borderRadius: "14px",
+              padding: "20px",
+              marginBottom: "20px"
+            }}>
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#67e8f9", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>👥</span> ดึงข้อมูลผู้เล่น 24 คนจากชุด Tournament (พร้อมรูปภาพ Google Photos)
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                ใช้รายชื่อผู้เข้าแข่งขันชุดใหม่ที่แข่งใน Tournament ทั้ง 24 คน (คนละชุดกับหน้าหลัก) พร้อมดึงรูป Google Photos, ชื่อเล่น, ชื่อจริง, และหัวข้อมาเป็นชุดตั้งต้นให้ทันที
+              </p>
+              <button
+                type="button"
+                onClick={handleReloadTournamentContestants}
+                style={{
+                  padding: "12px 24px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                  border: "none",
+                  color: "#030814",
+                  fontSize: "14px",
+                  fontWeight: "900",
+                  cursor: "pointer",
+                  boxShadow: "0 0 16px rgba(0, 229, 255, 0.4)"
+                }}
+              >
+                ⚡ ซิงก์รายชื่อ 24 คนจาก Tournament
               </button>
             </div>
 
