@@ -186,16 +186,16 @@ export default function TrialAdminPage() {
     }
   };
 
-  // Reload Contestants from Tournament (24 contestants with Google Photos)
-  const handleReloadTournamentContestants = async () => {
-    if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการรีโหลดรายชื่อผู้เข้าแข่งขันชุดใหม่จาก Tournament?\n\nระบบจะแทนที่ผู้เข้าแข่งขัน 24 คนจาก Tournament (คนละชุดกับหน้าหลัก) พร้อมรูปภาพ Google Photos ครบทุกคน")) {
+  // Reset to Clean Blank Slots
+  const handleResetBlankSlots = async () => {
+    if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการสร้างช่องว่างผู้เข้าแข่งขันใหม่สำหรับ The Trial FOTY (งุ่นง่าน 2026)?\n\nระบบจะล้างรายชื่อเก่าออก และสร้าง Slot ว่างสำหรับใส่ชื่อเล่น, ชื่อจริง, หัวข้อ และรูปภาพ Google Photos")) {
       return;
     }
     try {
       const res = await fetch("/api/trial", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reload_tournament_contestants" }),
+        body: JSON.stringify({ action: "reset_blank_slots", count: 20 }),
       });
       const data = await res.json();
       if (data.success) {
@@ -205,7 +205,7 @@ export default function TrialAdminPage() {
         setOrderInput("");
         setIsPlayingInput(false);
         setWaitingInput(false);
-        showToast("รีโหลดรายชื่อผู้เข้าแข่งขันจาก Tournament เรียบร้อยแล้ว (24 คน)", "success");
+        showToast("รีเซ็ตเป็นช่องว่างผู้เข้าแข่งขันใหม่เรียบร้อยแล้ว", "success");
       } else {
         showToast(data.error || "เกิดข้อผิดพลาด", "error");
       }
@@ -1463,7 +1463,7 @@ export default function TrialAdminPage() {
               </button>
             </div>
 
-            {/* Reload from Tournament Box */}
+            {/* Reset to Blank Slots Box */}
             <div style={{
               background: "linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(10, 25, 47, 0.6) 100%)",
               border: "1px solid rgba(0, 229, 255, 0.35)",
@@ -1472,14 +1472,14 @@ export default function TrialAdminPage() {
               marginBottom: "20px"
             }}>
               <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#67e8f9", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>👥</span> ดึงข้อมูลผู้เล่น 24 คนจากชุด Tournament (พร้อมรูปภาพ Google Photos)
+                <span>👥</span> สร้างช่องว่างผู้เข้าแข่งขันใหม่ (Reset Blank Slots)
               </h3>
               <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
-                ใช้รายชื่อผู้เข้าแข่งขันชุดใหม่ที่แข่งใน Tournament ทั้ง 24 คน (คนละชุดกับหน้าหลัก) พร้อมดึงรูป Google Photos, ชื่อเล่น, ชื่อจริง, และหัวข้อมาเป็นชุดตั้งต้นให้ทันที
+                ล้างรายชื่อชุดอื่นออก และสร้าง Slot ว่างสำหรับใส่ชื่อเล่น, ชื่อจริง, หัวข้อ และแปะรูปภาพ Google Photos ของชุดงุ่นง่าน 2026 ด้วยตนเอง
               </p>
               <button
                 type="button"
-                onClick={handleReloadTournamentContestants}
+                onClick={handleResetBlankSlots}
                 style={{
                   padding: "12px 24px",
                   borderRadius: "10px",
@@ -1492,7 +1492,7 @@ export default function TrialAdminPage() {
                   boxShadow: "0 0 16px rgba(0, 229, 255, 0.4)"
                 }}
               >
-                ⚡ ซิงก์รายชื่อ 24 คนจาก Tournament
+                🔄 รีเซ็ตเป็นช่องว่าง 20 คน
               </button>
             </div>
 

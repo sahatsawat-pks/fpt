@@ -1,10 +1,10 @@
 [
   {
     "id": "1",
-    "name": "ศุภกร นิลสุวรรณ",
-    "nickname": "หมี",
-    "topic": "Coldplay",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMSx09lFNStjwGSoBCe1S6CVdaeZAlUgHXFBSRlDhVSsiCd7KFbeerK-dkmZpIsNAlsXBV8mFKlXy5YHrSzjN48auD8etOjURf8YSBq59PPrR52RSIGYdy73YEwuVC8iwrCOihhewJZ14RkWlpnPmfk=w1096-h1097-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 1",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -15,15 +15,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.450Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.081Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "2",
-    "name": "เจษฎาพร ศรีมาตย์",
-    "nickname": "ออมสิน",
-    "topic": "BGN Squad",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPm7XK3GBPrPoj5mitFuPhsIM-Ro5DWjk2l4zC8YydVisJjER1unaYVitNce0BUZa18n7hmXdnWbwa0DO5CkrWEHvBKBctORALIzEnkkPkRjlQlWlT12sVUEv2s2MySTZFoabz9xfc8nj2U9e-vmHL6=w1101-h1099-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 2",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -34,15 +34,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "3",
-    "name": "นัทธสม บุญมา",
-    "nickname": "ซ่า",
-    "topic": "Cocktail",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczN9_pbMETa6aA9mNW9WZPhWmUi-ac42Zp2obSTLTtiztKA312V1RbqanK_eAAAUFmWL5En2oiFPUwLry3TkNYg5m4muafCBNnQ0crkIIPWrJGdpKYRcugDDt-2Ttm17_gSPGEdbdyrGw2-AG0N5q5-1=w1112-h1117-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 3",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -53,15 +53,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "4",
-    "name": "ณฤกร วงศ์บูรณะ",
-    "nickname": "ตฤณ",
-    "topic": "Tattoo Colour",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 4",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -72,15 +72,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "5",
-    "name": "วรงกร แจ่มปัญญา",
-    "nickname": "กร",
-    "topic": "Saturday Night Live",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 5",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -91,15 +91,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "6",
-    "name": "ณัฐวุฒิ โนรี",
-    "nickname": "แสตมป์",
-    "topic": "Thai BL Series",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 6",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -110,15 +110,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "7",
-    "name": "ปกรณ์ สถิตอยู่คู่ไทย",
-    "nickname": "แมน",
-    "topic": "ตลกไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 7",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -129,15 +129,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "8",
-    "name": "เชาว์วรรธน์ จันทร์สุข",
-    "nickname": "ก๊อง",
-    "topic": "Workpoint",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczO16Pbxv_LOcMn1OGJM6Ha7SWcpEXNeNhMwBNcJaaBSd0D_aWmjLO4S7123_qtY3GkXpgXLV9uWJ_hSyGzu1tK90zh_Q5i-jysqGqRXq7vLTVITDupLrn7Am5HOqWavHUJKvgh1qXD4ctiuDuUNNAY7=w1125-h1125-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 8",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -148,15 +148,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "9",
-    "name": "ณัฐภัทร แก้วสินธุ์",
-    "nickname": "นที",
-    "topic": "Heliconia Cooking Show",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOvDbHaUHp5S6iJubpPZzJCkpKXJVjJ7fnMn0YYSeRwWSS36FbDpX9w8eVt3my1wqKrg5utQbSFFVWG4s_hek_Yo8Zff6toTZCc_sp1_l16xArjwOcJHdBOTnjVXIKphWRfbOUlKwhvqYVNANRnnEy1=w1096-h1096-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 9",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -167,15 +167,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "10",
-    "name": "สหัสวรรษ นิจพันธ์",
-    "nickname": "พีท",
-    "topic": "Rubsarb Production",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczNQ8B2o7fdgG-YweA57XLY-mnfrA-3X_lUjgIAeaCBTiegx-ZhBFRhp5zIBZItlakAmAC7a5sla7p5sTkup2h6dxqCOsFMwTPwHgE_OzJ2pK3w58LVT6wj_DHgbXSSh6osp4Jl1gIsMSzHFw48_tetS=w1095-h1098-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 10",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -186,15 +186,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "11",
-    "name": "ณชนน ยุงคุณ",
-    "nickname": "เจสัน",
-    "topic": "กัปตันสึบาสะ",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOSfRwKmGHwdQPemYmAyUztPOb_QZCsSc1rYwm9fWUESjcG42qQxj7cRgnPKMV_vZbmyPat7r_vGpKs0M9bgDXYyERBMJALw3cTMUNHRRJP-QF7hjCR_ZfgyFYWlTXEIq9nMBzf-Xxci2lMhlmH1DTq=w1110-h1113-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 11",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -205,15 +205,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "12",
-    "name": "พัทธ์ศีล ปุญศิริ",
-    "nickname": "ศีล",
-    "topic": "เกมโชว์สหรัฐอเมริกา",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczM_hN8XWd9yv9EnS7_ELTNSVFz2dWD6SsNto-pFZE1nfJOUmxT0nfInpXfPLlx9Xe9zHA5zo07vNW09WM9_7l5zNudYVE_ZQoy2FMNm_qA1g0n19JpVLuZMgycHp61xigXt2S0s6ZJlfJJdpdF1DHuN=w1099-h1099-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 12",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -224,15 +224,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "13",
-    "name": "ณัฐดนัย วงศ์ปัญญา",
-    "nickname": "แฟรงค์",
-    "topic": "รถไฟไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMKFo_EG_3hY04pei5boOCaAm5MoLVG0354EE_uwQyjkDii9cy6oxbBsEOsOIXphC63oiOfSIdNET2A_-HxnpH636W1IiTOGYbNGg51lGhSsZ00i4u7X-zaUX2QhlfZSAksy6e4g970k_0jUO9VSIVl=w1093-h1092-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 13",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -243,15 +243,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "14",
-    "name": "รติพงษ์ กมลเกียรติพัฒน์",
-    "nickname": "นิว",
-    "topic": "ไพ่ทาโร่ต์",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMYZtcBBAeBGcM50DIJ_hTvAne-blauzEryrQWkWweLAOOkqlwvrDmU0FRq_DEXmoE4HqHTiDB1zASFEKzok8vds2h6WvXSpI40ThimweGepynYIIvp4WspiPfVwDRnoFYL-gEOXIhkkZPXO9IKW-Oi=w1108-h1110-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 14",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -262,15 +262,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "15",
-    "name": "ปฏิปัน อัศวภูไชย",
-    "nickname": "ปัน",
-    "topic": "สุนทราภรณ์",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMYJs2gfkpivIlfFh_ogguJ850aCteu5kKVtkB2sKh-XFht5S6AzcTd42JOYXTFCi_-mpl16FpUV2fHvuZlY5J9ENOize1yH06NsdYgjLekboQ--KeSMVnuviGwjLkB5anel5ToX5KKP5d_g6NtvB9I=w1092-h1092-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 15",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -281,15 +281,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "16",
-    "name": "พีรภัทร หมื่นหาญ",
-    "nickname": "พีม",
-    "topic": "อัสนี - วสันต์ โชติกุล",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczN4jEy-gRiP0MERBXqhkVTBrfQIsPXleD9Poc2xbKfFR7AxQeEthPl5HcqDWlNip6lmnvLifxL2f8HjYkZK8qyliukv2SVP1YIilK5Zy8DRHJEUMbpy324nqe-o1NzCJ2IZK3UbFMTeS2G7LUwIfAYk=w1125-h1125-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 16",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -300,15 +300,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "17",
-    "name": "ฤทธิชัย ภูสิญามณี",
-    "nickname": "ริท",
-    "topic": "ขสมก.",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPoobelYtJFgLBfwoO4JX5KwnjFgzPl1yDpAcnnTnYawU4qUdoQhegCiT8M_XxF3kUQXYujweANW183NPbe5PR9hK83WFmZgokhpiDlIHBXncUgIYwp6lEKutOIwbIqiEhtY2hc_OMRD4TyMnbIy1XM=w1114-h1110-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 17",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -319,15 +319,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "18",
-    "name": "พศวัต พุ่มเงิน",
-    "nickname": "ปาร์ค",
-    "topic": "VTuber ไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczMwFPheesY-nKVcVpRYTHvCFm_Kvsf2djmqLhSfgE6btw62df02FN84YxvJnUHojPbRuOTYYcL-JEol0ZwrqvhwyENZWRk8KHGxLoZ4byFEbxKy7tYrZhY_9PSnMIxvau4O3_iyy_noIIO24OkcYhQJ=w1125-h1125-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 18",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -338,15 +338,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "19",
-    "name": "ธนกร สุขปาน",
-    "nickname": "ออม",
-    "topic": "GeneLab",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczO-iIGwT9VP8Z5RO_tSXrDqx7gXF8vEFYRquqyBBzdoShAXQtUrlaYWuehjJUNMcRC0DsNP_tAm8yGCUByEBvNSz4vo1iymcdYYp-F4xmmYKzwlwDXdLPSP487u4riLxJpOh0RXJKjZoaJkbo0UaOpW=w1098-h1099-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 19",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -357,15 +357,15 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   },
   {
     "id": "20",
-    "name": "กันตชาติ ศรีเพ็ชร",
-    "nickname": "กัปตัน",
-    "topic": "เกาะรัตนโกสินทร์",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczNMZIYoOYw84qTNgPcHiMxBSThspgdh3h8zYV6NlWgTGGT_6A-z3eokutDS0LIHwN5buC_i1B6ZP5tvCEgW8RSvT0v89_HnjdjvAMYwJfrgsKOoBX1_EYS2xt8Xnq_tke4dqtmmHn3Mh-O7F6AWeNWt=w1098-h1101-s-no-gm",
+    "name": "ผู้เข้าแข่งขัน 20",
+    "nickname": "",
+    "topic": "ยังไม่ระบุหัวข้อ",
+    "image": "",
     "scores": {
       "3sec": null,
       "qa": null,
@@ -376,83 +376,7 @@
     "order": null,
     "isPlaying": false,
     "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
-  },
-  {
-    "id": "21",
-    "name": "ธีรวีร์ จรูญศรีโชติ",
-    "nickname": "ชีส",
-    "topic": "Tales of The Series",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPmtgYHGll5yAE5ULClZmSwDgwHnuzdvUl71F9IXMZNybTjWa1xwW7LNFh6h11HvomGdVBQnpf_YnZhzf68F-1muMGK8_MTSRaQJB2iQORgoblxzGj05Q2IOYH6UT5ZDV9jwL7dzTjhHifPQFZGiccR=w1096-h1103-s-no-gm",
-    "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
-    },
-    "totalScore": 0,
-    "order": null,
-    "isPlaying": false,
-    "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
-  },
-  {
-    "id": "22",
-    "name": "ภควัต เลี้ยงอยู่",
-    "nickname": "ไผ่",
-    "topic": "ขบวนการ 5 สี",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczOZEYRIxluoGWpWlpyhdIGofaZ6exlgo7OcBi8BJR9NeDFTFi-ImTwmaWI0FWrReH-5RisncZ-m7QBfYQtPWFWddOiNatRdCcYfAW-qylv3jhF8nbtX0A8I48zEgj5Dww6znjtkoikD9eViaSnxS3Ke=w1125-h1125-s-no-gm",
-    "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
-    },
-    "totalScore": 0,
-    "order": null,
-    "isPlaying": false,
-    "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
-  },
-  {
-    "id": "23",
-    "name": "สิปโปทัย ศรีบุญเรือง",
-    "nickname": "กัส",
-    "topic": "ประวัติศาสตร์ไทย",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczP4Zz5dzdpoyYZP25peANzW6uA30P3k08TJLk_NbipaYy_vR47l9V3En3DEQFU4JhAzM8z5f_-wtwBRp16-q0nhAjq9l1UzmZM3L7VYduoMsnWwekhiukE3Yg2A7qj0m0dQ2eCLREdzro1EIGTttYeO=w1089-h1092-s-no-gm",
-    "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
-    },
-    "totalScore": 0,
-    "order": null,
-    "isPlaying": false,
-    "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
-  },
-  {
-    "id": "24",
-    "name": "รัฐศาสตร์ สายโท",
-    "nickname": "เติ๊ด",
-    "topic": "นิธิทัศน์ โปรโมชั่น",
-    "image": "https://lh3.googleusercontent.com/pw/AP1GczPMpCgRhk7Nio2xpZN6badc9D3oFRnB_FRC0KjzJ125xoTqSKPdmwxgzdpchuOBOT2lHJWar8hmOdQf2t3WYha9jhlC5VA5qjAw2FPRfRL7bvTPlls61han8PVGK-jgbiXGsThwtFjeBID4sqnIdi-L=w1125-h1125-s-no-gm",
-    "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
-    },
-    "totalScore": 0,
-    "order": null,
-    "isPlaying": false,
-    "waitingNextMatch": false,
-    "createdAt": "2026-10-27T18:02:28.451Z",
-    "updatedAt": "2026-10-27T18:02:28.451Z"
+    "createdAt": "2026-10-27T20:55:47.085Z",
+    "updatedAt": "2026-10-27T20:55:47.085Z"
   }
 ]

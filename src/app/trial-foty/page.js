@@ -288,10 +288,10 @@ export default function TrialFOTYPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Compute 6 Floating Hero Columns (22 contestants duplicated seamlessly)
+  // Compute 6 Floating Hero Columns (contestants duplicated seamlessly)
   const heroColumns = useMemo(() => {
-    const list = contestants && contestants.length > 0 ? contestants : fallbackPollData;
-    const cols = [[], [], [], [], [], []];
+    const list = contestants && contestants.length > 0 ? contestants : [];
+    if (list.length === 0) return [[], [], [], [], [], []];
     list.forEach((c, idx) => {
       cols[idx % 6].push(c);
     });
