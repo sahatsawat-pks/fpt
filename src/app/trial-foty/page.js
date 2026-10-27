@@ -790,26 +790,6 @@ export default function TrialFOTYPage() {
             >
               📊 ดูตารางอันดับโพลล์
             </button>
-
-            <Link
-              href="/trial-foty/admin"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "14px 24px",
-                borderRadius: "30px",
-                background: "rgba(0, 20, 45, 0.8)",
-                border: "2px solid rgba(0, 229, 255, 0.5)",
-                color: "#00e5ff",
-                fontSize: "16px",
-                fontWeight: "800",
-                textDecoration: "none",
-                boxShadow: "0 0 15px rgba(0, 229, 255, 0.25)",
-              }}
-            >
-              <span>⚙️</span> แผงควบคุม Admin
-            </Link>
           </div>
         </div>
       </section>
