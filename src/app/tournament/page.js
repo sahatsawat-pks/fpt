@@ -7,12 +7,16 @@ import defaultTournamentData from "@/app/data/tournament.json";
 function getOptimizedAvatarUrl(url, size = 120) {
   if (!url || typeof url !== "string") return "";
   let clean = url.trim();
-  if (clean.includes("lh3.googleusercontent.com")) {
-    if (clean.includes("=")) {
-      clean = clean.split("=")[0] + `=s${size}-c`;
-    } else {
-      clean = clean + `=s${size}-c`;
-    }
+  if (clean.startsWith("http://")) {
+    clean = clean.replace("http://", "https://");
+  }
+  if (clean.includes("?authuser=")) {
+    clean = clean.split("?authuser=")[0];
+  }
+  if (clean.includes("googleusercontent.com")) {
+    const base = clean.includes("=") ? clean.split("=")[0] : clean;
+    const sz = Math.min(Math.max(size, 80), 600);
+    return `${base}=s${sz}-c`;
   }
   return clean;
 }
@@ -57,6 +61,31 @@ export default function TournamentPage() {
   const currentMD = useMemo(() => {
     return matchdays.find((m) => m.id === selectedMatchday) || matchdays[0];
   }, [matchdays, selectedMatchday]);
+
+  // 6 columns of contestant photos for the hero background wall (matching main page)
+  const heroColumns = useMemo(() => {
+    let list = [];
+    if (Array.isArray(data?.contestants) && data.contestants.length > 0) {
+      list = data.contestants;
+    } else {
+      const gA = data?.standings?.groupA || [];
+      const gB = data?.standings?.groupB || [];
+      list = [...gA, ...gB];
+    }
+    if (list.length === 0) {
+      const defGA = defaultTournamentData?.standings?.groupA || [];
+      const defGB = defaultTournamentData?.standings?.groupB || [];
+      list = [...defGA, ...defGB];
+    }
+    if (list.length === 0) return [[], [], [], [], [], []];
+
+    const cols = [[], [], [], [], [], []];
+    list.forEach((c, idx) => {
+      cols[idx % 6].push(c);
+    });
+    // 4 repetitions so columns can traverse the full vertical range with zero blank gaps
+    return cols.map((col) => [...col, ...col, ...col, ...col]);
+  }, [data]);
 
   // Filtered matches for current matchday
   const filteredMatches = useMemo(() => {
@@ -513,13 +542,13 @@ export default function TournamentPage() {
       <section
         style={{
           position: "relative",
-          minHeight: "440px",
+          minHeight: "560px",
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           background: "radial-gradient(circle at 50% 40%, #0c2d5e 0%, #061633 45%, #020712 100%)",
-          padding: "50px 24px",
+          padding: "60px 24px",
           borderBottom: "1px solid rgba(0, 229, 255, 0.2)",
         }}
       >
@@ -557,6 +586,87 @@ export default function TournamentPage() {
             pointerEvents: "none",
           }}
         ></div>
+
+        {/* ========================================================
+            6 Vertical Floating Columns of Contestant Photos (Background Wall)
+            Odd columns (1,3,5): Scroll Down-Up in sync | Even columns (2,4,6): Scroll Up-Down in sync
+           ======================================================== */}
+        <div
+          style={{
+            position: "absolute",
+            inset: "-45px 0",
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "repeat(6, 1fr)",
+            gap: "10px",
+            padding: "0 14px",
+            opacity: 0.2,
+            pointerEvents: "none",
+            zIndex: 1,
+            filter: "contrast(1.05) saturate(0.85)",
+            maskImage: "linear-gradient(180deg, transparent 0%, black 15%, black 85%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 15%, black 85%, transparent 100%)",
+          }}
+        >
+          {heroColumns.map((col, cIdx) => {
+            const isOdd = cIdx % 2 === 0;
+            const animClass = isOdd ? "hero-col-odd" : "hero-col-even";
+
+            return (
+              <div
+                key={cIdx}
+                className={animClass}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  willChange: "transform",
+                }}
+              >
+                {col.map((c, rIdx) => (
+                  <div
+                    key={`${c.id || c.name || "c"}-${rIdx}`}
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      aspectRatio: "1 / 1",
+                      borderRadius: "10px",
+                      overflow: "hidden",
+                      background: "rgba(10, 25, 48, 0.6)",
+                      border: "1px solid rgba(0, 229, 255, 0.2)",
+                      boxShadow: "0 4px 14px rgba(0, 0, 0, 0.5)",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <img
+                      src={getOptimizedAvatarUrl(c.photo || c.image, 240)}
+                      alt={c.nickname || c.name}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Soft Vignette Overlay keeping original blue gradient & glowing rays prominent */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "radial-gradient(ellipse at 50% 40%, rgba(12, 45, 94, 0.25) 0%, rgba(6, 22, 51, 0.55) 50%, rgba(2, 7, 18, 0.85) 100%)",
+            pointerEvents: "none",
+            zIndex: 2,
+          }}
+        />
 
         <div style={{ position: "relative", zIndex: 10, maxWidth: "1100px", width: "100%", textAlign: "center" }}>
           {/* Official Tournament Logo Emblem */}
