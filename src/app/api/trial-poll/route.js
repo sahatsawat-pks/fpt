@@ -108,18 +108,23 @@ export async function POST(request) {
         "5": 1, // อันดับ 5 ได้ 1 คะแนน
       };
 
-      // Add points for ranks 1-5
-      Object.entries(ranks).forEach(([rankStr, cId]) => {
-        if (!cId) return;
-        const target = current.find(
-          (item) => String(item.id) === String(cId) || String(item.pollRank) === String(cId)
-        );
-        if (target) {
-          const weight = rankWeights[rankStr] || 1;
-          target.votes = (Number(target.votes) || 0) + weight;
-          if (!target.rankVotes) target.rankVotes = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-          target.rankVotes[rankStr] = (target.rankVotes[rankStr] || 0) + 1;
-        }
+      // Add points for ranks 1-5 (each rank can have up to 5 contestants)
+      Object.entries(ranks).forEach(([rankStr, cIds]) => {
+        if (!cIds) return;
+        const idList = Array.isArray(cIds) ? cIds : [cIds];
+        const weight = rankWeights[rankStr] || 1;
+
+        idList.forEach((cId) => {
+          if (!cId) return;
+          const target = current.find(
+            (item) => String(item.id) === String(cId) || String(item.pollRank) === String(cId)
+          );
+          if (target) {
+            target.votes = (Number(target.votes) || 0) + weight;
+            if (!target.rankVotes) target.rankVotes = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            target.rankVotes[rankStr] = (target.rankVotes[rankStr] || 0) + 1;
+          }
+        });
       });
 
       // Add champion vote
