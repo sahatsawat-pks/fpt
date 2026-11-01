@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
-import fallbackPollData from "../data/poll.json";
+import fallbackPollData from "../data/trial-poll.json";
 
 // ─── Score Pill Styles matching authentic page.js ────────────────────────────
 
@@ -258,7 +258,7 @@ export default function TrialFOTYPage() {
       if (isManual) setLoading(true);
       const [resTrial, resPoll] = await Promise.all([
         fetch("/api/trial", { cache: "no-store" }),
-        fetch("/api/poll", { cache: "no-store" }).catch(() => null),
+        fetch("/api/trial-poll", { cache: "no-store" }).catch(() => null),
       ]);
 
       if (resTrial && resTrial.ok) {
@@ -489,6 +489,25 @@ export default function TrialFOTYPage() {
             >
               📊 โพลล์มหาชน
             </button>
+
+            <Link
+              href="/trial-foty/vote"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 14px",
+                borderRadius: "8px",
+                background: "rgba(255, 215, 0, 0.15)",
+                border: "1px solid rgba(255, 215, 0, 0.4)",
+                color: "#ffd700",
+                fontWeight: "700",
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
+            >
+              🗳️ ร่วมโหวตโพลล์
+            </Link>
 
             <Link
               href="/trial-foty/admin"
@@ -1975,6 +1994,56 @@ export default function TrialFOTYPage() {
            ======================================================== */}
         {activeTableTab === "poll" && (
           <div key="poll-tab-view" className="table-slide-down">
+            {/* Vote CTA Banner */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 136, 0, 0.22) 100%)",
+                border: "2px solid #ffd700",
+                borderRadius: "14px",
+                padding: "16px 20px",
+                marginBottom: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "14px",
+                boxShadow: "0 0 25px rgba(255, 215, 0, 0.25)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "28px" }}>🗳️</span>
+                <div>
+                  <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
+                    เปิดรับคะแนนโหวตโพลล์มหาชนแล้ว!
+                  </div>
+                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
+                    ร่วมส่งแรงใจและโหวตให้กับผู้เข้าแข่งขันคนโปรดของคุณใน Trial Fan of the Year 2026
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                href="/trial-foty/vote"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 22px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)",
+                  color: "#030812",
+                  fontWeight: "900",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                  boxShadow: "0 0 20px rgba(255, 215, 0, 0.5)",
+                  transition: "transform 0.15s ease",
+                }}
+              >
+                <span>กดที่นี่เพื่อไปหน้าโหวต</span>
+                <span>➔</span>
+              </Link>
+            </div>
+
             {/* Poll Search Bar */}
             <div
               style={{
