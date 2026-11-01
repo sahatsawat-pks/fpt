@@ -1742,16 +1742,9 @@ export default function TrialAdminPage() {
                   }}
                 >
                   {/* Category 1: 3 วินาที */}
-                  <div
-                    style={{
-                      background: "rgba(0, 15, 30, 0.75)",
-                      border: "1px solid rgba(0, 229, 255, 0.25)",
-                      borderRadius: "14px",
-                      padding: "18px",
-                    }}
-                  >
+                  <div style={{ background: "rgba(0, 15, 30, 0.75)", border: "1px solid rgba(0, 229, 255, 0.25)", borderRadius: "14px", padding: "18px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                      <strong style={{ fontSize: "16px", color: "#86efac", display: "flex", alignItems: "center", gap: "6px" }}>
+                      <strong style={{ fontSize: "16px", color: "#00e5ff", display: "flex", alignItems: "center", gap: "6px" }}>
                         <span>⏱️</span> 1. 3 วินาที
                       </strong>
                       <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
@@ -1775,7 +1768,7 @@ export default function TrialAdminPage() {
                           color: "#fff",
                           fontSize: "18px",
                           fontWeight: "800",
-                          cursor: "pointer",
+                          cursor: "pointer"
                         }}
                       >
                         -
@@ -1796,7 +1789,7 @@ export default function TrialAdminPage() {
                           color: "#ffd700",
                           fontSize: "20px",
                           fontWeight: "800",
-                          textAlign: "center",
+                          textAlign: "center"
                         }}
                       />
                       <button
@@ -1814,7 +1807,7 @@ export default function TrialAdminPage() {
                           color: "#00e5ff",
                           fontSize: "18px",
                           fontWeight: "800",
-                          cursor: "pointer",
+                          cursor: "pointer"
                         }}
                       >
                         +
@@ -1833,16 +1826,26 @@ export default function TrialAdminPage() {
                             padding: "4px 6px",
                             fontSize: "12px",
                             borderRadius: "6px",
-                            background: activeScores["3sec"] === String(val) ? "rgba(82, 196, 26, 0.3)" : "rgba(255,255,255,0.06)",
-                            color: activeScores["3sec"] === String(val) ? "#86efac" : "#fff",
-                            border: activeScores["3sec"] === String(val) ? "1px solid #52c41a" : "1px solid rgba(255,255,255,0.12)",
+                            background: activeScores["3sec"] === String(val) ? "rgba(0, 229, 255, 0.3)" : "rgba(255,255,255,0.06)",
+                            color: activeScores["3sec"] === String(val) ? "#00e5ff" : "#fff",
+                            border: activeScores["3sec"] === String(val) ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.12)",
                             fontWeight: activeScores["3sec"] === String(val) ? "800" : "500",
-                            cursor: "pointer",
+                            cursor: "pointer"
                           }}
                         >
                           {val}
                         </button>
                       ))}
+                    </div>
+
+                    {/* Mini Meter */}
+                    <div style={{ width: "100%", height: "5px", background: "rgba(255,255,255,0.08)", borderRadius: "3px", overflow: "hidden", marginBottom: "12px" }}>
+                      <div style={{
+                        width: `${Math.min(100, Math.max(0, ((Number(activeScores["3sec"]) || 0) / 25) * 100))}%`,
+                        height: "100%",
+                        background: (Number(activeScores["3sec"]) || 0) === 25 ? "linear-gradient(90deg, #ffd700, #52c41a)" : "linear-gradient(90deg, #00b4d8, #00e5ff)",
+                        transition: "width 0.25s ease"
+                      }} />
                     </div>
 
                     <button
@@ -1852,12 +1855,12 @@ export default function TrialAdminPage() {
                         width: "100%",
                         padding: "8px",
                         borderRadius: "8px",
-                        background: "rgba(16, 185, 129, 0.2)",
-                        border: "1px solid #10b981",
-                        color: "#86efac",
+                        background: "rgba(0, 180, 216, 0.25)",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#00e5ff",
                         fontWeight: "700",
                         cursor: "pointer",
-                        fontSize: "13px",
+                        fontSize: "13px"
                       }}
                     >
                       💾 บันทึก 3 วินาที
@@ -1865,16 +1868,9 @@ export default function TrialAdminPage() {
                   </div>
 
                   {/* Category 2: ถาม-ตอบ */}
-                  <div
-                    style={{
-                      background: "rgba(0, 15, 30, 0.75)",
-                      border: "1px solid rgba(0, 229, 255, 0.25)",
-                      borderRadius: "14px",
-                      padding: "18px",
-                    }}
-                  >
+                  <div style={{ background: "rgba(0, 15, 30, 0.75)", border: "1px solid rgba(0, 229, 255, 0.25)", borderRadius: "14px", padding: "18px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                      <strong style={{ fontSize: "16px", color: "#f3f4f6", display: "flex", alignItems: "center", gap: "6px" }}>
+                      <strong style={{ fontSize: "16px", color: "#00e5ff", display: "flex", alignItems: "center", gap: "6px" }}>
                         <span>❓</span> 2. ถาม-ตอบ
                       </strong>
                       <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
@@ -1882,7 +1878,7 @@ export default function TrialAdminPage() {
                       </span>
                     </div>
 
-                    {/* Quick Award Buttons */}
+                    {/* Quick Award Buttons: Correct (25) or Wrong (0) */}
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
                       <button
                         type="button"
@@ -1896,6 +1892,7 @@ export default function TrialAdminPage() {
                           fontSize: "12px",
                           fontWeight: "800",
                           cursor: "pointer",
+                          boxShadow: activeScores.qa === "25" ? "0 0 12px rgba(82, 196, 26, 0.5)" : "none"
                         }}
                       >
                         ✅ ถูก 25 เต็ม
@@ -1912,13 +1909,14 @@ export default function TrialAdminPage() {
                           fontSize: "12px",
                           fontWeight: "800",
                           cursor: "pointer",
+                          boxShadow: activeScores.qa === "0" ? "0 0 12px rgba(255, 77, 79, 0.5)" : "none"
                         }}
                       >
                         ❌ ผิด 0 คะแนน
                       </button>
                     </div>
 
-                    <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
                       <input
                         type="number"
                         min="0"
@@ -1928,31 +1926,50 @@ export default function TrialAdminPage() {
                         placeholder="คะแนน (0-25)"
                         style={{
                           width: "100%",
-                          padding: "8px",
+                          padding: "8px 10px",
                           borderRadius: "8px",
                           background: "#050b14",
                           border: "1px solid rgba(0, 229, 255, 0.4)",
                           color: "#ffd700",
                           fontSize: "18px",
                           fontWeight: "800",
-                          textAlign: "center",
+                          textAlign: "center"
                         }}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setActiveScores({ ...activeScores, qa: "" })}
-                        style={{
-                          padding: "8px 12px",
-                          borderRadius: "8px",
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                          color: "rgba(255,255,255,0.7)",
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ล้าง
-                      </button>
+                    </div>
+
+                    {/* Presets */}
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "12px" }}>
+                      {[0, 5, 10, 15, 20, 25].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setActiveScores({ ...activeScores, qa: String(val) })}
+                          style={{
+                            flex: "1",
+                            padding: "4px 6px",
+                            fontSize: "12px",
+                            borderRadius: "6px",
+                            background: activeScores.qa === String(val) ? "rgba(0, 229, 255, 0.3)" : "rgba(255,255,255,0.06)",
+                            color: activeScores.qa === String(val) ? "#00e5ff" : "#fff",
+                            border: activeScores.qa === String(val) ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.12)",
+                            fontWeight: activeScores.qa === String(val) ? "800" : "500",
+                            cursor: "pointer"
+                          }}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Mini Meter */}
+                    <div style={{ width: "100%", height: "5px", background: "rgba(255,255,255,0.08)", borderRadius: "3px", overflow: "hidden", marginBottom: "12px" }}>
+                      <div style={{
+                        width: `${Math.min(100, Math.max(0, ((Number(activeScores.qa) || 0) / 25) * 100))}%`,
+                        height: "100%",
+                        background: (Number(activeScores.qa) || 0) === 25 ? "linear-gradient(90deg, #ffd700, #52c41a)" : "linear-gradient(90deg, #00b4d8, #00e5ff)",
+                        transition: "width 0.25s ease"
+                      }} />
                     </div>
 
                     <button
@@ -1962,12 +1979,12 @@ export default function TrialAdminPage() {
                         width: "100%",
                         padding: "8px",
                         borderRadius: "8px",
-                        background: "rgba(255, 255, 255, 0.12)",
-                        border: "1px solid #d9d9d9",
-                        color: "#ffffff",
+                        background: "rgba(0, 180, 216, 0.25)",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#00e5ff",
                         fontWeight: "700",
                         cursor: "pointer",
-                        fontSize: "13px",
+                        fontSize: "13px"
                       }}
                     >
                       💾 บันทึก ถาม-ตอบ
@@ -1975,16 +1992,9 @@ export default function TrialAdminPage() {
                   </div>
 
                   {/* Category 3: จิ๊กซอว์ */}
-                  <div
-                    style={{
-                      background: "rgba(0, 15, 30, 0.75)",
-                      border: "1px solid rgba(0, 229, 255, 0.25)",
-                      borderRadius: "14px",
-                      padding: "18px",
-                    }}
-                  >
+                  <div style={{ background: "rgba(0, 15, 30, 0.75)", border: "1px solid rgba(0, 229, 255, 0.25)", borderRadius: "14px", padding: "18px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                      <strong style={{ fontSize: "16px", color: "#fca5a5", display: "flex", alignItems: "center", gap: "6px" }}>
+                      <strong style={{ fontSize: "16px", color: "#00e5ff", display: "flex", alignItems: "center", gap: "6px" }}>
                         <span>🧩</span> 3. จิ๊กซอว์
                       </strong>
                       <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
@@ -2006,9 +2016,10 @@ export default function TrialAdminPage() {
                           fontSize: "12px",
                           fontWeight: "800",
                           cursor: "pointer",
+                          boxShadow: activeScores.jigsaw === "25" ? "0 0 12px rgba(82, 196, 26, 0.5)" : "none"
                         }}
                       >
-                        ✅ ถูก 25 เต็ม
+                        ✅ ตอบถูก 25 เต็ม
                       </button>
                       <button
                         type="button"
@@ -2022,13 +2033,14 @@ export default function TrialAdminPage() {
                           fontSize: "12px",
                           fontWeight: "800",
                           cursor: "pointer",
+                          boxShadow: activeScores.jigsaw === "0" ? "0 0 12px rgba(255, 77, 79, 0.5)" : "none"
                         }}
                       >
-                        ❌ ผิด 0 คะแนน
+                        ❌ ตอบผิด 0 คะแนน
                       </button>
                     </div>
 
-                    <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
                       <input
                         type="number"
                         min="0"
@@ -2038,31 +2050,50 @@ export default function TrialAdminPage() {
                         placeholder="คะแนน (0-25)"
                         style={{
                           width: "100%",
-                          padding: "8px",
+                          padding: "8px 10px",
                           borderRadius: "8px",
                           background: "#050b14",
                           border: "1px solid rgba(0, 229, 255, 0.4)",
                           color: "#ffd700",
                           fontSize: "18px",
                           fontWeight: "800",
-                          textAlign: "center",
+                          textAlign: "center"
                         }}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setActiveScores({ ...activeScores, jigsaw: "" })}
-                        style={{
-                          padding: "8px 12px",
-                          borderRadius: "8px",
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                          color: "rgba(255,255,255,0.7)",
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ล้าง
-                      </button>
+                    </div>
+
+                    {/* Presets */}
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "12px" }}>
+                      {[0, 5, 10, 15, 20, 25].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setActiveScores({ ...activeScores, jigsaw: String(val) })}
+                          style={{
+                            flex: "1",
+                            padding: "4px 6px",
+                            fontSize: "12px",
+                            borderRadius: "6px",
+                            background: activeScores.jigsaw === String(val) ? "rgba(0, 229, 255, 0.3)" : "rgba(255,255,255,0.06)",
+                            color: activeScores.jigsaw === String(val) ? "#00e5ff" : "#fff",
+                            border: activeScores.jigsaw === String(val) ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.12)",
+                            fontWeight: activeScores.jigsaw === String(val) ? "800" : "500",
+                            cursor: "pointer"
+                          }}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Mini Meter */}
+                    <div style={{ width: "100%", height: "5px", background: "rgba(255,255,255,0.08)", borderRadius: "3px", overflow: "hidden", marginBottom: "12px" }}>
+                      <div style={{
+                        width: `${Math.min(100, Math.max(0, ((Number(activeScores.jigsaw) || 0) / 25) * 100))}%`,
+                        height: "100%",
+                        background: (Number(activeScores.jigsaw) || 0) === 25 ? "linear-gradient(90deg, #ffd700, #52c41a)" : "linear-gradient(90deg, #00b4d8, #00e5ff)",
+                        transition: "width 0.25s ease"
+                      }} />
                     </div>
 
                     <button
@@ -2072,12 +2103,12 @@ export default function TrialAdminPage() {
                         width: "100%",
                         padding: "8px",
                         borderRadius: "8px",
-                        background: "rgba(239, 68, 68, 0.2)",
-                        border: "1px solid #ff4d4f",
-                        color: "#fca5a5",
+                        background: "rgba(0, 180, 216, 0.25)",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#00e5ff",
                         fontWeight: "700",
                         cursor: "pointer",
-                        fontSize: "13px",
+                        fontSize: "13px"
                       }}
                     >
                       💾 บันทึก จิ๊กซอว์
@@ -2085,47 +2116,55 @@ export default function TrialAdminPage() {
                   </div>
 
                   {/* Category 4: คุณสมบัติ */}
-                  <div
-                    style={{
-                      background: "rgba(0, 15, 30, 0.75)",
-                      border: "1px solid rgba(0, 229, 255, 0.25)",
-                      borderRadius: "14px",
-                      padding: "18px",
-                    }}
-                  >
+                  <div style={{ background: "rgba(0, 15, 30, 0.75)", border: "1px solid rgba(0, 229, 255, 0.25)", borderRadius: "14px", padding: "18px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                      <strong style={{ fontSize: "16px", color: "#67e8f9", display: "flex", alignItems: "center", gap: "6px" }}>
-                        <span>🔍</span> 4. คุณสมบัติ
+                      <strong style={{ fontSize: "16px", color: "#00e5ff", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span>🏷️</span> 4. คุณสมบัติ
                       </strong>
                       <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
                         {activeScores.attribute !== "" ? `${activeScores.attribute}/25` : "ยังไม่ใส่"}
                       </span>
                     </div>
 
-                    {/* Quick Clue Buttons: 25, 20, 15, 10, 5, 0 */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", marginBottom: "10px" }}>
-                      {[25, 20, 15, 10, 5, 0].map((val) => (
-                        <button
-                          key={val}
-                          type="button"
-                          onClick={() => setActiveScores({ ...activeScores, attribute: String(val) })}
-                          style={{
-                            padding: "6px 4px",
-                            borderRadius: "6px",
-                            background: activeScores.attribute === String(val) ? "rgba(0, 229, 255, 0.3)" : "rgba(255,255,255,0.06)",
-                            border: activeScores.attribute === String(val) ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.12)",
-                            color: activeScores.attribute === String(val) ? "#00e5ff" : "#fff",
-                            fontSize: "11px",
-                            fontWeight: activeScores.attribute === String(val) ? "800" : "600",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {val === 25 ? "25 (0คำ)" : val === 20 ? "20 (1คำ)" : val === 15 ? "15 (2คำ)" : val === 10 ? "10 (3คำ)" : val === 5 ? "5 (4คำ)" : "0 (ผิด)"}
-                        </button>
-                      ))}
+                    {/* Quick Award Buttons */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, attribute: "25" })}
+                        style={{
+                          padding: "8px 6px",
+                          borderRadius: "8px",
+                          background: activeScores.attribute === "25" ? "linear-gradient(135deg, #237804 0%, #52c41a 100%)" : "rgba(82, 196, 26, 0.15)",
+                          border: activeScores.attribute === "25" ? "1px solid #73d13d" : "1px solid rgba(82, 196, 26, 0.4)",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                          boxShadow: activeScores.attribute === "25" ? "0 0 12px rgba(82, 196, 26, 0.5)" : "none"
+                        }}
+                      >
+                        ✅ ตอบถูก 25 เต็ม
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, attribute: "0" })}
+                        style={{
+                          padding: "8px 6px",
+                          borderRadius: "8px",
+                          background: activeScores.attribute === "0" ? "linear-gradient(135deg, #a8071a 0%, #ff4d4f 100%)" : "rgba(255, 77, 79, 0.15)",
+                          border: activeScores.attribute === "0" ? "1px solid #ff7875" : "1px solid rgba(255, 77, 79, 0.4)",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                          boxShadow: activeScores.attribute === "0" ? "0 0 12px rgba(255, 77, 79, 0.5)" : "none"
+                        }}
+                      >
+                        ❌ ตอบผิด 0 คะแนน
+                      </button>
                     </div>
 
-                    <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
                       <input
                         type="number"
                         min="0"
@@ -2135,31 +2174,50 @@ export default function TrialAdminPage() {
                         placeholder="คะแนน (0-25)"
                         style={{
                           width: "100%",
-                          padding: "8px",
+                          padding: "8px 10px",
                           borderRadius: "8px",
                           background: "#050b14",
                           border: "1px solid rgba(0, 229, 255, 0.4)",
                           color: "#ffd700",
                           fontSize: "18px",
                           fontWeight: "800",
-                          textAlign: "center",
+                          textAlign: "center"
                         }}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setActiveScores({ ...activeScores, attribute: "" })}
-                        style={{
-                          padding: "8px 12px",
-                          borderRadius: "8px",
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                          color: "rgba(255,255,255,0.7)",
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ล้าง
-                      </button>
+                    </div>
+
+                    {/* Presets */}
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "12px" }}>
+                      {[0, 5, 10, 15, 20, 25].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setActiveScores({ ...activeScores, attribute: String(val) })}
+                          style={{
+                            flex: "1",
+                            padding: "4px 6px",
+                            fontSize: "12px",
+                            borderRadius: "6px",
+                            background: activeScores.attribute === String(val) ? "rgba(0, 229, 255, 0.3)" : "rgba(255,255,255,0.06)",
+                            color: activeScores.attribute === String(val) ? "#00e5ff" : "#fff",
+                            border: activeScores.attribute === String(val) ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.12)",
+                            fontWeight: activeScores.attribute === String(val) ? "800" : "500",
+                            cursor: "pointer"
+                          }}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Mini Meter */}
+                    <div style={{ width: "100%", height: "5px", background: "rgba(255,255,255,0.08)", borderRadius: "3px", overflow: "hidden", marginBottom: "12px" }}>
+                      <div style={{
+                        width: `${Math.min(100, Math.max(0, ((Number(activeScores.attribute) || 0) / 25) * 100))}%`,
+                        height: "100%",
+                        background: (Number(activeScores.attribute) || 0) === 25 ? "linear-gradient(90deg, #ffd700, #52c41a)" : "linear-gradient(90deg, #00b4d8, #00e5ff)",
+                        transition: "width 0.25s ease"
+                      }} />
                     </div>
 
                     <button
@@ -2169,12 +2227,12 @@ export default function TrialAdminPage() {
                         width: "100%",
                         padding: "8px",
                         borderRadius: "8px",
-                        background: "rgba(0, 229, 255, 0.2)",
-                        border: "1px solid #00e5ff",
-                        color: "#67e8f9",
+                        background: "rgba(0, 180, 216, 0.25)",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#00e5ff",
                         fontWeight: "700",
                         cursor: "pointer",
-                        fontSize: "13px",
+                        fontSize: "13px"
                       }}
                     >
                       💾 บันทึก คุณสมบัติ
