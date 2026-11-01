@@ -242,6 +242,7 @@ function evaluatePlayerStatus(player, denseLeaderboard, targetTotalPlayers = 24)
 export default function TrialFOTYPage() {
   const [contestants, setContestants] = useState([]);
   const [pollList, setPollList] = useState(fallbackPollData);
+  const [votingOpen, setVotingOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
 
@@ -273,6 +274,9 @@ export default function TrialFOTYPage() {
         const jsonPoll = await resPoll.json();
         if (jsonPoll.success && Array.isArray(jsonPoll.data)) {
           setPollList(jsonPoll.data);
+        }
+        if (jsonPoll.votingOpen !== undefined) {
+          setVotingOpen(Boolean(jsonPoll.votingOpen));
         }
       }
     } catch (e) {
@@ -477,15 +481,15 @@ export default function TrialFOTYPage() {
                 gap: "6px",
                 padding: "8px 14px",
                 borderRadius: "8px",
-                background: "rgba(255, 215, 0, 0.15)",
-                border: "1px solid rgba(255, 215, 0, 0.4)",
-                color: "#ffd700",
+                background: votingOpen ? "rgba(255, 215, 0, 0.15)" : "rgba(255, 255, 255, 0.08)",
+                border: votingOpen ? "1px solid rgba(255, 215, 0, 0.4)" : "1px solid rgba(255, 255, 255, 0.2)",
+                color: votingOpen ? "#ffd700" : "rgba(255, 255, 255, 0.65)",
                 fontWeight: "700",
                 fontSize: "13px",
                 textDecoration: "none",
               }}
             >
-              🗳️ ร่วมโหวตโพลล์
+              {votingOpen ? "🗳️ ร่วมโหวตโพลล์" : "🔒 หน้าโหวต (ปิดแล้ว)"}
             </Link>
 
             <Link
@@ -2012,16 +2016,19 @@ export default function TrialFOTYPage() {
                   gap: "8px",
                   padding: "10px 22px",
                   borderRadius: "10px",
-                  background: "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)",
-                  color: "#030812",
+                  background: votingOpen
+                    ? "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)"
+                    : "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+                  color: votingOpen ? "#030812" : "#cbd5e1",
+                  border: votingOpen ? "none" : "1px solid rgba(255,255,255,0.2)",
                   fontWeight: "900",
                   fontSize: "14px",
                   textDecoration: "none",
-                  boxShadow: "0 0 20px rgba(255, 215, 0, 0.5)",
+                  boxShadow: votingOpen ? "0 0 20px rgba(255, 215, 0, 0.5)" : "none",
                   transition: "transform 0.15s ease",
                 }}
               >
-                <span>กดที่นี่เพื่อไปหน้าโหวต</span>
+                <span>{votingOpen ? "กดที่นี่เพื่อไปหน้าโหวต" : "ระบบปิดรับโหวตแล้ว (ดูรายละเอียด)"}</span>
                 <span>➔</span>
               </Link>
             </div>

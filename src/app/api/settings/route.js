@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS = {
   archivedAt: null,
   currentPhase: "qualifying", // 'qualifying' | 'finals'
   qualifyingLocked: false,
+  trialVotingOpen: true,
 };
 
 function readSettings() {
@@ -77,6 +78,7 @@ export async function GET(request) {
       archivedAt: settings.archivedAt || null,
       currentPhase: settings.currentPhase || "qualifying",
       qualifyingLocked: Boolean(settings.qualifyingLocked),
+      trialVotingOpen: settings.trialVotingOpen !== false,
     });
   }
 
@@ -93,6 +95,7 @@ export async function GET(request) {
     archivedAt: settings.archivedAt || null,
     currentPhase: settings.currentPhase || "qualifying",
     qualifyingLocked: Boolean(settings.qualifyingLocked),
+    trialVotingOpen: settings.trialVotingOpen !== false,
   });
 }
 
@@ -217,6 +220,9 @@ export async function POST(request) {
       if (body.archivedAt !== undefined) {
         newSettings.archivedAt = body.archivedAt;
       }
+      if (body.trialVotingOpen !== undefined) {
+        newSettings.trialVotingOpen = Boolean(body.trialVotingOpen);
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -239,6 +245,7 @@ export async function POST(request) {
           archivedAt: newSettings.archivedAt,
           currentPhase: newSettings.currentPhase,
           qualifyingLocked: newSettings.qualifyingLocked,
+          trialVotingOpen: newSettings.trialVotingOpen !== false,
         },
       });
     }

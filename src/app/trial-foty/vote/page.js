@@ -884,6 +884,7 @@ export default function TrialFotyBallotVotePage() {
     "5": [],
   });
   const [championId, setChampionId] = useState("");
+  const [votingOpen, setVotingOpen] = useState(true);
 
   const loadPollData = async () => {
     try {
@@ -892,6 +893,9 @@ export default function TrialFotyBallotVotePage() {
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           setPollList(json.data);
+        }
+        if (json.votingOpen !== undefined) {
+          setVotingOpen(Boolean(json.votingOpen));
         }
       }
     } catch (e) {
@@ -963,6 +967,10 @@ export default function TrialFotyBallotVotePage() {
 
   // Submit Ballot
   const handleSubmitBallot = async () => {
+    if (!votingOpen) {
+      alert("ระบบปิดรับการโหวตโพลล์มหาชนแล้ว ขออภัยในความไม่สะดวกครับ");
+      return;
+    }
     if (!isFormComplete) {
       alert("กรุณาเลือกผู้เข้าแข่งขันอย่างน้อย 1 คนในแต่ละอันดับ (1 ถึง 5) และระบุสุดยอดแฟนพันธุ์แท้ 1 คนครับ");
       return;
@@ -1303,6 +1311,36 @@ export default function TrialFotyBallotVotePage() {
 
       {/* Main Ballot Form */}
       <main style={{ maxWidth: "1080px", margin: "0 auto", padding: "28px 24px" }}>
+        {/* Closed Banner */}
+        {!votingOpen && (
+          <div
+            style={{
+              padding: "18px 24px",
+              borderRadius: "16px",
+              background: "linear-gradient(90deg, rgba(239, 68, 68, 0.2) 0%, rgba(127, 29, 29, 0.35) 100%)",
+              border: "1.5px solid rgba(239, 68, 68, 0.6)",
+              boxShadow: "0 0 25px rgba(239, 68, 68, 0.25)",
+              marginBottom: "28px",
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+            }}
+          >
+            <span style={{ fontSize: "32px", lineHeight: 1 }}>🔒</span>
+            <div>
+              <div style={{ fontSize: "17px", fontWeight: "900", color: "#fca5a5", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>ขณะนี้ระบบปิดรับการโหวตโพลล์มหาชน The Trial แล้ว</span>
+                <span style={{ fontSize: "11px", fontWeight: "800", padding: "2px 8px", borderRadius: "12px", background: "rgba(239,68,68,0.3)", color: "#ff8080", border: "1px solid rgba(239,68,68,0.5)" }}>
+                  CLOSED
+                </span>
+              </div>
+              <div style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.8)", marginTop: "4px", lineHeight: "1.5" }}>
+                ขอขอบคุณทุกท่านที่ร่วมลงคะแนนโหวต ตอนนี้ระบบปิดรับการส่งคะแนนโหวตใหม่แล้ว ท่านยังสามารถเปิดดูรายชื่อผู้เข้าแข่งขันและติดตามผลคะแนนสะสมได้ที่หน้าตารางคะแนน
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Intro Card */}
         <div
           style={{
@@ -1475,45 +1513,75 @@ export default function TrialFotyBallotVotePage() {
           <div>
             <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginBottom: "4px" }}>
               สถานะใบลงคะแนน:{" "}
-              <span style={{ color: isFormComplete ? "#34d399" : "#f59e0b" }}>
-                {isFormComplete
-                  ? `ครบถ้วนพร้อมส่ง (เลือกทั้ง 5 อันดับ รวม ${totalSelectedInRanks} คน + แชมป์)`
-                  : `ยังเลือกไม่ครบ (ระบุไปแล้ว ${activeRanksCount} / 5 อันดับ ${championId ? "+ แชมป์" : ""})`}
-              </span>
+              {!votingOpen ? (
+                <span style={{ color: "#f87171" }}>🔒 ปิดรับการโหวตแล้ว</span>
+              ) : (
+                <span style={{ color: isFormComplete ? "#34d399" : "#f59e0b" }}>
+                  {isFormComplete
+                    ? `ครบถ้วนพร้อมส่ง (เลือกทั้ง 5 อันดับ รวม ${totalSelectedInRanks} คน + แชมป์)`
+                    : `ยังเลือกไม่ครบ (ระบุไปแล้ว ${activeRanksCount} / 5 อันดับ ${championId ? "+ แชมป์" : ""})`}
+                </span>
+              )}
             </div>
             <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
-              {isFormComplete
+              {!votingOpen
+                ? "ขณะนี้แอดมินได้ทำการปิดรับการโหวตโพลล์มหาชนแล้ว ท่านไม่สามารถส่งคะแนนโหวตเพิ่มได้"
+                : isFormComplete
                 ? "คุณได้ระบุผู้เข้าแข่งขันครบทั้ง 5 อันดับแรกและแชมป์แล้ว กดปุ่มยืนยันด้านขวาเพื่อส่งผลโหวตเข้าสู่ระบบ"
                 : "กรุณาเลือกผู้เข้าแข่งขันอย่างน้อยอันดับละ 1 คน (สูงสุดอันดับละ 5 คน) และระบุสุดยอดแฟนพันธุ์แท้แห่งปี"}
             </div>
           </div>
 
-          <button
-            type="button"
-            disabled={!isFormComplete || submitting}
-            onClick={() => setShowConfirmModal(true)}
-            style={{
-              padding: "14px 32px",
-              borderRadius: "12px",
-              background: isFormComplete
-                ? "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)"
-                : "rgba(255, 255, 255, 0.1)",
-              border: isFormComplete ? "none" : "1px solid rgba(255, 255, 255, 0.2)",
-              color: isFormComplete ? "#030812" : "rgba(255,255,255,0.4)",
-              fontWeight: "900",
-              fontSize: "16px",
-              letterSpacing: "0.5px",
-              cursor: isFormComplete ? "pointer" : "not-allowed",
-              boxShadow: isFormComplete ? "0 0 25px rgba(255, 215, 0, 0.5)" : "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              transition: "transform 0.15s ease",
-            }}
-          >
-            <span>{submitting ? "⏳ กำลังส่ง..." : "🗳️ ยืนยันการส่งผลโหวต"}</span>
-            {isFormComplete && <span>➔</span>}
-          </button>
+          {!votingOpen ? (
+            <button
+              type="button"
+              disabled={true}
+              style={{
+                padding: "14px 32px",
+                borderRadius: "12px",
+                background: "rgba(239, 68, 68, 0.15)",
+                border: "1.5px solid rgba(239, 68, 68, 0.4)",
+                color: "#fca5a5",
+                fontWeight: "900",
+                fontSize: "16px",
+                letterSpacing: "0.5px",
+                cursor: "not-allowed",
+                boxShadow: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <span>🔒 ปิดรับการโหวตแล้ว</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={!isFormComplete || submitting}
+              onClick={() => setShowConfirmModal(true)}
+              style={{
+                padding: "14px 32px",
+                borderRadius: "12px",
+                background: isFormComplete
+                  ? "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)"
+                  : "rgba(255, 255, 255, 0.1)",
+                border: isFormComplete ? "none" : "1px solid rgba(255, 255, 255, 0.2)",
+                color: isFormComplete ? "#030812" : "rgba(255,255,255,0.4)",
+                fontWeight: "900",
+                fontSize: "16px",
+                letterSpacing: "0.5px",
+                cursor: isFormComplete ? "pointer" : "not-allowed",
+                boxShadow: isFormComplete ? "0 0 25px rgba(255, 215, 0, 0.5)" : "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                transition: "transform 0.15s ease",
+              }}
+            >
+              <span>{submitting ? "⏳ กำลังส่ง..." : "🗳️ ยืนยันการส่งผลโหวต"}</span>
+              {isFormComplete && <span>➔</span>}
+            </button>
+          )}
         </div>
       </main>
     </div>

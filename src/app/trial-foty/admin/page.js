@@ -107,6 +107,8 @@ export default function TrialAdminPage() {
   const [pollItems, setPollItems] = useState([]);
   const [savingPoll, setSavingPoll] = useState(false);
   const [pollNotice, setPollNotice] = useState("");
+  const [votingOpen, setVotingOpen] = useState(true);
+  const [togglingVoting, setTogglingVoting] = useState(false);
 
   // Fetch contestants from API
   const fetchContestants = async () => {
@@ -126,6 +128,9 @@ export default function TrialAdminPage() {
         const jsonPoll = await resPoll.json();
         if (jsonPoll.success && Array.isArray(jsonPoll.data)) {
           setPollItems(jsonPoll.data);
+        }
+        if (jsonPoll.votingOpen !== undefined) {
+          setVotingOpen(Boolean(jsonPoll.votingOpen));
         }
       }
     } catch {
@@ -350,11 +355,40 @@ export default function TrialAdminPage() {
     try {
       const res = await fetch("/api/settings?admin=1");
       const data = await res.json();
-      if (data.success && data.trialAdminPassword) {
-        setTrialAdminPassConfig(data.trialAdminPassword);
+      if (data.success) {
+        if (data.trialAdminPassword) {
+          setTrialAdminPassConfig(data.trialAdminPassword);
+        }
+        if (data.trialVotingOpen !== undefined) {
+          setVotingOpen(Boolean(data.trialVotingOpen));
+        }
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleToggleVoting = async (newStatus) => {
+    const targetStatus = typeof newStatus === "boolean" ? newStatus : !votingOpen;
+    setTogglingVoting(true);
+    try {
+      const res = await fetch("/api/trial-poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "set_voting_open", votingOpen: targetStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setVotingOpen(targetStatus);
+        showToast(targetStatus ? "🟢 เปิดรับการโหวตโพลล์มหาชนแล้ว" : "🔴 ปิดรับการโหวตโพลล์มหาชนแล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการเปลี่ยนสถานะการโหวต", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setTogglingVoting(false);
     }
   };
 
@@ -2499,6 +2533,107 @@ export default function TrialAdminPage() {
                 </div>
               </div>
 
+              {/* Voting Open / Close Toggle Control Box */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "16px 20px",
+                  borderRadius: "14px",
+                  background: votingOpen
+                    ? "linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 78, 59, 0.25) 100%)"
+                    : "linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(127, 29, 29, 0.25) 100%)",
+                  border: votingOpen ? "1.5px solid rgba(16, 185, 129, 0.45)" : "1.5px solid rgba(239, 68, 68, 0.45)",
+                  boxShadow: votingOpen ? "0 0 16px rgba(16, 185, 129, 0.15)" : "0 0 16px rgba(239, 68, 68, 0.15)",
+                  marginBottom: "16px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingVoting ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={votingOpen}
+                    disabled={togglingVoting}
+                    onChange={(e) => handleToggleVoting(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingVoting ? "not-allowed" : "pointer",
+                      accentColor: "#10b981",
+                    }}
+                  />
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <span
+                        style={{
+                          fontSize: "15px",
+                          fontWeight: "900",
+                          color: votingOpen ? "#4ade80" : "#f87171",
+                        }}
+                      >
+                        {votingOpen ? "🟢 เปิดรับการโหวตโพลล์มหาชน (Voting Open)" : "🔴 ปิดรับการโหวตโพลล์มหาชน (Voting Closed)"}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: "800",
+                          padding: "2px 8px",
+                          borderRadius: "20px",
+                          background: votingOpen ? "rgba(74, 222, 128, 0.2)" : "rgba(248, 113, 113, 0.2)",
+                          color: votingOpen ? "#86efac" : "#fca5a5",
+                          border: votingOpen ? "1px solid rgba(74, 222, 128, 0.4)" : "1px solid rgba(248, 113, 113, 0.4)",
+                        }}
+                      >
+                        {votingOpen ? "เปิดให้ผู้ชมโหวตอยู่" : "ปิดรับโหวตแล้ว"}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {votingOpen
+                        ? "ผู้ชมสามารถเข้าหน้า /trial-foty/vote และส่งคะแนนโหวตได้ตามปกติ (อันดับ 1-5 และแชมป์)"
+                        : "หน้า /trial-foty/vote จะขึ้นแถบแจ้งเตือนปิดรับโหวต และบล็อกไม่ให้ส่งคะแนน"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingVoting}
+                    onClick={() => handleToggleVoting(!votingOpen)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: votingOpen ? "rgba(239, 68, 68, 0.2)" : "rgba(16, 185, 129, 0.2)",
+                      border: votingOpen ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(16, 185, 129, 0.5)",
+                      color: votingOpen ? "#fca5a5" : "#86efac",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingVoting ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {togglingVoting
+                      ? "⏳ กำลังบันทึก..."
+                      : votingOpen
+                      ? "🔒 คลิกเพื่อปิดรับโหวต"
+                      : "🔓 คลิกเพื่อเปิดรับโหวต"}
+                  </button>
+                </div>
+              </div>
+
               {pollNotice && (
                 <div
                   style={{
@@ -3347,6 +3482,120 @@ export default function TrialAdminPage() {
            ======================================================== */}
         {activeTab === "settings" && (
           <div>
+            {/* Trial Voting Open / Close Settings Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: votingOpen ? "1.5px solid rgba(16, 185, 129, 0.4)" : "1.5px solid rgba(239, 68, 68, 0.4)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+                boxShadow: votingOpen ? "0 0 20px rgba(16, 185, 129, 0.12)" : "0 0 20px rgba(239, 68, 68, 0.12)",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>🗳️</span> เปิด-ปิดระบบโหวตโพลล์มหาชน (Trial FoTY Poll Voting)
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                ควบคุมการเปิดหรือปิดรับการส่งคะแนนโหวตจากผู้ชมในหน้า <code>/trial-foty/vote</code> หากปิดระบบ ผู้ชมจะไม่สามารถส่งคะแนนได้
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  background: votingOpen ? "rgba(16, 185, 129, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                  border: votingOpen ? "1px solid rgba(16, 185, 129, 0.35)" : "1px solid rgba(239, 68, 68, 0.35)",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingVoting ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={votingOpen}
+                    disabled={togglingVoting}
+                    onChange={(e) => handleToggleVoting(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingVoting ? "not-allowed" : "pointer",
+                      accentColor: "#10b981",
+                    }}
+                  />
+                  <div>
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "900",
+                        color: votingOpen ? "#4ade80" : "#f87171",
+                      }}
+                    >
+                      {votingOpen ? "🟢 เปิดรับการโหวตอยู่ (Open for Voting)" : "🔴 ปิดรับการโหวตแล้ว (Voting Closed)"}
+                    </span>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.65)", margin: "2px 0 0" }}>
+                      {votingOpen
+                        ? "สถานะปัจจุบัน: ผู้ชมสามารถเข้าหน้าโหวตและส่งคะแนนได้ตามปกติ"
+                        : "สถานะปัจจุบัน: หน้าโหวตแสดงแจ้งเตือนปิดรับโหวต และบล็อกการส่งคะแนน"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <Link
+                    href="/trial-foty/vote"
+                    target="_blank"
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: "8px",
+                      background: "rgba(255, 215, 0, 0.12)",
+                      border: "1px solid rgba(255, 215, 0, 0.4)",
+                      color: "#ffd700",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                      textDecoration: "none",
+                    }}
+                  >
+                    ↗ ดูหน้าโหวต
+                  </Link>
+                  <button
+                    type="button"
+                    disabled={togglingVoting}
+                    onClick={() => handleToggleVoting(!votingOpen)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: votingOpen ? "rgba(239, 68, 68, 0.2)" : "rgba(16, 185, 129, 0.2)",
+                      border: votingOpen ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(16, 185, 129, 0.5)",
+                      color: votingOpen ? "#fca5a5" : "#86efac",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingVoting ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    {togglingVoting
+                      ? "⏳ กำลังบันทึก..."
+                      : votingOpen
+                      ? "🔒 คลิกเพื่อปิดรับโหวต"
+                      : "🔓 คลิกเพื่อเปิดรับโหวต"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Trial Admin Password Management Box */}
             <div
               style={{

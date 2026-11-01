@@ -4,6 +4,32 @@ import path from "path";
 import { getKVData, saveKVData } from "@/lib/kv";
 
 const POLL_FILE = path.join(process.cwd(), "src/app/data/trial-poll.json");
+const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
+
+function readSettings() {
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      return JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf-8"));
+    }
+  } catch (e) {}
+  return { trialVotingOpen: true };
+}
+
+function writeSettings(data) {
+  try {
+    fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (e) {}
+}
+
+async function getVotingStatus() {
+  try {
+    const settings = await getKVData("fpt_settings", readSettings);
+    return settings ? settings.trialVotingOpen !== false : true;
+  } catch (e) {
+    return true;
+  }
+}
 
 function getDefaultPoll() {
   try {
@@ -80,12 +106,34 @@ function computePollPercentages(items) {
 
 export async function GET() {
   const data = await getKVData("fpt_trial_poll", readLocalPoll);
-  return NextResponse.json({ success: true, data: data || getDefaultPoll() });
+  const votingOpen = await getVotingStatus();
+  return NextResponse.json({
+    success: true,
+    data: data || getDefaultPoll(),
+    votingOpen,
+  });
 }
 
 export async function POST(request) {
   try {
     const body = await request.json();
+
+    // Toggle / Set voting open status
+    if (body.action === "toggle_voting" || body.action === "set_voting_open") {
+      const rawSettings = await getKVData("fpt_settings", readSettings);
+      const currentStatus = rawSettings ? rawSettings.trialVotingOpen !== false : true;
+      const newStatus = body.votingOpen !== undefined ? Boolean(body.votingOpen) : !currentStatus;
+      const updatedSettings = { ...(rawSettings || {}), trialVotingOpen: newStatus };
+
+      writeSettings(updatedSettings);
+      await saveKVData("fpt_settings", updatedSettings, writeSettings);
+
+      return NextResponse.json({
+        success: true,
+        votingOpen: newStatus,
+        message: newStatus ? "🟢 เปิดรับการโหวตโพลล์มหาชนแล้ว" : "🔴 ปิดรับการโหวตโพลล์มหาชนแล้ว",
+      });
+    }
 
     // Reset poll to default 40 contestants
     if (body.action === "reset") {
@@ -149,6 +197,20 @@ export async function POST(request) {
     let current = await getKVData("fpt_trial_poll", readLocalPoll);
     if (!Array.isArray(current) || current.length === 0) {
       current = getDefaultPoll();
+    }
+
+    // Check if voting is open before processing any vote action
+    if (body.action === "ballot_vote" || body.action === "vote") {
+      const isVotingOpen = await getVotingStatus();
+      if (!isVotingOpen) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "ขณะนี้ระบบปิดรับการโหวตโพลล์มหาชนแล้ว ขออภัยในความไม่สะดวก",
+          },
+          { status: 403 }
+        );
+      }
     }
 
     // Ballot vote: 5 ranks (up to 5 contestants per rank) + 1 champion
