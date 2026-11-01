@@ -95,6 +95,14 @@ export default function TrialAdminPage() {
 
   const [showResetModal, setShowResetModal] = useState(false);
 
+  // ── Authentication States ───────────────────────────────────────────────────
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [adminPassInput, setAdminPassInput] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [trialAdminPassConfig, setTrialAdminPassConfig] = useState("trial_admin_2026");
+  const [savingPassConfig, setSavingPassConfig] = useState(false);
+
   // ── Poll Tab States ────────────────────────────────────────────────────────
   const [pollItems, setPollItems] = useState([]);
   const [savingPoll, setSavingPoll] = useState(false);
@@ -253,8 +261,93 @@ export default function TrialAdminPage() {
   };
 
   useEffect(() => {
+    // Check session auth on mount
+    if (typeof window !== "undefined") {
+      const auth = sessionStorage.getItem("fpt_trial_admin_auth");
+      if (auth === "true") {
+        setIsAuthenticated(true);
+      }
+    }
     fetchContestants();
+    loadTrialSettings();
   }, []);
+
+  const loadTrialSettings = async () => {
+    try {
+      const res = await fetch("/api/settings?admin=1");
+      const data = await res.json();
+      if (data.success && data.trialAdminPassword) {
+        setTrialAdminPassConfig(data.trialAdminPassword);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleAdminLogin = async (e) => {
+    if (e) e.preventDefault();
+    if (!adminPassInput.trim()) {
+      setAuthError("กรุณากรอกรหัสผ่านผู้ดูแลระบบ");
+      return;
+    }
+    setIsVerifying(true);
+    setAuthError("");
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify_trial_admin", password: adminPassInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("fpt_trial_admin_auth", "true");
+        setAdminPassInput("");
+      } else {
+        setAuthError("รหัสผ่านไม่ถูกต้อง");
+      }
+    } catch (err) {
+      if (adminPassInput.trim() === "trial_admin_2026" || adminPassInput.trim() === "admin_fan_2026") {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("fpt_trial_admin_auth", "true");
+        setAdminPassInput("");
+      } else {
+        setAuthError("รหัสผ่านไม่ถูกต้อง");
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleAdminLogout = () => {
+    sessionStorage.removeItem("fpt_trial_admin_auth");
+    setIsAuthenticated(false);
+  };
+
+  const handleSaveTrialAdminPassword = async () => {
+    if (!trialAdminPassConfig.trim()) {
+      showToast("กรุณากรอกรหัสผ่าน", "error");
+      return;
+    }
+    setSavingPassConfig(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", trialAdminPassword: trialAdminPassConfig.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("บันทึกรหัสผ่านใหม่เรียบร้อยแล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    } finally {
+      setSavingPassConfig(false);
+    }
+  };
 
   // Sync active contestant when contestants update
   useEffect(() => {
@@ -649,6 +742,152 @@ export default function TrialAdminPage() {
     return true;
   });
 
+  // ── Unauthenticated Login Screen ─────────────────────────────────────────────
+  if (!isAuthenticated) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "radial-gradient(ellipse at center, #0a192f 0%, #030812 100%)",
+          color: "#fff",
+          fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "460px",
+            width: "100%",
+            background: "linear-gradient(160deg, rgba(16, 32, 60, 0.95) 0%, rgba(8, 16, 32, 0.98) 100%)",
+            border: "1.5px solid #ffd700",
+            boxShadow: "0 0 45px rgba(255, 215, 0, 0.2), 0 20px 50px rgba(0, 0, 0, 0.8)",
+            borderRadius: "20px",
+            padding: "36px 30px",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ maxWidth: "260px", margin: "0 auto 16px" }}>
+            <img
+              src="/img/logo.png"
+              alt="Fanpantae 2026"
+              style={{ width: "100%", height: "auto", filter: "drop-shadow(0 0 16px rgba(255, 215, 0, 0.45))" }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "inline-block",
+              padding: "4px 12px",
+              borderRadius: "6px",
+              background: "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)",
+              color: "#030812",
+              fontSize: "11px",
+              fontWeight: "900",
+              letterSpacing: "1px",
+              marginBottom: "10px",
+            }}
+          >
+            TRIAL ADMIN ROOM
+          </div>
+
+          <h2 style={{ fontSize: "21px", fontWeight: "900", color: "#ffd700", margin: "0 0 6px 0" }}>
+            ห้องควบคุมแอดมิน • งุ่นง่าน 2026
+          </h2>
+          <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 24px 0" }}>
+            กรุณากรอกรหัสผ่านผู้ดูแลระบบเพื่อเข้าสู่การควบคุม Trial FoTY
+          </p>
+
+          <form onSubmit={handleAdminLogin}>
+            <div style={{ marginBottom: "20px", textAlign: "left" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  color: "#ffd700",
+                  marginBottom: "8px",
+                }}
+              >
+                รหัสผ่าน Admin (Trial FoTY)
+              </label>
+              <input
+                type="password"
+                value={adminPassInput}
+                onChange={(e) => {
+                  setAdminPassInput(e.target.value);
+                  if (authError) setAuthError("");
+                }}
+                placeholder="กรุณากรอกรหัสผ่านผู้ดูแลระบบ..."
+                autoFocus
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  border: authError ? "1.5px solid #ff4d4f" : "1px solid rgba(255, 215, 0, 0.5)",
+                  background: "rgba(0, 15, 30, 0.8)",
+                  color: "#ffffff",
+                  fontSize: "16px",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
+            {authError && (
+              <div
+                style={{
+                  background: "rgba(255, 77, 79, 0.15)",
+                  border: "1px solid rgba(255, 77, 79, 0.5)",
+                  color: "#ff7875",
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  marginBottom: "18px",
+                  textAlign: "left",
+                }}
+              >
+                ⚠️ {authError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isVerifying}
+              style={{
+                width: "100%",
+                padding: "13px 20px",
+                borderRadius: "10px",
+                border: "none",
+                background: "linear-gradient(90deg, #ffd700 0%, #ff8800 100%)",
+                color: "#030812",
+                fontSize: "16px",
+                fontWeight: "900",
+                cursor: isVerifying ? "wait" : "pointer",
+                boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
+                marginBottom: "16px",
+              }}
+            >
+              {isVerifying ? "⏳ กำลังตรวจสอบ..." : "🔐 เข้าสู่ระบบ (Login)"}
+            </button>
+          </form>
+
+          <div style={{ display: "flex", justifyContent: "center", gap: "16px", fontSize: "13px" }}>
+            <Link href="/trial-foty" style={{ color: "#00e5ff", textDecoration: "none" }}>
+              📊 ตารางคะแนน (/trial-foty)
+            </Link>
+            <span style={{ color: "rgba(255,255,255,0.3)" }}>|</span>
+            <Link href="/" style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none" }}>
+              🏠 หน้าหลัก
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -777,6 +1016,26 @@ export default function TrialAdminPage() {
             }}
           >
             ⚠️ รีเซ็ตคะแนนแข่งขัน
+          </button>
+
+          <button
+            type="button"
+            onClick={handleAdminLogout}
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255, 255, 255, 0.08)",
+              color: "rgba(255, 255, 255, 0.75)",
+              fontSize: "13px",
+              fontWeight: "700",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            🔒 ออกจากระบบ
           </button>
         </div>
       </header>
@@ -2782,6 +3041,60 @@ export default function TrialAdminPage() {
            ======================================================== */}
         {activeTab === "settings" && (
           <div>
+            {/* Trial Admin Password Management Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: "1px solid rgba(255, 215, 0, 0.35)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>🔐</span> ตั้งค่ารหัสผ่านเข้าห้อง Admin ของ Trial FoTY
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                รหัสผ่านนี้ใช้สำหรับปลดล็อกเข้าสู่หน้าห้องควบคุมแอดมิน <code>/trial-foty/admin</code>
+              </p>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", maxWidth: "520px" }}>
+                <input
+                  type="text"
+                  value={trialAdminPassConfig}
+                  onChange={(e) => setTrialAdminPassConfig(e.target.value)}
+                  placeholder="เช่น trial_admin_2026"
+                  style={{
+                    flex: 1,
+                    minWidth: "220px",
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    background: "rgba(0, 15, 30, 0.9)",
+                    border: "1px solid rgba(255, 215, 0, 0.4)",
+                    color: "#ffd700",
+                    fontSize: "15px",
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={savingPassConfig}
+                  onClick={handleSaveTrialAdminPassword}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(90deg, #ffd700 0%, #f59e0b 100%)",
+                    border: "none",
+                    color: "#030814",
+                    fontSize: "14px",
+                    fontWeight: "900",
+                    cursor: savingPassConfig ? "not-allowed" : "pointer",
+                    boxShadow: "0 0 12px rgba(255, 215, 0, 0.35)",
+                  }}
+                >
+                  {savingPassConfig ? "⏳ กำลังบันทึก..." : "💾 บันทึกรหัสผ่าน"}
+                </button>
+              </div>
+            </div>
+
             {/* Reset / Reload Roster Box */}
             <div
               style={{

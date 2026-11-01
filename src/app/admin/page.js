@@ -42,6 +42,7 @@ export default function AdminPage() {
   // Settings State
   const [gamePassword, setGamePassword] = useState("fanpantae_2026");
   const [adminPassword, setAdminPassword] = useState("admin_fan_2026");
+  const [trialAdminPassword, setTrialAdminPassword] = useState("trial_admin_2026");
   const [totalContestants, setTotalContestants] = useState(23);
   const [protectHome, setProtectHome] = useState(false);
   const [homePassword, setHomePassword] = useState("");
@@ -455,6 +456,7 @@ export default function AdminPage() {
       if (data.success) {
         setGamePassword(data.gamePassword || "fanpantae_2026");
         setAdminPassword(data.adminPassword || "admin_fan_2026");
+        setTrialAdminPassword(data.trialAdminPassword || "trial_admin_2026");
         setTotalContestants(data.totalContestants || 23);
         setProtectHome(Boolean(data.protectHome));
         setHomePassword(data.homePassword || "");
@@ -680,6 +682,7 @@ export default function AdminPage() {
           action: "update",
           gamePassword,
           adminPassword,
+          trialAdminPassword,
           totalContestants,
           protectHome,
           homePassword,
@@ -4454,6 +4457,31 @@ export default function AdminPage() {
                     fontSize: "15px"
                   }}
                 />
+              </div>
+
+              {/* Trial Admin Password */}
+              <div style={{ marginBottom: "18px" }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#ffd700", marginBottom: "6px" }}>
+                  ⚙️ รหัสผ่านห้อง Admin ของ Trial FoTY (/trial-foty/admin)
+                </label>
+                <input
+                  type="text"
+                  value={trialAdminPassword}
+                  onChange={(e) => setTrialAdminPassword(e.target.value)}
+                  placeholder="เช่น trial_admin_2026"
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    background: "rgba(0, 15, 30, 0.9)",
+                    border: "1px solid rgba(255, 215, 0, 0.4)",
+                    color: "#ffd700",
+                    fontSize: "15px"
+                  }}
+                />
+                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginTop: "4px", display: "block" }}>
+                  ผู้ดูแลระบบจะต้องใส่รหัสนี้เพื่อเข้าสู่หน้าจัดการแข่งขัน <code>/trial-foty/admin</code>
+                </span>
               </div>
 
               {/* Total Contestants */}
