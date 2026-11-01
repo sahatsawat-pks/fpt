@@ -2525,14 +2525,14 @@ export default function TrialAdminPage() {
                 overflowX: "auto",
               }}
             >
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "850px", fontSize: "14px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "1280px", fontSize: "14px" }}>
                 <thead>
                   <tr style={{ background: "rgba(0, 229, 255, 0.12)", borderBottom: "1px solid rgba(0, 229, 255, 0.3)" }}>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "80px", color: "#ffd700", fontWeight: "800" }}>อันดับ</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "70px", color: "#ffd700", fontWeight: "800" }}>อันดับ</th>
                     <th rowSpan={2} style={{ padding: "10px 4px", textAlign: "center", width: "48px", color: "#80d0ff" }}>รูป</th>
-                    <th rowSpan={2} style={{ padding: "10px 10px", textAlign: "left", minWidth: "140px", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "110px", color: "#80d0ff" }}>ชื่อเล่น</th>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", minWidth: "150px", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
+                    <th rowSpan={2} style={{ padding: "10px 10px", textAlign: "left", minWidth: "160px", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "150px", minWidth: "150px", color: "#80d0ff" }}>ชื่อเล่น</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", minWidth: "180px", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
                     <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "95px", color: "#ffd700", fontWeight: "900", background: "rgba(255, 215, 0, 0.1)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100) คิดเป็น 30% ของโพลล์">
                       What If?<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#fef08a" }}>(เต็ม 100)</span>
                     </th>
@@ -2620,7 +2620,7 @@ export default function TrialAdminPage() {
                         </td>
 
                         {/* Name Input */}
-                        <td style={{ padding: "8px 10px" }}>
+                        <td style={{ padding: "8px 10px", minWidth: "160px" }}>
                           <input
                             type="text"
                             value={item.name || ""}
@@ -2639,7 +2639,7 @@ export default function TrialAdminPage() {
                         </td>
 
                         {/* Nickname Input */}
-                        <td style={{ padding: "8px 10px" }}>
+                        <td style={{ padding: "8px 10px", minWidth: "150px" }}>
                           <input
                             type="text"
                             value={item.nickname || ""}
@@ -2659,7 +2659,7 @@ export default function TrialAdminPage() {
                         </td>
 
                         {/* Topic Input */}
-                        <td style={{ padding: "8px 10px" }}>
+                        <td style={{ padding: "8px 10px", minWidth: "180px" }}>
                           <input
                             type="text"
                             value={item.topic || ""}
