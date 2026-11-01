@@ -1998,6 +1998,9 @@ export default function TrialFOTYPage() {
                   <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
                     ร่วมส่งแรงใจและโหวตให้กับผู้เข้าแข่งขันคนโปรดของคุณใน Trial Fan of the Year 2026
                   </div>
+                  <div style={{ fontSize: "12px", color: "#fef08a", marginTop: "4px", fontWeight: "700" }}>
+                    ⚡ สูตรคำนวณคะแนนโพลล์: คะแนนโหวตมหาชน 70% + คะแนนรอบอุ่นเครื่อง (What If?) 30%
+                  </div>
                 </div>
               </div>
 

@@ -47,20 +47,14 @@ function RankMultiSelectCard({
   // Filter contestants
   const filteredContestants = useMemo(() => {
     const q = search.trim().toLowerCase();
-    // Exclude contestants already in this rank
-    const available = contestants.filter((c) => {
-      const cId = String(c.id || c.pollRank);
-      return !selectedIds.includes(cId);
-    });
-
-    if (!q) return available;
-    return available.filter(
+    if (!q) return contestants;
+    return contestants.filter(
       (c) =>
         (c.name && c.name.toLowerCase().includes(q)) ||
         (c.nickname && c.nickname.toLowerCase().includes(q)) ||
         (c.topic && c.topic.toLowerCase().includes(q))
     );
-  }, [contestants, search, selectedIds]);
+  }, [contestants, search]);
 
   // Selected contestant objects
   const selectedContestantsList = useMemo(() => {
@@ -339,6 +333,9 @@ function RankMultiSelectCard({
               background: "#09172e",
               padding: "10px 12px",
               borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
             <input
@@ -348,7 +345,7 @@ function RankMultiSelectCard({
               onChange={(e) => setSearch(e.target.value)}
               placeholder="พิมพ์ค้นหาชื่อเล่น, ชื่อจริง หรือหัวข้อ..."
               style={{
-                width: "100%",
+                flex: 1,
                 padding: "8px 12px",
                 borderRadius: "8px",
                 background: "rgba(0, 0, 0, 0.6)",
@@ -359,6 +356,23 @@ function RankMultiSelectCard({
                 boxSizing: "border-box",
               }}
             />
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "8px",
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "#ffffff",
+                fontSize: "12px",
+                fontWeight: "700",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              ปิด ✕
+            </button>
           </div>
 
           {/* Contestants List */}
@@ -369,6 +383,7 @@ function RankMultiSelectCard({
           ) : (
             filteredContestants.map((c) => {
               const cId = String(c.id || c.pollRank);
+              const isSelectedInThisRank = selectedIds.includes(cId);
 
               // Check if selected in another rank
               let alreadyInRank = null;
@@ -381,10 +396,20 @@ function RankMultiSelectCard({
               return (
                 <div
                   key={cId}
-                  onClick={() => {
-                    onAddContestant(cId);
-                    setIsOpen(false);
-                    setSearch("");
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isSelectedInThisRank) {
+                      onRemoveContestant(cId);
+                    } else {
+                      if (selectedIds.length >= maxQuota) {
+                        alert("คุณเลือกครบโควตา 5 คนในอันดับนี้แล้วครับ");
+                        return;
+                      }
+                      onAddContestant(cId);
+                      if (selectedIds.length + 1 >= maxQuota) {
+                        setIsOpen(false);
+                      }
+                    }
                   }}
                   style={{
                     display: "flex",
@@ -393,14 +418,24 @@ function RankMultiSelectCard({
                     padding: "10px 14px",
                     borderBottom: "1px solid rgba(255,255,255,0.05)",
                     cursor: "pointer",
-                    background: alreadyInRank ? "rgba(255, 215, 0, 0.04)" : "transparent",
+                    background: isSelectedInThisRank
+                      ? "rgba(16, 185, 129, 0.18)"
+                      : alreadyInRank
+                      ? "rgba(255, 215, 0, 0.04)"
+                      : "transparent",
                     transition: "background 0.12s ease",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(0, 229, 255, 0.18)";
+                    e.currentTarget.style.background = isSelectedInThisRank
+                      ? "rgba(16, 185, 129, 0.26)"
+                      : "rgba(0, 229, 255, 0.18)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = alreadyInRank ? "rgba(255, 215, 0, 0.04)" : "transparent";
+                    e.currentTarget.style.background = isSelectedInThisRank
+                      ? "rgba(16, 185, 129, 0.18)"
+                      : alreadyInRank
+                      ? "rgba(255, 215, 0, 0.04)"
+                      : "transparent";
                   }}
                 >
                   {/* Photo */}
@@ -411,7 +446,7 @@ function RankMultiSelectCard({
                       borderRadius: "50%",
                       overflow: "hidden",
                       background: "#030814",
-                      border: "1px solid rgba(255,255,255,0.2)",
+                      border: isSelectedInThisRank ? "1.5px solid #10b981" : "1px solid rgba(255,255,255,0.2)",
                       flexShrink: 0,
                       display: "flex",
                       alignItems: "center",
@@ -433,7 +468,7 @@ function RankMultiSelectCard({
                   {/* Name and Topic */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <strong style={{ fontSize: "14px", color: "#ffffff" }}>
+                      <strong style={{ fontSize: "14px", color: isSelectedInThisRank ? "#34d399" : "#ffffff" }}>
                         {c.nickname || c.name}
                       </strong>
                       {c.nickname && (
@@ -454,7 +489,7 @@ function RankMultiSelectCard({
                   </div>
 
                   {/* Already in another rank indicator */}
-                  {alreadyInRank && (
+                  {alreadyInRank && !isSelectedInThisRank && (
                     <span
                       style={{
                         fontSize: "10px",
@@ -470,7 +505,15 @@ function RankMultiSelectCard({
                     </span>
                   )}
 
-                  <span style={{ color: badgeColor, fontSize: "14px", fontWeight: "900", flexShrink: 0 }}>+ เพิ่ม</span>
+                  {isSelectedInThisRank ? (
+                    <span style={{ color: "#34d399", fontSize: "12px", fontWeight: "800", flexShrink: 0 }}>
+                      ✓ เลือกแล้ว
+                    </span>
+                  ) : (
+                    <span style={{ color: badgeColor, fontSize: "13px", fontWeight: "800", flexShrink: 0 }}>
+                      + เลือก
+                    </span>
+                  )}
                 </div>
               );
             })

@@ -46,6 +46,38 @@ function writeLocalPoll(data) {
   }
 }
 
+/**
+ * Recalculate poll percentages:
+ * 70% from Popular Votes (share of total vote points)
+ * 30% from Warm-up Round What If? Score (share of total What If points, or out of 100)
+ */
+function computePollPercentages(items) {
+  const totalVotes = items.reduce((sum, item) => sum + (Number(item.votes) || 0), 0);
+  const totalWhatIf = items.reduce((sum, item) => sum + (Number(item.whatIfScore) || 0), 0);
+
+  return items.map((item) => {
+    const v = Number(item.votes) || 0;
+    const w = Number(item.whatIfScore) || 0;
+
+    let finalPct = 0;
+    if (totalVotes > 0 && totalWhatIf > 0) {
+      const voteShare = (v / totalVotes) * 100;
+      const whatIfShare = (w / totalWhatIf) * 100;
+      finalPct = voteShare * 0.7 + whatIfShare * 0.3;
+    } else if (totalVotes > 0) {
+      finalPct = (v / totalVotes) * 100;
+    } else if (totalWhatIf > 0) {
+      finalPct = (w / totalWhatIf) * 100;
+    }
+
+    return {
+      ...item,
+      whatIfScore: w,
+      percent: `${finalPct.toFixed(2)}%`,
+    };
+  });
+}
+
 export async function GET() {
   const data = await getKVData("fpt_trial_poll", readLocalPoll);
   return NextResponse.json({ success: true, data: data || getDefaultPoll() });
@@ -66,7 +98,7 @@ export async function POST(request) {
       });
     }
 
-    // Save all items (reorder, manual percent, etc.)
+    // Save all items (reorder, manual percent, whatIfScore, etc.)
     if (body.action === "save_all" && Array.isArray(body.items)) {
       const sanitized = body.items.map((item, idx) => ({
         pollRank: Number(item.pollRank) || idx + 1,
@@ -76,6 +108,7 @@ export async function POST(request) {
         topic: String(item.topic || "").trim(),
         percent: String(item.percent || "").trim() || "0.00%",
         votes: Number(item.votes) || 0,
+        whatIfScore: Math.min(100, Math.max(0, Number(item.whatIfScore) || 0)),
         championVotes: Number(item.championVotes) || 0,
         rankVotes:
           item.rankVotes && typeof item.rankVotes === "object"
@@ -100,22 +133,35 @@ export async function POST(request) {
       });
     }
 
+    // Calculate percent formula action (70% votes + 30% what-if)
+    if (body.action === "calculate_percent" && Array.isArray(body.items)) {
+      let computed = computePollPercentages(body.items);
+      computed.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
+      computed = computed.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
+      await saveKVData("fpt_trial_poll", computed, writeLocalPoll);
+      return NextResponse.json({
+        success: true,
+        data: computed,
+        message: "คำนวณ % โพลล์ (โหวต 70% + รอบอุ่นเครื่อง 30%) เรียบร้อยแล้ว",
+      });
+    }
+
     let current = await getKVData("fpt_trial_poll", readLocalPoll);
     if (!Array.isArray(current) || current.length === 0) {
       current = getDefaultPoll();
     }
 
-    // Ballot vote: 5 ranks + 1 champion
+    // Ballot vote: 5 ranks (up to 5 contestants per rank) + 1 champion
     if (body.action === "ballot_vote") {
-      const ranks = body.ranks || {}; // { "1": id, "2": id, "3": id, "4": id, "5": id }
+      const ranks = body.ranks || {};
       const championId = body.champion ? String(body.champion) : null;
 
       const rankWeights = {
-        "1": 5, // อันดับ 1 ได้ 5 คะแนน
-        "2": 4, // อันดับ 2 ได้ 4 คะแนน
-        "3": 3, // อันดับ 3 ได้ 3 คะแนน
-        "4": 2, // อันดับ 4 ได้ 2 คะแนน
-        "5": 1, // อันดับ 5 ได้ 1 คะแนน
+        "1": 5, // อันดับ 1 ได้ 5 คะแนนต่อคน
+        "2": 4, // อันดับ 2 ได้ 4 คะแนนต่อคน
+        "3": 3, // อันดับ 3 ได้ 3 คะแนนต่อคน
+        "4": 2, // อันดับ 4 ได้ 2 คะแนนต่อคน
+        "5": 1, // อันดับ 5 ได้ 1 คะแนนต่อคน
       };
 
       // Add points for ranks 1-5 (each rank can have up to 5 contestants)
@@ -131,7 +177,7 @@ export async function POST(request) {
           );
           if (target) {
             target.votes = (Number(target.votes) || 0) + weight;
-            if (!target.rankVotes) target.rankVotes = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            if (!target.rankVotes) target.rankVotes = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
             target.rankVotes[rankStr] = (target.rankVotes[rankStr] || 0) + 1;
           }
         });
@@ -148,28 +194,17 @@ export async function POST(request) {
         }
       }
 
-      // Recalculate percent across all candidates
-      const totalVotes = current.reduce((sum, item) => sum + (Number(item.votes) || 0), 0);
-      if (totalVotes > 0) {
-        current = current.map((item) => {
-          const v = Number(item.votes) || 0;
-          const pct = ((v / totalVotes) * 100).toFixed(2);
-          return {
-            ...item,
-            percent: `${pct}%`,
-          };
-        });
-      }
+      // Recalculate percent using 70% votes + 30% What-If formula
+      current = computePollPercentages(current);
 
-      // Sort by votes descending
-      current.sort((a, b) => (Number(b.votes) || 0) - (Number(a.votes) || 0));
+      // Sort by percent descending
+      current.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
       current = current.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
 
       await saveKVData("fpt_trial_poll", current, writeLocalPoll);
       return NextResponse.json({
         success: true,
         data: current,
-        totalVotes,
         message: "บันทึกผลการโหวตของคุณเรียบร้อยแล้ว!",
       });
     }
@@ -201,22 +236,11 @@ export async function POST(request) {
       const currentVotes = Number(current[targetIndex].votes) || 0;
       current[targetIndex].votes = currentVotes + 1;
 
-      // Recalculate percent across all candidates
-      const totalVotes = current.reduce((sum, item) => sum + (Number(item.votes) || 0), 0);
-      if (totalVotes > 0) {
-        current = current.map((item) => {
-          const v = Number(item.votes) || 0;
-          const pct = ((v / totalVotes) * 100).toFixed(2);
-          return {
-            ...item,
-            percent: `${pct}%`,
-          };
-        });
-      }
+      // Recalculate percent using 70% votes + 30% What-If formula
+      current = computePollPercentages(current);
 
-      // If user requested automatic rank update based on votes
       if (body.autoSort) {
-        current.sort((a, b) => (Number(b.votes) || 0) - (Number(a.votes) || 0));
+        current.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
         current = current.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
       }
 
@@ -225,7 +249,6 @@ export async function POST(request) {
         success: true,
         data: current,
         votedCandidate: current[targetIndex],
-        totalVotes,
         message: `โหวตให้ ${current[targetIndex].nickname || current[targetIndex].name} สำเร็จ!`,
       });
     }
@@ -249,7 +272,9 @@ export async function POST(request) {
         topic: String(body.topic || "-").trim(),
         percent: String(body.percent || "0.00%").trim(),
         votes: Number(body.votes) || 0,
+        whatIfScore: 0,
         championVotes: 0,
+        rankVotes: { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
         image: body.image || "",
       };
       current.push(newItem);

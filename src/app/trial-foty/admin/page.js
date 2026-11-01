@@ -240,18 +240,38 @@ export default function TrialAdminPage() {
 
   const handleAutoCalculatePercent = () => {
     const totalVotes = pollItems.reduce((sum, it) => sum + (Number(it.votes) || 0), 0);
-    if (totalVotes === 0) {
-      showToast("ยังไม่มียอดคะแนนโหวตในตารางโพลล์", "info");
+    const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
+
+    if (totalVotes === 0 && totalWhatIf === 0) {
+      showToast("ยังไม่มีคะแนนโหวตหรือคะแนนรอบอุ่นเครื่องในระบบ", "info");
       return;
     }
-    setPollItems((prev) =>
-      prev.map((item) => {
+
+    setPollItems((prev) => {
+      const computed = prev.map((item) => {
         const v = Number(item.votes) || 0;
-        const pct = ((v / totalVotes) * 100).toFixed(2);
-        return { ...item, percent: `${pct}%` };
-      })
-    );
-    showToast(`คำนวณ % จากยอดโหวตทั้งหมด ${totalVotes.toLocaleString()} โหวต เรียบร้อยแล้ว`);
+        const w = Number(item.whatIfScore) || 0;
+
+        let finalPct = 0;
+        if (totalVotes > 0 && totalWhatIf > 0) {
+          const voteShare = (v / totalVotes) * 100;
+          const whatIfShare = (w / totalWhatIf) * 100;
+          finalPct = voteShare * 0.7 + whatIfShare * 0.3;
+        } else if (totalVotes > 0) {
+          finalPct = (v / totalVotes) * 100;
+        } else if (totalWhatIf > 0) {
+          finalPct = (w / totalWhatIf) * 100;
+        }
+
+        return { ...item, percent: `${finalPct.toFixed(2)}%` };
+      });
+
+      // Sort by percent descending
+      computed.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
+      return computed.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
+    });
+
+    showToast("คำนวณ % โพลล์ (โหวต 70% + What If 30%) และจัดอันดับเรียบร้อยแล้ว");
   };
 
   const handleAutoSortByVotes = () => {
@@ -2291,7 +2311,7 @@ export default function TrialAdminPage() {
                   </h2>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: 0, lineHeight: "1.6" }}>
                     ตารางนี้จะแสดงบนหน้าตารางคะแนน (/trial-foty) และหน้าโหวต (/trial-foty/vote)<br />
-                    คุณสามารถกดปุ่ม <strong style={{ color: "#00e5ff" }}>⬆️ / ⬇️</strong> เพื่อสลับอันดับ แก้ไขคะแนนโหวต หรือกดคำนวณ % อัตโนมัติ แล้วกด <strong>"บันทึกผลโพลล์ทั้งหมด"</strong>
+                    💡 <strong>สูตรคะแนนโพลล์:</strong> คะแนนโหวตมหาชน (70%) + คะแนนรอบอุ่นเครื่อง What If? (30% เต็ม 100)<br />คุณสามารถใส่คะแนน What If?, แก้ไขคะแนนโหวต หรือกดปุ่ม <strong>"🧮 คำนวณ % โพลล์"</strong> แล้วกด <strong>"บันทึกผลโพลล์ทั้งหมด"</strong>
                   </p>
                 </div>
 
@@ -2320,21 +2340,22 @@ export default function TrialAdminPage() {
                     type="button"
                     onClick={handleAutoCalculatePercent}
                     style={{
-                      padding: "10px 14px",
+                      padding: "10px 16px",
                       borderRadius: "8px",
-                      background: "rgba(0, 229, 255, 0.12)",
-                      border: "1px solid rgba(0, 229, 255, 0.4)",
-                      color: "#67e8f9",
+                      background: "linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(255, 215, 0, 0.2) 100%)",
+                      border: "1.5px solid #ffd700",
+                      color: "#ffd700",
                       fontSize: "13px",
-                      fontWeight: "700",
+                      fontWeight: "800",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       gap: "6px",
+                      boxShadow: "0 0 12px rgba(255, 215, 0, 0.25)",
                     }}
-                    title="คำนวณสัดส่วน % จากยอดโหวตของทุกคน"
+                    title="คำนวณเปอร์เซ็นต์โพลล์ตามสูตร: โหวตมหาชน 70% + รอบอุ่นเครื่อง (What If?) 30%"
                   >
-                    🧮 คำนวณ % จากยอดโหวต
+                    🧮 คำนวณ % โพลล์ (โหวต 70% + What If 30%)
                   </button>
 
                   <button
@@ -2454,8 +2475,11 @@ export default function TrialAdminPage() {
                     <th rowSpan={2} style={{ padding: "10px 10px", textAlign: "left", minWidth: "140px", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "110px", color: "#80d0ff" }}>ชื่อเล่น</th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", minWidth: "150px", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
+                    <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "95px", color: "#ffd700", fontWeight: "900", background: "rgba(255, 215, 0, 0.1)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100) คิดเป็น 30% ของโพลล์">
+                      What If?<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#fef08a" }}>(เต็ม 100)</span>
+                    </th>
                     <th colSpan={6} style={{ padding: "8px", textAlign: "center", color: "#ffd700", background: "rgba(255, 215, 0, 0.12)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)", borderRight: "1px solid rgba(255, 215, 0, 0.3)", fontWeight: "900", fontSize: "13px" }}>
-                      📊 จำนวนคนโหวตแยกอันดับ (Vote Breakdown)
+                      📊 จำนวนคนโหวตแยกอันดับ (Vote Breakdown - 70%)
                     </th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "80px", color: "#67e8f9", fontWeight: "800" }}>คะแนนรวม</th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "85px", color: "#ffd700", fontWeight: "800" }}>คิดเป็น %</th>
@@ -2591,6 +2615,32 @@ export default function TrialAdminPage() {
                               border: "1px solid rgba(0, 229, 255, 0.3)",
                               color: "#67e8f9",
                               fontSize: "13px",
+                            }}
+                          />
+                        </td>
+
+                        {/* What If Score Input (เต็ม 100) */}
+                        <td style={{ padding: "6px 4px", textAlign: "center", background: "rgba(255, 215, 0, 0.04)", borderLeft: "1px solid rgba(255, 215, 0, 0.2)" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={item.whatIfScore ?? 0}
+                            onChange={(e) => {
+                              const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                              handlePollFieldChange(index, "whatIfScore", val);
+                            }}
+                            title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100)"
+                            style={{
+                              width: "56px",
+                              padding: "6px 2px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(255, 215, 0, 0.6)",
+                              color: "#ffd700",
+                              fontSize: "13px",
+                              fontWeight: "900",
+                              textAlign: "center",
                             }}
                           />
                         </td>
@@ -2847,7 +2897,7 @@ export default function TrialAdminPage() {
 
                   {pollItems.length === 0 && (
                     <tr>
-                      <td colSpan={15} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.5)" }}>
+                      <td colSpan={16} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.5)" }}>
                         ยังไม่มีข้อมูลในตารางอันดับโพลล์ กดปุ่ม "➕ เพิ่มคนในโพลล์" หรือ "🔄 รีเซ็ตค่าเริ่มต้น" เพื่อเริ่มต้น
                       </td>
                     </tr>
