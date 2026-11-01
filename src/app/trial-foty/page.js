@@ -292,6 +292,7 @@ export default function TrialFOTYPage() {
   const heroColumns = useMemo(() => {
     const list = contestants && contestants.length > 0 ? contestants : [];
     if (list.length === 0) return [[], [], [], [], [], []];
+    const cols = [[], [], [], [], [], []];
     list.forEach((c, idx) => {
       cols[idx % 6].push(c);
     });
