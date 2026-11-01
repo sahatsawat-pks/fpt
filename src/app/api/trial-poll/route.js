@@ -76,6 +76,7 @@ export async function POST(request) {
         topic: String(item.topic || "").trim(),
         percent: String(item.percent || "").trim() || "0.00%",
         votes: Number(item.votes) || 0,
+        championVotes: Number(item.championVotes) || 0,
         image: item.image || "",
       }));
 
@@ -94,7 +95,71 @@ export async function POST(request) {
       current = getDefaultPoll();
     }
 
-    // Vote for a contestant
+    // Ballot vote: 5 ranks + 1 champion
+    if (body.action === "ballot_vote") {
+      const ranks = body.ranks || {}; // { "1": id, "2": id, "3": id, "4": id, "5": id }
+      const championId = body.champion ? String(body.champion) : null;
+
+      const rankWeights = {
+        "1": 5, // อันดับ 1 ได้ 5 คะแนน
+        "2": 4, // อันดับ 2 ได้ 4 คะแนน
+        "3": 3, // อันดับ 3 ได้ 3 คะแนน
+        "4": 2, // อันดับ 4 ได้ 2 คะแนน
+        "5": 1, // อันดับ 5 ได้ 1 คะแนน
+      };
+
+      // Add points for ranks 1-5
+      Object.entries(ranks).forEach(([rankStr, cId]) => {
+        if (!cId) return;
+        const target = current.find(
+          (item) => String(item.id) === String(cId) || String(item.pollRank) === String(cId)
+        );
+        if (target) {
+          const weight = rankWeights[rankStr] || 1;
+          target.votes = (Number(target.votes) || 0) + weight;
+          if (!target.rankVotes) target.rankVotes = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+          target.rankVotes[rankStr] = (target.rankVotes[rankStr] || 0) + 1;
+        }
+      });
+
+      // Add champion vote
+      if (championId) {
+        const champTarget = current.find(
+          (item) => String(item.id) === String(championId) || String(item.pollRank) === String(championId)
+        );
+        if (champTarget) {
+          champTarget.votes = (Number(champTarget.votes) || 0) + 5; // เพิ่ม 5 คะแนนพิเศษสำหรับตำแหน่งแชมป์
+          champTarget.championVotes = (Number(champTarget.championVotes) || 0) + 1;
+        }
+      }
+
+      // Recalculate percent across all candidates
+      const totalVotes = current.reduce((sum, item) => sum + (Number(item.votes) || 0), 0);
+      if (totalVotes > 0) {
+        current = current.map((item) => {
+          const v = Number(item.votes) || 0;
+          const pct = ((v / totalVotes) * 100).toFixed(2);
+          return {
+            ...item,
+            percent: `${pct}%`,
+          };
+        });
+      }
+
+      // Sort by votes descending
+      current.sort((a, b) => (Number(b.votes) || 0) - (Number(a.votes) || 0));
+      current = current.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
+
+      await saveKVData("fpt_trial_poll", current, writeLocalPoll);
+      return NextResponse.json({
+        success: true,
+        data: current,
+        totalVotes,
+        message: "บันทึกผลการโหวตของคุณเรียบร้อยแล้ว!",
+      });
+    }
+
+    // Single Vote for a contestant (backward compatibility)
     if (body.action === "vote") {
       const candidateId = body.id ? String(body.id) : null;
       const candidateName = body.name ? String(body.name).trim() : null;
@@ -169,6 +234,7 @@ export async function POST(request) {
         topic: String(body.topic || "-").trim(),
         percent: String(body.percent || "0.00%").trim(),
         votes: Number(body.votes) || 0,
+        championVotes: 0,
         image: body.image || "",
       };
       current.push(newItem);
