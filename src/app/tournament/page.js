@@ -1630,7 +1630,7 @@ export default function TournamentPage() {
             {selectedContestant.topics && selectedContestant.topics.length > 0 && (
               <div style={{ marginBottom: "24px" }}>
                 <div style={{ fontSize: "15px", fontWeight: "900", color: "#ffd700", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>📚</span> หัวข้อประจำตัวและสถิติชุดข้อสอบ
+                  <span>📚</span> หัวข้อประจำตัวและสถิติในแต่ละชุด
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   {selectedContestant.topics.map((t, idx) => (

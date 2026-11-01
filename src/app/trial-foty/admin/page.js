@@ -2880,7 +2880,7 @@ export default function TrialAdminPage() {
               }}
             >
               <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#00e5ff", margin: "0 0 12px" }}>
-                📊 ข้อมูลสถิติชุดทดสอบ The Trial
+                📊 ข้อมูลสถิติ The Trial Fan of The Year 2026
               </h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", fontSize: "13px" }}>
                 <div style={{ background: "rgba(0, 0, 0, 0.3)", padding: "12px", borderRadius: "8px" }}>
@@ -2894,7 +2894,7 @@ export default function TrialAdminPage() {
                   </div>
                 </div>
                 <div style={{ background: "rgba(0, 0, 0, 0.3)", padding: "12px", borderRadius: "8px" }}>
-                  <div style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "11px" }}>คะแนนสูงสุดในชุดทดสอบ:</div>
+                  <div style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "11px" }}>คะแนนสูงสุด:</div>
                   <div style={{ fontSize: "20px", fontWeight: "900", color: "#ffd700", marginTop: "4px" }}>
                     {Math.max(0, ...contestants.map((c) => c.totalScore || 0))} คะแนน
                   </div>

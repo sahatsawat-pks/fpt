@@ -8,6 +8,7 @@ const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
 const DEFAULT_SETTINGS = {
   gamePassword: "fanpantae_2026",
   adminPassword: "admin_fan_2026",
+  trialAdminPassword: "trial_admin_2026",
   totalContestants: 22,
   protectHome: false,
   homePassword: "",
@@ -62,6 +63,7 @@ export async function GET(request) {
       success: true,
       gamePassword: settings.gamePassword || "fanpantae_2026",
       adminPassword: settings.adminPassword || "admin_fan_2026",
+      trialAdminPassword: settings.trialAdminPassword || "trial_admin_2026",
       totalContestants: settings.totalContestants || 22,
       protectHome: Boolean(settings.protectHome),
       homePassword: settings.homePassword || "",
@@ -112,6 +114,15 @@ export async function POST(request) {
       return NextResponse.json({ success: true, valid: match });
     }
 
+    // Verify trial admin password action
+    if (body.action === "verify_trial_admin") {
+      const inputPass = String(body.password || "").trim();
+      const match =
+        inputPass === String(current.trialAdminPassword || "trial_admin_2026").trim() ||
+        inputPass === String(current.adminPassword || "admin_fan_2026").trim();
+      return NextResponse.json({ success: true, valid: match });
+    }
+
     // Verify home password action
     if (body.action === "verify_home") {
       if (!current.protectHome) {
@@ -157,6 +168,9 @@ export async function POST(request) {
       }
       if (body.adminPassword !== undefined && body.adminPassword.trim() !== "") {
         newSettings.adminPassword = body.adminPassword.trim();
+      }
+      if (body.trialAdminPassword !== undefined && body.trialAdminPassword.trim() !== "") {
+        newSettings.trialAdminPassword = body.trialAdminPassword.trim();
       }
       if (body.totalContestants !== undefined) {
         const n = parseInt(body.totalContestants, 10);
@@ -211,6 +225,7 @@ export async function POST(request) {
         settings: {
           gamePassword: newSettings.gamePassword,
           adminPassword: newSettings.adminPassword,
+          trialAdminPassword: newSettings.trialAdminPassword,
           totalContestants: newSettings.totalContestants,
           protectHome: newSettings.protectHome,
           homePassword: newSettings.homePassword,
