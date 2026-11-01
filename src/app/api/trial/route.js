@@ -86,16 +86,20 @@ export async function POST(req) {
 
     // 5. Add contestant slot
     if (body.action === "add_slot" || body.action === "add_contestant") {
-      const newId = String(Date.now());
+      const maxId = data.reduce((max, c) => {
+        const num = Number(c.id);
+        return !isNaN(num) && num < 1000000 ? Math.max(max, num) : max;
+      }, 0);
+      const newId = String(maxId + 1);
       const newSlot = {
         id: newId,
-        name: body.name || `ผู้เข้าแข่งขัน ${data.length + 1}`,
+        name: body.name || `ผู้เข้าแข่งขัน ${newId}`,
         nickname: body.nickname || "",
         topic: body.topic || "ไม่ระบุหัวข้อ",
         image: body.image || body.photo || "",
         scores: { "3sec": null, qa: null, jigsaw: null, attribute: null },
         totalScore: 0,
-        order: body.order ? Number(body.order) : (data.length + 1),
+        order: body.order ? Number(body.order) : Number(newId),
         isPlaying: false,
         waitingNextMatch: false,
         createdAt: new Date().toISOString(),
