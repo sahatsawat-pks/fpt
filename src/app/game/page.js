@@ -3081,8 +3081,9 @@ export default function Home() {
                 <div style={{
                   marginTop: "16px",
                   padding: "10px 16px",
-                  background: "rgba(233,69,96,0.15)",
-                  border: "1px solid rgba(233,69,96,0.3)",
+                  background: "rgba(0, 229, 255, 0.12)",
+                  border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                  boxShadow: "0 0 15px rgba(0, 229, 255, 0.15)",
                   borderRadius: "8px",
                   display: "flex",
                   justifyContent: "space-between",
