@@ -15,18 +15,28 @@ function getOptimizedImageUrl(src, targetSize = 120) {
   return s;
 }
 
-function AdminPhotoPreview({ src, name, size = 44 }) {
+function AdminPhotoPreview({ src, name, size = 36 }) {
   const [err, setErr] = useState(false);
-  useEffect(() => { setErr(false); }, [src]);
-  const clean = getOptimizedImageUrl(src, size * 2);
+  useEffect(() => {
+    setErr(false);
+  }, [src]);
+  let clean = (src || "").trim().split("?authuser=")[0];
+  if (clean.startsWith("http://")) {
+    clean = clean.replace("http://", "https://");
+  }
+  if (clean.includes("googleusercontent.com") && clean.includes("=")) {
+    clean = `${clean.split("=")[0]}=s${Math.min(Math.max(size * 2, 72), 300)}-c`;
+  }
   if (!clean || err) {
-    return <span style={{ fontSize: `${Math.round(size * 0.45)}px`, opacity: 0.6 }}>👤</span>;
+    return <span style={{ fontSize: `${Math.round(size * 0.42)}px`, opacity: 0.6 }}>👤</span>;
   }
   return (
     <img
+      key={clean}
       src={clean}
       alt={name || ""}
       loading="lazy"
+      decoding="async"
       referrerPolicy="no-referrer"
       onError={() => setErr(true)}
       style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -40,30 +50,52 @@ export default function TrialAdminPage() {
   const [activeTab, setActiveTab] = useState("scoring"); // 'scoring' | 'contestants' | 'settings'
   const [toast, setToast] = useState(null); // { message, type }
 
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 3500);
+  };
+
   // ── Scoring Session States ──────────────────────────────────────────────────
   const [selectedContestantId, setSelectedContestantId] = useState("");
-  const [activeScores, setActiveScores] = useState({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
+  const [activeContestant, setActiveContestant] = useState(null);
+  const [activeScores, setActiveScores] = useState({
+    "3sec": "",
+    qa: "",
+    jigsaw: "",
+    attribute: "",
+  });
   const [orderInput, setOrderInput] = useState("");
-  const [isPlayingInput, setIsPlayingInput] = useState(false);
-  const [waitingInput, setWaitingInput] = useState(false);
   const [isSavingScore, setIsSavingScore] = useState(false);
+  const [scoringNotice, setScoringNotice] = useState("");
 
-  // Custom Rich Dropdown
+  // Custom Dropdown State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownSearch, setDropdownSearch] = useState("");
   const dropdownRef = useRef(null);
 
-  // ── Contestants Manager States ──────────────────────────────────────────────
+  // ── Contestants Tab States ──────────────────────────────────────────────────
   const [contestantSearch, setContestantSearch] = useState("");
-  const [editingContestant, setEditingContestant] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newContestant, setNewContestant] = useState({ name: "", nickname: "", topic: "", image: "", order: "" });
+  const [contestantFilter, setContestantFilter] = useState("all"); // 'all' | 'withPhoto' | 'noPhoto' | 'hasScores'
+  const [quickPhotos, setQuickPhotos] = useState({});
+  const [savingQuickPhotoId, setSavingQuickPhotoId] = useState(null);
 
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
-  };
+  // Modal States
+  const [showContestantModal, setShowContestantModal] = useState(false);
+  const [modalMode, setModalMode] = useState("add"); // 'add' | 'edit'
+  const [formData, setFormData] = useState({
+    id: "",
+    name: "",
+    nickname: "",
+    topic: "",
+    image: "",
+    order: "",
+  });
 
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  // Fetch contestants from API
   const fetchContestants = async () => {
     try {
       setLoading(true);
@@ -83,21 +115,32 @@ export default function TrialAdminPage() {
     fetchContestants();
   }, []);
 
-  // Close dropdown on outside click
+  // Sync active contestant when contestants update
   useEffect(() => {
-    const handler = (e) => {
+    if (selectedContestantId && contestants.length > 0) {
+      const found = contestants.find((c) => String(c.id) === String(selectedContestantId));
+      if (found) {
+        setActiveContestant(found);
+      }
+    }
+  }, [contestants, selectedContestantId]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsDropdownOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // When selecting contestant for scoring
+  // When user selects a contestant from dropdown
   const handleSelectContestant = (c) => {
     setSelectedContestantId(c.id);
     setIsDropdownOpen(false);
+    setActiveContestant(c);
     const s = c.scores || {};
     setActiveScores({
       "3sec": s["3sec"] !== null && s["3sec"] !== undefined && s["3sec"] !== "" ? String(s["3sec"]) : "",
@@ -106,28 +149,112 @@ export default function TrialAdminPage() {
       attribute: s.attribute !== null && s.attribute !== undefined && s.attribute !== "" ? String(s.attribute) : "",
     });
     setOrderInput(c.order !== null && c.order !== undefined ? String(c.order) : "");
-    setIsPlayingInput(Boolean(c.isPlaying));
-    setWaitingInput(Boolean(c.waitingNextMatch));
+    setScoringNotice("");
   };
 
-  const selectedContestant = contestants.find((c) => String(c.id) === String(selectedContestantId));
+  // Toggle Playing (On-Air)
+  const handleTogglePlaying = async (contestant) => {
+    if (!contestant) return;
+    try {
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_playing", id: contestant.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        const updated = data.data.find((c) => String(c.id) === String(contestant.id));
+        if (updated) setActiveContestant(updated);
+        showToast(
+          updated?.isPlaying
+            ? `🔴 ${updated.nickname || updated.name} ขึ้นเวทีกำลังแข่งขัน (LIVE)!`
+            : `จบการแข่งขันของ ${contestant.nickname || contestant.name}`,
+          "success"
+        );
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
 
-  const totalScorePreview = ["3sec", "qa", "jigsaw", "attribute"].reduce((sum, key) => {
-    const v = activeScores[key];
-    return sum + (v !== "" && !isNaN(Number(v)) ? Number(v) : 0);
-  }, 0);
+  // Toggle Waiting Next Match
+  const handleToggleWaiting = async (contestant) => {
+    if (!contestant) return;
+    try {
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_waiting", id: contestant.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        const updated = data.data.find((c) => String(c.id) === String(contestant.id));
+        if (updated) setActiveContestant(updated);
+        showToast(
+          updated?.waitingNextMatch
+            ? `⏳ เพิ่ม ${updated.nickname || updated.name} เป็นสถานะรอลุ้นผลในวันแข่งขันถัดไป`
+            : `ปลดสถานะรอลุ้นผลของ ${contestant.nickname || contestant.name}`,
+          "success"
+        );
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
 
-  // Save Score
-  const handleSaveScore = async () => {
-    if (!selectedContestantId) {
-      showToast("กรุณาเลือกผู้เข้าแข่งขันที่ต้องการบันทึกคะแนน", "error");
+  // Save Specific Category Score
+  const handleSaveCategoryScore = async (categoryKey) => {
+    if (!activeContestant) {
+      showToast("กรุณาเลือกผู้เข้าแข่งขันก่อน", "error");
+      return;
+    }
+    const val = activeScores[categoryKey];
+    const newScores = {
+      ...(activeContestant.scores || {}),
+      [categoryKey]: val !== "" && !isNaN(Number(val)) ? Number(val) : null,
+    };
+
+    try {
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_score",
+          id: activeContestant.id,
+          scores: newScores,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        const updated = data.data.find((c) => String(c.id) === String(activeContestant.id));
+        if (updated) setActiveContestant(updated);
+        showToast(`บันทึกคะแนนหมวด ${categoryKey} (${val || 0} คะแนน) สำเร็จ!`, "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการบันทึก", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  // Save All Scores
+  const handleSaveAllScores = async () => {
+    if (!activeContestant) {
+      showToast("กรุณาเลือกผู้เข้าแข่งขันก่อน", "error");
       return;
     }
     setIsSavingScore(true);
     try {
       const payload = {
         action: "update_score",
-        id: selectedContestantId,
+        id: activeContestant.id,
         scores: {
           "3sec": activeScores["3sec"] !== "" ? Number(activeScores["3sec"]) : null,
           qa: activeScores.qa !== "" ? Number(activeScores.qa) : null,
@@ -135,8 +262,6 @@ export default function TrialAdminPage() {
           attribute: activeScores.attribute !== "" ? Number(activeScores.attribute) : null,
         },
         order: orderInput !== "" ? Number(orderInput) : null,
-        isPlaying: isPlayingInput,
-        waitingNextMatch: waitingInput,
       };
 
       const res = await fetch("/api/trial", {
@@ -147,22 +272,140 @@ export default function TrialAdminPage() {
       const data = await res.json();
       if (data.success) {
         setContestants(data.data);
-        showToast(`บันทึกคะแนน ${selectedContestant?.nickname || "ผู้เข้าแข่งขัน"} สำเร็จแล้ว! (${totalScorePreview} คะแนน)`, "success");
+        const updated = data.data.find((c) => String(c.id) === String(activeContestant.id));
+        if (updated) setActiveContestant(updated);
+        showToast(`บันทึกคะแนนทั้งหมดของ ${activeContestant.nickname || activeContestant.name} สำเร็จ! (${activeCalculatedTotal} คะแนน)`, "success");
+        setScoringNotice(`✅ บันทึกคะแนนเรียบร้อย: รวม ${activeCalculatedTotal} คะแนน`);
       } else {
         showToast(data.error || "เกิดข้อผิดพลาดในการบันทึก", "error");
+        setScoringNotice(`❌ ${data.error || "บันทึกไม่สำเร็จ"}`);
       }
     } catch {
       showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+      setScoringNotice("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ");
     } finally {
       setIsSavingScore(false);
     }
   };
 
-  // Reset All Scores
-  const handleResetScores = async () => {
-    if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตคะแนนทั้งหมดของ The Trial FOTY 2026?\n\nคะแนนทุกคนจะกลายเป็น 0 และสถานะรอแข่งใหม่ทั้งหมด")) {
+  // Open Add Contestant Modal
+  const openAddModal = () => {
+    setModalMode("add");
+    setFormData({
+      id: "",
+      name: "",
+      nickname: "",
+      topic: "",
+      image: "",
+      order: String(contestants.length + 1),
+    });
+    setShowContestantModal(true);
+  };
+
+  // Open Edit Contestant Modal
+  const openEditModal = (c) => {
+    setModalMode("edit");
+    setFormData({
+      id: c.id,
+      name: c.name || "",
+      nickname: c.nickname || "",
+      topic: c.topic || "",
+      image: c.image || "",
+      order: c.order !== null && c.order !== undefined ? String(c.order) : "",
+    });
+    setShowContestantModal(true);
+  };
+
+  // Handle Save Contestant from Modal
+  const handleSaveContestant = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        action: modalMode === "add" ? "add_slot" : "update_contestant",
+        id: formData.id,
+        name: formData.name,
+        nickname: formData.nickname,
+        topic: formData.topic,
+        image: formData.image,
+        order: formData.order !== "" ? Number(formData.order) : null,
+      };
+
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        setShowContestantModal(false);
+        showToast(modalMode === "add" ? "เพิ่มผู้เข้าแข่งขันเรียบร้อยแล้ว!" : "อัปเดตข้อมูลผู้เข้าแข่งขันเรียบร้อยแล้ว!", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  // Quick Save Photo from Contestants Table
+  const handleQuickSavePhoto = async (c) => {
+    const newUrl = quickPhotos[c.id];
+    if (newUrl === undefined) return;
+    setSavingQuickPhotoId(c.id);
+    try {
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_contestant",
+          id: c.id,
+          image: newUrl.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        showToast(`บันทึกรูปภาพของ ${c.nickname || c.name} สำเร็จ!`, "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    } finally {
+      setSavingQuickPhotoId(null);
+    }
+  };
+
+  // Delete Contestant
+  const handleDeleteContestant = async (c) => {
+    if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบ "${c.nickname ? `${c.nickname} (${c.name})` : c.name}" ออกจากระบบ?`)) {
       return;
     }
+    try {
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_slot", id: c.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        if (String(selectedContestantId) === String(c.id)) {
+          setSelectedContestantId("");
+          setActiveContestant(null);
+        }
+        showToast(`ลบ "${c.name}" เรียบร้อยแล้ว`, "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
+  // Reset All Scores
+  const handleResetScores = async () => {
     try {
       const res = await fetch("/api/trial", {
         method: "POST",
@@ -173,39 +416,11 @@ export default function TrialAdminPage() {
       if (data.success) {
         setContestants(data.data);
         setSelectedContestantId("");
+        setActiveContestant(null);
         setActiveScores({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
         setOrderInput("");
-        setIsPlayingInput(false);
-        setWaitingInput(false);
-        showToast("รีเซ็ตคะแนนทั้งหมดเรียบร้อยแล้ว", "success");
-      } else {
-        showToast(data.error || "เกิดข้อผิดพลาด", "error");
-      }
-    } catch {
-      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
-    }
-  };
-
-  // Reset to Clean Blank Slots
-  const handleResetBlankSlots = async () => {
-    if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการสร้างช่องว่างผู้เข้าแข่งขันใหม่สำหรับ The Trial FOTY (งุ่นง่าน 2026)?\n\nระบบจะล้างรายชื่อเก่าออก และสร้าง Slot ว่างสำหรับใส่ชื่อเล่น, ชื่อจริง, หัวข้อ และรูปภาพ Google Photos")) {
-      return;
-    }
-    try {
-      const res = await fetch("/api/trial", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reset_blank_slots", count: 20 }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setContestants(data.data);
-        setSelectedContestantId("");
-        setActiveScores({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
-        setOrderInput("");
-        setIsPlayingInput(false);
-        setWaitingInput(false);
-        showToast("รีเซ็ตเป็นช่องว่างผู้เข้าแข่งขันใหม่เรียบร้อยแล้ว", "success");
+        setShowResetModal(false);
+        showToast("รีเซ็ตคะแนนทั้งหมดเป็น 0 เรียบร้อยแล้ว (รายชื่อและรูปยังคงอยู่)", "success");
       } else {
         showToast(data.error || "เกิดข้อผิดพลาด", "error");
       }
@@ -229,10 +444,9 @@ export default function TrialAdminPage() {
       if (data.success) {
         setContestants(data.data);
         setSelectedContestantId("");
+        setActiveContestant(null);
         setActiveScores({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
         setOrderInput("");
-        setIsPlayingInput(false);
-        setWaitingInput(false);
         showToast("รีโหลดรายชื่อ 39 คนตั้งต้นเรียบร้อยแล้ว", "success");
       } else {
         showToast(data.error || "เกิดข้อผิดพลาด", "error");
@@ -242,79 +456,24 @@ export default function TrialAdminPage() {
     }
   };
 
-  // Save Contestant Edit
-  const handleSaveEditContestant = async (e) => {
-    e.preventDefault();
-    if (!editingContestant) return;
-    try {
-      const res = await fetch("/api/trial", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "update_contestant",
-          id: editingContestant.id,
-          name: editingContestant.name,
-          nickname: editingContestant.nickname,
-          topic: editingContestant.topic,
-          image: editingContestant.image,
-          order: editingContestant.order !== "" && editingContestant.order !== null ? Number(editingContestant.order) : null,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setContestants(data.data);
-        setEditingContestant(null);
-        showToast("อัปเดตข้อมูลผู้เข้าแข่งขันเรียบร้อยแล้ว", "success");
-      } else {
-        showToast(data.error || "เกิดข้อผิดพลาด", "error");
-      }
-    } catch {
-      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
-    }
-  };
-
-  // Add Contestant Slot
-  const handleAddContestant = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("/api/trial", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "add_slot",
-          ...newContestant,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setContestants(data.data);
-        setShowAddModal(false);
-        setNewContestant({ name: "", nickname: "", topic: "", image: "", order: "" });
-        showToast("เพิ่มผู้เข้าแข่งขันเรียบร้อยแล้ว", "success");
-      } else {
-        showToast(data.error || "เกิดข้อผิดพลาด", "error");
-      }
-    } catch {
-      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
-    }
-  };
-
-  // Delete Contestant Slot
-  const handleDeleteContestant = async (id, name) => {
-    if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบผู้เข้าแข่งขัน "${name}" ออกจาก Trial Leaderboard?`)) {
+  // Reset to 20 Blank Slots
+  const handleResetBlankSlots = async () => {
+    if (!confirm("⚠️ ต้องการล้างและรีเซ็ตเป็นช่องว่าง 20 คนสำหรับกรอกข้อมูลใหม่?")) {
       return;
     }
     try {
       const res = await fetch("/api/trial", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete_slot", id }),
+        body: JSON.stringify({ action: "reset_blank_slots", count: 20 }),
       });
       const data = await res.json();
       if (data.success) {
         setContestants(data.data);
-        if (selectedContestantId === id) setSelectedContestantId("");
-        showToast(`ลบ "${name}" เรียบร้อยแล้ว`, "success");
+        setSelectedContestantId("");
+        setActiveContestant(null);
+        setActiveScores({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
+        showToast("รีเซ็ตเป็นช่องว่าง 20 คนเรียบร้อยแล้ว", "success");
       } else {
         showToast(data.error || "เกิดข้อผิดพลาด", "error");
       }
@@ -323,320 +482,408 @@ export default function TrialAdminPage() {
     }
   };
 
-  const categories = [
-    { key: "3sec", label: "3 วินาที", icon: "⏱️", color: "#52c41a" },
-    { key: "qa", label: "ถาม-ตอบ", icon: "❓", color: "#d9d9d9" },
-    { key: "jigsaw", label: "จิ๊กซอว์", icon: "🧩", color: "#ff4d4f" },
-    { key: "attribute", label: "คุณสมบัติ", icon: "🔍", color: "#00e5ff" },
-  ];
+  // Calculated Active Total Score
+  const activeCalculatedTotal = ["3sec", "qa", "jigsaw", "attribute"].reduce((sum, key) => {
+    const v = activeScores[key];
+    return sum + (v !== "" && !isNaN(Number(v)) ? Number(v) : 0);
+  }, 0);
+
+  // Contestant filter counts
+  const withPhotoCount = contestants.filter((c) => Boolean(c.image)).length;
+  const noPhotoCount = contestants.filter((c) => !c.image).length;
+  const hasScoreCount = contestants.filter((c) => (c.totalScore ?? 0) > 0).length;
+
+  const filteredContestants = contestants.filter((c) => {
+    if (contestantFilter === "withPhoto" && !c.image) return false;
+    if (contestantFilter === "noPhoto" && c.image) return false;
+    if (contestantFilter === "hasScores" && (!c.totalScore || c.totalScore === 0)) return false;
+
+    if (contestantSearch.trim()) {
+      const q = contestantSearch.trim().toLowerCase();
+      const matchName = (c.name || "").toLowerCase().includes(q);
+      const matchNick = (c.nickname || "").toLowerCase().includes(q);
+      const matchTopic = (c.topic || "").toLowerCase().includes(q);
+      if (!matchName && !matchNick && !matchTopic) return false;
+    }
+    return true;
+  });
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #030a16 0%, #051428 50%, #020813 100%)",
-      color: "#ffffff",
-      fontFamily: "system-ui, -apple-system, sans-serif",
-      padding: "24px 16px 80px"
-    }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "radial-gradient(ellipse at top center, #0f2744 0%, #07101f 60%, #02050a 100%)",
+        color: "#ffffff",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Noto Sans Thai', sans-serif)",
+      }}
+    >
       {/* Toast Notification */}
       {toast && (
-        <div style={{
-          position: "fixed",
-          top: "24px",
-          right: "24px",
-          zIndex: 9999,
-          padding: "12px 22px",
-          borderRadius: "12px",
-          background: toast.type === "error" ? "rgba(220, 38, 38, 0.95)" : "rgba(16, 185, 129, 0.95)",
-          color: "#ffffff",
-          fontWeight: "800",
-          fontSize: "14px",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          backdropFilter: "blur(10px)",
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "24px",
+            right: "24px",
+            zIndex: 9999,
+            padding: "12px 22px",
+            borderRadius: "12px",
+            background: toast.type === "error" ? "rgba(220, 38, 38, 0.95)" : "rgba(16, 185, 129, 0.95)",
+            color: "#ffffff",
+            fontWeight: "800",
+            fontSize: "14px",
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            backdropFilter: "blur(10px)",
+          }}
+        >
           <span>{toast.type === "error" ? "❌" : "✅"}</span>
           <span>{toast.message}</span>
         </div>
       )}
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Top Header Card */}
-        <div style={{
-          background: "linear-gradient(135deg, rgba(0, 229, 255, 0.12) 0%, rgba(3, 15, 30, 0.85) 100%)",
-          border: "1.5px solid rgba(0, 229, 255, 0.4)",
-          borderRadius: "20px",
-          padding: "24px 28px",
-          marginBottom: "24px",
-          boxShadow: "0 10px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 229, 255, 0.15)",
+      {/* ========================================================
+          1. TOP NAVIGATION HEADER (Matching Main Admin Exactly)
+         ======================================================== */}
+      <header
+        style={{
+          background: "rgba(5, 15, 30, 0.95)",
+          borderBottom: "1px solid rgba(0, 229, 255, 0.25)",
+          backdropFilter: "blur(10px)",
+          padding: "14px 24px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: "18px"
-        }}>
-          <div>
-            <div style={{
-              display: "inline-block",
-              padding: "4px 12px",
-              borderRadius: "20px",
-              background: "rgba(0, 229, 255, 0.2)",
-              border: "1px solid #00e5ff",
-              color: "#00e5ff",
-              fontSize: "12px",
-              fontWeight: "900",
-              letterSpacing: "2px",
-              marginBottom: "8px"
-            }}>
-              THE TRIAL FAN OF THE YEAR 2026
-            </div>
-            <h1 style={{
-              fontSize: "26px",
-              fontWeight: "900",
-              margin: 0,
-              background: "linear-gradient(90deg, #ffffff 0%, #80d0ff 60%, #00e5ff 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
-            }}>
-              🛠️ ระบบจัดการคะแนนและการแข่งขัน (Admin Manager)
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <Link href="/trial-foty" title="ไปที่ตารางคะแนนแข่งขัน">
+            <img
+              src="/img/logo.png"
+              alt="Fanpantae 2026"
+              style={{
+                height: "36px",
+                width: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
+              }}
+            />
+          </Link>
+          <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "12px" }}>
+            <h1 style={{ fontSize: "16px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
+              ห้องควบคุมแอดมิน • งุ่นง่าน Of The Year 2026
             </h1>
-            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "rgba(255, 255, 255, 0.65)" }}>
-              งุ่นง่าน Of The Year 2026 • บันทึกคะแนนสด จัดการรายชื่อ และอัปเดตรูปภาพ Google Photos
+            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+              THE TRIAL FAN OF THE YEAR 2026 ADMIN ROOM
             </p>
           </div>
-
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            <Link
-              href="/trial-foty"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "10px 20px",
-                borderRadius: "12px",
-                background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                color: "#030814",
-                fontWeight: "900",
-                fontSize: "14px",
-                textDecoration: "none",
-                boxShadow: "0 0 20px rgba(0, 229, 255, 0.4)",
-                transition: "all 0.2s"
-              }}
-            >
-              <span>🏆</span> ดูตารางคะแนน (/trial-foty)
-            </Link>
-            <button
-              onClick={fetchContestants}
-              style={{
-                padding: "10px 16px",
-                borderRadius: "12px",
-                background: "rgba(255, 255, 255, 0.08)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                color: "#ffffff",
-                fontWeight: "700",
-                fontSize: "13px",
-                cursor: "pointer"
-              }}
-            >
-              🔄 รีเฟรชข้อมูล
-            </button>
-          </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div style={{
-          display: "flex",
-          gap: "10px",
-          marginBottom: "24px",
-          borderBottom: "1px solid rgba(0, 229, 255, 0.2)",
-          paddingBottom: "12px",
-          flexWrap: "wrap"
-        }}>
-          {[
-            { id: "scoring", label: "🎮 บันทึกคะแนนการแข่งขัน (Live Scoring)", icon: "🎯" },
-            { id: "contestants", label: `👥 จัดการรายชื่อ & รูปภาพ (${contestants.length} คน)`, icon: "👤" },
-            { id: "settings", label: "⚙️ จัดการระบบ & รีเซ็ตคะแนน", icon: "🔄" },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "12px",
-                  background: isActive ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)" : "rgba(0, 15, 30, 0.6)",
-                  color: isActive ? "#030814" : "#80d0ff",
-                  border: isActive ? "1px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.25)",
-                  fontSize: "14px",
-                  fontWeight: "800",
-                  cursor: "pointer",
-                  boxShadow: isActive ? "0 0 18px rgba(0, 229, 255, 0.4)" : "none",
-                  transition: "all 0.2s"
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <Link
+            href="/trial-foty"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(0, 229, 255, 0.15)",
+              color: "#00e5ff",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(0, 229, 255, 0.4)",
+              fontWeight: "700",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            📊 ดูตารางคะแนน (/trial-foty)
+          </Link>
+
+          <Link
+            href="/"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255,255,255,0.06)",
+              color: "#80d0ff",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(0, 229, 255, 0.3)",
+            }}
+          >
+            🏠 หน้าหลักเว็บ
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setShowResetModal(true)}
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(239, 68, 68, 0.2)",
+              color: "#fca5a5",
+              fontSize: "13px",
+              fontWeight: "700",
+              border: "1px solid rgba(239, 68, 68, 0.5)",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            ⚠️ รีเซ็ตคะแนนแข่งขัน
+          </button>
+        </div>
+      </header>
+
+      {/* ========================================================
+          2. MAIN CONTENT CONTAINER & TABS (Matching Main Admin)
+         ======================================================== */}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 20px" }}>
+        {/* Navigation Tabs Bar */}
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
+            marginBottom: "24px",
+            overflowX: "auto",
+          }}
+        >
+          <button
+            onClick={() => setActiveTab("scoring")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "scoring" ? "rgba(0, 229, 255, 0.12)" : "transparent",
+              color: activeTab === "scoring" ? "#00e5ff" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "scoring" ? "2px solid #00e5ff" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            🎯 จัดการคะแนนแข่งขัน (Live Scoring)
+          </button>
+
+          <button
+            onClick={() => setActiveTab("contestants")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "contestants" ? "rgba(0, 229, 255, 0.12)" : "transparent",
+              color: activeTab === "contestants" ? "#00e5ff" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "contestants" ? "2px solid #00e5ff" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            👥 รายชื่อผู้เข้าแข่งขัน & ผูกรูป ({contestants.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("settings")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "settings" ? "rgba(0, 229, 255, 0.12)" : "transparent",
+              color: activeTab === "settings" ? "#00e5ff" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "settings" ? "2px solid #00e5ff" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            ⚙️ ตั้งค่า & ข้อมูลระบบ (Settings & Tools)
+          </button>
         </div>
 
-        {/* ══════════════════════════════════════════════════════════════════════ */}
-        {/* TAB 1: SCORING SESSION                                                */}
-        {/* ══════════════════════════════════════════════════════════════════════ */}
+        {/* ========================================================
+            TAB 1: LIVE SCORING SESSION (Matching Main Admin)
+           ======================================================== */}
         {activeTab === "scoring" && (
           <div>
-            <div style={{
-              background: "rgba(0, 15, 30, 0.85)",
-              border: "1.5px solid rgba(0, 229, 255, 0.35)",
-              borderRadius: "18px",
-              padding: "24px",
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
-              marginBottom: "28px"
-            }}>
-              <h2 style={{
-                fontSize: "18px",
-                fontWeight: "800",
-                color: "#80d0ff",
-                margin: "0 0 20px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px"
-              }}>
-                <span>1️⃣</span> เลือกผู้เข้าแข่งขันและกรอกคะแนน
+            {/* Step 1: Select Contestant Card */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                borderRadius: "16px",
+                padding: "24px",
+                marginBottom: "24px",
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  color: "#80d0ff",
+                  margin: "0 0 16px 0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span>1️⃣ เลือกผู้เข้าแข่งขันที่ต้องการกรอกคะแนน</span>
+                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "normal" }}>
+                  พิมพ์ค้นหาหรือคลิกเลือกจากรายชื่อ {contestants.length} คน
+                </span>
               </h2>
 
-              {/* Contestant Rich Selector Dropdown */}
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "8px", fontWeight: "700" }}>
-                  เลือกผู้เข้าแข่งขัน (คลิกเพื่อค้นหาชื่อ / ชื่อเล่น / หัวข้อ):
-                </label>
-
-                <div ref={dropdownRef} style={{ position: "relative" }}>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                {/* Rich Custom Dropdown */}
+                <div ref={dropdownRef} style={{ position: "relative", flex: 1, minWidth: "280px" }}>
                   <div
-                    onClick={() => {
-                      setIsDropdownOpen(!isDropdownOpen);
-                      setDropdownSearch("");
-                    }}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     style={{
-                      padding: "10px 16px",
-                      borderRadius: "12px",
-                      background: "rgba(0, 10, 22, 0.95)",
-                      border: isDropdownOpen ? "2px solid #00e5ff" : "1.5px solid rgba(0, 229, 255, 0.4)",
-                      boxShadow: isDropdownOpen ? "0 0 20px rgba(0, 229, 255, 0.35)" : "none",
-                      cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      gap: "14px",
-                      minHeight: "60px",
-                      transition: "all 0.2s"
+                      gap: "12px",
+                      padding: "10px 16px",
+                      borderRadius: "10px",
+                      background: "rgba(0, 15, 30, 0.9)",
+                      border: isDropdownOpen ? "1.5px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.4)",
+                      cursor: "pointer",
+                      boxShadow: isDropdownOpen ? "0 0 16px rgba(0, 229, 255, 0.3)" : "none",
+                      transition: "all 0.2s ease",
+                      minHeight: "52px",
+                      boxSizing: "border-box",
                     }}
                   >
-                    {selectedContestant ? (
-                      <div style={{ display: "flex", alignItems: "center", gap: "14px", flex: 1, overflow: "hidden" }}>
-                        {selectedContestant.order && (
-                          <span style={{
+                    {!activeContestant ? (
+                      <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>
+                        -- กรุณาเลือกผู้เข้าแข่งขันที่ต้องการบันทึกคะแนน --
+                      </span>
+                    ) : (
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1, minWidth: 0 }}>
+                        <span
+                          style={{
                             display: "inline-block",
-                            padding: "4px 10px",
-                            borderRadius: "8px",
-                            fontWeight: "900",
-                            fontSize: "12px",
-                            background: "rgba(0, 229, 255, 0.2)",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            background: "rgba(0, 229, 255, 0.15)",
+                            border: "1px solid #00e5ff",
                             color: "#00e5ff",
-                            border: "1px solid rgba(0, 229, 255, 0.5)",
-                            flexShrink: 0
-                          }}>
-                            ลำดับ #{selectedContestant.order}
-                          </span>
-                        )}
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            flexShrink: 0,
+                          }}
+                        >
+                          #{activeContestant.id}
+                        </span>
 
-                        <div style={{
-                          width: "42px",
-                          height: "42px",
-                          borderRadius: "50%",
-                          overflow: "hidden",
-                          border: "2px solid #00e5ff",
-                          background: "rgba(0, 0, 0, 0.4)",
-                          flexShrink: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}>
-                          <AdminPhotoPreview src={selectedContestant.image} name={selectedContestant.name} size={42} />
+                        <div
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "50%",
+                            overflow: "hidden",
+                            background: "#030814",
+                            border: "1.5px solid #00e5ff",
+                            flexShrink: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <AdminPhotoPreview src={activeContestant.image} name={activeContestant.name} size={36} />
                         </div>
 
-                        <div style={{ flex: 1, overflow: "hidden" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                            <span style={{ fontWeight: "900", fontSize: "16px", color: "#ffffff" }}>
-                              {selectedContestant.name}
-                            </span>
-                            {selectedContestant.nickname && (
-                              <span style={{ color: "#ffd700", fontWeight: "800", fontSize: "14px" }}>
-                                ({selectedContestant.nickname})
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <strong style={{ fontSize: "15px", color: "#ffffff" }}>
+                              {activeContestant.nickname || activeContestant.name}
+                            </strong>
+                            {activeContestant.nickname && (
+                              <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                                ({activeContestant.name})
                               </span>
                             )}
                           </div>
-                          <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            หัวข้อ: {selectedContestant.topic}
+                          <div style={{ fontSize: "12px", color: "#67e8f9", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            📌 {activeContestant.topic}
                           </div>
                         </div>
 
-                        <div style={{
-                          padding: "6px 14px",
-                          borderRadius: "10px",
-                          background: "rgba(255, 215, 0, 0.15)",
-                          border: "1px solid #ffd700",
-                          color: "#ffd700",
-                          fontWeight: "900",
-                          fontSize: "14px",
-                          flexShrink: 0
-                        }}>
-                          {Number(selectedContestant.totalScore) || 0} คะแนน
-                        </div>
+                        <span
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: "8px",
+                            background: "rgba(255, 215, 0, 0.15)",
+                            color: "#ffd700",
+                            fontSize: "12px",
+                            fontWeight: "800",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {activeContestant.totalScore ?? 0} คะแนน
+                        </span>
                       </div>
-                    ) : (
-                      <span style={{ color: "rgba(255, 255, 255, 0.45)", fontSize: "15px" }}>
-                        -- กรุณาคลิกเพื่อเลือกผู้เข้าแข่งขัน --
-                      </span>
                     )}
-                    <span style={{
-                      color: "#00e5ff",
-                      fontSize: "14px",
-                      transform: isDropdownOpen ? "rotate(180deg)" : "none",
-                      transition: "transform 0.2s",
-                      flexShrink: 0
-                    }}>
+
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        color: "#00e5ff",
+                        transform: isDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                        transition: "transform 0.2s ease",
+                        flexShrink: 0,
+                      }}
+                    >
                       ▼
                     </span>
                   </div>
 
                   {/* Dropdown Options List */}
                   {isDropdownOpen && (
-                    <div style={{
-                      position: "absolute",
-                      top: "calc(100% + 6px)",
-                      left: 0,
-                      right: 0,
-                      zIndex: 1000,
-                      background: "linear-gradient(160deg, #07162b 0%, #030a14 100%)",
-                      border: "1.5px solid #00e5ff",
-                      borderRadius: "14px",
-                      boxShadow: "0 14px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 229, 255, 0.3)",
-                      maxHeight: "380px",
-                      overflowY: "auto",
-                      backdropFilter: "blur(12px)"
-                    }}>
-                      <div style={{
-                        position: "sticky",
-                        top: 0,
-                        background: "#07162b",
-                        padding: "10px 12px",
-                        borderBottom: "1px solid rgba(0, 229, 255, 0.25)",
-                        zIndex: 10
-                      }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 6px)",
+                        left: 0,
+                        right: 0,
+                        zIndex: 1000,
+                        background: "linear-gradient(160deg, #07162b 0%, #030a14 100%)",
+                        border: "1.5px solid #00e5ff",
+                        borderRadius: "12px",
+                        boxShadow: "0 14px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 229, 255, 0.3)",
+                        maxHeight: "380px",
+                        overflowY: "auto",
+                        backdropFilter: "blur(12px)",
+                      }}
+                    >
+                      {/* Search box inside dropdown */}
+                      <div
+                        style={{
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 10,
+                          background: "#07162b",
+                          padding: "10px 12px",
+                          borderBottom: "1px solid rgba(0, 229, 255, 0.25)",
+                        }}
+                      >
                         <input
                           type="text"
                           value={dropdownSearch}
@@ -652,853 +899,1251 @@ export default function TrialAdminPage() {
                             color: "#ffffff",
                             fontSize: "13px",
                             outline: "none",
-                            boxSizing: "border-box"
+                            boxSizing: "border-box",
                           }}
                         />
                       </div>
 
-                      {contestants.filter((c) => {
+                      {/* Filtered items */}
+                      {(() => {
                         const q = dropdownSearch.trim().toLowerCase();
-                        if (!q) return true;
-                        return (
-                          c.name?.toLowerCase().includes(q) ||
-                          c.nickname?.toLowerCase().includes(q) ||
-                          c.topic?.toLowerCase().includes(q)
-                        );
-                      }).map((c) => {
-                        const isSel = String(c.id) === String(selectedContestantId);
-                        return (
-                          <div
-                            key={c.id}
-                            onClick={() => handleSelectContestant(c)}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "12px",
-                              padding: "12px 14px",
-                              borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-                              background: isSel ? "rgba(0, 229, 255, 0.18)" : "transparent",
-                              cursor: "pointer",
-                              transition: "background 0.15s ease"
-                            }}
-                            onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.background = "rgba(0, 229, 255, 0.08)"; }}
-                            onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.background = "transparent"; }}
-                          >
-                            <div style={{
-                              width: "36px",
-                              height: "36px",
-                              borderRadius: "50%",
-                              overflow: "hidden",
-                              border: "2px solid #00e5ff",
-                              flexShrink: 0,
-                              background: "rgba(0, 0, 0, 0.3)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center"
-                            }}>
-                              <AdminPhotoPreview src={c.image} name={c.name} size={36} />
-                            </div>
+                        const filtered = contestants.filter((c) => {
+                          if (!q) return true;
+                          return (
+                            c.name?.toLowerCase().includes(q) ||
+                            c.nickname?.toLowerCase().includes(q) ||
+                            c.topic?.toLowerCase().includes(q)
+                          );
+                        });
 
-                            <div style={{ flex: 1, overflow: "hidden" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <span style={{ fontWeight: "800", fontSize: "14px", color: "#ffffff" }}>
-                                  {c.name}
-                                </span>
-                                {c.nickname && (
-                                  <span style={{ color: "#ffd700", fontWeight: "700", fontSize: "12px" }}>
-                                    ({c.nickname})
+                        if (filtered.length === 0) {
+                          return (
+                            <div style={{ padding: "20px", textAlign: "center", color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>
+                              ไม่พบผู้เข้าแข่งขันที่ตรงกับการค้นหา
+                            </div>
+                          );
+                        }
+
+                        return filtered.map((c) => {
+                          const isSelected = String(c.id) === String(selectedContestantId);
+                          return (
+                            <div
+                              key={c.id}
+                              onClick={() => handleSelectContestant(c)}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                                padding: "10px 14px",
+                                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                background: isSelected ? "rgba(0, 229, 255, 0.18)" : "transparent",
+                                cursor: "pointer",
+                                transition: "background 0.15s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) e.currentTarget.style.background = "rgba(0, 229, 255, 0.1)";
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) e.currentTarget.style.background = "transparent";
+                              }}
+                            >
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  minWidth: "36px",
+                                  textAlign: "center",
+                                  padding: "3px 6px",
+                                  borderRadius: "6px",
+                                  fontWeight: "900",
+                                  fontSize: "11px",
+                                  background: "rgba(0, 229, 255, 0.12)",
+                                  color: "#67e8f9",
+                                  border: "1px solid rgba(0, 229, 255, 0.3)",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                #{c.id}
+                              </span>
+
+                              <div
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "50%",
+                                  overflow: "hidden",
+                                  background: "#030814",
+                                  border: c.image ? "1.5px solid #52c41a" : "1px solid rgba(0, 229, 255, 0.4)",
+                                  flexShrink: 0,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <AdminPhotoPreview src={c.image} name={c.name} size={36} />
+                              </div>
+
+                              <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <span style={{ fontWeight: "700", fontSize: "14px", color: isSelected ? "#00e5ff" : "#ffffff" }}>
+                                    {c.nickname ? `${c.nickname} (${c.name})` : c.name}
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {c.topic}
+                                </div>
+                              </div>
+
+                              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#ffd700" }}>
+                                  {c.totalScore ?? 0} คะแนน
+                                </div>
+                                {isSelected && (
+                                  <span style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "800" }}>
+                                    ✓ กำลังเลือก
                                   </span>
                                 )}
                               </div>
-                              <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                {c.topic}
-                              </div>
                             </div>
-
-                            <span style={{
-                              fontSize: "12px",
-                              fontWeight: "800",
-                              color: (Number(c.totalScore) || 0) > 0 ? "#ffd700" : "rgba(255, 255, 255, 0.35)",
-                              flexShrink: 0
-                            }}>
-                              {Number(c.totalScore) || 0} คะแนน
-                            </span>
-                          </div>
-                        );
-                      })}
+                          );
+                        });
+                      })()}
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Active Contestant Form */}
-              {selectedContestant ? (
-                <div>
-                  {/* Status & Order Row */}
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                    gap: "14px",
-                    marginBottom: "22px",
-                    background: "rgba(0, 10, 22, 0.6)",
-                    padding: "16px",
-                    borderRadius: "12px",
-                    border: "1px solid rgba(0, 229, 255, 0.2)"
-                  }}>
-                    <div>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "6px", fontWeight: "700" }}>
-                        ลำดับการแข่งขัน (Order):
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={orderInput}
-                        onChange={(e) => setOrderInput(e.target.value)}
-                        placeholder="เช่น 1, 2, 3..."
-                        style={{
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: "8px",
-                          background: "#030a14",
-                          border: "1px solid rgba(0, 229, 255, 0.4)",
-                          color: "#ffffff",
-                          fontSize: "14px",
-                          fontWeight: "800",
-                          boxSizing: "border-box",
-                          outline: "none"
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "6px", fontWeight: "700" }}>
-                        สถานะการแข่งขันสด:
-                      </label>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsPlayingInput(!isPlayingInput);
-                            if (!isPlayingInput) setWaitingInput(false);
-                          }}
-                          style={{
-                            flex: 1,
-                            padding: "10px 8px",
-                            borderRadius: "8px",
-                            background: isPlayingInput ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)" : "rgba(0, 15, 30, 0.8)",
-                            color: isPlayingInput ? "#030814" : "#80d0ff",
-                            border: isPlayingInput ? "1px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.3)",
-                            fontSize: "12px",
-                            fontWeight: "800",
-                            cursor: "pointer"
-                          }}
-                        >
-                          {isPlayingInput ? "🎯 กำลังแข่ง (ON)" : "⬜ กำลังแข่ง"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setWaitingInput(!waitingInput);
-                            if (!waitingInput) setIsPlayingInput(false);
-                          }}
-                          style={{
-                            flex: 1,
-                            padding: "10px 8px",
-                            borderRadius: "8px",
-                            background: waitingInput ? "rgba(255, 193, 7, 0.25)" : "rgba(0, 15, 30, 0.8)",
-                            color: waitingInput ? "#ffc107" : "rgba(255, 255, 255, 0.6)",
-                            border: waitingInput ? "1px solid #ffc107" : "1px solid rgba(255, 255, 255, 0.2)",
-                            fontSize: "12px",
-                            fontWeight: "800",
-                            cursor: "pointer"
-                          }}
-                        >
-                          {waitingInput ? "⏳ รอลุ้นผล (ON)" : "⬜ รอลุ้นผล"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 4 Category Score Inputs */}
-                  <div style={{ marginBottom: "22px" }}>
-                    <label style={{ display: "block", fontSize: "13px", color: "rgba(255, 255, 255, 0.8)", marginBottom: "12px", fontWeight: "800" }}>
-                      คะแนนแต่ละหมวดการแข่งขัน (0 - 25 คะแนน):
-                    </label>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "14px" }}>
-                      {categories.map((cat) => {
-                        const curVal = activeScores[cat.key];
-                        return (
-                          <div
-                            key={cat.key}
-                            style={{
-                              background: "rgba(0, 10, 22, 0.8)",
-                              border: `1.5px solid ${cat.color}40`,
-                              borderRadius: "14px",
-                              padding: "16px",
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "8px"
-                            }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                              <span style={{ fontSize: "14px", fontWeight: "800", color: cat.color }}>
-                                {cat.icon} {cat.label}
-                              </span>
-                              <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)" }}>/ 25</span>
-                            </div>
-
-                            <input
-                              type="number"
-                              min="0"
-                              max="25"
-                              value={curVal}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setActiveScores((prev) => ({ ...prev, [cat.key]: val }));
-                              }}
-                              placeholder="0 - 25"
-                              style={{
-                                width: "100%",
-                                padding: "10px",
-                                borderRadius: "8px",
-                                background: "#030a14",
-                                border: `1.5px solid ${cat.color}60`,
-                                color: "#ffffff",
-                                fontSize: "20px",
-                                fontWeight: "900",
-                                textAlign: "center",
-                                outline: "none",
-                                boxSizing: "border-box"
-                              }}
-                            />
-
-                            {/* Preset Buttons */}
-                            <div style={{ display: "flex", gap: "4px", justifyContent: "center" }}>
-                              {[0, 15, 20, 25].map((preset) => (
-                                <button
-                                  key={preset}
-                                  type="button"
-                                  onClick={() => setActiveScores((prev) => ({ ...prev, [cat.key]: String(preset) }))}
-                                  style={{
-                                    padding: "3px 8px",
-                                    borderRadius: "6px",
-                                    background: curVal === String(preset) ? cat.color : "rgba(255, 255, 255, 0.08)",
-                                    color: curVal === String(preset) ? "#030814" : "#ffffff",
-                                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                                    fontSize: "11px",
-                                    fontWeight: "800",
-                                    cursor: "pointer"
-                                  }}
-                                >
-                                  {preset}
-                                </button>
-                              ))}
-                              <button
-                                type="button"
-                                onClick={() => setActiveScores((prev) => ({ ...prev, [cat.key]: "" }))}
-                                style={{
-                                  padding: "3px 6px",
-                                  borderRadius: "6px",
-                                  background: "rgba(255, 77, 79, 0.15)",
-                                  color: "#ff7875",
-                                  border: "1px solid rgba(255, 77, 79, 0.3)",
-                                  fontSize: "10px",
-                                  fontWeight: "700",
-                                  cursor: "pointer"
-                                }}
-                              >
-                                ล้าง
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Total Score Preview Bar */}
-                  <div style={{
-                    background: "linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, rgba(255, 215, 0, 0.15) 100%)",
-                    border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                    borderRadius: "14px",
-                    padding: "16px 22px",
-                    marginBottom: "20px",
+                <button
+                  type="button"
+                  onClick={openAddModal}
+                  style={{
+                    padding: "12px 20px",
+                    borderRadius: "10px",
+                    background: "rgba(0, 229, 255, 0.15)",
+                    border: "1.5px solid #00e5ff",
+                    color: "#00e5ff",
+                    fontSize: "14px",
+                    fontWeight: "800",
+                    cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "12px"
-                  }}>
-                    <div>
-                      <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.65)", fontWeight: "700" }}>
-                        คะแนนรวมคำนวณสด (Total Score Preview):
-                      </div>
-                      <div style={{ fontSize: "14px", color: "#ffffff", fontWeight: "800" }}>
-                        {selectedContestant.name} ({selectedContestant.nickname})
-                      </div>
-                    </div>
+                    gap: "6px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  ➕ เพิ่มผู้เข้าแข่งขันใหม่
+                </button>
+              </div>
 
-                    <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
-                      <span style={{ fontSize: "36px", fontWeight: "900", color: "#ffd700" }}>
-                        {totalScorePreview}
-                      </span>
-                      <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.5)", fontWeight: "700" }}>
-                        / 100 คะแนน
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Save Button */}
-                  <button
-                    type="button"
-                    onClick={handleSaveScore}
-                    disabled={isSavingScore}
-                    style={{
-                      width: "100%",
-                      padding: "16px",
-                      borderRadius: "14px",
-                      background: isSavingScore ? "rgba(0, 229, 255, 0.2)" : "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                      color: "#030814",
-                      fontSize: "17px",
-                      fontWeight: "900",
-                      border: "none",
-                      cursor: isSavingScore ? "not-allowed" : "pointer",
-                      boxShadow: isSavingScore ? "none" : "0 0 25px rgba(0, 229, 255, 0.5)",
-                      transition: "all 0.2s ease"
-                    }}
-                  >
-                    {isSavingScore ? "⏳ กำลังบันทึกคะแนน..." : "💾 บันทึกคะแนนและคำนวณอันดับ (Save Score)"}
-                  </button>
-                </div>
-              ) : (
-                <div style={{
-                  padding: "40px",
-                  textAlign: "center",
-                  color: "rgba(255, 255, 255, 0.4)",
-                  fontSize: "14px",
-                  background: "rgba(0, 10, 22, 0.4)",
-                  borderRadius: "12px"
-                }}>
-                  👆 กรุณาเลือกผู้เข้าแข่งขันจากช่องด้านบนเพื่อเริ่มต้นใส่คะแนน
+              {scoringNotice && (
+                <div
+                  style={{
+                    marginTop: "14px",
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    background: scoringNotice.startsWith("✅") ? "rgba(34, 197, 94, 0.15)" : "rgba(255, 77, 79, 0.15)",
+                    color: scoringNotice.startsWith("✅") ? "#86efac" : "#ff7875",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                  }}
+                >
+                  {scoringNotice}
                 </div>
               )}
             </div>
 
-            {/* Quick Standings Table View */}
-            <div style={{
-              background: "rgba(0, 15, 30, 0.8)",
-              border: "1px solid rgba(0, 229, 255, 0.25)",
-              borderRadius: "18px",
-              padding: "20px"
-            }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#80d0ff", margin: 0 }}>
-                  📋 ตารางคะแนนสรุปย่อทั้งหมด ({contestants.length} คน)
-                </h3>
-                <span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.5)" }}>
-                  คลิกที่แถวเพื่อเลือกคนนั้นมากรอกคะแนน
-                </span>
-              </div>
+            {/* Step 2: Scoring Form Cards */}
+            {activeContestant ? (
+              <div
+                style={{
+                  background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
+                  border: activeContestant.isPlaying ? "2px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.35)",
+                  boxShadow: activeContestant.isPlaying ? "0 0 25px rgba(0, 229, 255, 0.3)" : "none",
+                  borderRadius: "16px",
+                  padding: "24px",
+                }}
+              >
+                {/* Active Contestant Meta Header */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "16px",
+                    borderBottom: "1px solid rgba(255,255,255,0.1)",
+                    paddingBottom: "18px",
+                    marginBottom: "24px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                    <div
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        background: "#030814",
+                        border: "2px solid #00e5ff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "24px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <AdminPhotoPreview src={activeContestant.image} name={activeContestant.name} size={60} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#ffffff", margin: "0 0 4px 0" }}>
+                        {activeContestant.name}{" "}
+                        {activeContestant.nickname && <span style={{ color: "#ffd700" }}>({activeContestant.nickname})</span>}
+                      </h3>
+                      <p style={{ fontSize: "14px", color: "#ffd700", margin: 0, display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                        <span>📌 หัวข้อ: <strong>{activeContestant.topic}</strong></span>
+                        {activeContestant.order && (
+                          <span style={{ color: "#00e5ff", fontWeight: "700" }}>
+                            • 🎲 ลำดับแข่ง #{activeContestant.order}
+                          </span>
+                        )}
+                        {activeContestant.waitingNextMatch && (
+                          <span
+                            style={{
+                              padding: "2px 10px",
+                              borderRadius: "12px",
+                              background: "rgba(99, 102, 241, 0.25)",
+                              border: "1px solid #818cf8",
+                              color: "#c7d2fe",
+                              fontSize: "12px",
+                              fontWeight: "700",
+                            }}
+                          >
+                            ⏳ ในตาราง: รอลุ้นผลวันถัดไป
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
 
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-                  <thead>
-                    <tr style={{ background: "rgba(0, 229, 255, 0.1)", borderBottom: "1.5px solid rgba(0, 229, 255, 0.3)" }}>
-                      <th style={{ padding: "10px", textAlign: "center", color: "#00e5ff" }}>#Order</th>
-                      <th style={{ padding: "10px", textAlign: "left", color: "#00e5ff" }}>ผู้เข้าแข่งขัน</th>
-                      <th style={{ padding: "10px", textAlign: "left", color: "#00e5ff" }}>หัวข้อ</th>
-                      <th style={{ padding: "10px", textAlign: "center", color: "#52c41a" }}>⏱️ 3วิ</th>
-                      <th style={{ padding: "10px", textAlign: "center", color: "#d9d9d9" }}>❓ ถาม-ตอบ</th>
-                      <th style={{ padding: "10px", textAlign: "center", color: "#ff4d4f" }}>🧩 จิ๊กซอว์</th>
-                      <th style={{ padding: "10px", textAlign: "center", color: "#00e5ff" }}>🔍 คุณสมบัติ</th>
-                      <th style={{ padding: "10px", textAlign: "center", color: "#ffd700" }}>รวม</th>
-                      <th style={{ padding: "10px", textAlign: "center", color: "#80d0ff" }}>สถานะ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {contestants.map((c) => {
-                      const isSel = String(c.id) === String(selectedContestantId);
-                      const s = c.scores || {};
-                      return (
-                        <tr
-                          key={c.id}
-                          onClick={() => handleSelectContestant(c)}
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                    {/* Toggle Playing Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleTogglePlaying(activeContestant)}
+                      style={{
+                        padding: "10px 18px",
+                        borderRadius: "12px",
+                        background: activeContestant.isPlaying
+                          ? "linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)"
+                          : "rgba(0, 229, 255, 0.12)",
+                        border: activeContestant.isPlaying ? "1.5px solid #ef4444" : "1.5px solid rgba(0, 229, 255, 0.4)",
+                        color: "#ffffff",
+                        fontSize: "14px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        boxShadow: activeContestant.isPlaying ? "0 0 16px rgba(239, 68, 68, 0.6)" : "none",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      {activeContestant.isPlaying ? (
+                        <>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              width: "10px",
+                              height: "10px",
+                              borderRadius: "50%",
+                              background: "#fff",
+                              boxShadow: "0 0 8px #fff",
+                            }}
+                          />
+                          <span>🔴 กำลังแข่งขันอยู่บนเวที (คลิกเพื่อจบการแข่ง)</span>
+                        </>
+                      ) : (
+                        <span>🎮 ตั้งเป็นคนกำลังแข่ง (ขึ้นเวที)</span>
+                      )}
+                    </button>
+
+                    {/* Toggle Waiting Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleWaiting(activeContestant)}
+                      style={{
+                        padding: "10px 18px",
+                        borderRadius: "12px",
+                        background: activeContestant.waitingNextMatch
+                          ? "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)"
+                          : "rgba(99, 102, 241, 0.15)",
+                        border: activeContestant.waitingNextMatch ? "1.5px solid #818cf8" : "1.5px solid rgba(129, 140, 248, 0.4)",
+                        color: "#ffffff",
+                        fontSize: "14px",
+                        fontWeight: "800",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        boxShadow: activeContestant.waitingNextMatch ? "0 0 16px rgba(99, 102, 241, 0.5)" : "none",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      {activeContestant.waitingNextMatch ? "📋 อยู่ในตารางแล้ว (คลิกเพื่อนำออก)" : "⏳ ตั้งเป็นรอลุ้นผล"}
+                    </button>
+
+                    {/* Calculated Total Box */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        background: "rgba(0, 229, 255, 0.08)",
+                        border: "1px solid rgba(0, 229, 255, 0.3)",
+                        padding: "8px 18px",
+                        borderRadius: "12px",
+                      }}
+                    >
+                      <div style={{ textAlign: "right" }}>
+                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", display: "block" }}>คะแนนรวม</span>
+                        <strong
                           style={{
-                            borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                            background: isSel ? "rgba(0, 229, 255, 0.15)" : "transparent",
-                            cursor: "pointer",
-                            transition: "background 0.15s"
+                            fontSize: "26px",
+                            color: activeCalculatedTotal === 100 ? "#52c41a" : "#ffd700",
+                            fontFamily: "monospace",
+                            textShadow: activeCalculatedTotal === 100 ? "0 0 12px rgba(82,196,26,0.8)" : "none",
                           }}
-                          onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.background = "rgba(0, 229, 255, 0.06)"; }}
-                          onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.background = "transparent"; }}
                         >
-                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "800", color: "#00e5ff" }}>
-                            {c.order ? `#${c.order}` : "–"}
-                          </td>
-                          <td style={{ padding: "10px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                              <div style={{ width: "28px", height: "28px", borderRadius: "50%", overflow: "hidden", border: "1.5px solid #00e5ff", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <AdminPhotoPreview src={c.image} name={c.name} size={28} />
-                              </div>
-                              <span style={{ fontWeight: "700" }}>{c.name}</span>
-                              {c.nickname && <span style={{ color: "#ffd700", fontSize: "12px" }}>({c.nickname})</span>}
-                            </div>
-                          </td>
-                          <td style={{ padding: "10px", color: "rgba(255, 255, 255, 0.65)" }}>{c.topic}</td>
-                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>{s["3sec"] ?? "–"}</td>
-                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>{s.qa ?? "–"}</td>
-                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>{s.jigsaw ?? "–"}</td>
-                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>{s.attribute ?? "–"}</td>
-                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "900", color: "#ffd700" }}>{c.totalScore ?? 0}</td>
-                          <td style={{ padding: "10px", textAlign: "center" }}>
-                            {c.isPlaying ? (
-                              <span style={{ padding: "2px 8px", borderRadius: "6px", background: "rgba(0, 229, 255, 0.2)", color: "#00e5ff", fontSize: "11px", fontWeight: "800" }}>กำลังแข่ง</span>
-                            ) : c.waitingNextMatch ? (
-                              <span style={{ padding: "2px 8px", borderRadius: "6px", background: "rgba(255, 193, 7, 0.2)", color: "#ffc107", fontSize: "11px", fontWeight: "800" }}>รอลุ้น</span>
-                            ) : (
-                              <span style={{ color: "rgba(255, 255, 255, 0.3)", fontSize: "11px" }}>–</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                          {activeCalculatedTotal}
+                        </strong>
+                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}> / 100</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4 Category Scoring Grid */}
+                <h2
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: "700",
+                    color: "#80d0ff",
+                    marginBottom: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span>2️⃣ อัปเดตคะแนนทีละหมวด (0 - 25 คะแนนต่อหมวด)</span>
+                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "normal" }}>
+                    กดปุ่มด่วนหรือกรอกตัวเลขแล้วกดบันทึก
+                  </span>
+                </h2>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                    gap: "16px",
+                    marginBottom: "24px",
+                  }}
+                >
+                  {/* Category 1: 3 วินาที */}
+                  <div
+                    style={{
+                      background: "rgba(0, 15, 30, 0.75)",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      borderRadius: "14px",
+                      padding: "18px",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                      <strong style={{ fontSize: "16px", color: "#86efac", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span>⏱️</span> 1. 3 วินาที
+                      </strong>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
+                        {activeScores["3sec"] !== "" ? `${activeScores["3sec"]}/25` : "ยังไม่ใส่"}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "10px" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cur = Math.max(0, (Number(activeScores["3sec"]) || 0) - 1);
+                          setActiveScores({ ...activeScores, "3sec": String(cur) });
+                        }}
+                        style={{
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "8px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          color: "#fff",
+                          fontSize: "18px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        min="0"
+                        max="25"
+                        value={activeScores["3sec"]}
+                        onChange={(e) => setActiveScores({ ...activeScores, "3sec": e.target.value })}
+                        placeholder="0-25"
+                        style={{
+                          flex: 1,
+                          padding: "10px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1px solid rgba(0, 229, 255, 0.4)",
+                          color: "#ffd700",
+                          fontSize: "20px",
+                          fontWeight: "800",
+                          textAlign: "center",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cur = Math.min(25, (Number(activeScores["3sec"]) || 0) + 1);
+                          setActiveScores({ ...activeScores, "3sec": String(cur) });
+                        }}
+                        style={{
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "8px",
+                          background: "rgba(0, 229, 255, 0.15)",
+                          border: "1px solid rgba(0, 229, 255, 0.4)",
+                          color: "#00e5ff",
+                          fontSize: "18px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Quick Preset Buttons */}
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "12px" }}>
+                      {[0, 5, 10, 15, 20, 25].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setActiveScores({ ...activeScores, "3sec": String(val) })}
+                          style={{
+                            flex: "1",
+                            padding: "4px 6px",
+                            fontSize: "12px",
+                            borderRadius: "6px",
+                            background: activeScores["3sec"] === String(val) ? "rgba(82, 196, 26, 0.3)" : "rgba(255,255,255,0.06)",
+                            color: activeScores["3sec"] === String(val) ? "#86efac" : "#fff",
+                            border: activeScores["3sec"] === String(val) ? "1px solid #52c41a" : "1px solid rgba(255,255,255,0.12)",
+                            fontWeight: activeScores["3sec"] === String(val) ? "800" : "500",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSaveCategoryScore("3sec")}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "8px",
+                        background: "rgba(16, 185, 129, 0.2)",
+                        border: "1px solid #10b981",
+                        color: "#86efac",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
+                      💾 บันทึก 3 วินาที
+                    </button>
+                  </div>
+
+                  {/* Category 2: ถาม-ตอบ */}
+                  <div
+                    style={{
+                      background: "rgba(0, 15, 30, 0.75)",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      borderRadius: "14px",
+                      padding: "18px",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                      <strong style={{ fontSize: "16px", color: "#f3f4f6", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span>❓</span> 2. ถาม-ตอบ
+                      </strong>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
+                        {activeScores.qa !== "" ? `${activeScores.qa}/25` : "ยังไม่ใส่"}
+                      </span>
+                    </div>
+
+                    {/* Quick Award Buttons */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, qa: "25" })}
+                        style={{
+                          padding: "8px 6px",
+                          borderRadius: "8px",
+                          background: activeScores.qa === "25" ? "linear-gradient(135deg, #237804 0%, #52c41a 100%)" : "rgba(82, 196, 26, 0.15)",
+                          border: activeScores.qa === "25" ? "1px solid #73d13d" : "1px solid rgba(82, 196, 26, 0.4)",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ✅ ถูก 25 เต็ม
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, qa: "0" })}
+                        style={{
+                          padding: "8px 6px",
+                          borderRadius: "8px",
+                          background: activeScores.qa === "0" ? "linear-gradient(135deg, #a8071a 0%, #ff4d4f 100%)" : "rgba(255, 77, 79, 0.15)",
+                          border: activeScores.qa === "0" ? "1px solid #ff7875" : "1px solid rgba(255, 77, 79, 0.4)",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ❌ ผิด 0 คะแนน
+                      </button>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                      <input
+                        type="number"
+                        min="0"
+                        max="25"
+                        value={activeScores.qa}
+                        onChange={(e) => setActiveScores({ ...activeScores, qa: e.target.value })}
+                        placeholder="คะแนน (0-25)"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1px solid rgba(0, 229, 255, 0.4)",
+                          color: "#ffd700",
+                          fontSize: "18px",
+                          fontWeight: "800",
+                          textAlign: "center",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, qa: "" })}
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          color: "rgba(255,255,255,0.7)",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ล้าง
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSaveCategoryScore("qa")}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "8px",
+                        background: "rgba(255, 255, 255, 0.12)",
+                        border: "1px solid #d9d9d9",
+                        color: "#ffffff",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
+                      💾 บันทึก ถาม-ตอบ
+                    </button>
+                  </div>
+
+                  {/* Category 3: จิ๊กซอว์ */}
+                  <div
+                    style={{
+                      background: "rgba(0, 15, 30, 0.75)",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      borderRadius: "14px",
+                      padding: "18px",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                      <strong style={{ fontSize: "16px", color: "#fca5a5", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span>🧩</span> 3. จิ๊กซอว์
+                      </strong>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
+                        {activeScores.jigsaw !== "" ? `${activeScores.jigsaw}/25` : "ยังไม่ใส่"}
+                      </span>
+                    </div>
+
+                    {/* Quick Award Buttons */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, jigsaw: "25" })}
+                        style={{
+                          padding: "8px 6px",
+                          borderRadius: "8px",
+                          background: activeScores.jigsaw === "25" ? "linear-gradient(135deg, #237804 0%, #52c41a 100%)" : "rgba(82, 196, 26, 0.15)",
+                          border: activeScores.jigsaw === "25" ? "1px solid #73d13d" : "1px solid rgba(82, 196, 26, 0.4)",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ✅ ถูก 25 เต็ม
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, jigsaw: "0" })}
+                        style={{
+                          padding: "8px 6px",
+                          borderRadius: "8px",
+                          background: activeScores.jigsaw === "0" ? "linear-gradient(135deg, #a8071a 0%, #ff4d4f 100%)" : "rgba(255, 77, 79, 0.15)",
+                          border: activeScores.jigsaw === "0" ? "1px solid #ff7875" : "1px solid rgba(255, 77, 79, 0.4)",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ❌ ผิด 0 คะแนน
+                      </button>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                      <input
+                        type="number"
+                        min="0"
+                        max="25"
+                        value={activeScores.jigsaw}
+                        onChange={(e) => setActiveScores({ ...activeScores, jigsaw: e.target.value })}
+                        placeholder="คะแนน (0-25)"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1px solid rgba(0, 229, 255, 0.4)",
+                          color: "#ffd700",
+                          fontSize: "18px",
+                          fontWeight: "800",
+                          textAlign: "center",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, jigsaw: "" })}
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          color: "rgba(255,255,255,0.7)",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ล้าง
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSaveCategoryScore("jigsaw")}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "8px",
+                        background: "rgba(239, 68, 68, 0.2)",
+                        border: "1px solid #ff4d4f",
+                        color: "#fca5a5",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
+                      💾 บันทึก จิ๊กซอว์
+                    </button>
+                  </div>
+
+                  {/* Category 4: คุณสมบัติ */}
+                  <div
+                    style={{
+                      background: "rgba(0, 15, 30, 0.75)",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      borderRadius: "14px",
+                      padding: "18px",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                      <strong style={{ fontSize: "16px", color: "#67e8f9", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span>🔍</span> 4. คุณสมบัติ
+                      </strong>
+                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>
+                        {activeScores.attribute !== "" ? `${activeScores.attribute}/25` : "ยังไม่ใส่"}
+                      </span>
+                    </div>
+
+                    {/* Quick Clue Buttons: 25, 20, 15, 10, 5, 0 */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", marginBottom: "10px" }}>
+                      {[25, 20, 15, 10, 5, 0].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setActiveScores({ ...activeScores, attribute: String(val) })}
+                          style={{
+                            padding: "6px 4px",
+                            borderRadius: "6px",
+                            background: activeScores.attribute === String(val) ? "rgba(0, 229, 255, 0.3)" : "rgba(255,255,255,0.06)",
+                            border: activeScores.attribute === String(val) ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.12)",
+                            color: activeScores.attribute === String(val) ? "#00e5ff" : "#fff",
+                            fontSize: "11px",
+                            fontWeight: activeScores.attribute === String(val) ? "800" : "600",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {val === 25 ? "25 (0คำ)" : val === 20 ? "20 (1คำ)" : val === 15 ? "15 (2คำ)" : val === 10 ? "10 (3คำ)" : val === 5 ? "5 (4คำ)" : "0 (ผิด)"}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                      <input
+                        type="number"
+                        min="0"
+                        max="25"
+                        value={activeScores.attribute}
+                        onChange={(e) => setActiveScores({ ...activeScores, attribute: e.target.value })}
+                        placeholder="คะแนน (0-25)"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1px solid rgba(0, 229, 255, 0.4)",
+                          color: "#ffd700",
+                          fontSize: "18px",
+                          fontWeight: "800",
+                          textAlign: "center",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setActiveScores({ ...activeScores, attribute: "" })}
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          color: "rgba(255,255,255,0.7)",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ล้าง
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSaveCategoryScore("attribute")}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "8px",
+                        background: "rgba(0, 229, 255, 0.2)",
+                        border: "1px solid #00e5ff",
+                        color: "#67e8f9",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
+                      💾 บันทึก คุณสมบัติ
+                    </button>
+                  </div>
+                </div>
+
+                {/* Grand Action Bar */}
+                <div
+                  style={{
+                    background: "rgba(0, 15, 30, 0.75)",
+                    border: "1.5px solid rgba(0, 229, 255, 0.35)",
+                    borderRadius: "14px",
+                    padding: "16px 20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "14px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "700", color: "#80d0ff" }}>
+                      🎲 ลำดับการแข่ง (Order):
+                    </label>
+                    <input
+                      type="number"
+                      value={orderInput}
+                      onChange={(e) => setOrderInput(e.target.value)}
+                      placeholder="เช่น 1, 2, 3..."
+                      style={{
+                        width: "90px",
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0, 229, 255, 0.4)",
+                        color: "#ffffff",
+                        fontSize: "15px",
+                        fontWeight: "800",
+                        textAlign: "center",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                    <button
+                      type="button"
+                      onClick={handleSaveAllScores}
+                      disabled={isSavingScore}
+                      style={{
+                        padding: "12px 28px",
+                        borderRadius: "10px",
+                        background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                        border: "none",
+                        color: "#030814",
+                        fontSize: "15px",
+                        fontWeight: "900",
+                        cursor: isSavingScore ? "wait" : "pointer",
+                        boxShadow: "0 0 20px rgba(0, 229, 255, 0.45)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <span>💾</span> บันทึกคะแนนทั้งหมด 4 หมวด ({activeCalculatedTotal} คะแนน)
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "50px 20px",
+                  background: "rgba(0, 15, 30, 0.5)",
+                  borderRadius: "16px",
+                  border: "1px dashed rgba(0, 229, 255, 0.3)",
+                  color: "rgba(255,255,255,0.6)",
+                }}
+              >
+                <div style={{ fontSize: "40px", marginBottom: "12px" }}>👆</div>
+                <div style={{ fontSize: "16px", fontWeight: "700", color: "#ffffff" }}>
+                  กรุณาเลือกผู้เข้าแข่งขันจากช่องด้านบน
+                </div>
+                <div style={{ fontSize: "13px", marginTop: "4px" }}>
+                  เพื่อเปิดหน้าต่างกรอกคะแนนแบบละเอียดและควบคุมสถานะ On-Air
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════════════════════════ */}
-        {/* TAB 2: CONTESTANTS & PHOTOS MANAGER                                   */}
-        {/* ══════════════════════════════════════════════════════════════════════ */}
+        {/* ========================================================
+            TAB 2: CONTESTANTS & PHOTOS (Matching Main Admin)
+           ======================================================== */}
         {activeTab === "contestants" && (
-          <div style={{
-            background: "rgba(0, 15, 30, 0.85)",
-            border: "1.5px solid rgba(0, 229, 255, 0.35)",
-            borderRadius: "18px",
-            padding: "24px",
-            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
+          <div>
+            {/* Header & Add Button */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "12px",
+                marginBottom: "18px",
+              }}
+            >
               <div>
-                <h2 style={{ fontSize: "18px", fontWeight: "800", color: "#80d0ff", margin: "0 0 4px" }}>
-                  👥 จัดการรายชื่อและรูปภาพผู้เข้าแข่งขัน
+                <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#80d0ff", margin: "0 0 4px 0" }}>
+                  👥 รายชื่อผู้เข้าแข่งขันทั้งหมด ({contestants.length} คน)
                 </h2>
-                <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)" }}>
-                  แก้ไขชื่อ, ชื่อเล่น, หัวข้อ และใส่ URL รูปภาพจาก Google Photos
-                </div>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+                  ผูกรูปโปรไฟล์จาก Google Photos, อัปเดตข้อมูล และตรวจสอบคะแนนรวม
+                </p>
               </div>
 
-              <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                type="button"
+                onClick={openAddModal}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                  color: "#030812",
+                  fontWeight: "800",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)",
+                }}
+              >
+                ➕ เพิ่มผู้เข้าแข่งขันใหม่
+              </button>
+            </div>
+
+            {/* Search & Filter Toolbar */}
+            <div
+              style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: "1px solid rgba(0, 229, 255, 0.2)",
+                borderRadius: "12px",
+                padding: "14px 18px",
+                marginBottom: "16px",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
+            >
+              {/* Search Bar */}
+              <div style={{ position: "relative", flex: "1", minWidth: "240px", maxWidth: "420px" }}>
                 <input
                   type="text"
                   value={contestantSearch}
                   onChange={(e) => setContestantSearch(e.target.value)}
-                  placeholder="🔍 ค้นหาผู้เข้าแข่งขัน..."
+                  placeholder="🔍 ค้นหาชื่อ, ชื่อเล่น หรือหัวข้อ..."
                   style={{
-                    padding: "8px 14px",
+                    width: "100%",
+                    padding: "8px 12px 8px 34px",
                     borderRadius: "8px",
-                    background: "#030a14",
-                    border: "1px solid rgba(0, 229, 255, 0.4)",
-                    color: "#ffffff",
+                    background: "#050b14",
+                    border: "1px solid rgba(0, 229, 255, 0.35)",
+                    color: "#fff",
                     fontSize: "13px",
-                    outline: "none"
+                    outline: "none",
+                    boxSizing: "border-box",
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(true)}
-                  style={{
-                    padding: "8px 16px",
-                    borderRadius: "8px",
-                    background: "linear-gradient(90deg, #10b981 0%, #059669 100%)",
-                    color: "#ffffff",
-                    fontWeight: "800",
-                    fontSize: "13px",
-                    border: "none",
-                    cursor: "pointer"
-                  }}
-                >
-                  ➕ เพิ่มผู้เข้าแข่งขัน
-                </button>
+                <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", opacity: 0.5 }}>
+                  🔍
+                </span>
               </div>
-            </div>
 
-            {/* Contestants Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "14px" }}>
-              {contestants.filter((c) => {
-                const q = contestantSearch.trim().toLowerCase();
-                if (!q) return true;
-                return c.name?.toLowerCase().includes(q) || c.nickname?.toLowerCase().includes(q) || c.topic?.toLowerCase().includes(q);
-              }).map((c) => (
-                <div
-                  key={c.id}
-                  style={{
-                    background: "rgba(0, 10, 22, 0.7)",
-                    border: "1px solid rgba(0, 229, 255, 0.25)",
-                    borderRadius: "14px",
-                    padding: "14px",
-                    display: "flex",
-                    gap: "12px",
-                    alignItems: "center"
-                  }}
-                >
-                  <div style={{
-                    width: "56px",
-                    height: "56px",
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    border: "2px solid #00e5ff",
-                    flexShrink: 0,
-                    background: "rgba(0, 0, 0, 0.3)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
-                    <AdminPhotoPreview src={c.image} name={c.name} size={56} />
-                  </div>
-
-                  <div style={{ flex: 1, overflow: "hidden" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span style={{ fontWeight: "800", fontSize: "15px" }}>{c.name}</span>
-                      {c.nickname && <span style={{ color: "#ffd700", fontWeight: "700", fontSize: "13px" }}>({c.nickname})</span>}
-                    </div>
-                    <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {c.topic}
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#00e5ff", marginTop: "2px", fontWeight: "700" }}>
-                      {c.order ? `Order #${c.order}` : "ยังไม่มีลำดับ"} • {c.totalScore ?? 0} คะแนน
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", flexShrink: 0 }}>
+              {/* Filter Chips */}
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                {[
+                  { key: "all", label: `ทั้งหมด (${contestants.length})` },
+                  { key: "withPhoto", label: `📷 มีรูปแล้ว (${withPhotoCount})` },
+                  { key: "noPhoto", label: `👤 ยังไม่มีรูป (${noPhotoCount})` },
+                  { key: "hasScores", label: `🏆 มีคะแนน (${hasScoreCount})` },
+                ].map((chip) => {
+                  const active = contestantFilter === chip.key;
+                  return (
                     <button
+                      key={chip.key}
                       type="button"
-                      onClick={() => setEditingContestant({ ...c })}
+                      onClick={() => setContestantFilter(chip.key)}
                       style={{
                         padding: "6px 12px",
-                        borderRadius: "6px",
-                        background: "rgba(0, 229, 255, 0.15)",
-                        border: "1px solid rgba(0, 229, 255, 0.4)",
-                        color: "#00e5ff",
+                        borderRadius: "20px",
                         fontSize: "12px",
-                        fontWeight: "700",
-                        cursor: "pointer"
+                        fontWeight: active ? "800" : "600",
+                        background: active ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)" : "rgba(255,255,255,0.06)",
+                        color: active ? "#030812" : "rgba(255,255,255,0.75)",
+                        border: active ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.12)",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
                       }}
                     >
-                      ✏️ แก้ไข
+                      {chip.label}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteContestant(c.id, c.name)}
-                      style={{
-                        padding: "4px 8px",
-                        borderRadius: "6px",
-                        background: "rgba(239, 68, 68, 0.1)",
-                        border: "1px solid rgba(239, 68, 68, 0.3)",
-                        color: "#fca5a5",
-                        fontSize: "11px",
-                        fontWeight: "700",
-                        cursor: "pointer"
-                      }}
-                    >
-                      🗑️ ลบ
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Edit Contestant Modal */}
-            {editingContestant && (
-              <div style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(0, 0, 0, 0.8)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 10000,
-                padding: "16px",
-                backdropFilter: "blur(8px)"
-              }}>
-                <div style={{
-                  background: "linear-gradient(135deg, #07162b 0%, #030a14 100%)",
-                  border: "2px solid #00e5ff",
-                  borderRadius: "18px",
-                  padding: "24px",
-                  maxWidth: "520px",
-                  width: "100%",
-                  boxShadow: "0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 229, 255, 0.3)"
-                }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-                    <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
-                      ✏️ แก้ไขข้อมูลผู้เข้าแข่งขัน
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setEditingContestant(null)}
-                      style={{ background: "none", border: "none", color: "rgba(255, 255, 255, 0.5)", fontSize: "20px", cursor: "pointer" }}
-                    >
-                      ✕
-                    </button>
-                  </div>
+            {/* Contestants Table (Matching Main Admin Exact Structure) */}
+            <div
+              style={{
+                overflowX: "auto",
+                background: "rgba(0, 15, 30, 0.8)",
+                borderRadius: "12px",
+                border: "1px solid rgba(0, 229, 255, 0.25)",
+              }}
+            >
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "14px" }}>
+                <thead>
+                  <tr style={{ background: "rgba(0, 229, 255, 0.12)", borderBottom: "1px solid rgba(0, 229, 255, 0.3)" }}>
+                    <th style={{ padding: "12px 14px", width: "70px", textAlign: "center", color: "#ffd700" }}>#ID</th>
+                    <th style={{ padding: "12px 14px", width: "60px", textAlign: "center" }}>รูป</th>
+                    <th style={{ padding: "12px 14px" }}>ชื่อจริง - นามสกุล</th>
+                    <th style={{ padding: "12px 14px" }}>ชื่อเล่น</th>
+                    <th style={{ padding: "12px 14px" }}>หัวข้อแฟนพันธุ์แท้</th>
+                    <th style={{ padding: "12px 14px", width: "260px" }}>📸 ใส่ URL รูป Google Photos ด่วน</th>
+                    <th style={{ padding: "12px 14px", textAlign: "center", width: "80px" }}>รวม</th>
+                    <th style={{ padding: "12px 14px", textAlign: "center", width: "140px" }}>จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredContestants.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" style={{ padding: "30px", textAlign: "center", color: "rgba(255,255,255,0.5)" }}>
+                        ไม่พบผู้เข้าแข่งขันที่ตรงตามเงื่อนไข
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredContestants.map((c) => {
+                      const inputUrl = quickPhotos[c.id] ?? c.image ?? "";
+                      const hasChanged = inputUrl.trim() !== (c.image || "").trim();
+                      const isSaving = savingQuickPhotoId === c.id;
 
-                  <form onSubmit={handleSaveEditContestant}>
-                    <div style={{ marginBottom: "14px" }}>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ชื่อจริง-นามสกุล:</label>
-                      <input
-                        type="text"
-                        value={editingContestant.name}
-                        onChange={(e) => setEditingContestant({ ...editingContestant, name: e.target.value })}
-                        required
-                        style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                      />
-                    </div>
+                      return (
+                        <tr
+                          key={c.id}
+                          style={{
+                            borderBottom: "1px solid rgba(255,255,255,0.06)",
+                            transition: "background 0.15s ease",
+                          }}
+                        >
+                          <td style={{ padding: "10px", textAlign: "center" }}>
+                            <span
+                              style={{
+                                display: "inline-block",
+                                padding: "3px 8px",
+                                borderRadius: "6px",
+                                fontWeight: "800",
+                                fontSize: "12px",
+                                background: "rgba(0, 229, 255, 0.12)",
+                                color: "#67e8f9",
+                                border: "1px solid rgba(0, 229, 255, 0.3)",
+                              }}
+                            >
+                              #{c.id}
+                            </span>
+                          </td>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "14px" }}>
-                      <div>
-                        <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ชื่อเล่น:</label>
-                        <input
-                          type="text"
-                          value={editingContestant.nickname || ""}
-                          onChange={(e) => setEditingContestant({ ...editingContestant, nickname: e.target.value })}
-                          style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ลำดับแข่ง (Order):</label>
-                        <input
-                          type="number"
-                          value={editingContestant.order ?? ""}
-                          onChange={(e) => setEditingContestant({ ...editingContestant, order: e.target.value })}
-                          placeholder="เช่น 1, 2"
-                          style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                        />
-                      </div>
-                    </div>
+                          <td style={{ padding: "10px", textAlign: "center" }}>
+                            <div
+                              onClick={() => openEditModal(c)}
+                              title="คลิกเพื่อผูกรูปหรือแก้ไข"
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                overflow: "hidden",
+                                background: "rgba(0, 229, 255, 0.1)",
+                                border: c.image ? "2px solid #52c41a" : "1px dashed rgba(255, 77, 79, 0.6)",
+                                margin: "0 auto",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <AdminPhotoPreview src={c.image} name={c.name} size={40} />
+                            </div>
+                          </td>
 
-                    <div style={{ marginBottom: "14px" }}>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>หัวข้อแฟนพันธุ์แท้:</label>
-                      <input
-                        type="text"
-                        value={editingContestant.topic}
-                        onChange={(e) => setEditingContestant({ ...editingContestant, topic: e.target.value })}
-                        required
-                        style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                      />
-                    </div>
+                          <td style={{ padding: "12px 14px", fontWeight: "700" }}>
+                            {c.name}
+                            {c.waitingNextMatch && (
+                              <span
+                                style={{
+                                  marginLeft: "6px",
+                                  fontSize: "11px",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  background: "rgba(99, 102, 241, 0.25)",
+                                  border: "1px solid #818cf8",
+                                  color: "#c7d2fe",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                รอลุ้นผล
+                              </span>
+                            )}
+                            {c.isPlaying && (
+                              <span
+                                style={{
+                                  marginLeft: "6px",
+                                  fontSize: "11px",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  background: "rgba(239, 68, 68, 0.3)",
+                                  border: "1px solid #ef4444",
+                                  color: "#fca5a5",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                LIVE
+                              </span>
+                            )}
+                          </td>
 
-                    <div style={{ marginBottom: "18px" }}>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ลิงก์รูปภาพ (Google Photos URL):</label>
-                      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                        <div style={{ width: "46px", height: "46px", borderRadius: "50%", overflow: "hidden", border: "2px solid #00e5ff", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <AdminPhotoPreview src={editingContestant.image} name={editingContestant.name} size={46} />
-                        </div>
-                        <input
-                          type="text"
-                          value={editingContestant.image || ""}
-                          onChange={(e) => setEditingContestant({ ...editingContestant, image: e.target.value })}
-                          placeholder="https://lh3.googleusercontent.com/..."
-                          style={{ flex: 1, padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "12px", boxSizing: "border-box" }}
-                        />
-                      </div>
-                    </div>
+                          <td style={{ padding: "12px 14px", color: "#ffd700", fontWeight: "700" }}>
+                            {c.nickname || "-"}
+                          </td>
 
-                    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                      <button
-                        type="button"
-                        onClick={() => setEditingContestant(null)}
-                        style={{ padding: "10px 18px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)", color: "#ffffff", fontWeight: "700", cursor: "pointer" }}
-                      >
-                        ยกเลิก
-                      </button>
-                      <button
-                        type="submit"
-                        style={{ padding: "10px 22px", borderRadius: "8px", background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)", border: "none", color: "#030814", fontWeight: "900", cursor: "pointer" }}
-                      >
-                        บันทึกการแก้ไข
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
+                          <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.75)" }}>
+                            {c.topic}
+                          </td>
 
-            {/* Add Contestant Modal */}
-            {showAddModal && (
-              <div style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(0, 0, 0, 0.8)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 10000,
-                padding: "16px",
-                backdropFilter: "blur(8px)"
-              }}>
-                <div style={{
-                  background: "linear-gradient(135deg, #07162b 0%, #030a14 100%)",
-                  border: "2px solid #10b981",
-                  borderRadius: "18px",
-                  padding: "24px",
-                  maxWidth: "520px",
-                  width: "100%",
-                  boxShadow: "0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.3)"
-                }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-                    <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#10b981", margin: 0 }}>
-                      ➕ เพิ่มผู้เข้าแข่งขันใหม่
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddModal(false)}
-                      style={{ background: "none", border: "none", color: "rgba(255, 255, 255, 0.5)", fontSize: "20px", cursor: "pointer" }}
-                    >
-                      ✕
-                    </button>
-                  </div>
+                          {/* Quick Google Photo URL Input */}
+                          <td style={{ padding: "10px 14px" }}>
+                            <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                              <input
+                                type="text"
+                                value={inputUrl}
+                                onChange={(e) => setQuickPhotos({ ...quickPhotos, [c.id]: e.target.value })}
+                                placeholder="วางลิงก์ Google Photos..."
+                                style={{
+                                  width: "100%",
+                                  padding: "6px 10px",
+                                  borderRadius: "6px",
+                                  background: "#030a14",
+                                  border: hasChanged ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                                  color: "#ffffff",
+                                  fontSize: "12px",
+                                  outline: "none",
+                                }}
+                              />
+                              {hasChanged && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickSavePhoto(c)}
+                                  disabled={isSaving}
+                                  style={{
+                                    padding: "6px 12px",
+                                    borderRadius: "6px",
+                                    background: "#00e5ff",
+                                    color: "#030814",
+                                    fontWeight: "800",
+                                    fontSize: "12px",
+                                    border: "none",
+                                    cursor: isSaving ? "wait" : "pointer",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {isSaving ? "..." : "บันทึก"}
+                                </button>
+                              )}
+                            </div>
+                          </td>
 
-                  <form onSubmit={handleAddContestant}>
-                    <div style={{ marginBottom: "14px" }}>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ชื่อจริง-นามสกุล:</label>
-                      <input
-                        type="text"
-                        value={newContestant.name}
-                        onChange={(e) => setNewContestant({ ...newContestant, name: e.target.value })}
-                        required
-                        placeholder="เช่น สมชาย ใจดี"
-                        style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                      />
-                    </div>
+                          <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: "900", color: "#ffd700", fontSize: "16px" }}>
+                            {c.totalScore ?? 0}
+                          </td>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "14px" }}>
-                      <div>
-                        <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ชื่อเล่น:</label>
-                        <input
-                          type="text"
-                          value={newContestant.nickname}
-                          onChange={(e) => setNewContestant({ ...newContestant, nickname: e.target.value })}
-                          placeholder="เช่น แบงค์"
-                          style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ลำดับแข่ง (Order):</label>
-                        <input
-                          type="number"
-                          value={newContestant.order}
-                          onChange={(e) => setNewContestant({ ...newContestant, order: e.target.value })}
-                          placeholder="เช่น 1, 2"
-                          style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                        />
-                      </div>
-                    </div>
+                          {/* Action Buttons */}
+                          <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                            <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleSelectContestant(c);
+                                  setActiveTab("scoring");
+                                }}
+                                style={{
+                                  padding: "5px 10px",
+                                  borderRadius: "6px",
+                                  background: "rgba(0, 229, 255, 0.15)",
+                                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                                  color: "#00e5ff",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                  cursor: "pointer",
+                                }}
+                                title="เลือกคนนี้ไปกรอกคะแนน"
+                              >
+                                🎯 ให้คะแนน
+                              </button>
 
-                    <div style={{ marginBottom: "14px" }}>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>หัวข้อแฟนพันธุ์แท้:</label>
-                      <input
-                        type="text"
-                        value={newContestant.topic}
-                        onChange={(e) => setNewContestant({ ...newContestant, topic: e.target.value })}
-                        required
-                        placeholder="เช่น ไพ่ทาโร่ต์, Battle Spirits"
-                        style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "14px", boxSizing: "border-box" }}
-                      />
-                    </div>
+                              <button
+                                type="button"
+                                onClick={() => openEditModal(c)}
+                                style={{
+                                  padding: "5px 8px",
+                                  borderRadius: "6px",
+                                  background: "rgba(255,255,255,0.08)",
+                                  border: "1px solid rgba(255,255,255,0.2)",
+                                  color: "#ffffff",
+                                  fontSize: "12px",
+                                  cursor: "pointer",
+                                }}
+                                title="แก้ไขข้อมูล"
+                              >
+                                ✏️
+                              </button>
 
-                    <div style={{ marginBottom: "18px" }}>
-                      <label style={{ display: "block", fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", marginBottom: "4px", fontWeight: "700" }}>ลิงก์รูปภาพ (Google Photos URL):</label>
-                      <input
-                        type="text"
-                        value={newContestant.image}
-                        onChange={(e) => setNewContestant({ ...newContestant, image: e.target.value })}
-                        placeholder="https://lh3.googleusercontent.com/..."
-                        style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "#030a14", border: "1px solid rgba(0, 229, 255, 0.4)", color: "#fff", fontSize: "12px", boxSizing: "border-box" }}
-                      />
-                    </div>
-
-                    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                      <button
-                        type="button"
-                        onClick={() => setShowAddModal(false)}
-                        style={{ padding: "10px 18px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)", color: "#ffffff", fontWeight: "700", cursor: "pointer" }}
-                      >
-                        ยกเลิก
-                      </button>
-                      <button
-                        type="submit"
-                        style={{ padding: "10px 22px", borderRadius: "8px", background: "linear-gradient(90deg, #10b981 0%, #059669 100%)", border: "none", color: "#ffffff", fontWeight: "900", cursor: "pointer" }}
-                      >
-                        ยืนยันการเพิ่ม
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteContestant(c)}
+                                style={{
+                                  padding: "5px 8px",
+                                  borderRadius: "6px",
+                                  background: "rgba(239, 68, 68, 0.15)",
+                                  border: "1px solid rgba(239, 68, 68, 0.4)",
+                                  color: "#fca5a5",
+                                  fontSize: "12px",
+                                  cursor: "pointer",
+                                }}
+                                title="ลบผู้เข้าแข่งขัน"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════════════════════════ */}
-        {/* TAB 3: SETTINGS & RESET                                               */}
-        {/* ══════════════════════════════════════════════════════════════════════ */}
+        {/* ========================================================
+            TAB 3: SETTINGS & TOOLS (Matching Main Admin)
+           ======================================================== */}
         {activeTab === "settings" && (
-          <div style={{
-            background: "rgba(0, 15, 30, 0.85)",
-            border: "1.5px solid rgba(0, 229, 255, 0.35)",
-            borderRadius: "18px",
-            padding: "24px",
-            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)"
-          }}>
-            <h2 style={{ fontSize: "18px", fontWeight: "800", color: "#80d0ff", margin: "0 0 16px" }}>
-              ⚙️ การตั้งค่าและการจัดการข้อมูล (Danger Zone)
-            </h2>
-
-            <div style={{
-              background: "rgba(239, 68, 68, 0.1)",
-              border: "1.5px solid rgba(239, 68, 68, 0.4)",
-              borderRadius: "14px",
-              padding: "20px",
-              marginBottom: "20px"
-            }}>
-              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#fca5a5", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>⚠️</span> รีเซ็ตคะแนนการแข่งขันทั้งหมด (Reset All Scores)
-              </h3>
-              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
-                การกดปุ่มนี้จะล้างคะแนนทั้ง 4 หมวด (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ) ของผู้เข้าแข่งขันทุกคนใน The Trial FOTY กลับเป็น 0 และปลดสถานะกำลังแข่ง โดยรายชื่อและรูปภาพจะยังคงอยู่เหมือนเดิม
-              </p>
-              <button
-                type="button"
-                onClick={handleResetScores}
-                style={{
-                  padding: "12px 24px",
-                  borderRadius: "10px",
-                  background: "linear-gradient(90deg, #dc2626 0%, #991b1b 100%)",
-                  border: "none",
-                  color: "#ffffff",
-                  fontSize: "14px",
-                  fontWeight: "800",
-                  cursor: "pointer",
-                  boxShadow: "0 0 16px rgba(220, 38, 38, 0.4)"
-                }}
-              >
-                🔄 ยืนยันการรีเซ็ตคะแนนทั้งหมด
-              </button>
-            </div>
-
+          <div>
             {/* Reset / Reload Roster Box */}
-            <div style={{
-              background: "linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(10, 25, 47, 0.6) 100%)",
-              border: "1px solid rgba(0, 229, 255, 0.35)",
-              borderRadius: "14px",
-              padding: "20px",
-              marginBottom: "20px"
-            }}>
+            <div
+              style={{
+                background: "linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(10, 25, 47, 0.6) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                borderRadius: "14px",
+                padding: "20px",
+                marginBottom: "20px",
+              }}
+            >
               <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#67e8f9", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
                 <span>👥</span> จัดการรายชื่อผู้เข้าแข่งขัน The Trial (งุ่นง่าน 2026)
               </h3>
@@ -1518,7 +2163,7 @@ export default function TrialAdminPage() {
                     fontSize: "14px",
                     fontWeight: "900",
                     cursor: "pointer",
-                    boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)"
+                    boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
                   }}
                 >
                   ⚡ ซิงก์รายชื่อ 39 คนตั้งต้น
@@ -1542,12 +2187,50 @@ export default function TrialAdminPage() {
               </div>
             </div>
 
-            <div style={{
-              background: "rgba(0, 10, 22, 0.6)",
-              border: "1px solid rgba(0, 229, 255, 0.2)",
-              borderRadius: "14px",
-              padding: "20px"
-            }}>
+            {/* Danger Zone: Reset All Scores */}
+            <div
+              style={{
+                background: "rgba(239, 68, 68, 0.08)",
+                border: "1.5px solid rgba(239, 68, 68, 0.4)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#fca5a5", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>⚠️</span> รีเซ็ตคะแนนการแข่งขันทั้งหมด (Reset All Scores)
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                การกดปุ่มนี้จะล้างคะแนนทั้ง 4 หมวดของผู้เข้าแข่งขันทุกคนใน The Trial FOTY กลับเป็น 0 และปลดสถานะกำลังแข่ง โดยรายชื่อและรูปภาพจะยังคงอยู่เหมือนเดิม
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowResetModal(true)}
+                style={{
+                  padding: "12px 24px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(90deg, #dc2626 0%, #991b1b 100%)",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: "14px",
+                  fontWeight: "800",
+                  cursor: "pointer",
+                  boxShadow: "0 0 16px rgba(220, 38, 38, 0.4)",
+                }}
+              >
+                🔄 รีเซ็ตคะแนนทั้งหมด
+              </button>
+            </div>
+
+            {/* Stats Summary Card */}
+            <div
+              style={{
+                background: "rgba(0, 10, 22, 0.6)",
+                border: "1px solid rgba(0, 229, 255, 0.2)",
+                borderRadius: "14px",
+                padding: "20px",
+              }}
+            >
               <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#00e5ff", margin: "0 0 12px" }}>
                 📊 ข้อมูลสถิติชุดทดสอบ The Trial
               </h3>
@@ -1565,7 +2248,7 @@ export default function TrialAdminPage() {
                 <div style={{ background: "rgba(0, 0, 0, 0.3)", padding: "12px", borderRadius: "8px" }}>
                   <div style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "11px" }}>คะแนนสูงสุดในชุดทดสอบ:</div>
                   <div style={{ fontSize: "20px", fontWeight: "900", color: "#ffd700", marginTop: "4px" }}>
-                    {Math.max(0, ...contestants.map((c) => Number(c.totalScore) || 0))} คะแนน
+                    {Math.max(0, ...contestants.map((c) => c.totalScore || 0))} คะแนน
                   </div>
                 </div>
               </div>
@@ -1573,6 +2256,304 @@ export default function TrialAdminPage() {
           </div>
         )}
       </div>
+
+      {/* ========================================================
+          MODAL: ADD / EDIT CONTESTANT (Matching Main Admin Exact Structure)
+         ======================================================== */}
+      {showContestantModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.75)",
+            backdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "520px",
+              width: "100%",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              background: "linear-gradient(150deg, #0d213a 0%, #07101f 100%)",
+              border: "1px solid rgba(0, 229, 255, 0.4)",
+              borderRadius: "18px",
+              padding: "26px",
+              boxShadow: "0 0 40px rgba(0, 229, 255, 0.25)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+              <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
+                {modalMode === "edit" ? "✏️ แก้ไขข้อมูล / ผูกรูปผู้เข้าแข่งขัน" : "➕ เพิ่มผู้เข้าแข่งขันใหม่"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowContestantModal(false)}
+                style={{ background: "transparent", border: "none", color: "#fff", fontSize: "20px", cursor: "pointer" }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveContestant}>
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
+                  ชื่อจริง - นามสกุล *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="เช่น นัทธสม บุญมา"
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    background: "#050b14",
+                    border: "1px solid rgba(0,229,255,0.3)",
+                    color: "#fff",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
+                    ชื่อเล่น
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nickname}
+                    onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                    placeholder="เช่น ซ่า"
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      background: "#050b14",
+                      border: "1px solid rgba(0,229,255,0.3)",
+                      color: "#fff",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
+                    ลำดับแข่ง (Order)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.order}
+                    onChange={(e) => setFormData({ ...formData, order: e.target.value })}
+                    placeholder="เช่น 1, 2, 3"
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      background: "#050b14",
+                      border: "1px solid rgba(0,229,255,0.3)",
+                      color: "#fff",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#80d0ff", marginBottom: "4px" }}>
+                  หัวข้อแฟนพันธุ์แท้ *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.topic}
+                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                  placeholder="เช่น ประวัติศาสตร์ไทย"
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    background: "#050b14",
+                    border: "1px solid rgba(0,229,255,0.3)",
+                    color: "#fff",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+
+              {/* Photo Binding Section */}
+              <div
+                style={{
+                  background: "rgba(0, 15, 30, 0.7)",
+                  border: "1px solid rgba(0, 229, 255, 0.25)",
+                  borderRadius: "10px",
+                  padding: "14px",
+                  marginBottom: "16px",
+                }}
+              >
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "700", color: "#00e5ff", marginBottom: "8px" }}>
+                  🖼️ ผูกรูปภาพผู้เข้าแข่งขัน (Google Photos Binding)
+                </label>
+
+                <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "10px" }}>
+                  <div
+                    style={{
+                      width: "56px",
+                      height: "56px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      background: "#050b14",
+                      border: "2px solid #00e5ff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <AdminPhotoPreview src={formData.image} name={formData.name} size={56} />
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <input
+                      type="text"
+                      value={formData.image}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      placeholder="วาง URL รูปภาพ เช่น https://lh3.googleusercontent.com/..."
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1px solid rgba(0,229,255,0.3)",
+                        color: "#fff",
+                        fontSize: "12px",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "4px", display: "block" }}>
+                      รองรับ Direct Link ของ Google Photos (`lh3.googleusercontent.com`)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowContestantModal(false)}
+                  style={{
+                    padding: "10px 18px",
+                    borderRadius: "8px",
+                    background: "rgba(255,255,255,0.1)",
+                    border: "none",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                  }}
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px 22px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                    border: "none",
+                    color: "#030812",
+                    fontWeight: "800",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                  }}
+                >
+                  💾 บันทึกข้อมูล
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          MODAL: RESET COMPETITION CONFIRMATION
+         ======================================================== */}
+      {showResetModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.8)",
+            backdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "460px",
+              width: "100%",
+              background: "linear-gradient(150deg, #2b0b0e 0%, #150507 100%)",
+              border: "1.5px solid #ef4444",
+              borderRadius: "18px",
+              padding: "26px",
+              boxShadow: "0 0 40px rgba(239, 68, 68, 0.4)",
+            }}
+          >
+            <div style={{ fontSize: "36px", textAlign: "center", marginBottom: "12px" }}>⚠️</div>
+            <h3 style={{ fontSize: "18px", fontWeight: "900", color: "#fca5a5", textAlign: "center", margin: "0 0 10px 0" }}>
+              ยืนยันการรีเซ็ตคะแนนทั้งหมด?
+            </h3>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)", lineHeight: "1.6", textAlign: "center", margin: "0 0 20px 0" }}>
+              คะแนนทั้ง 4 หมวดของผู้เข้าแข่งขันทุกคนจะถูกรีเซ็ตกลับเป็น <strong>0</strong> และปลดสถานะกำลังแข่งทั้งหมด เพื่อให้พร้อมเริ่มแข่งขันรอบใหม่ (รายชื่อและรูปภาพจะไม่ถูกลบ)
+            </p>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button
+                type="button"
+                onClick={() => setShowResetModal(false)}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: "8px",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleResetScores}
+                style={{
+                  padding: "10px 22px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(90deg, #dc2626 0%, #991b1b 100%)",
+                  border: "none",
+                  color: "#ffffff",
+                  fontWeight: "800",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  boxShadow: "0 0 15px rgba(220, 38, 38, 0.5)",
+                }}
+              >
+                🔄 ยืนยันการรีเซ็ต
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
