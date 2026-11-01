@@ -980,7 +980,7 @@ export default function TrialFotyBallotVotePage() {
 
           <BallotDropdown
             rankKey="champion"
-            label="🏆 ผู้ที่คิดว่าจะเป็นสุดยอดแฟนพันธุ์แท้แห่งปี (The Champion)"
+            label="ผู้ที่คิดว่าจะเป็นสุดยอดแฟนพันธุ์แท้แห่งปี (The Champion)"
             badgeIcon="🏆"
             badgeColor="#ffd700"
             badgeBg="rgba(255, 215, 0, 0.25)"
