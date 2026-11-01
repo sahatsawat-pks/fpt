@@ -214,6 +214,34 @@ export default function TrialAdminPage() {
     }
   };
 
+  // Reload 39 Contestants Roster
+  const handleReloadTrialRoster = async () => {
+    if (!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการรีโหลดรายชื่อ 39 คนตั้งต้นของ งุ่นง่าน Of The Year 2026?")) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reload_trial_roster" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContestants(data.data);
+        setSelectedContestantId("");
+        setActiveScores({ "3sec": "", qa: "", jigsaw: "", attribute: "" });
+        setOrderInput("");
+        setIsPlayingInput(false);
+        setWaitingInput(false);
+        showToast("รีโหลดรายชื่อ 39 คนตั้งต้นเรียบร้อยแล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+    }
+  };
+
   // Save Contestant Edit
   const handleSaveEditContestant = async (e) => {
     e.preventDefault();
@@ -1463,7 +1491,7 @@ export default function TrialAdminPage() {
               </button>
             </div>
 
-            {/* Reset to Blank Slots Box */}
+            {/* Reset / Reload Roster Box */}
             <div style={{
               background: "linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(10, 25, 47, 0.6) 100%)",
               border: "1px solid rgba(0, 229, 255, 0.35)",
@@ -1472,28 +1500,46 @@ export default function TrialAdminPage() {
               marginBottom: "20px"
             }}>
               <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#67e8f9", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>👥</span> สร้างช่องว่างผู้เข้าแข่งขันใหม่ (Reset Blank Slots)
+                <span>👥</span> จัดการรายชื่อผู้เข้าแข่งขัน The Trial (งุ่นง่าน 2026)
               </h3>
               <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
-                ล้างรายชื่อชุดอื่นออก และสร้าง Slot ว่างสำหรับใส่ชื่อเล่น, ชื่อจริง, หัวข้อ และแปะรูปภาพ Google Photos ของชุดงุ่นง่าน 2026 ด้วยตนเอง
+                สามารถรีโหลดรายชื่อชุดตั้งต้น 39 คน หรือล้างเป็นช่องว่างสำหรับกรอกรายชื่อใหม่ได้ตามต้องการ
               </p>
-              <button
-                type="button"
-                onClick={handleResetBlankSlots}
-                style={{
-                  padding: "12px 24px",
-                  borderRadius: "10px",
-                  background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                  border: "none",
-                  color: "#030814",
-                  fontSize: "14px",
-                  fontWeight: "900",
-                  cursor: "pointer",
-                  boxShadow: "0 0 16px rgba(0, 229, 255, 0.4)"
-                }}
-              >
-                🔄 รีเซ็ตเป็นช่องว่าง 20 คน
-              </button>
+              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={handleReloadTrialRoster}
+                  style={{
+                    padding: "12px 24px",
+                    borderRadius: "10px",
+                    background: "linear-gradient(90deg, #ffd700 0%, #f59e0b 100%)",
+                    border: "none",
+                    color: "#030814",
+                    fontSize: "14px",
+                    fontWeight: "900",
+                    cursor: "pointer",
+                    boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)"
+                  }}
+                >
+                  ⚡ ซิงก์รายชื่อ 39 คนตั้งต้น
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetBlankSlots}
+                  style={{
+                    padding: "12px 24px",
+                    borderRadius: "10px",
+                    background: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    fontWeight: "800",
+                    cursor: "pointer",
+                  }}
+                >
+                  🔄 ล้างเป็นช่องว่าง 20 คน
+                </button>
+              </div>
             </div>
 
             <div style={{

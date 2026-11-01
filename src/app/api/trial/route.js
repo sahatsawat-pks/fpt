@@ -143,6 +143,14 @@ export async function POST(req) {
       return NextResponse.json({ success: true, data, message: `รีเซ็ตเป็นช่องว่าง ${count} ผู้เข้าแข่งขันเรียบร้อยแล้ว` });
     }
 
+    // 6.2 Reload trial roster from trial-leaderboard.json
+    if (body.action === "reload_trial_roster" || body.action === "reload_file_roster") {
+      const fileData = readData();
+      data = fileData;
+      await saveKVData("fpt_trial", data, writeData);
+      return NextResponse.json({ success: true, data, message: `รีโหลดรายชื่อผู้เข้าแข่งขันจากไฟล์เรียบร้อยแล้ว (${data.length} คน)` });
+    }
+
     // 7. Save / update contestant score (both action-based and direct payload)
     const targetId = body.id;
     if (!targetId) {
