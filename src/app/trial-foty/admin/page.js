@@ -156,6 +156,60 @@ export default function TrialAdminPage() {
     });
   };
 
+  const handleRankVoteChange = (index, rankKey, value) => {
+    const num = Math.max(0, parseInt(value) || 0);
+    setPollItems((prev) => {
+      const updated = [...prev];
+      const item = { ...updated[index] };
+      const currentRanks = {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        ...(item.rankVotes || {}),
+      };
+      currentRanks[rankKey] = num;
+      item.rankVotes = currentRanks;
+
+      // Auto calculate total points
+      const champ = Number(item.championVotes) || 0;
+      const calcVotes =
+        (Number(currentRanks["1"]) || 0) * 5 +
+        (Number(currentRanks["2"]) || 0) * 4 +
+        (Number(currentRanks["3"]) || 0) * 3 +
+        (Number(currentRanks["4"]) || 0) * 2 +
+        (Number(currentRanks["5"]) || 0) * 1 +
+        champ * 5;
+
+      item.votes = calcVotes;
+      updated[index] = item;
+      return updated;
+    });
+  };
+
+  const handleChampionVoteChange = (index, value) => {
+    const num = Math.max(0, parseInt(value) || 0);
+    setPollItems((prev) => {
+      const updated = [...prev];
+      const item = { ...updated[index] };
+      item.championVotes = num;
+
+      const currentRanks = item.rankVotes || {};
+      const calcVotes =
+        (Number(currentRanks["1"]) || 0) * 5 +
+        (Number(currentRanks["2"]) || 0) * 4 +
+        (Number(currentRanks["3"]) || 0) * 3 +
+        (Number(currentRanks["4"]) || 0) * 2 +
+        (Number(currentRanks["5"]) || 0) * 1 +
+        num * 5;
+
+      item.votes = calcVotes;
+      updated[index] = item;
+      return updated;
+    });
+  };
+
   const handleAddPollItem = () => {
     const newRank = pollItems.length + 1;
     setPollItems((prev) => [
@@ -2394,16 +2448,27 @@ export default function TrialAdminPage() {
             >
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "850px", fontSize: "14px" }}>
                 <thead>
-                  <tr style={{ background: "rgba(0, 229, 255, 0.08)", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
-                    <th style={{ padding: "12px 14px", textAlign: "center", width: "95px", color: "#ffd700", fontWeight: "800" }}>อันดับโพลล์</th>
-                    <th style={{ padding: "12px 14px", textAlign: "center", width: "55px", color: "#80d0ff" }}>รูป</th>
-                    <th style={{ padding: "12px 14px", textAlign: "left", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
-                    <th style={{ padding: "12px 14px", textAlign: "left", width: "130px", color: "#80d0ff" }}>ชื่อเล่น</th>
-                    <th style={{ padding: "12px 14px", textAlign: "left", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
-                    <th style={{ padding: "12px 14px", textAlign: "center", width: "110px", color: "#80d0ff" }}>คะแนนโหวต</th>
-                    <th style={{ padding: "12px 14px", textAlign: "center", width: "110px", color: "#80d0ff" }}>คิดเป็น %</th>
-                    <th style={{ padding: "12px 14px", textAlign: "center", width: "110px", color: "#80d0ff" }}>เลื่อนลำดับ</th>
-                    <th style={{ padding: "12px 14px", textAlign: "center", width: "70px", color: "#80d0ff" }}>ลบ</th>
+                  <tr style={{ background: "rgba(0, 229, 255, 0.12)", borderBottom: "1px solid rgba(0, 229, 255, 0.3)" }}>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "80px", color: "#ffd700", fontWeight: "800" }}>อันดับ</th>
+                    <th rowSpan={2} style={{ padding: "10px 4px", textAlign: "center", width: "48px", color: "#80d0ff" }}>รูป</th>
+                    <th rowSpan={2} style={{ padding: "10px 10px", textAlign: "left", minWidth: "140px", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "110px", color: "#80d0ff" }}>ชื่อเล่น</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", minWidth: "150px", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
+                    <th colSpan={6} style={{ padding: "8px", textAlign: "center", color: "#ffd700", background: "rgba(255, 215, 0, 0.12)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)", borderRight: "1px solid rgba(255, 215, 0, 0.3)", fontWeight: "900", fontSize: "13px" }}>
+                      📊 จำนวนคนโหวตแยกอันดับ (Vote Breakdown)
+                    </th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "80px", color: "#67e8f9", fontWeight: "800" }}>คะแนนรวม</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "85px", color: "#ffd700", fontWeight: "800" }}>คิดเป็น %</th>
+                    <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "76px", color: "#80d0ff" }}>เลื่อน</th>
+                    <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "45px", color: "#80d0ff" }}>ลบ</th>
+                  </tr>
+                  <tr style={{ background: "rgba(255, 215, 0, 0.06)", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#ffd700", fontSize: "12px", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="อันดับ 1 (5 คะแนน)">🥇 #1</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#e2e8f0", fontSize: "12px" }} title="อันดับ 2 (4 คะแนน)">🥈 #2</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#cd7f32", fontSize: "12px" }} title="อันดับ 3 (3 คะแนน)">🥉 #3</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#38bdf8", fontSize: "12px" }} title="อันดับ 4 (2 คะแนน)">🎖️ #4</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#a855f7", fontSize: "12px" }} title="อันดับ 5 (1 คะแนน)">🎖️ #5</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "52px", color: "#ffd700", fontSize: "12px", borderRight: "1px solid rgba(255, 215, 0, 0.3)" }} title="สุดยอดแฟนพันธุ์แท้ (5 คะแนน)">🏆 แชมป์</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2530,22 +2595,155 @@ export default function TrialAdminPage() {
                           />
                         </td>
 
-                        {/* Votes Input */}
-                        <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                        {/* Rank 1 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center", borderLeft: "1px solid rgba(255, 215, 0, 0.15)" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.rankVotes?.["1"] ?? item.rankVotes?.[1] ?? 0}
+                            onChange={(e) => handleRankVoteChange(index, "1", e.target.value)}
+                            title="จำนวนคนโหวตให้อยู่อันดับ 1 (5 คะแนน)"
+                            style={{
+                              width: "46px",
+                              padding: "6px 2px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(255, 215, 0, 0.4)",
+                              color: "#ffd700",
+                              fontSize: "13px",
+                              fontWeight: "800",
+                              textAlign: "center",
+                            }}
+                          />
+                        </td>
+
+                        {/* Rank 2 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.rankVotes?.["2"] ?? item.rankVotes?.[2] ?? 0}
+                            onChange={(e) => handleRankVoteChange(index, "2", e.target.value)}
+                            title="จำนวนคนโหวตให้อยู่อันดับ 2 (4 คะแนน)"
+                            style={{
+                              width: "46px",
+                              padding: "6px 2px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(226, 232, 240, 0.3)",
+                              color: "#e2e8f0",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              textAlign: "center",
+                            }}
+                          />
+                        </td>
+
+                        {/* Rank 3 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.rankVotes?.["3"] ?? item.rankVotes?.[3] ?? 0}
+                            onChange={(e) => handleRankVoteChange(index, "3", e.target.value)}
+                            title="จำนวนคนโหวตให้อยู่อันดับ 3 (3 คะแนน)"
+                            style={{
+                              width: "46px",
+                              padding: "6px 2px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(205, 127, 50, 0.3)",
+                              color: "#cd7f32",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              textAlign: "center",
+                            }}
+                          />
+                        </td>
+
+                        {/* Rank 4 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.rankVotes?.["4"] ?? item.rankVotes?.[4] ?? 0}
+                            onChange={(e) => handleRankVoteChange(index, "4", e.target.value)}
+                            title="จำนวนคนโหวตให้อยู่อันดับ 4 (2 คะแนน)"
+                            style={{
+                              width: "46px",
+                              padding: "6px 2px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(56, 189, 248, 0.3)",
+                              color: "#38bdf8",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              textAlign: "center",
+                            }}
+                          />
+                        </td>
+
+                        {/* Rank 5 votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.rankVotes?.["5"] ?? item.rankVotes?.[5] ?? 0}
+                            onChange={(e) => handleRankVoteChange(index, "5", e.target.value)}
+                            title="จำนวนคนโหวตให้อยู่อันดับ 5 (1 คะแนน)"
+                            style={{
+                              width: "46px",
+                              padding: "6px 2px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(168, 85, 247, 0.3)",
+                              color: "#a855f7",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              textAlign: "center",
+                            }}
+                          />
+                        </td>
+
+                        {/* Champion votes */}
+                        <td style={{ padding: "6px 2px", textAlign: "center", borderRight: "1px solid rgba(255, 215, 0, 0.15)" }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.championVotes ?? 0}
+                            onChange={(e) => handleChampionVoteChange(index, e.target.value)}
+                            title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (5 คะแนนพิเศษ)"
+                            style={{
+                              width: "46px",
+                              padding: "6px 2px",
+                              borderRadius: "6px",
+                              background: "#050b14",
+                              border: "1px solid rgba(255, 215, 0, 0.5)",
+                              color: "#ffd700",
+                              fontSize: "13px",
+                              fontWeight: "900",
+                              textAlign: "center",
+                            }}
+                          />
+                        </td>
+
+                        {/* Total Score Input */}
+                        <td style={{ padding: "8px 6px", textAlign: "center" }}>
                           <input
                             type="number"
                             min="0"
                             value={item.votes ?? 0}
                             onChange={(e) => handlePollFieldChange(index, "votes", Math.max(0, parseInt(e.target.value) || 0))}
+                            title="คะแนนรวมทั้งหมด (คำนวณจากโหวตอัตโนมัติ หรือแก้ไขได้)"
                             style={{
-                              width: "80px",
-                              padding: "8px 6px",
+                              width: "65px",
+                              padding: "6px 4px",
                               borderRadius: "6px",
                               background: "#050b14",
                               border: "1px solid rgba(0, 229, 255, 0.4)",
                               color: "#67e8f9",
                               fontSize: "13px",
-                              fontWeight: "700",
+                              fontWeight: "800",
                               textAlign: "center",
                             }}
                           />
@@ -2649,7 +2847,7 @@ export default function TrialAdminPage() {
 
                   {pollItems.length === 0 && (
                     <tr>
-                      <td colSpan={9} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.5)" }}>
+                      <td colSpan={15} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.5)" }}>
                         ยังไม่มีข้อมูลในตารางอันดับโพลล์ กดปุ่ม "➕ เพิ่มคนในโพลล์" หรือ "🔄 รีเซ็ตค่าเริ่มต้น" เพื่อเริ่มต้น
                       </td>
                     </tr>

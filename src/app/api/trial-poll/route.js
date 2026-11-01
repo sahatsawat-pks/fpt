@@ -77,6 +77,16 @@ export async function POST(request) {
         percent: String(item.percent || "").trim() || "0.00%",
         votes: Number(item.votes) || 0,
         championVotes: Number(item.championVotes) || 0,
+        rankVotes:
+          item.rankVotes && typeof item.rankVotes === "object"
+            ? {
+                "1": Number(item.rankVotes["1"] || item.rankVotes[1]) || 0,
+                "2": Number(item.rankVotes["2"] || item.rankVotes[2]) || 0,
+                "3": Number(item.rankVotes["3"] || item.rankVotes[3]) || 0,
+                "4": Number(item.rankVotes["4"] || item.rankVotes[4]) || 0,
+                "5": Number(item.rankVotes["5"] || item.rankVotes[5]) || 0,
+              }
+            : { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
         image: item.image || "",
       }));
 
