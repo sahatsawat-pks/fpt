@@ -469,27 +469,6 @@ export default function TrialFOTYPage() {
               🏆 ตารางคะแนน
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTableTab("poll");
-                const el = document.getElementById("leaderboard");
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: activeTableTab === "poll" ? "rgba(255, 215, 0, 0.25)" : "transparent",
-                border: "none",
-                color: "#ffd700",
-                fontWeight: "700",
-                fontSize: "13px",
-                cursor: "pointer",
-              }}
-            >
-              📊 โพลล์มหาชน
-            </button>
-
             <Link
               href="/trial-foty/vote"
               style={{
