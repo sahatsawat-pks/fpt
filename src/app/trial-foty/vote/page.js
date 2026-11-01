@@ -610,7 +610,7 @@ function ChampionDropdownCard({
               border: "1px solid rgba(255, 215, 0, 0.4)",
             }}
           >
-            ★ คะแนนพิเศษ 5 แต้ม
+            ★ คะแนนพิเศษ 10 แต้ม
           </span>
         </div>
 
@@ -1327,7 +1327,7 @@ export default function TrialFotyBallotVotePage() {
             <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
               <span style={{ color: "#ffd700", fontWeight: "900" }}>2.</span>
               <span>
-                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว (รับคะแนนพิเศษ 5 แต้ม)
+                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว (รับคะแนนพิเศษ 10 แต้ม)
               </span>
             </div>
           </div>

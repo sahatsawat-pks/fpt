@@ -172,7 +172,7 @@ export default function TrialAdminPage() {
       currentRanks[rankKey] = num;
       item.rankVotes = currentRanks;
 
-      // Auto calculate total points
+      // Auto calculate total points (อันดับ 1=5, 2=4, 3=3, 4=2, 5=1, แชมป์=10)
       const champ = Number(item.championVotes) || 0;
       const calcVotes =
         (Number(currentRanks["1"]) || 0) * 5 +
@@ -180,7 +180,7 @@ export default function TrialAdminPage() {
         (Number(currentRanks["3"]) || 0) * 3 +
         (Number(currentRanks["4"]) || 0) * 2 +
         (Number(currentRanks["5"]) || 0) * 1 +
-        champ * 5;
+        champ * 10;
 
       item.votes = calcVotes;
       updated[index] = item;
@@ -202,7 +202,7 @@ export default function TrialAdminPage() {
         (Number(currentRanks["3"]) || 0) * 3 +
         (Number(currentRanks["4"]) || 0) * 2 +
         (Number(currentRanks["5"]) || 0) * 1 +
-        num * 5;
+        num * 10;
 
       item.votes = calcVotes;
       updated[index] = item;
@@ -2550,7 +2550,7 @@ export default function TrialAdminPage() {
                     <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#cd7f32", fontSize: "12px" }} title="อันดับ 3 (3 คะแนน)">🥉 #3</th>
                     <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#38bdf8", fontSize: "12px" }} title="อันดับ 4 (2 คะแนน)">🎖️ #4</th>
                     <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#a855f7", fontSize: "12px" }} title="อันดับ 5 (1 คะแนน)">🎖️ #5</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "52px", color: "#ffd700", fontSize: "12px", borderRight: "1px solid rgba(255, 215, 0, 0.3)" }} title="สุดยอดแฟนพันธุ์แท้ (5 คะแนน)">🏆 แชมป์</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "52px", color: "#ffd700", fontSize: "12px", borderRight: "1px solid rgba(255, 215, 0, 0.3)" }} title="สุดยอดแฟนพันธุ์แท้ (10 คะแนน)">🏆 แชมป์</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2820,7 +2820,7 @@ export default function TrialAdminPage() {
                             min="0"
                             value={item.championVotes ?? 0}
                             onChange={(e) => handleChampionVoteChange(index, e.target.value)}
-                            title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (5 คะแนนพิเศษ)"
+                            title="จำนวนคนโหวตให้เป็นสุดยอดแฟนพันธุ์แท้ (10 คะแนนพิเศษ)"
                             style={{
                               width: "46px",
                               padding: "6px 2px",

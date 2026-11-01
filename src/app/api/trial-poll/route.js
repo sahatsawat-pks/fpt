@@ -183,13 +183,13 @@ export async function POST(request) {
         });
       });
 
-      // Add champion vote
+      // Add champion vote (10 คะแนนพิเศษ)
       if (championId) {
         const champTarget = current.find(
           (item) => String(item.id) === String(championId) || String(item.pollRank) === String(championId)
         );
         if (champTarget) {
-          champTarget.votes = (Number(champTarget.votes) || 0) + 5; // เพิ่ม 5 คะแนนพิเศษสำหรับตำแหน่งแชมป์
+          champTarget.votes = (Number(champTarget.votes) || 0) + 10; // เพิ่ม 10 คะแนนพิเศษสำหรับตำแหน่งแชมป์
           champTarget.championVotes = (Number(champTarget.championVotes) || 0) + 1;
         }
       }
