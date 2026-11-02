@@ -2018,9 +2018,9 @@ export default function TrialFOTYPage() {
               )}
             </div>
 
-            {/* Warm-up Graphic Layout */}
-            <div style={{ overflowX: "auto", padding: "12px 14px 28px 14px", WebkitOverflowScrolling: "touch" }}>
-              <div style={{ minWidth: "1040px", boxSizing: "border-box" }}>
+            {/* Warm-up Graphic Layout (Matching 1:1 with Normal Standings Table) */}
+            <div style={{ overflowX: "auto", padding: "12px 24px 28px 24px" }}>
+              <div style={{ minWidth: "980px", padding: "0 14px", boxSizing: "border-box" }}>
                 {/* Top Main Tournament Banner Pill */}
                 <div
                   style={{
@@ -2049,37 +2049,38 @@ export default function TrialFOTYPage() {
                         textShadow: "0 2px 10px rgba(0,0,0,0.8)",
                       }}
                     >
-                      WARM-UP WHAT IF? ROUND STANDINGS 2026
+                      THE TRIAL FAN OF THE YEAR 2026 • WARM-UP STANDINGS
                     </h2>
                   </div>
                   <div style={{ transform: "skewX(16deg)", fontSize: "12px", color: "rgba(255,255,255,0.7)", fontStyle: "italic", fontWeight: "700" }}>
-                    คะแนนเต็ม 100 (สัดส่วน 30% ของโพลล์มหาชน)
+                    คะแนนรอบอุ่นเครื่อง (What If? • สัดส่วน 30% ในโพลล์มหาชน)
                   </div>
                 </div>
 
-                {/* Column Headers Row (Slanted Pills) */}
+                {/* Column Headers Row (Matching Normal Standings Exactly) */}
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-                  {/* Rank Header */}
+                  {/* Header 1: อันดับ */}
                   <div
                     style={{
-                      width: "88px",
+                      width: "60px",
                       height: "32px",
                       borderRadius: "8px",
                       transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #3d1b06 0%, #170902 100%)",
-                      border: "2px solid #ff8800",
-                      boxShadow: "0 0 10px rgba(255, 136, 0, 0.4)",
+                      background: "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                      border: "2px solid #ffd700",
+                      boxShadow: "0 0 10px rgba(255, 215, 0, 0.35)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      flexShrink: 0,
                     }}
                   >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffa940" }}>
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
                       อันดับ
                     </span>
                   </div>
 
-                  {/* Contestant Name Header */}
+                  {/* Header 2: ผู้เข้าแข่งขัน */}
                   <div
                     style={{
                       flex: 1,
@@ -2095,75 +2096,98 @@ export default function TrialFOTYPage() {
                     }}
                   >
                     <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "13px", color: "#ffffff", letterSpacing: "1px" }}>
-                      ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง)
+                      ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง • หัวข้อ)
                     </span>
                   </div>
 
-                  {/* Topic Header */}
+                  {/* Header 3: 3 วินาที (Green) */}
                   <div
                     style={{
-                      width: "220px",
+                      width: "74px",
                       height: "32px",
                       borderRadius: "8px",
                       transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #0a2538 0%, #03101a 100%)",
+                      background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)",
+                      border: "2px solid #52c41a",
+                      boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#86efac" }}>
+                      3 วินาที
+                    </span>
+                  </div>
+
+                  {/* Header 4: ถาม-ตอบ (Silver) */}
+                  <div
+                    style={{
+                      width: "74px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      transform: "skewX(-16deg)",
+                      background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
+                      border: "2px solid #e0e0e0",
+                      boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>
+                      ถาม-ตอบ
+                    </span>
+                  </div>
+
+                  {/* Header 5: จิ๊กซอว์ (Red) */}
+                  <div
+                    style={{
+                      width: "74px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      transform: "skewX(-16deg)",
+                      background: "linear-gradient(180deg, #331316 0%, #160608 100%)",
+                      border: "2px solid #ff4d4f",
+                      boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#fca5a5" }}>
+                      จิ๊กซอว์
+                    </span>
+                  </div>
+
+                  {/* Header 6: คุณสมบัติ (Cyan) */}
+                  <div
+                    style={{
+                      width: "74px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      transform: "skewX(-16deg)",
+                      background: "linear-gradient(180deg, #092338 0%, #03101c 100%)",
                       border: "2px solid #00e5ff",
                       boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      flexShrink: 0,
                     }}
                   >
                     <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>
-                      หัวข้อแฟนพันธุ์แท้
+                      คุณสมบัติ
                     </span>
                   </div>
 
-                  {/* 4 Rounds Header */}
+                  {/* Header 7: รวมคะแนน (Gold) */}
                   <div
                     style={{
-                      width: "220px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #1a2233 0%, #0c111c 100%)",
-                      border: "2px solid rgba(255, 255, 255, 0.35)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-around",
-                      padding: "0 6px",
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontWeight: "800", fontSize: "11px", color: "#52c41a" }}>3วิ</span>
-                    <span style={{ transform: "skewX(16deg)", fontWeight: "800", fontSize: "11px", color: "#d9d9d9" }}>ถามตอบ</span>
-                    <span style={{ transform: "skewX(16deg)", fontWeight: "800", fontSize: "11px", color: "#ff4d4f" }}>จิ๊กซอว์</span>
-                    <span style={{ transform: "skewX(16deg)", fontWeight: "800", fontSize: "11px", color: "#00e5ff" }}>คุณสมบัติ</span>
-                  </div>
-
-                  {/* Total Score Header */}
-                  <div
-                    style={{
-                      width: "110px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #3d1b06 0%, #170902 100%)",
-                      border: "2px solid #ff8800",
-                      boxShadow: "0 0 10px rgba(255, 136, 0, 0.4)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffa940" }}>
-                      รวมเต็ม 100
-                    </span>
-                  </div>
-
-                  {/* Weight 30% Header */}
-                  <div
-                    style={{
-                      width: "110px",
+                      width: "78px",
                       height: "32px",
                       borderRadius: "8px",
                       transform: "skewX(-16deg)",
@@ -2173,10 +2197,11 @@ export default function TrialFOTYPage() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      flexShrink: 0,
                     }}
                   >
                     <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                      สัดส่วน 30%
+                      คะแนน
                     </span>
                   </div>
                 </div>
@@ -2187,7 +2212,7 @@ export default function TrialFOTYPage() {
                     ไม่พบข้อมูลผู้เข้าแข่งขันในตารางรอบอุ่นเครื่อง
                   </div>
                 ) : (
-                  filteredWarmup.map((item) => {
+                  filteredWarmup.map((item, index) => {
                     const matchedContestant = contestants.find(
                       (c) =>
                         (c.id && item.id && String(c.id) === String(item.id)) ||
@@ -2204,279 +2229,315 @@ export default function TrialFOTYPage() {
                     const scoreJigsaw = scores.jigsaw !== undefined && scores.jigsaw !== null ? scores.jigsaw : null;
                     const scoreAttr = scores.attribute !== undefined && scores.attribute !== null ? scores.attribute : null;
 
+                    const prevItem = index > 0 ? filteredWarmup[index - 1] : null;
+                    const showCutoffLine =
+                      prevItem &&
+                      (Number(prevItem.warmupRank) || 0) <= 5 &&
+                      (Number(item.warmupRank) || 0) > 5;
+
                     return (
-                      <div
-                        key={item.id || item.name}
-                        onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
-                        title="คลิกเพื่อดูสถิติเจาะลึก"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          marginBottom: "8px",
-                          cursor: "pointer",
-                          transition: "transform 0.15s ease, filter 0.15s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
-                          e.currentTarget.style.filter = "brightness(1.15)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = "scale(1) translateX(0)";
-                          e.currentTarget.style.filter = "brightness(1)";
-                        }}
-                      >
-                        {/* Slanted Warm-up Rank Box */}
-                        <div
-                          style={{
-                            width: "88px",
-                            height: "48px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: isTop5
-                              ? "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)"
-                              : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
-                            border: isTop5 ? "2.5px solid #ffa940" : "2.5px solid rgba(255, 255, 255, 0.3)",
-                            boxShadow: isRank1
-                              ? "0 0 20px rgba(255, 136, 0, 0.7)"
-                              : isTop5
-                              ? "0 0 14px rgba(255, 136, 0, 0.45)"
-                              : "0 0 8px rgba(0, 0, 0, 0.5)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <span
+                      <Fragment key={item.id || item.name}>
+                        {/* Cutoff Line after Top 5 */}
+                        {showCutoffLine && (
+                          <div
                             style={{
-                              transform: "skewX(16deg)",
-                              fontFamily: "var(--font-num)",
-                              fontStyle: "italic",
-                              fontWeight: "900",
-                              fontSize: isRank1 ? "22px" : "18px",
-                              color: isTop5 ? "#ffffff" : "#67e8f9",
-                              textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                              margin: "12px 0 16px",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "14px",
                             }}
                           >
-                            {isRank1 ? `👑 ${item.warmupRank}` : `#${item.warmupRank}`}
-                          </span>
-                        </div>
+                            <div style={{ flex: 1, height: "1.5px", background: "linear-gradient(90deg, transparent, #ffd700)" }} />
+                            <span
+                              style={{
+                                padding: "3px 14px",
+                                borderRadius: "20px",
+                                background: "rgba(255, 215, 0, 0.15)",
+                                border: "1px solid #ffd700",
+                                color: "#ffd700",
+                                fontSize: "11px",
+                                fontWeight: "800",
+                                letterSpacing: "1px",
+                              }}
+                            >
+                              ▲ 5 อันดับแรก (Top 5 Safe Zone) ▲
+                            </span>
+                            <div style={{ flex: 1, height: "1.5px", background: "linear-gradient(90deg, #ffd700, transparent)" }} />
+                          </div>
+                        )}
 
-                        {/* Contestant Name & Avatar Pill */}
                         <div
+                          onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
+                          title="คลิกเพื่อดูสถิติเจาะลึก"
                           style={{
-                            flex: 1,
-                            height: "48px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: "linear-gradient(180deg, #091a30 0%, #040c17 100%)",
-                            border: isTop5 ? "2px solid rgba(255, 136, 0, 0.5)" : "2px solid rgba(255, 255, 255, 0.25)",
-                            boxShadow: "0 4px 14px rgba(0, 0, 0, 0.6)",
                             display: "flex",
                             alignItems: "center",
-                            padding: "0 14px",
-                            gap: "12px",
-                            overflow: "hidden",
+                            gap: "8px",
+                            marginBottom: "8px",
+                            cursor: "pointer",
+                            transition: "transform 0.15s ease, filter 0.15s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
+                            e.currentTarget.style.filter = "brightness(1.15)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1) translateX(0)";
+                            e.currentTarget.style.filter = "brightness(1)";
                           }}
                         >
-                          <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-                            {photo ? (
-                              <img
-                                src={photo}
-                                alt={item.nickname || item.name}
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  borderRadius: "50%",
-                                  objectFit: "cover",
-                                  border: isTop5 ? "2px solid #ffa940" : "1.5px solid rgba(0, 229, 255, 0.5)",
-                                  flexShrink: 0,
-                                }}
-                              />
-                            ) : (
+                          {/* 1. Slanted Rank Capsule (Matching Normal Standings) */}
+                          <div
+                            style={{
+                              width: "60px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: isTop5
+                                ? "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)"
+                                : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                              border: isTop5 ? "2.5px solid #fff566" : "2.5px solid rgba(255, 255, 255, 0.3)",
+                              boxShadow: isRank1
+                                ? "0 0 18px rgba(255, 215, 0, 0.75)"
+                                : isTop5
+                                ? "0 0 14px rgba(255, 215, 0, 0.45)"
+                                : "0 0 8px rgba(0, 0, 0, 0.5)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <span
+                              style={{
+                                transform: "skewX(16deg)",
+                                fontStyle: "italic",
+                                fontWeight: "900",
+                                fontSize: "18px",
+                                color: isTop5 ? "#000000" : "#ffffff",
+                              }}
+                            >
+                              #{item.warmupRank}
+                            </span>
+                          </div>
+
+                          {/* 2. Slanted Name & Info Capsule (Matching Normal Standings) */}
+                          <div
+                            style={{
+                              flex: 1,
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #0f1c30 0%, #08111f 100%)",
+                              border: isTop5 ? "2px solid #ffd700" : "2px solid rgba(255, 255, 255, 0.3)",
+                              boxShadow: isTop5 ? "0 0 14px rgba(255, 215, 0, 0.3)" : "0 0 8px rgba(0, 0, 0, 0.5)",
+                              display: "flex",
+                              alignItems: "center",
+                              padding: "0 14px",
+                              gap: "12px",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px", width: "100%", minWidth: 0 }}>
+                              {/* Photo Avatar */}
                               <div
                                 style={{
                                   width: "36px",
                                   height: "36px",
                                   borderRadius: "50%",
-                                  background: "rgba(0, 229, 255, 0.15)",
-                                  border: "1px dashed rgba(0, 229, 255, 0.4)",
+                                  overflow: "hidden",
+                                  border: isTop5 ? "2px solid #ffd700" : "1.5px solid rgba(255, 255, 255, 0.5)",
+                                  flexShrink: 0,
+                                  background: "rgba(0, 0, 0, 0.4)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
-                                  fontSize: "13px",
-                                  fontWeight: "900",
-                                  color: "#67e8f9",
-                                  flexShrink: 0,
                                 }}
                               >
-                                {(item.nickname || item.name || "?").slice(0, 1)}
+                                {photo ? (
+                                  <img
+                                    src={getOptimizedImageUrl(photo, 80)}
+                                    alt={item.nickname || item.name}
+                                    referrerPolicy="no-referrer"
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                  />
+                                ) : (
+                                  <span style={{ fontSize: "16px" }}>👤</span>
+                                )}
                               </div>
-                            )}
-                            <div style={{ minWidth: 0 }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+
+                              {/* Contestant Text Info */}
+                              <div style={{ display: "flex", alignItems: "baseline", gap: "8px", overflow: "hidden", whiteSpace: "nowrap" }}>
                                 <span
                                   style={{
+                                    fontStyle: "italic",
                                     fontWeight: "900",
-                                    fontSize: "15px",
-                                    color: isTop5 ? "#ffa940" : "#ffffff",
+                                    fontSize: "16px",
+                                    color: isTop5 ? "#ffd700" : "#ffffff",
                                     letterSpacing: "0.5px",
-                                    whiteSpace: "nowrap",
                                   }}
                                 >
                                   {item.nickname || item.name}
                                 </span>
-                                {item.nickname && item.name && (
-                                  <span
-                                    style={{
-                                      fontSize: "12px",
-                                      color: "rgba(255, 255, 255, 0.55)",
-                                      whiteSpace: "nowrap",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                    }}
-                                  >
-                                    ({item.name})
-                                  </span>
-                                )}
+                                <span style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.65)", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {item.name}
+                                </span>
+                                <span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.45)" }}>•</span>
+                                <span style={{ fontSize: "12px", color: "#67e8f9", fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {item.topic}
+                                </span>
+                              </div>
+
+                              {/* 30% Weight Status Tag */}
+                              <div style={{ marginLeft: "auto", flexShrink: 0 }}>
+                                <span
+                                  style={{
+                                    display: "inline-block",
+                                    padding: "3px 9px",
+                                    borderRadius: "8px",
+                                    fontSize: "11px",
+                                    fontWeight: "800",
+                                    background: isTop5 ? "rgba(255, 215, 0, 0.15)" : "rgba(0, 229, 255, 0.12)",
+                                    border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
+                                    color: isTop5 ? "#ffd700" : "#67e8f9",
+                                  }}
+                                >
+                                  {isTop5 ? "🌟 TOP 5 (30% โพลล์)" : "30% โพลล์"}
+                                </span>
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Topic Pill */}
-                        <div
-                          style={{
-                            width: "220px",
-                            height: "48px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: "linear-gradient(180deg, #071728 0%, #030b14 100%)",
-                            border: "2px solid rgba(0, 229, 255, 0.35)",
-                            boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            padding: "0 12px",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <span
+                          {/* 3. Slanted 3 วินาที Pill (Green) */}
+                          {(() => {
+                            const sc = score3sec;
+                            const st = getScorePillStyle(sc, "3sec");
+                            return (
+                              <div
+                                style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...st.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                </span>
+                              </div>
+                            );
+                          })()}
+
+                          {/* 4. Slanted ถาม-ตอบ Pill (Silver) */}
+                          {(() => {
+                            const sc = scoreQa;
+                            const st = getScorePillStyle(sc, "qa");
+                            return (
+                              <div
+                                style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...st.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                </span>
+                              </div>
+                            );
+                          })()}
+
+                          {/* 5. Slanted จิ๊กซอว์ Pill (Red) */}
+                          {(() => {
+                            const sc = scoreJigsaw;
+                            const st = getScorePillStyle(sc, "jigsaw");
+                            return (
+                              <div
+                                style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...st.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                </span>
+                              </div>
+                            );
+                          })()}
+
+                          {/* 6. Slanted คุณสมบัติ Pill (Cyan) */}
+                          {(() => {
+                            const sc = scoreAttr;
+                            const st = getScorePillStyle(sc, "attribute");
+                            return (
+                              <div
+                                style={{
+                                  width: "74px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  ...st.container,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                </span>
+                              </div>
+                            );
+                          })()}
+
+                          {/* 7. Slanted Total Score Capsule (Gold Glowing) */}
+                          <div
                             style={{
-                              transform: "skewX(16deg)",
-                              fontSize: "12px",
-                              fontWeight: "700",
-                              color: "#67e8f9",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              textAlign: "center",
+                              width: "78px",
+                              height: "48px",
+                              borderRadius: "8px",
+                              transform: "skewX(-16deg)",
+                              background: "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)",
+                              border: "3px solid #fff566",
+                              boxShadow: "0 0 16px rgba(255, 215, 0, 0.75)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
                             }}
                           >
-                            {item.topic || "-"}
-                          </span>
-                        </div>
-
-                        {/* 4 Rounds Breakdown Capsules */}
-                        <div
-                          style={{
-                            width: "220px",
-                            height: "48px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: "linear-gradient(180deg, #08111f 0%, #040810 100%)",
-                            border: "2px solid rgba(255, 255, 255, 0.25)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-around",
-                            padding: "0 4px",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <div style={{ transform: "skewX(16deg)", textAlign: "center" }} title="3 วินาที (เต็ม 25)">
-                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>3วิ</div>
-                            <div style={{ fontSize: "13px", fontWeight: "900", color: score3sec !== null ? "#52c41a" : "rgba(255,255,255,0.3)" }}>
-                              {score3sec !== null ? score3sec : "–"}
-                            </div>
-                          </div>
-                          <div style={{ transform: "skewX(16deg)", textAlign: "center" }} title="ถาม-ตอบ (เต็ม 25)">
-                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>ถามตอบ</div>
-                            <div style={{ fontSize: "13px", fontWeight: "900", color: scoreQa !== null ? "#d9d9d9" : "rgba(255,255,255,0.3)" }}>
-                              {scoreQa !== null ? scoreQa : "–"}
-                            </div>
-                          </div>
-                          <div style={{ transform: "skewX(16deg)", textAlign: "center" }} title="จิ๊กซอว์ (เต็ม 25)">
-                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>จิ๊กซอว์</div>
-                            <div style={{ fontSize: "13px", fontWeight: "900", color: scoreJigsaw !== null ? "#ff4d4f" : "rgba(255,255,255,0.3)" }}>
-                              {scoreJigsaw !== null ? scoreJigsaw : "–"}
-                            </div>
-                          </div>
-                          <div style={{ transform: "skewX(16deg)", textAlign: "center" }} title="คุณสมบัติ (เต็ม 25)">
-                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)" }}>คุณสมบัติ</div>
-                            <div style={{ fontSize: "13px", fontWeight: "900", color: scoreAttr !== null ? "#00e5ff" : "rgba(255,255,255,0.3)" }}>
-                              {scoreAttr !== null ? scoreAttr : "–"}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Total Score Capsule (Out of 100) */}
-                        <div
-                          style={{
-                            width: "110px",
-                            height: "48px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)",
-                            border: "2.5px solid #ffa940",
-                            boxShadow: "0 0 14px rgba(255, 136, 0, 0.5)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "baseline", gap: "2px" }}>
                             <span
                               style={{
-                                fontFamily: "var(--font-num)",
+                                transform: "skewX(16deg)",
                                 fontStyle: "italic",
                                 fontWeight: "900",
-                                fontSize: "19px",
-                                color: "#ffffff",
-                                textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                                fontSize: "22px",
+                                color: "#000000",
                               }}
                             >
                               {item.finalWarmupScore}
                             </span>
-                            <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.8)", fontWeight: "700" }}>/100</span>
                           </div>
                         </div>
-
-                        {/* Weight Share Capsule (30% Weight) */}
-                        <div
-                          style={{
-                            width: "110px",
-                            height: "48px",
-                            borderRadius: "8px",
-                            transform: "skewX(-16deg)",
-                            background: "linear-gradient(180deg, #2a1f06 0%, #0f0a02 100%)",
-                            border: "2px solid #ffd700",
-                            boxShadow: "0 0 10px rgba(255, 215, 0, 0.3)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <div style={{ transform: "skewX(16deg)", textAlign: "center" }}>
-                            <div style={{ fontSize: "10px", color: "rgba(255,215,0,0.7)", fontWeight: "700" }}>ค่าน้ำหนัก</div>
-                            <div style={{ fontFamily: "var(--font-num)", fontSize: "14px", fontWeight: "900", color: "#ffd700" }}>
-                              30%
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      </Fragment>
                     );
                   })
                 )}
