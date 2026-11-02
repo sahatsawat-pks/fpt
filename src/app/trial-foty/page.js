@@ -378,9 +378,24 @@ export default function TrialFOTYPage() {
     );
   }, [pollList, pollSearchQuery]);
 
-  // Compute Warm-up Standings & Ranking (From /game scores, 30% weight)
+  // Helper: Check if a contestant has warm-up score recorded
+  const hasWarmupScoreRecorded = (item) => {
+    if (!item) return false;
+    const s = item.gameScores || {};
+    const hasCat = ["3sec", "qa", "jigsaw", "attribute"].some(
+      (k) => s[k] !== null && s[k] !== undefined && s[k] !== ""
+    );
+    const hasTotal = item.gameTotalScore !== undefined && item.gameTotalScore !== null && Number(item.gameTotalScore) > 0;
+    const hasWhatIf = item.whatIfScore !== undefined && item.whatIfScore !== null && Number(item.whatIfScore) > 0;
+    return Boolean(hasCat || hasTotal || hasWhatIf);
+  };
+
+  // Compute Warm-up Standings & Ranking (Only contestants whose scores have been filled!)
   const warmupRanking = useMemo(() => {
-    const list = [...pollList];
+    const played = pollList.filter((item) => hasWarmupScoreRecorded(item));
+    if (played.length === 0) return [];
+
+    const list = [...played];
     list.sort((a, b) => {
       const scoreA = Number(a.gameTotalScore !== undefined ? a.gameTotalScore : a.whatIfScore) || 0;
       const scoreB = Number(b.gameTotalScore !== undefined ? b.gameTotalScore : b.whatIfScore) || 0;
@@ -402,6 +417,15 @@ export default function TrialFOTYPage() {
       };
     });
   }, [pollList]);
+
+  // Unplayed Warm-up Contestants (Contestants whose scores haven't been entered yet)
+  const unplayedWarmupContestants = useMemo(() => {
+    return pollList
+      .filter((item) => !hasWarmupScoreRecorded(item))
+      .sort((a, b) => (a.nickname || a.name || "").localeCompare(b.nickname || b.name || "", "th"));
+  }, [pollList]);
+
+  const hasStartedWarmup = warmupRanking.length > 0;
 
   // Filtered Warm-up
   const filteredWarmup = useMemo(() => {
@@ -1945,6 +1969,164 @@ export default function TrialFOTYPage() {
                     })}
                   </div>
                 </div>
+
+                {/* Section: Contestants Awaiting Competition (Main Standings) */}
+                {unplayedContestants.length > 0 && (
+                  <div
+                    style={{
+                      marginTop: "32px",
+                      background: "linear-gradient(160deg, rgba(14, 28, 52, 0.78) 0%, rgba(5, 12, 24, 0.94) 100%)",
+                      border: "1.5px solid rgba(0, 229, 255, 0.3)",
+                      borderRadius: "20px",
+                      padding: "20px 22px",
+                      boxShadow: "0 10px 35px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.08)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        background: "linear-gradient(90deg, #020712 0%, #0a172e 50%, #020712 100%)",
+                        border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                        borderRadius: "14px",
+                        transform: "skewX(-14deg)",
+                        padding: "10px 22px",
+                        marginBottom: "18px",
+                        boxShadow: "0 6px 20px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.2)",
+                      }}
+                    >
+                      <div style={{ transform: "skewX(14deg)", display: "flex", alignItems: "center", gap: "12px" }}>
+                        <span style={{ fontSize: "20px" }}>⏳</span>
+                        <div>
+                          <h3
+                            style={{
+                              fontStyle: "italic",
+                              fontWeight: "900",
+                              fontSize: "18px",
+                              letterSpacing: "1px",
+                              color: "#ffffff",
+                              margin: 0,
+                              textShadow: "0 2px 8px rgba(0,0,0,0.8)",
+                            }}
+                          >
+                            CONTESTANTS AWAITING COMPETITION
+                          </h3>
+                          <div style={{ fontSize: "11.5px", color: "rgba(255,255,255,0.7)", fontStyle: "italic", marginTop: "1px" }}>
+                            รายชื่อผู้เข้าแข่งขันที่ยังไม่ได้ลงแข่งขัน • รอบคัดเลือก แฟนพันธุ์แท้แห่งปี 2026
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          transform: "skewX(14deg)",
+                          fontSize: "12.5px",
+                          fontWeight: "800",
+                          color: "#67e8f9",
+                          background: "rgba(0, 229, 255, 0.15)",
+                          border: "1.5px solid rgba(0, 229, 255, 0.45)",
+                          padding: "5px 14px",
+                          borderRadius: "20px",
+                          boxShadow: "0 0 10px rgba(0, 229, 255, 0.25)",
+                        }}
+                      >
+                        รอแข่ง {unplayedContestants.length} คน
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                        gap: "12px",
+                      }}
+                    >
+                      {unplayedContestants.map((item) => (
+                        <div
+                          key={item.id || item.name}
+                          onClick={() => setSelectedSpotlight(item)}
+                          title="คลิกเพื่อดูข้อมูลผู้เข้าแข่งขัน"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
+                            padding: "12px 14px",
+                            background: "linear-gradient(145deg, rgba(16, 32, 60, 0.65) 0%, rgba(8, 16, 32, 0.88) 100%)",
+                            border: "1px solid rgba(255, 255, 255, 0.12)",
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                            transition: "transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "translateY(-3px)";
+                            e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.6)";
+                            e.currentTarget.style.boxShadow = "0 8px 22px rgba(0, 229, 255, 0.25)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                            e.currentTarget.style.boxShadow = "none";
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "44px",
+                              height: "44px",
+                              borderRadius: "50%",
+                              overflow: "hidden",
+                              border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                              background: "#081020",
+                              flexShrink: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {item.image ? (
+                              <img
+                                src={getOptimizedImageUrl(item.image, 100)}
+                                alt={item.name}
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              />
+                            ) : (
+                              <span style={{ fontSize: "18px" }}>👤</span>
+                            )}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "baseline", gap: "6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              <span style={{ fontStyle: "italic", fontWeight: "900", fontSize: "16px", color: "#ffffff" }}>
+                                {item.nickname || item.name}
+                              </span>
+                              <span style={{ fontStyle: "italic", fontWeight: "700", fontSize: "13px", color: "rgba(255, 255, 255, 0.8)", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {item.name}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: "11.5px", color: "#80d0ff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: "1px" }}>
+                              • {item.topic}
+                            </div>
+                            <div style={{ marginTop: "4px" }}>
+                              <span
+                                style={{
+                                  fontSize: "10.5px",
+                                  fontWeight: "800",
+                                  padding: "2px 7px",
+                                  borderRadius: "6px",
+                                  background: "rgba(148, 163, 184, 0.16)",
+                                  border: "1px dashed rgba(148, 163, 184, 0.45)",
+                                  color: "#cbd5e1",
+                                }}
+                              >
+                                ⏳ รอแข่ง
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1955,645 +2137,888 @@ export default function TrialFOTYPage() {
            ======================================================== */}
         {activeTableTab === "warmup" && showWarmupTable && (
           <div key="warmup-tab-view" className="table-slide-down">
-            {/* Warm-up Info CTA Banner */}
-            <div
-              style={{
-                background: "linear-gradient(135deg, rgba(255, 136, 0, 0.15) 0%, rgba(255, 69, 0, 0.22) 100%)",
-                border: "2px solid #ff8800",
-                borderRadius: "14px",
-                padding: "18px 22px",
-                marginBottom: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: "14px",
-                boxShadow: "0 0 25px rgba(255, 136, 0, 0.25)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                <span style={{ fontSize: "32px" }}>🔥</span>
-                <div>
-                  <div style={{ fontSize: "17px", fontWeight: "900", color: "#ffa940" }}>
-                    ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)
-                  </div>
-                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)", marginTop: "2px" }}>
-                    คะแนนจริงจากการลงสนามอุ่นเครื่อง รวม 4 หมวดการแข่งขัน (หมวดละ 25 คะแนน รวมเต็ม 100 คะแนน)
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#ffd591", marginTop: "4px", fontWeight: "700" }}>
-                    ⚡ สัดส่วนคะแนน: คะแนนรอบอุ่นเครื่องนี้ถูกนำไปคิดเป็น <strong>30%</strong> ของคะแนนในตารางโพลล์มหาชน (อีก 70% มาจากคะแนนโหวต)
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Warm-up Search Bar */}
-            <div
-              style={{
-                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
-                border: "1px solid rgba(255, 136, 0, 0.35)",
-                borderRadius: "14px",
-                padding: "14px 18px",
-                marginBottom: "20px",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <span style={{ fontSize: "16px" }}>🔍</span>
-              <input
-                type="text"
-                value={warmupSearchQuery}
-                onChange={(e) => setWarmupSearchQuery(e.target.value)}
-                placeholder="ค้นหาชื่อจริง, ชื่อเล่น หรือหัวข้อในตารางรอบอุ่นเครื่อง..."
+            {!hasStartedWarmup ? (
+              <div
                 style={{
-                  width: "100%",
-                  background: "rgba(0, 15, 30, 0.8)",
-                  border: "1px solid rgba(255, 136, 0, 0.3)",
-                  borderRadius: "8px",
-                  padding: "8px 14px",
-                  color: "#fff",
-                  fontSize: "14px",
-                  outline: "none",
+                  textAlign: "center",
+                  padding: "80px 24px",
+                  background: "linear-gradient(150deg, rgba(35, 18, 5, 0.75) 0%, rgba(18, 9, 2, 0.9) 100%)",
+                  borderRadius: "20px",
+                  border: "1px dashed rgba(255, 136, 0, 0.4)",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                 }}
-              />
-              {warmupSearchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setWarmupSearchQuery("")}
+              >
+                <div style={{ fontSize: "56px", marginBottom: "16px" }}>⏳</div>
+                <h3
                   style={{
-                    background: "none",
-                    border: "none",
-                    color: "rgba(255,255,255,0.5)",
-                    cursor: "pointer",
-                    fontSize: "14px",
+                    fontSize: "28px",
+                    fontWeight: "900",
+                    color: "#ffa940",
+                    letterSpacing: "1px",
+                    marginBottom: "12px",
+                    textShadow: "0 2px 10px rgba(255, 136, 0, 0.3)",
                   }}
                 >
-                  ✕
-                </button>
-              )}
-            </div>
-
-            {/* Warm-up Graphic Layout (Matching 1:1 with Normal Standings Table) */}
-            <div style={{ overflowX: "auto", padding: "12px 24px 28px 24px" }}>
-              <div style={{ minWidth: "980px", padding: "0 14px", boxSizing: "border-box" }}>
-                {/* Top Main Tournament Banner Pill */}
+                  ยังไม่เริ่มต้นการแข่งขันรอบอุ่นเครื่อง
+                </h3>
+                <p
+                  style={{
+                    fontSize: "16px",
+                    color: "rgba(255, 255, 255, 0.7)",
+                    maxWidth: "540px",
+                    margin: "0 auto 28px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  ตารางคะแนนรอบอุ่นเครื่อง (What If?) จะเริ่มแสดงผลแบบเรียลไทม์ทันทีที่มีการบันทึกคะแนนจากหน้าเกม หรือจากระบบควบคุม Admin
+                </p>
+                <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+                  <Link
+                    href="/game"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "12px 24px",
+                      borderRadius: "24px",
+                      background: "linear-gradient(90deg, #ff8800 0%, #e65100 100%)",
+                      color: "#ffffff",
+                      fontWeight: "900",
+                      fontSize: "15px",
+                      textDecoration: "none",
+                      boxShadow: "0 0 16px rgba(255, 136, 0, 0.4)",
+                    }}
+                  >
+                    🎮 ไปที่หน้าเกม (เล่นเพื่อบันทึกคะแนน)
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTableTab("poll")}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "12px 24px",
+                      borderRadius: "24px",
+                      background: "rgba(255, 136, 0, 0.15)",
+                      border: "1px solid #ff8800",
+                      color: "#ffa940",
+                      fontWeight: "700",
+                      fontSize: "15px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    📊 ดูผลโพลล์มหาชน
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {/* Warm-up Info CTA Banner */}
                 <div
                   style={{
+                    background: "linear-gradient(135deg, rgba(255, 136, 0, 0.15) 0%, rgba(255, 69, 0, 0.22) 100%)",
+                    border: "2px solid #ff8800",
+                    borderRadius: "14px",
+                    padding: "18px 22px",
+                    marginBottom: "20px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    background: "linear-gradient(90deg, #020712 0%, #1a0e05 50%, #020712 100%)",
-                    border: "2px solid rgba(255, 136, 0, 0.6)",
-                    borderRadius: "14px",
-                    transform: "skewX(-16deg)",
-                    padding: "10px 30px",
-                    marginBottom: "16px",
-                    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7), inset 0 1px 3px rgba(255, 136, 0, 0.6)",
+                    flexWrap: "wrap",
+                    gap: "14px",
+                    boxShadow: "0 0 25px rgba(255, 136, 0, 0.25)",
                   }}
                 >
-                  <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{ fontSize: "20px" }}>🔥</span>
-                    <h2
+                  <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                    <span style={{ fontSize: "32px" }}>🔥</span>
+                    <div>
+                      <div style={{ fontSize: "17px", fontWeight: "900", color: "#ffa940" }}>
+                        ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)
+                      </div>
+                      <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)", marginTop: "2px" }}>
+                        คะแนนจริงจากการลงสนามอุ่นเครื่อง รวม 4 หมวดการแข่งขัน (หมวดละ 25 คะแนน รวมเต็ม 100 คะแนน)
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#ffd591", marginTop: "4px", fontWeight: "700" }}>
+                        ⚡ สัดส่วนคะแนน: คะแนนรอบอุ่นเครื่องนี้ถูกนำไปคิดเป็น <strong>30%</strong> ของคะแนนในตารางโพลล์มหาชน (อีก 70% มาจากคะแนนโหวต)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Warm-up Search Bar */}
+                <div
+                  style={{
+                    background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                    border: "1px solid rgba(255, 136, 0, 0.35)",
+                    borderRadius: "14px",
+                    padding: "14px 18px",
+                    marginBottom: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <span style={{ fontSize: "16px" }}>🔍</span>
+                  <input
+                    type="text"
+                    value={warmupSearchQuery}
+                    onChange={(e) => setWarmupSearchQuery(e.target.value)}
+                    placeholder="ค้นหาชื่อจริง, ชื่อเล่น หรือหัวข้อในตารางรอบอุ่นเครื่อง..."
+                    style={{
+                      width: "100%",
+                      background: "rgba(0, 15, 30, 0.8)",
+                      border: "1px solid rgba(255, 136, 0, 0.3)",
+                      borderRadius: "8px",
+                      padding: "8px 14px",
+                      color: "#fff",
+                      fontSize: "14px",
+                      outline: "none",
+                    }}
+                  />
+                  {warmupSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setWarmupSearchQuery("")}
                       style={{
-                        fontStyle: "italic",
-                        fontWeight: "900",
-                        fontSize: "20px",
-                        letterSpacing: "2px",
-                        color: "#ffa940",
-                        margin: 0,
-                        textShadow: "0 2px 10px rgba(0,0,0,0.8)",
+                        background: "none",
+                        border: "none",
+                        color: "rgba(255,255,255,0.5)",
+                        cursor: "pointer",
+                        fontSize: "14px",
                       }}
                     >
-                      THE TRIAL FAN OF THE YEAR 2026 • WARM-UP STANDINGS
-                    </h2>
-                  </div>
-                  <div style={{ transform: "skewX(16deg)", fontSize: "12px", color: "rgba(255,255,255,0.7)", fontStyle: "italic", fontWeight: "700" }}>
-                    คะแนนรอบอุ่นเครื่อง (What If? • สัดส่วน 30% ในโพลล์มหาชน)
-                  </div>
+                      ✕
+                    </button>
+                  )}
                 </div>
 
-                {/* Column Headers Row (Matching Normal Standings Exactly) */}
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-                  {/* Header 1: อันดับ */}
-                  <div
-                    style={{
-                      width: "60px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #132238 0%, #060e18 100%)",
-                      border: "2px solid #ffd700",
-                      boxShadow: "0 0 10px rgba(255, 215, 0, 0.35)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                      อันดับ
-                    </span>
-                  </div>
+                {/* Warm-up Graphic Layout (Matching 1:1 with Normal Standings Table, Orange Flame Theme) */}
+                <div style={{ overflowX: "auto", padding: "12px 24px 28px 24px" }}>
+                  <div style={{ minWidth: "980px", padding: "0 14px", boxSizing: "border-box" }}>
+                    {/* Top Main Tournament Banner Pill */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        background: "linear-gradient(90deg, #020712 0%, #1f0d03 50%, #020712 100%)",
+                        border: "2px solid rgba(255, 136, 0, 0.7)",
+                        borderRadius: "14px",
+                        transform: "skewX(-16deg)",
+                        padding: "10px 30px",
+                        marginBottom: "16px",
+                        boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7), inset 0 1px 3px rgba(255, 136, 0, 0.6)",
+                      }}
+                    >
+                      <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "12px" }}>
+                        <span style={{ fontSize: "20px" }}>🔥</span>
+                        <h2
+                          style={{
+                            fontStyle: "italic",
+                            fontWeight: "900",
+                            fontSize: "20px",
+                            letterSpacing: "2px",
+                            color: "#ffa940",
+                            margin: 0,
+                            textShadow: "0 2px 10px rgba(0,0,0,0.8)",
+                          }}
+                        >
+                          THE TRIAL FAN OF THE YEAR 2026 • WARM-UP STANDINGS
+                        </h2>
+                      </div>
+                      <div style={{ transform: "skewX(16deg)", fontSize: "12px", color: "rgba(255,255,255,0.7)", fontStyle: "italic", fontWeight: "700" }}>
+                        คะแนนรอบอุ่นเครื่อง (What If? • สัดส่วน 30% ในโพลล์มหาชน)
+                      </div>
+                    </div>
 
-                  {/* Header 2: ผู้เข้าแข่งขัน */}
-                  <div
-                    style={{
-                      flex: 1,
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
-                      border: "2px solid rgba(255, 255, 255, 0.4)",
-                      boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "0 18px",
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "13px", color: "#ffffff", letterSpacing: "1px" }}>
-                      ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง • หัวข้อ)
-                    </span>
-                  </div>
+                    {/* Column Headers Row (Matching Normal Standings in Orange Theme) */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                      {/* Header 1: อันดับ (Orange) */}
+                      <div
+                        style={{
+                          width: "60px",
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #3d1b06 0%, #170902 100%)",
+                          border: "2px solid #ff8800",
+                          boxShadow: "0 0 10px rgba(255, 136, 0, 0.4)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffa940" }}>
+                          อันดับ
+                        </span>
+                      </div>
 
-                  {/* Header 3: 3 วินาที (Green) */}
-                  <div
-                    style={{
-                      width: "74px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)",
-                      border: "2px solid #52c41a",
-                      boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#86efac" }}>
-                      3 วินาที
-                    </span>
-                  </div>
+                      {/* Header 2: ผู้เข้าแข่งขัน (Warm Dark) */}
+                      <div
+                        style={{
+                          flex: 1,
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #261508 0%, #100802 100%)",
+                          border: "2px solid rgba(255, 136, 0, 0.45)",
+                          boxShadow: "0 0 10px rgba(255, 136, 0, 0.25)",
+                          display: "flex",
+                          alignItems: "center",
+                          padding: "0 18px",
+                        }}
+                      >
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "13px", color: "#ffffff", letterSpacing: "1px" }}>
+                          ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง • หัวข้อ)
+                        </span>
+                      </div>
 
-                  {/* Header 4: ถาม-ตอบ (Silver) */}
-                  <div
-                    style={{
-                      width: "74px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
-                      border: "2px solid #e0e0e0",
-                      boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>
-                      ถาม-ตอบ
-                    </span>
-                  </div>
+                      {/* Header 3: 3 วินาที (Green) */}
+                      <div
+                        style={{
+                          width: "74px",
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #132b1b 0%, #06150a 100%)",
+                          border: "2px solid #52c41a",
+                          boxShadow: "0 0 10px rgba(82, 196, 26, 0.4)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#86efac" }}>
+                          3 วินาที
+                        </span>
+                      </div>
 
-                  {/* Header 5: จิ๊กซอว์ (Red) */}
-                  <div
-                    style={{
-                      width: "74px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #331316 0%, #160608 100%)",
-                      border: "2px solid #ff4d4f",
-                      boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#fca5a5" }}>
-                      จิ๊กซอว์
-                    </span>
-                  </div>
+                      {/* Header 4: ถาม-ตอบ (Silver) */}
+                      <div
+                        style={{
+                          width: "74px",
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #262c35 0%, #111418 100%)",
+                          border: "2px solid #e0e0e0",
+                          boxShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#f3f4f6" }}>
+                          ถาม-ตอบ
+                        </span>
+                      </div>
 
-                  {/* Header 6: คุณสมบัติ (Cyan) */}
-                  <div
-                    style={{
-                      width: "74px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #092338 0%, #03101c 100%)",
-                      border: "2px solid #00e5ff",
-                      boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>
-                      คุณสมบัติ
-                    </span>
-                  </div>
+                      {/* Header 5: จิ๊กซอว์ (Red) */}
+                      <div
+                        style={{
+                          width: "74px",
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #331316 0%, #160608 100%)",
+                          border: "2px solid #ff4d4f",
+                          boxShadow: "0 0 10px rgba(255, 77, 79, 0.4)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#fca5a5" }}>
+                          จิ๊กซอว์
+                        </span>
+                      </div>
 
-                  {/* Header 7: รวมคะแนน (Gold) */}
-                  <div
-                    style={{
-                      width: "86px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      transform: "skewX(-16deg)",
-                      background: "linear-gradient(180deg, #332608 0%, #140e02 100%)",
-                      border: "2px solid #ffd700",
-                      boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                      คะแนน
-                    </span>
-                  </div>
-                </div>
+                      {/* Header 6: คุณสมบัติ (Cyan) */}
+                      <div
+                        style={{
+                          width: "74px",
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #092338 0%, #03101c 100%)",
+                          border: "2px solid #00e5ff",
+                          boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>
+                          คุณสมบัติ
+                        </span>
+                      </div>
 
-                {/* Warm-up Data Rows */}
-                {filteredWarmup.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(255,255,255,0.5)" }}>
-                    ไม่พบข้อมูลผู้เข้าแข่งขันในตารางรอบอุ่นเครื่อง
-                  </div>
-                ) : (
-                  filteredWarmup.map((item, index) => {
-                    const matchedContestant = contestants.find(
-                      (c) =>
-                        (c.id && item.id && String(c.id) === String(item.id)) ||
-                        (c.name && item.name && (c.name.trim() === item.name.trim() || c.name.includes(item.name) || item.name.includes(c.name))) ||
-                        (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
-                    );
-                    const photo = item.image || matchedContestant?.image || null;
-                    const isTop5 = item.warmupRank <= 5;
-                    const isRank1 = item.warmupRank === 1;
+                      {/* Header 7: รวมคะแนน (Orange Glowing) */}
+                      <div
+                        style={{
+                          width: "86px",
+                          height: "32px",
+                          borderRadius: "8px",
+                          transform: "skewX(-16deg)",
+                          background: "linear-gradient(180deg, #3d1b06 0%, #170902 100%)",
+                          border: "2px solid #ff8800",
+                          boxShadow: "0 0 10px rgba(255, 136, 0, 0.5)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffa940" }}>
+                          คะแนน
+                        </span>
+                      </div>
+                    </div>
 
-                    const scores = item.gameScores || {};
-                    const score3sec = scores["3sec"] !== undefined && scores["3sec"] !== null ? scores["3sec"] : null;
-                    const scoreQa = scores.qa !== undefined && scores.qa !== null ? scores.qa : null;
-                    const scoreJigsaw = scores.jigsaw !== undefined && scores.jigsaw !== null ? scores.jigsaw : null;
-                    const scoreAttr = scores.attribute !== undefined && scores.attribute !== null ? scores.attribute : null;
+                    {/* Warm-up Data Rows */}
+                    {filteredWarmup.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(255,255,255,0.5)" }}>
+                        ไม่พบข้อมูลผู้เข้าแข่งขันที่ตรงกับการค้นหา
+                      </div>
+                    ) : (
+                      filteredWarmup.map((item, index) => {
+                        const matchedContestant = contestants.find(
+                          (c) =>
+                            (c.id && item.id && String(c.id) === String(item.id)) ||
+                            (c.name && item.name && (c.name.trim() === item.name.trim() || c.name.includes(item.name) || item.name.includes(c.name))) ||
+                            (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
+                        );
+                        const photo = item.image || matchedContestant?.image || null;
+                        const isTop5 = item.warmupRank <= 5;
+                        const isRank1 = item.warmupRank === 1;
 
-                    const prevItem = index > 0 ? filteredWarmup[index - 1] : null;
-                    const showCutoffLine =
-                      prevItem &&
-                      (Number(prevItem.warmupRank) || 0) <= 5 &&
-                      (Number(item.warmupRank) || 0) > 5;
+                        const scores = item.gameScores || {};
+                        const score3sec = scores["3sec"] !== undefined && scores["3sec"] !== null ? scores["3sec"] : null;
+                        const scoreQa = scores.qa !== undefined && scores.qa !== null ? scores.qa : null;
+                        const scoreJigsaw = scores.jigsaw !== undefined && scores.jigsaw !== null ? scores.jigsaw : null;
+                        const scoreAttr = scores.attribute !== undefined && scores.attribute !== null ? scores.attribute : null;
 
-                    return (
-                      <Fragment key={item.id || item.name}>
-                        {/* Cutoff Line after Top 5 */}
-                        {showCutoffLine && (
-                          <div
-                            style={{
-                              margin: "14px 0 10px 0",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "12px",
-                              position: "relative",
-                            }}
-                          >
+                        const prevItem = index > 0 ? filteredWarmup[index - 1] : null;
+                        const showCutoffLine =
+                          prevItem &&
+                          (Number(prevItem.warmupRank) || 0) <= 5 &&
+                          (Number(item.warmupRank) || 0) > 5;
+
+                        return (
+                          <Fragment key={item.id || item.name}>
+                            {/* Cutoff Line after Top 5 (Orange Glowing Beam) */}
+                            {showCutoffLine && (
+                              <div
+                                style={{
+                                  margin: "14px 0 10px 0",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "12px",
+                                  position: "relative",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    flex: 1,
+                                    height: "2px",
+                                    background: "linear-gradient(90deg, rgba(255, 136, 0, 0) 0%, #ff8800 100%)",
+                                    boxShadow: "0 0 10px rgba(255, 136, 0, 0.8)",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    transform: "skewX(-16deg)",
+                                    background: "linear-gradient(135deg, #2b1406 0%, #0d0601 100%)",
+                                    border: "1.5px solid #ff8800",
+                                    boxShadow: "0 0 16px rgba(255, 136, 0, 0.45)",
+                                    padding: "4px 16px",
+                                    borderRadius: "8px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      transform: "skewX(16deg)",
+                                      fontSize: "12px",
+                                      fontWeight: "900",
+                                      fontStyle: "italic",
+                                      letterSpacing: "0.8px",
+                                      color: "#ffa940",
+                                      textShadow: "0 0 10px rgba(255, 136, 0, 0.7)",
+                                    }}
+                                  >
+                                    ⚡ เส้นคัดเข้ารอบ 5 อันดับแรก (TOP 5 QUALIFYING CUTOFF)
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    flex: 1,
+                                    height: "2px",
+                                    background: "linear-gradient(90deg, #ff8800 0%, rgba(255, 136, 0, 0) 100%)",
+                                    boxShadow: "0 0 10px rgba(255, 136, 0, 0.8)",
+                                  }}
+                                />
+                              </div>
+                            )}
+
                             <div
+                              className="table-row-entrance"
+                              onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
+                              title="คลิกเพื่อดูสถิติเจาะลึก"
                               style={{
-                                flex: 1,
-                                height: "2px",
-                                background: "linear-gradient(90deg, rgba(255, 215, 0, 0) 0%, #ffd700 100%)",
-                                boxShadow: "0 0 10px rgba(255, 215, 0, 0.8)",
-                              }}
-                            />
-                            <div
-                              style={{
-                                transform: "skewX(-16deg)",
-                                background: "linear-gradient(135deg, #2b1f06 0%, #0d0901 100%)",
-                                border: "1.5px solid #ffd700",
-                                boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
-                                padding: "4px 16px",
-                                borderRadius: "8px",
                                 display: "flex",
                                 alignItems: "center",
                                 gap: "8px",
-                                flexShrink: 0,
+                                marginBottom: "8px",
+                                cursor: "pointer",
+                                transition: "transform 0.15s ease, filter 0.15s ease",
+                                animationDelay: `${Math.min(index * 0.02, 0.6)}s`,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
+                                e.currentTarget.style.filter = "brightness(1.15)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "scale(1) translateX(0)";
+                                e.currentTarget.style.filter = "brightness(1)";
                               }}
                             >
-                              <span
+                              {/* 1. Slanted Rank Capsule (Orange Flame Theme) */}
+                              <div
                                 style={{
-                                  transform: "skewX(16deg)",
-                                  fontSize: "12px",
-                                  fontWeight: "900",
-                                  fontStyle: "italic",
-                                  letterSpacing: "0.8px",
-                                  color: "#ffd700",
-                                  textShadow: "0 0 10px rgba(255, 215, 0, 0.7)",
+                                  width: "60px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  background: isRank1
+                                    ? "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)"
+                                    : isTop5
+                                    ? "linear-gradient(180deg, #fa8c16 0%, #ad4e00 100%)"
+                                    : "linear-gradient(180deg, #2b1406 0%, #120802 100%)",
+                                  border: isRank1
+                                    ? "2.5px solid #ffa940"
+                                    : isTop5
+                                    ? "2px solid #ff8800"
+                                    : "1.5px solid rgba(255, 136, 0, 0.35)",
+                                  boxShadow: isRank1
+                                    ? "0 0 18px rgba(255, 136, 0, 0.75)"
+                                    : isTop5
+                                    ? "0 0 14px rgba(255, 136, 0, 0.45)"
+                                    : "0 0 8px rgba(0, 0, 0, 0.5)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
                                 }}
                               >
-                                ⚡ เส้นคัดเข้ารอบ 5 อันดับแรก (TOP 5 QUALIFYING CUTOFF)
-                              </span>
-                            </div>
-                            <div
-                              style={{
-                                flex: 1,
-                                height: "2px",
-                                background: "linear-gradient(90deg, #ffd700 0%, rgba(255, 215, 0, 0) 100%)",
-                                boxShadow: "0 0 10px rgba(255, 215, 0, 0.8)",
-                              }}
-                            />
-                          </div>
-                        )}
+                                <span
+                                  style={{
+                                    transform: "skewX(16deg)",
+                                    fontStyle: "italic",
+                                    fontWeight: "900",
+                                    fontSize: "18px",
+                                    color: isTop5 ? "#ffffff" : "#ffa940",
+                                  }}
+                                >
+                                  #{item.warmupRank}
+                                </span>
+                              </div>
 
+                              {/* 2. Slanted Name & Info Capsule (Warm Amber Theme) */}
+                              <div
+                                style={{
+                                  flex: 1,
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  background: isRank1
+                                    ? "linear-gradient(180deg, #231206 0%, #110802 100%)"
+                                    : "linear-gradient(180deg, #180d05 0%, #0c0602 100%)",
+                                  border: isTop5 ? "2px solid #ff8800" : "2px solid rgba(255, 136, 0, 0.3)",
+                                  boxShadow: isTop5 ? "0 0 14px rgba(255, 136, 0, 0.35)" : "0 0 8px rgba(0, 0, 0, 0.5)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  padding: "0 14px",
+                                  gap: "12px",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px", width: "100%", minWidth: 0 }}>
+                                  {/* Photo Avatar */}
+                                  <div
+                                    style={{
+                                      width: "36px",
+                                      height: "36px",
+                                      borderRadius: "50%",
+                                      overflow: "hidden",
+                                      border: isTop5 ? "2px solid #ff8800" : "1.5px solid rgba(255, 136, 0, 0.4)",
+                                      boxShadow: isTop5 ? "0 0 10px rgba(255, 136, 0, 0.5)" : "none",
+                                      flexShrink: 0,
+                                      background: "rgba(0, 0, 0, 0.4)",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    {photo ? (
+                                      <img
+                                        src={getOptimizedImageUrl(photo, 80)}
+                                        alt={item.nickname || item.name}
+                                        referrerPolicy="no-referrer"
+                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                      />
+                                    ) : (
+                                      <span style={{ fontSize: "16px" }}>👤</span>
+                                    )}
+                                  </div>
+
+                                  {/* Contestant Text Info */}
+                                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", overflow: "hidden", whiteSpace: "nowrap" }}>
+                                    <span
+                                      style={{
+                                        fontStyle: "italic",
+                                        fontWeight: "900",
+                                        fontSize: "16px",
+                                        color: isTop5 ? "#ffa940" : "#ffffff",
+                                        letterSpacing: "0.5px",
+                                      }}
+                                    >
+                                      {item.nickname || item.name}
+                                    </span>
+                                    <span style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.65)", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                      {item.name}
+                                    </span>
+                                    <span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.45)" }}>•</span>
+                                    <span style={{ fontSize: "12px", color: "#ffd591", fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                      {item.topic}
+                                    </span>
+                                  </div>
+
+                                  {/* 30% Weight Status Tag */}
+                                  <div style={{ marginLeft: "auto", flexShrink: 0 }}>
+                                    <span
+                                      style={{
+                                        display: "inline-block",
+                                        padding: "3px 9px",
+                                        borderRadius: "8px",
+                                        fontSize: "11px",
+                                        fontWeight: "800",
+                                        background: isTop5 ? "rgba(255, 136, 0, 0.18)" : "rgba(255, 136, 0, 0.08)",
+                                        border: isTop5 ? "1px solid #ff8800" : "1px solid rgba(255, 136, 0, 0.35)",
+                                        color: isTop5 ? "#ffa940" : "#ffb86c",
+                                      }}
+                                    >
+                                      {isTop5 ? "🔥 TOP 5 (30% โพลล์)" : "30% โพลล์"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* 3. Slanted 3 วินาที Pill (Green) */}
+                              {(() => {
+                                const sc = score3sec;
+                                const st = getScorePillStyle(sc, "3sec");
+                                return (
+                                  <div
+                                    style={{
+                                      width: "74px",
+                                      height: "48px",
+                                      borderRadius: "8px",
+                                      transform: "skewX(-16deg)",
+                                      ...st.container,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+
+                              {/* 4. Slanted ถาม-ตอบ Pill (Silver) */}
+                              {(() => {
+                                const sc = scoreQa;
+                                const st = getScorePillStyle(sc, "qa");
+                                return (
+                                  <div
+                                    style={{
+                                      width: "74px",
+                                      height: "48px",
+                                      borderRadius: "8px",
+                                      transform: "skewX(-16deg)",
+                                      ...st.container,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+
+                              {/* 5. Slanted จิ๊กซอว์ Pill (Red) */}
+                              {(() => {
+                                const sc = scoreJigsaw;
+                                const st = getScorePillStyle(sc, "jigsaw");
+                                return (
+                                  <div
+                                    style={{
+                                      width: "74px",
+                                      height: "48px",
+                                      borderRadius: "8px",
+                                      transform: "skewX(-16deg)",
+                                      ...st.container,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+
+                              {/* 6. Slanted คุณสมบัติ Pill (Cyan) */}
+                              {(() => {
+                                const sc = scoreAttr;
+                                const st = getScorePillStyle(sc, "attribute");
+                                return (
+                                  <div
+                                    style={{
+                                      width: "74px",
+                                      height: "48px",
+                                      borderRadius: "8px",
+                                      transform: "skewX(-16deg)",
+                                      ...st.container,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+
+                              {/* 7. Slanted Total Score Capsule (Orange Glowing Flame) */}
+                              <div
+                                style={{
+                                  width: "86px",
+                                  height: "48px",
+                                  borderRadius: "8px",
+                                  transform: "skewX(-16deg)",
+                                  background: "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)",
+                                  border: "3px solid #ffa940",
+                                  boxShadow: "0 0 18px rgba(255, 136, 0, 0.75)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    transform: "skewX(16deg)",
+                                    fontStyle: "italic",
+                                    fontWeight: "900",
+                                    fontSize: "26px",
+                                    color: "#ffffff",
+                                    textShadow: "0 2px 6px rgba(0, 0, 0, 0.9)",
+                                  }}
+                                >
+                                  {item.finalWarmupScore ?? 0}
+                                </span>
+                              </div>
+                            </div>
+                          </Fragment>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* Section: Contestants Awaiting Warm-up Competition */}
+                {unplayedWarmupContestants.length > 0 && (
+                  <div
+                    style={{
+                      marginTop: "32px",
+                      background: "linear-gradient(160deg, rgba(32, 16, 6, 0.78) 0%, rgba(14, 7, 2, 0.94) 100%)",
+                      border: "1.5px solid rgba(255, 136, 0, 0.35)",
+                      borderRadius: "20px",
+                      padding: "20px 22px",
+                      boxShadow: "0 10px 35px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.08)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        background: "linear-gradient(90deg, #020712 0%, #1f0d03 50%, #020712 100%)",
+                        border: "1.5px solid rgba(255, 136, 0, 0.5)",
+                        borderRadius: "14px",
+                        transform: "skewX(-14deg)",
+                        padding: "10px 22px",
+                        marginBottom: "18px",
+                        boxShadow: "0 6px 20px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 136, 0, 0.2)",
+                      }}
+                    >
+                      <div style={{ transform: "skewX(14deg)", display: "flex", alignItems: "center", gap: "12px" }}>
+                        <span style={{ fontSize: "20px" }}>🔥</span>
+                        <div>
+                          <h3
+                            style={{
+                              fontStyle: "italic",
+                              fontWeight: "900",
+                              fontSize: "18px",
+                              letterSpacing: "1px",
+                              color: "#ffa940",
+                              margin: 0,
+                              textShadow: "0 2px 8px rgba(0,0,0,0.8)",
+                            }}
+                          >
+                            CONTESTANTS AWAITING WARM-UP ROUND
+                          </h3>
+                          <div style={{ fontSize: "11.5px", color: "rgba(255,255,255,0.7)", fontStyle: "italic", marginTop: "1px" }}>
+                            รายชื่อผู้เข้าแข่งขันที่ยังไม่ได้ลงแข่งรอบอุ่นเครื่อง (What If?)
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          transform: "skewX(14deg)",
+                          fontSize: "12.5px",
+                          fontWeight: "800",
+                          color: "#ffa940",
+                          background: "rgba(255, 136, 0, 0.15)",
+                          border: "1.5px solid rgba(255, 136, 0, 0.45)",
+                          padding: "5px 14px",
+                          borderRadius: "20px",
+                          boxShadow: "0 0 10px rgba(255, 136, 0, 0.25)",
+                        }}
+                      >
+                        รอแข่ง {unplayedWarmupContestants.length} คน
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                        gap: "12px",
+                      }}
+                    >
+                      {unplayedWarmupContestants.map((item) => (
                         <div
-                          className="table-row-entrance"
-                          onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
-                          title="คลิกเพื่อดูสถิติเจาะลึก"
+                          key={item.id || item.name}
+                          onClick={() => setSelectedSpotlight(item)}
+                          title="คลิกเพื่อดูข้อมูลผู้เข้าแข่งขัน"
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "8px",
-                            marginBottom: "8px",
+                            gap: "12px",
+                            padding: "12px 14px",
+                            background: "linear-gradient(145deg, rgba(28, 14, 5, 0.65) 0%, rgba(12, 6, 2, 0.88) 100%)",
+                            border: "1px solid rgba(255, 136, 0, 0.2)",
+                            borderRadius: "12px",
                             cursor: "pointer",
-                            transition: "transform 0.15s ease, filter 0.15s ease",
-                            animationDelay: `${Math.min(index * 0.02, 0.6)}s`,
+                            transition: "transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
-                            e.currentTarget.style.filter = "brightness(1.15)";
+                            e.currentTarget.style.transform = "translateY(-3px)";
+                            e.currentTarget.style.borderColor = "rgba(255, 136, 0, 0.6)";
+                            e.currentTarget.style.boxShadow = "0 8px 22px rgba(255, 136, 0, 0.25)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = "scale(1) translateX(0)";
-                            e.currentTarget.style.filter = "brightness(1)";
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.borderColor = "rgba(255, 136, 0, 0.2)";
+                            e.currentTarget.style.boxShadow = "none";
                           }}
                         >
-                          {/* 1. Slanted Rank Capsule (Matching Normal Standings) */}
                           <div
                             style={{
-                              width: "60px",
-                              height: "48px",
-                              borderRadius: "8px",
-                              transform: "skewX(-16deg)",
-                              background: isTop5
-                                ? "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)"
-                                : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
-                              border: isTop5 ? "2.5px solid #fff566" : "2.5px solid rgba(255, 255, 255, 0.3)",
-                              boxShadow: isRank1
-                                ? "0 0 18px rgba(255, 215, 0, 0.75)"
-                                : isTop5
-                                ? "0 0 14px rgba(255, 215, 0, 0.45)"
-                                : "0 0 8px rgba(0, 0, 0, 0.5)",
+                              width: "44px",
+                              height: "44px",
+                              borderRadius: "50%",
+                              overflow: "hidden",
+                              border: "1.5px solid rgba(255, 136, 0, 0.4)",
+                              background: "#081020",
+                              flexShrink: 0,
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              flexShrink: 0,
                             }}
                           >
-                            <span
-                              style={{
-                                transform: "skewX(16deg)",
-                                fontStyle: "italic",
-                                fontWeight: "900",
-                                fontSize: "18px",
-                                color: isTop5 ? "#000000" : "#ffffff",
-                              }}
-                            >
-                              #{item.warmupRank}
-                            </span>
+                            {item.image ? (
+                              <img
+                                src={getOptimizedImageUrl(item.image, 100)}
+                                alt={item.name}
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              />
+                            ) : (
+                              <span style={{ fontSize: "18px" }}>👤</span>
+                            )}
                           </div>
-
-                          {/* 2. Slanted Name & Info Capsule (Matching Normal Standings) */}
-                          <div
-                            style={{
-                              flex: 1,
-                              height: "48px",
-                              borderRadius: "8px",
-                              transform: "skewX(-16deg)",
-                              background: "linear-gradient(180deg, #0f1c30 0%, #08111f 100%)",
-                              border: isTop5 ? "2px solid #ffd700" : "2px solid rgba(255, 255, 255, 0.3)",
-                              boxShadow: isTop5 ? "0 0 14px rgba(255, 215, 0, 0.3)" : "0 0 8px rgba(0, 0, 0, 0.5)",
-                              display: "flex",
-                              alignItems: "center",
-                              padding: "0 14px",
-                              gap: "12px",
-                              overflow: "hidden",
-                            }}
-                          >
-                            <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px", width: "100%", minWidth: 0 }}>
-                              {/* Photo Avatar */}
-                              <div
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "baseline", gap: "6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              <span style={{ fontStyle: "italic", fontWeight: "900", fontSize: "16px", color: "#ffffff" }}>
+                                {item.nickname || item.name}
+                              </span>
+                              <span style={{ fontStyle: "italic", fontWeight: "700", fontSize: "13px", color: "rgba(255, 255, 255, 0.8)", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {item.name}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: "11.5px", color: "#ffd591", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: "1px" }}>
+                              • {item.topic}
+                            </div>
+                            <div style={{ marginTop: "4px" }}>
+                              <span
                                 style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  borderRadius: "50%",
-                                  overflow: "hidden",
-                                  border: isTop5 ? "2px solid #ffd700" : "1.5px solid rgba(255, 255, 255, 0.5)",
-                                  flexShrink: 0,
-                                  background: "rgba(0, 0, 0, 0.4)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
+                                  fontSize: "10.5px",
+                                  fontWeight: "800",
+                                  padding: "2px 7px",
+                                  borderRadius: "6px",
+                                  background: "rgba(255, 136, 0, 0.12)",
+                                  border: "1px dashed rgba(255, 136, 0, 0.4)",
+                                  color: "#ffa940",
                                 }}
                               >
-                                {photo ? (
-                                  <img
-                                    src={getOptimizedImageUrl(photo, 80)}
-                                    alt={item.nickname || item.name}
-                                    referrerPolicy="no-referrer"
-                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                  />
-                                ) : (
-                                  <span style={{ fontSize: "16px" }}>👤</span>
-                                )}
-                              </div>
-
-                              {/* Contestant Text Info */}
-                              <div style={{ display: "flex", alignItems: "baseline", gap: "8px", overflow: "hidden", whiteSpace: "nowrap" }}>
-                                <span
-                                  style={{
-                                    fontStyle: "italic",
-                                    fontWeight: "900",
-                                    fontSize: "16px",
-                                    color: isTop5 ? "#ffd700" : "#ffffff",
-                                    letterSpacing: "0.5px",
-                                  }}
-                                >
-                                  {item.nickname || item.name}
-                                </span>
-                                <span style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.65)", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                  {item.name}
-                                </span>
-                                <span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.45)" }}>•</span>
-                                <span style={{ fontSize: "12px", color: "#67e8f9", fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                  {item.topic}
-                                </span>
-                              </div>
-
-                              {/* 30% Weight Status Tag */}
-                              <div style={{ marginLeft: "auto", flexShrink: 0 }}>
-                                <span
-                                  style={{
-                                    display: "inline-block",
-                                    padding: "3px 9px",
-                                    borderRadius: "8px",
-                                    fontSize: "11px",
-                                    fontWeight: "800",
-                                    background: isTop5 ? "rgba(255, 215, 0, 0.15)" : "rgba(0, 229, 255, 0.12)",
-                                    border: isTop5 ? "1px solid #ffd700" : "1px solid rgba(0, 229, 255, 0.4)",
-                                    color: isTop5 ? "#ffd700" : "#67e8f9",
-                                  }}
-                                >
-                                  {isTop5 ? "🌟 TOP 5 (30% โพลล์)" : "30% โพลล์"}
-                                </span>
-                              </div>
+                                ⏳ รอแข่งรอบอุ่นเครื่อง
+                              </span>
                             </div>
                           </div>
-
-                          {/* 3. Slanted 3 วินาที Pill (Green) */}
-                          {(() => {
-                            const sc = score3sec;
-                            const st = getScorePillStyle(sc, "3sec");
-                            return (
-                              <div
-                                style={{
-                                  width: "74px",
-                                  height: "48px",
-                                  borderRadius: "8px",
-                                  transform: "skewX(-16deg)",
-                                  ...st.container,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
-                                </span>
-                              </div>
-                            );
-                          })()}
-
-                          {/* 4. Slanted ถาม-ตอบ Pill (Silver) */}
-                          {(() => {
-                            const sc = scoreQa;
-                            const st = getScorePillStyle(sc, "qa");
-                            return (
-                              <div
-                                style={{
-                                  width: "74px",
-                                  height: "48px",
-                                  borderRadius: "8px",
-                                  transform: "skewX(-16deg)",
-                                  ...st.container,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
-                                </span>
-                              </div>
-                            );
-                          })()}
-
-                          {/* 5. Slanted จิ๊กซอว์ Pill (Red) */}
-                          {(() => {
-                            const sc = scoreJigsaw;
-                            const st = getScorePillStyle(sc, "jigsaw");
-                            return (
-                              <div
-                                style={{
-                                  width: "74px",
-                                  height: "48px",
-                                  borderRadius: "8px",
-                                  transform: "skewX(-16deg)",
-                                  ...st.container,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
-                                </span>
-                              </div>
-                            );
-                          })()}
-
-                          {/* 6. Slanted คุณสมบัติ Pill (Cyan) */}
-                          {(() => {
-                            const sc = scoreAttr;
-                            const st = getScorePillStyle(sc, "attribute");
-                            return (
-                              <div
-                                style={{
-                                  width: "74px",
-                                  height: "48px",
-                                  borderRadius: "8px",
-                                  transform: "skewX(-16deg)",
-                                  ...st.container,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                  {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
-                                </span>
-                              </div>
-                            );
-                          })()}
-
-                          {/* 7. Slanted Total Score Capsule (Gold Glowing matching page.js) */}
-                          <div
-                            style={{
-                              width: "86px",
-                              height: "48px",
-                              borderRadius: "8px",
-                              transform: "skewX(-16deg)",
-                              background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)",
-                              border: "3px solid #ffd700",
-                              boxShadow: "0 0 18px rgba(255, 215, 0, 0.55)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0,
-                            }}
-                          >
-                            <span
-                              style={{
-                                transform: "skewX(16deg)",
-                                fontStyle: "italic",
-                                fontWeight: "900",
-                                fontSize: "26px",
-                                color: item.finalWarmupScore === 100 ? "#52c41a" : "#ffd700",
-                                textShadow:
-                                  item.finalWarmupScore === 100
-                                    ? "0 0 14px rgba(82, 196, 26, 0.9)"
-                                    : "0 0 12px rgba(255, 215, 0, 0.8)",
-                              }}
-                            >
-                              {item.finalWarmupScore ?? 0}
-                            </span>
-                          </div>
                         </div>
-                      </Fragment>
-                    );
-                  })
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
+            )}
           </div>
         )}
 
