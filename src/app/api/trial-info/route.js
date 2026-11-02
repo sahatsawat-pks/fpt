@@ -43,21 +43,27 @@ async function getTrialInfoData() {
   // Also read latest photos from fpt_trial KV so images are always up-to-date
   let trialData = await getKVData(KV_TRIAL_KEY, () => null);
 
-  const contestantsPool = trialData?.contestants || initialTrialLeaderboard.contestants || [];
-  const photoMap = new Map();
-  contestantsPool.forEach((c) => {
-    if (c.image) {
-      photoMap.set(String(c.id), c.image);
-      if (c.name) photoMap.set(c.name.trim(), c.image);
-    }
-  });
+  const contestantsPool = Array.isArray(trialData)
+    ? trialData
+    : trialData?.contestants || (Array.isArray(initialTrialLeaderboard) ? initialTrialLeaderboard : initialTrialLeaderboard.contestants) || [];
 
-  // Sync photos into keywords
+  // Sync photos into keywords (and ensure correct IDs, e.g. ณัฐกมล มานะดี is ID 40, not 23)
   data.keywords = (data.keywords || []).map((k) => {
-    const matchedPhoto = photoMap.get(String(k.id)) || photoMap.get(k.name?.trim()) || k.image || "";
+    let correctedId = String(k.id);
+    if (k.name?.trim() === "ณัฐกมล มานะดี") {
+      correctedId = "40";
+    }
+
+    const matched = contestantsPool.find(
+      (c) =>
+        (c.id && String(c.id) === correctedId) ||
+        (c.name && k.name && c.name.trim() === k.name.trim())
+    );
+
     return {
       ...k,
-      image: matchedPhoto,
+      id: correctedId,
+      image: matched?.image || k.image || "",
     };
   });
 

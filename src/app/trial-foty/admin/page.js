@@ -141,17 +141,22 @@ export default function TrialAdminPage() {
       if (res.ok) {
         const json = await res.json();
         if (json.success) {
-          const photoMap = new Map();
-          (roster || []).forEach((c) => {
-            if (c.image) {
-              photoMap.set(String(c.id), c.image);
-              if (c.name) photoMap.set(c.name.trim(), c.image);
+          const mergedKeywords = (json.keywords || []).map((k) => {
+            let targetId = String(k.id);
+            if (k.name?.trim() === "ณัฐกมล มานะดี") {
+              targetId = "40";
             }
+            const matched = (roster || []).find(
+              (c) =>
+                (c.id && String(c.id) === targetId) ||
+                (c.name && k.name && c.name.trim() === k.name.trim())
+            );
+            return {
+              ...k,
+              id: targetId,
+              image: matched?.image || k.image || "",
+            };
           });
-          const mergedKeywords = (json.keywords || []).map((k) => ({
-            ...k,
-            image: photoMap.get(String(k.id)) || photoMap.get(k.name?.trim()) || k.image || "",
-          }));
           setInfoKeywords(mergedKeywords);
           setInfoQaBoard(json.qaBoard || []);
         }
@@ -205,17 +210,22 @@ export default function TrialAdminPage() {
       if (resInfo.ok) {
         const jsonInfo = await resInfo.json();
         if (jsonInfo.success) {
-          const photoMap = new Map();
-          roster.forEach((c) => {
-            if (c.image) {
-              photoMap.set(String(c.id), c.image);
-              if (c.name) photoMap.set(c.name.trim(), c.image);
+          const mergedKeywords = (jsonInfo.keywords || []).map((k) => {
+            let targetId = String(k.id);
+            if (k.name?.trim() === "ณัฐกมล มานะดี") {
+              targetId = "40";
             }
+            const matched = roster.find(
+              (c) =>
+                (c.id && String(c.id) === targetId) ||
+                (c.name && k.name && c.name.trim() === k.name.trim())
+            );
+            return {
+              ...k,
+              id: targetId,
+              image: matched?.image || k.image || "",
+            };
           });
-          const mergedKeywords = (jsonInfo.keywords || []).map((k) => ({
-            ...k,
-            image: photoMap.get(String(k.id)) || photoMap.get(k.name?.trim()) || k.image || "",
-          }));
           setInfoKeywords(mergedKeywords);
           setInfoQaBoard(jsonInfo.qaBoard || []);
         }

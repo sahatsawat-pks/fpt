@@ -103,18 +103,22 @@ export default function TrialContestantInfoPage() {
         const data = await resInfo.json();
         if (data.success) {
           // Merge latest photos directly from roster so photos are always 100% in sync
-          const photoMap = new Map();
-          roster.forEach((c) => {
-            if (c.image) {
-              photoMap.set(String(c.id), c.image);
-              if (c.name) photoMap.set(c.name.trim(), c.image);
+          const syncedKeywords = (data.keywords || []).map((k) => {
+            let targetId = String(k.id);
+            if (k.name?.trim() === "ณัฐกมล มานะดี") {
+              targetId = "40";
             }
+            const matched = roster.find(
+              (c) =>
+                (c.id && String(c.id) === targetId) ||
+                (c.name && k.name && c.name.trim() === k.name.trim())
+            );
+            return {
+              ...k,
+              id: targetId,
+              image: matched?.image || k.image || "",
+            };
           });
-
-          const syncedKeywords = (data.keywords || []).map((k) => ({
-            ...k,
-            image: photoMap.get(String(k.id)) || photoMap.get(k.name?.trim()) || k.image || "",
-          }));
 
           setKeywords(syncedKeywords);
           setQaBoard(data.qaBoard || []);
