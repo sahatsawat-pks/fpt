@@ -298,9 +298,14 @@ export default function TrialFOTYPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Compute 6 Floating Hero Columns (contestants duplicated seamlessly)
+  // Compute 6 Floating Hero Columns (contestants duplicated seamlessly, fallback to trial-poll data for instant animation)
   const heroColumns = useMemo(() => {
-    const list = contestants && contestants.length > 0 ? contestants : [];
+    const list =
+      contestants && contestants.length > 0
+        ? contestants
+        : fallbackPollData && fallbackPollData.length > 0
+        ? fallbackPollData
+        : [];
     if (list.length === 0) return [[], [], [], [], [], []];
     const cols = [[], [], [], [], [], []];
     list.forEach((c, idx) => {
@@ -901,7 +906,16 @@ export default function TrialFOTYPage() {
                 letterSpacing: "1px",
               }}
             >
-              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444" }}></span>
+              <span
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: "#ef4444",
+                  boxShadow: "0 0 8px #ef4444",
+                  animation: "pulse 1.5s infinite",
+                }}
+              ></span>
               LIVE FEED
             </span>
             <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>
@@ -1615,6 +1629,7 @@ export default function TrialFOTYPage() {
                           )}
 
                           <div
+                            className="table-row-entrance"
                             onClick={() => {
                               if (!item.waitingNextMatch) setSelectedSpotlight(item);
                             }}
@@ -1626,6 +1641,7 @@ export default function TrialFOTYPage() {
                               marginBottom: "8px",
                               cursor: item.waitingNextMatch ? "default" : "pointer",
                               transition: "transform 0.15s ease, filter 0.15s ease",
+                              animationDelay: `${Math.min(index * 0.02, 0.6)}s`,
                             }}
                             onMouseEnter={(e) => {
                               if (!item.waitingNextMatch) {
@@ -2187,7 +2203,7 @@ export default function TrialFOTYPage() {
                   {/* Header 7: รวมคะแนน (Gold) */}
                   <div
                     style={{
-                      width: "78px",
+                      width: "86px",
                       height: "32px",
                       borderRadius: "8px",
                       transform: "skewX(-16deg)",
@@ -2241,32 +2257,62 @@ export default function TrialFOTYPage() {
                         {showCutoffLine && (
                           <div
                             style={{
-                              margin: "12px 0 16px",
+                              margin: "14px 0 10px 0",
                               display: "flex",
                               alignItems: "center",
-                              gap: "14px",
+                              gap: "12px",
+                              position: "relative",
                             }}
                           >
-                            <div style={{ flex: 1, height: "1.5px", background: "linear-gradient(90deg, transparent, #ffd700)" }} />
-                            <span
+                            <div
                               style={{
-                                padding: "3px 14px",
-                                borderRadius: "20px",
-                                background: "rgba(255, 215, 0, 0.15)",
-                                border: "1px solid #ffd700",
-                                color: "#ffd700",
-                                fontSize: "11px",
-                                fontWeight: "800",
-                                letterSpacing: "1px",
+                                flex: 1,
+                                height: "2px",
+                                background: "linear-gradient(90deg, rgba(255, 215, 0, 0) 0%, #ffd700 100%)",
+                                boxShadow: "0 0 10px rgba(255, 215, 0, 0.8)",
+                              }}
+                            />
+                            <div
+                              style={{
+                                transform: "skewX(-16deg)",
+                                background: "linear-gradient(135deg, #2b1f06 0%, #0d0901 100%)",
+                                border: "1.5px solid #ffd700",
+                                boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
+                                padding: "4px 16px",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                flexShrink: 0,
                               }}
                             >
-                              ▲ 5 อันดับแรก (Top 5 Safe Zone) ▲
-                            </span>
-                            <div style={{ flex: 1, height: "1.5px", background: "linear-gradient(90deg, #ffd700, transparent)" }} />
+                              <span
+                                style={{
+                                  transform: "skewX(16deg)",
+                                  fontSize: "12px",
+                                  fontWeight: "900",
+                                  fontStyle: "italic",
+                                  letterSpacing: "0.8px",
+                                  color: "#ffd700",
+                                  textShadow: "0 0 10px rgba(255, 215, 0, 0.7)",
+                                }}
+                              >
+                                ⚡ เส้นคัดเข้ารอบ 5 อันดับแรก (TOP 5 QUALIFYING CUTOFF)
+                              </span>
+                            </div>
+                            <div
+                              style={{
+                                flex: 1,
+                                height: "2px",
+                                background: "linear-gradient(90deg, #ffd700 0%, rgba(255, 215, 0, 0) 100%)",
+                                boxShadow: "0 0 10px rgba(255, 215, 0, 0.8)",
+                              }}
+                            />
                           </div>
                         )}
 
                         <div
+                          className="table-row-entrance"
                           onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
                           title="คลิกเพื่อดูสถิติเจาะลึก"
                           style={{
@@ -2276,6 +2322,7 @@ export default function TrialFOTYPage() {
                             marginBottom: "8px",
                             cursor: "pointer",
                             transition: "transform 0.15s ease, filter 0.15s ease",
+                            animationDelay: `${Math.min(index * 0.02, 0.6)}s`,
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
@@ -2508,16 +2555,16 @@ export default function TrialFOTYPage() {
                             );
                           })()}
 
-                          {/* 7. Slanted Total Score Capsule (Gold Glowing) */}
+                          {/* 7. Slanted Total Score Capsule (Gold Glowing matching page.js) */}
                           <div
                             style={{
-                              width: "78px",
+                              width: "86px",
                               height: "48px",
                               borderRadius: "8px",
                               transform: "skewX(-16deg)",
-                              background: "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)",
-                              border: "3px solid #fff566",
-                              boxShadow: "0 0 16px rgba(255, 215, 0, 0.75)",
+                              background: "linear-gradient(180deg, #2c2007 0%, #130d02 100%)",
+                              border: "3px solid #ffd700",
+                              boxShadow: "0 0 18px rgba(255, 215, 0, 0.55)",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -2529,11 +2576,15 @@ export default function TrialFOTYPage() {
                                 transform: "skewX(16deg)",
                                 fontStyle: "italic",
                                 fontWeight: "900",
-                                fontSize: "22px",
-                                color: "#000000",
+                                fontSize: "26px",
+                                color: item.finalWarmupScore === 100 ? "#52c41a" : "#ffd700",
+                                textShadow:
+                                  item.finalWarmupScore === 100
+                                    ? "0 0 14px rgba(82, 196, 26, 0.9)"
+                                    : "0 0 12px rgba(255, 215, 0, 0.8)",
                               }}
                             >
-                              {item.finalWarmupScore}
+                              {item.finalWarmupScore ?? 0}
                             </span>
                           </div>
                         </div>
@@ -2782,7 +2833,7 @@ export default function TrialFOTYPage() {
                     ไม่พบข้อมูลโพลล์ที่ตรงกับการค้นหา
                   </div>
                 ) : (
-                  filteredPoll.map((item) => {
+                  filteredPoll.map((item, index) => {
                     const matchedContestant = contestants.find(
                       (c) =>
                         (c.name && item.name && (c.name.trim() === item.name.trim() || c.name.includes(item.name) || item.name.includes(c.name))) ||
@@ -2803,6 +2854,7 @@ export default function TrialFOTYPage() {
                     return (
                       <div
                         key={item.pollRank}
+                        className="table-row-entrance"
                         onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
                         title="คลิกเพื่อดูสถิติเจาะลึก"
                         style={{
@@ -2812,6 +2864,7 @@ export default function TrialFOTYPage() {
                           marginBottom: "8px",
                           cursor: "pointer",
                           transition: "transform 0.15s ease, filter 0.15s ease",
+                          animationDelay: `${Math.min(index * 0.02, 0.6)}s`,
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
@@ -3010,6 +3063,7 @@ export default function TrialFOTYPage() {
               alignItems: "center",
               justifyContent: "center",
               padding: "20px",
+              animation: "spotlightBackdropFade 0.22s ease-out forwards",
             }}
           >
             <div
@@ -3024,6 +3078,9 @@ export default function TrialFOTYPage() {
                 boxShadow: "0 0 50px rgba(0, 229, 255, 0.4)",
                 color: "#ffffff",
                 position: "relative",
+                animation: "spotlightModalZoom 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+                transformOrigin: "center center",
+                willChange: "transform, opacity",
               }}
             >
               {/* Modal Header */}
