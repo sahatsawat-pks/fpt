@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
+import TrialNavbar from "../components/TrialNavbar";
 import fallbackPollData from "../../data/trial-poll.json";
 
 function getOptimizedImageUrl(url, size = 100) {
@@ -1213,121 +1214,8 @@ export default function TrialFotyBallotVotePage() {
         </div>
       )}
 
-      {/* Top Header & Navigation */}
-      <header
-        style={{
-          borderBottom: "1px solid rgba(255, 215, 0, 0.2)",
-          background: "linear-gradient(180deg, rgba(3, 8, 20, 0.95) 0%, rgba(3, 8, 20, 0.8) 100%)",
-          backdropFilter: "blur(12px)",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          padding: "16px 24px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1080px",
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "16px",
-          }}
-        >
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #ffd700 0%, #ff8800 100%)",
-                  color: "#030812",
-                  fontSize: "11px",
-                  fontWeight: "900",
-                  padding: "2px 8px",
-                  borderRadius: "6px",
-                  letterSpacing: "1px",
-                }}
-              >
-                FAN POLL BALLOT 2026
-              </span>
-              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", letterSpacing: "1px" }}>
-                THE TRIAL FAN OF THE YEAR
-              </span>
-            </div>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "22px",
-                fontWeight: "900",
-                letterSpacing: "0.5px",
-                background: "linear-gradient(90deg, #ffffff 0%, #ffd700 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              🗳️ โหวตโพลล์มหาชน • งุ่นง่าน Of The Year
-            </h1>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Link
-              href="/trial-foty"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 16px",
-                borderRadius: "10px",
-                background: "rgba(0, 229, 255, 0.12)",
-                border: "1px solid rgba(0, 229, 255, 0.4)",
-                color: "#67e8f9",
-                textDecoration: "none",
-                fontWeight: "700",
-                fontSize: "13px",
-              }}
-            >
-              📊 ตารางคะแนน & ผลโพลล์
-            </Link>
-            <Link
-              href="/trial-foty/info"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 16px",
-                borderRadius: "10px",
-                background: "rgba(0, 229, 255, 0.12)",
-                border: "1px solid rgba(0, 229, 255, 0.4)",
-                color: "#67e8f9",
-                textDecoration: "none",
-                fontWeight: "700",
-                fontSize: "13px",
-              }}
-            >
-              ℹ️ คำใบ้ & ถามทีมงาน
-            </Link>
-            <Link
-              href="/"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 16px",
-                borderRadius: "10px",
-                background: "rgba(255, 255, 255, 0.08)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                color: "#cbd5e1",
-                textDecoration: "none",
-                fontWeight: "700",
-                fontSize: "13px",
-              }}
-            >
-              🏠 หน้าหลัก
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Top Header & Navigation (Mobile Responsive) */}
+      <TrialNavbar active="vote" votingOpen={votingOpen} />
 
       {/* Main Ballot Form */}
       <main style={{ maxWidth: "1080px", margin: "0 auto", padding: "28px 24px" }}>

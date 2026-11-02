@@ -1344,39 +1344,42 @@ export default function TrialAdminPage() {
           background: "rgba(5, 15, 30, 0.95)",
           borderBottom: "1px solid rgba(0, 229, 255, 0.25)",
           backdropFilter: "blur(10px)",
-          padding: "14px 24px",
+          WebkitBackdropFilter: "blur(10px)",
+          padding: "12px clamp(12px, 3vw, 24px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "12px",
           position: "sticky",
           top: 0,
           zIndex: 100,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link href="/trial-foty" title="ไปที่ตารางคะแนนแข่งขัน">
             <img
               src="/img/logo.png"
               alt="Fanpantae 2026"
               style={{
-                height: "36px",
+                height: "34px",
                 width: "auto",
                 objectFit: "contain",
                 filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
               }}
             />
           </Link>
-          <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "12px" }}>
-            <h1 style={{ fontSize: "16px", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
-              ห้องควบคุมแอดมิน • งุ่นง่าน Of The Year 2026
+          <div style={{ borderLeft: "1px solid rgba(0, 229, 255, 0.3)", paddingLeft: "10px" }}>
+            <h1 style={{ fontSize: "clamp(14px, 3.5vw, 16px)", fontWeight: "800", color: "#00e5ff", margin: 0 }}>
+              ห้องควบคุมแอดมิน • The Trial
             </h1>
-            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
-              THE TRIAL FAN OF THE YEAR 2026 ADMIN ROOM
+            <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+              FOTY 2026 ADMIN ROOM
             </p>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", overflowX: "auto", maxWidth: "100%", WebkitOverflowScrolling: "touch" }}>
           <Link
             href="/trial-foty/info"
             target="_blank"

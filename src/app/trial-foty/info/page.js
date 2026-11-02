@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import TrialNavbar from "../components/TrialNavbar";
 import DiscordMarkdown from "@/app/components/DiscordMarkdown";
 
 function getOptimizedImageUrl(url, size = 120) {
@@ -180,173 +181,14 @@ export default function TrialContestantInfoPage() {
       }}
     >
       {/* ========================================================
-          1. TOP BROADCAST STICKY NAVIGATION BAR (Identical to other pages)
+          1. TOP BROADCAST STICKY NAVIGATION BAR (Mobile Responsive)
          ======================================================== */}
-      <nav
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          backdropFilter: "blur(14px)",
-          background: "rgba(3, 8, 20, 0.88)",
-          borderBottom: "1px solid rgba(0, 229, 255, 0.25)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
-          padding: "12px 24px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1400px",
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "12px",
-          }}
-        >
-          {/* Logo & Show Title */}
-          <Link
-            href="/trial-foty"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              textDecoration: "none",
-            }}
-          >
-            <img
-              src="/img/game_logo.png"
-              alt="FAN OF THE YEAR 2026"
-              style={{
-                height: "36px",
-                width: "auto",
-                filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
-              }}
-            />
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <span
-                style={{
-                  fontSize: "11px",
-                  fontWeight: "900",
-                  letterSpacing: "1.5px",
-                  color: "#ffd700",
-                  lineHeight: "1.2",
-                  fontFamily: "var(--font-num)",
-                }}
-              >
-                THE TRIAL FOTY 2026
-              </span>
-              <span
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "900",
-                  color: "#ffffff",
-                  lineHeight: "1.2",
-                }}
-              >
-                งุ่นง่าน Of The Year 2026
-              </span>
-            </div>
-          </Link>
-
-          {/* Navigation Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-            <Link
-              href="/trial-foty"
-              style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: "transparent",
-                border: "none",
-                color: "#cbd5e1",
-                fontWeight: "700",
-                fontSize: "13px",
-                textDecoration: "none",
-              }}
-            >
-              🏆 ตารางคะแนน
-            </Link>
-
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: "rgba(0, 229, 255, 0.25)",
-                border: "1px solid #00e5ff",
-                color: "#00e5ff",
-                fontWeight: "800",
-                fontSize: "13px",
-                boxShadow: "0 0 12px rgba(0, 229, 255, 0.4)",
-              }}
-            >
-              ℹ️ คำใบ้ & ถามทีมงาน
-            </span>
-
-            <Link
-              href="/trial-foty/vote"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: "rgba(255, 215, 0, 0.15)",
-                border: "1px solid rgba(255, 215, 0, 0.4)",
-                color: "#ffd700",
-                fontWeight: "700",
-                fontSize: "13px",
-                textDecoration: "none",
-              }}
-            >
-              🗳️ ร่วมโหวตโพลล์
-            </Link>
-
-            <Link
-              href="/trial-foty/admin"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 16px",
-                borderRadius: "20px",
-                background: "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)",
-                color: "#030814",
-                fontWeight: "900",
-                fontSize: "13px",
-                textDecoration: "none",
-                boxShadow: "0 0 16px rgba(255, 215, 0, 0.45)",
-              }}
-            >
-              <span>⚙️</span> Admin งุ่นง่าน
-            </Link>
-
-            <Link
-              href="/"
-              style={{
-                padding: "8px 12px",
-                borderRadius: "8px",
-                background: "rgba(255, 255, 255, 0.06)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                color: "rgba(255, 255, 255, 0.7)",
-                fontWeight: "700",
-                fontSize: "13px",
-                textDecoration: "none",
-              }}
-            >
-              🏠 หน้าหลัก
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <TrialNavbar active="info" />
 
       {/* ========================================================
           2. MAIN CONTENT
          ======================================================== */}
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 24px 80px" }}>
+      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "clamp(16px, 3vw, 28px) clamp(12px, 3vw, 24px) 80px" }}>
         {/* Hero Header */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <div
@@ -641,8 +483,8 @@ export default function TrialContestantInfoPage() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))",
-                  gap: "20px",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(min(290px, 100%), 1fr))",
+                  gap: "16px",
                 }}
               >
                 {filteredKeywords.map((c, index) => {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
+import TrialNavbar from "./components/TrialNavbar";
 import fallbackPollData from "../data/trial-poll.json";
 
 // ─── Score Pill Styles matching authentic page.js ────────────────────────────
@@ -390,148 +391,17 @@ export default function TrialFOTYPage() {
       }}
     >
       {/* ========================================================
-          1. TOP NAVIGATION BAR (Themed after official Fan Pan Tae)
+          1. TOP NAVIGATION BAR (Mobile Responsive)
          ======================================================== */}
-      <nav
-        style={{
-          background: "linear-gradient(90deg, #0077b6 0%, #0096c7 50%, #0077b6 100%)",
-          borderBottom: "2px solid #00e5ff",
-          boxShadow: "0 4px 20px rgba(0, 180, 216, 0.35)",
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          padding: "0 24px",
+      <TrialNavbar
+        active="home"
+        votingOpen={votingOpen}
+        onStandingsClick={() => {
+          setActiveTableTab("standings");
+          const el = document.getElementById("leaderboard");
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
-      >
-        <div
-          style={{
-            maxWidth: "1320px",
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            height: "64px",
-          }}
-        >
-          {/* Logo / Brand */}
-          <Link href="/trial-foty" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
-            <img
-              src="/img/logo.png"
-              alt="FANPANTAE 2026"
-              style={{
-                height: "40px",
-                width: "auto",
-                objectFit: "contain",
-                filter: "drop-shadow(0 0 12px rgba(0, 229, 255, 0.7))",
-              }}
-            />
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <span
-                style={{
-                  fontSize: "11px",
-                  fontWeight: "900",
-                  letterSpacing: "1.5px",
-                  color: "#ffd700",
-                  lineHeight: "1.2",
-                }}
-              >
-                THE TRIAL FOTY 2026
-              </span>
-              <span
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "900",
-                  color: "#ffffff",
-                  lineHeight: "1.2",
-                }}
-              >
-                งุ่นง่าน Of The Year 2026
-              </span>
-            </div>
-          </Link>
-
-          {/* Navigation Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTableTab("standings");
-                const el = document.getElementById("leaderboard");
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: activeTableTab === "standings" ? "rgba(0, 229, 255, 0.25)" : "transparent",
-                border: "none",
-                color: "#ffffff",
-                fontWeight: "700",
-                fontSize: "13px",
-                cursor: "pointer",
-              }}
-            >
-              🏆 ตารางคะแนน
-            </button>
-
-            <Link
-              href="/trial-foty/info"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: "rgba(0, 229, 255, 0.15)",
-                border: "1px solid rgba(0, 229, 255, 0.4)",
-                color: "#00e5ff",
-                fontWeight: "700",
-                fontSize: "13px",
-                textDecoration: "none",
-              }}
-            >
-              ℹ️ คำใบ้ & ถามทีมงาน
-            </Link>
-
-            <Link
-              href="/trial-foty/vote"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 14px",
-                borderRadius: "8px",
-                background: votingOpen ? "rgba(255, 215, 0, 0.15)" : "rgba(255, 255, 255, 0.08)",
-                border: votingOpen ? "1px solid rgba(255, 215, 0, 0.4)" : "1px solid rgba(255, 255, 255, 0.2)",
-                color: votingOpen ? "#ffd700" : "rgba(255, 255, 255, 0.65)",
-                fontWeight: "700",
-                fontSize: "13px",
-                textDecoration: "none",
-              }}
-            >
-              {votingOpen ? "🗳️ ร่วมโหวตโพลล์" : "🔒 หน้าโหวต (ปิดแล้ว)"}
-            </Link>
-
-            <Link
-              href="/trial-foty/admin"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 16px",
-                borderRadius: "20px",
-                background: "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)",
-                color: "#030814",
-                fontWeight: "900",
-                fontSize: "13px",
-                textDecoration: "none",
-                boxShadow: "0 0 16px rgba(255, 215, 0, 0.45)",
-              }}
-            >
-              <span>⚙️</span> Admin งุ่นง่าน
-            </Link>
-          </div>
-        </div>
-      </nav>
+      />
 
       {/* ========================================================
           2. HERO SECTION (With Floating 6-Column Photo Background)
