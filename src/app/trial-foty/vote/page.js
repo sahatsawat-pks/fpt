@@ -1290,6 +1290,24 @@ export default function TrialFotyBallotVotePage() {
               📊 ตารางคะแนน & ผลโพลล์
             </Link>
             <Link
+              href="/trial-foty/info"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 16px",
+                borderRadius: "10px",
+                background: "rgba(0, 229, 255, 0.12)",
+                border: "1px solid rgba(0, 229, 255, 0.4)",
+                color: "#67e8f9",
+                textDecoration: "none",
+                fontWeight: "700",
+                fontSize: "13px",
+              }}
+            >
+              ℹ️ คำใบ้ & ถามทีมงาน
+            </Link>
+            <Link
               href="/"
               style={{
                 display: "inline-flex",

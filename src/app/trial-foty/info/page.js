@@ -1,13 +1,71 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import DiscordMarkdown from "@/app/components/DiscordMarkdown";
 
+function getOptimizedImageUrl(url, size = 120) {
+  if (!url || typeof url !== "string") return "";
+  let clean = url.trim();
+  if (clean.startsWith("http://")) clean = clean.replace("http://", "https://");
+  if (clean.includes("?authuser=")) clean = clean.split("?authuser=")[0];
+  if (clean.includes("googleusercontent.com")) {
+    if (clean.includes("=")) {
+      const base = clean.split("=")[0];
+      return `${base}=w${size}-h${size}-c`;
+    }
+    return `${clean}=w${size}-h${size}-c`;
+  }
+  return clean;
+}
+
+function ContestantAvatar({ src, name, size = 52, borderColor = "#00e5ff" }) {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  const optimized = getOptimizedImageUrl(src, size * 2);
+
+  return (
+    <div
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: "12px",
+        overflow: "hidden",
+        background: "#030814",
+        border: `1.5px solid ${borderColor}`,
+        boxShadow: `0 0 12px ${borderColor}33`,
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {optimized && !hasError ? (
+        <img
+          src={optimized}
+          alt={name || ""}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setHasError(true)}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      ) : (
+        <span style={{ fontSize: `${Math.round(size * 0.44)}px`, opacity: 0.65 }}>👤</span>
+      )}
+    </div>
+  );
+}
+
 const CATEGORY_COLORS = {
-  "3 วินาที": { bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.4)", text: "#38bdf8", icon: "⏱️" },
-  "คำถาม-คำตอบ": { bg: "rgba(168, 85, 247, 0.15)", border: "rgba(168, 85, 247, 0.4)", text: "#c084fc", icon: "❓" },
-  "จิ๊กซอว์": { bg: "rgba(251, 146, 60, 0.15)", border: "rgba(251, 146, 60, 0.4)", text: "#fb923c", icon: "🧩" },
-  "คุณสมบัติ": { bg: "rgba(74, 222, 128, 0.15)", border: "rgba(74, 222, 128, 0.4)", text: "#4ade80", icon: "🔍" },
+  "3 วินาที": { bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.45)", text: "#38bdf8", icon: "⏱️" },
+  "คำถาม-คำตอบ": { bg: "rgba(168, 85, 247, 0.15)", border: "rgba(168, 85, 247, 0.45)", text: "#c084fc", icon: "❓" },
+  "จิ๊กซอว์": { bg: "rgba(251, 146, 60, 0.15)", border: "rgba(251, 146, 60, 0.45)", text: "#fb923c", icon: "🧩" },
+  "คุณสมบัติ": { bg: "rgba(74, 222, 128, 0.15)", border: "rgba(74, 222, 128, 0.45)", text: "#4ade80", icon: "🔍" },
 };
 
 export default function TrialContestantInfoPage() {
@@ -22,17 +80,44 @@ export default function TrialContestantInfoPage() {
   // QA Board Filter State
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQa, setSearchQa] = useState("");
-  const [expandedQaId, setExpandedQaId] = useState(null);
 
-  // Fetch data
+  // Load and sync data from both /api/trial-info and /api/trial (for latest synced photos)
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/trial-info", { cache: "no-store" });
-      const data = await res.json();
-      if (data.success) {
-        setKeywords(data.keywords || []);
-        setQaBoard(data.qaBoard || []);
+      const [resInfo, resTrial] = await Promise.all([
+        fetch("/api/trial-info", { cache: "no-store" }),
+        fetch("/api/trial", { cache: "no-store" }).catch(() => null),
+      ]);
+
+      let roster = [];
+      if (resTrial && resTrial.ok) {
+        const jsonTrial = await resTrial.json();
+        if (jsonTrial.success && Array.isArray(jsonTrial.data)) {
+          roster = jsonTrial.data;
+        }
+      }
+
+      if (resInfo && resInfo.ok) {
+        const data = await resInfo.json();
+        if (data.success) {
+          // Merge latest photos directly from roster so photos are always 100% in sync
+          const photoMap = new Map();
+          roster.forEach((c) => {
+            if (c.image) {
+              photoMap.set(String(c.id), c.image);
+              if (c.name) photoMap.set(c.name.trim(), c.image);
+            }
+          });
+
+          const syncedKeywords = (data.keywords || []).map((k) => ({
+            ...k,
+            image: photoMap.get(String(k.id)) || photoMap.get(k.name?.trim()) || k.image || "",
+          }));
+
+          setKeywords(syncedKeywords);
+          setQaBoard(data.qaBoard || []);
+        }
       }
     } catch (err) {
       console.error("Failed to load trial info:", err);
@@ -87,90 +172,181 @@ export default function TrialContestantInfoPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "radial-gradient(ellipse at 50% 0%, #0c2040 0%, #030814 70%)",
+        background:
+          "radial-gradient(ellipse 90% 60% at 50% -10%, rgba(0, 119, 182, 0.28) 0%, transparent 70%), radial-gradient(ellipse 70% 50% at 80% 20%, rgba(255, 215, 0, 0.12) 0%, transparent 60%), #030814",
         color: "#ffffff",
-        fontFamily: "'Chakra Petch', sans-serif",
-        padding: "24px 16px 80px",
+        fontFamily: "var(--font-th, 'Sukhumvit Set', 'Kanit', 'Prompt', sans-serif)",
         boxSizing: "border-box",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Navigation Bar */}
+      {/* ========================================================
+          1. TOP BROADCAST STICKY NAVIGATION BAR (Identical to other pages)
+         ======================================================== */}
+      <nav
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          backdropFilter: "blur(14px)",
+          background: "rgba(3, 8, 20, 0.88)",
+          borderBottom: "1px solid rgba(0, 229, 255, 0.25)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+          padding: "12px 24px",
+        }}
+      >
         <div
           style={{
+            maxWidth: "1400px",
+            margin: "0 auto",
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
+            justifyContent: "space-between",
             flexWrap: "wrap",
             gap: "12px",
-            marginBottom: "24px",
-            paddingBottom: "16px",
-            borderBottom: "1px solid rgba(0, 229, 255, 0.2)",
           }}
         >
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            <a
+          {/* Logo & Show Title */}
+          <Link
+            href="/trial-foty"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              textDecoration: "none",
+            }}
+          >
+            <img
+              src="/img/game_logo.png"
+              alt="FAN OF THE YEAR 2026"
+              style={{
+                height: "36px",
+                width: "auto",
+                filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
+              }}
+            />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontWeight: "900",
+                  letterSpacing: "1.5px",
+                  color: "#ffd700",
+                  lineHeight: "1.2",
+                  fontFamily: "var(--font-num)",
+                }}
+              >
+                THE TRIAL FOTY 2026
+              </span>
+              <span
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "900",
+                  color: "#ffffff",
+                  lineHeight: "1.2",
+                }}
+              >
+                งุ่นง่าน Of The Year 2026
+              </span>
+            </div>
+          </Link>
+
+          {/* Navigation Links */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <Link
               href="/trial-foty"
+              style={{
+                padding: "8px 14px",
+                borderRadius: "8px",
+                background: "transparent",
+                border: "none",
+                color: "#cbd5e1",
+                fontWeight: "700",
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
+            >
+              🏆 ตารางคะแนน
+            </Link>
+
+            <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                background: "rgba(10, 25, 50, 0.8)",
-                border: "1px solid rgba(0, 229, 255, 0.4)",
-                color: "#80d0ff",
-                padding: "8px 16px",
-                borderRadius: "12px",
-                textDecoration: "none",
-                fontSize: "14px",
-                fontWeight: "700",
-                backdropFilter: "blur(6px)",
-                transition: "all 0.2s",
+                padding: "8px 14px",
+                borderRadius: "8px",
+                background: "rgba(0, 229, 255, 0.25)",
+                border: "1px solid #00e5ff",
+                color: "#00e5ff",
+                fontWeight: "800",
+                fontSize: "13px",
+                boxShadow: "0 0 12px rgba(0, 229, 255, 0.4)",
               }}
             >
-              ← กลับหน้าหลัก The Trial
-            </a>
-            <a
+              ℹ️ คำใบ้ & ถามทีมงาน
+            </span>
+
+            <Link
               href="/trial-foty/vote"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                background: "rgba(255, 215, 0, 0.12)",
+                padding: "8px 14px",
+                borderRadius: "8px",
+                background: "rgba(255, 215, 0, 0.15)",
                 border: "1px solid rgba(255, 215, 0, 0.4)",
                 color: "#ffd700",
-                padding: "8px 16px",
-                borderRadius: "12px",
-                textDecoration: "none",
-                fontSize: "14px",
                 fontWeight: "700",
-                backdropFilter: "blur(6px)",
-                transition: "all 0.2s",
+                fontSize: "13px",
+                textDecoration: "none",
               }}
             >
-              🗳️ โหวต The Trial
-            </a>
+              🗳️ ร่วมโหวตโพลล์
+            </Link>
+
+            <Link
+              href="/trial-foty/admin"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 16px",
+                borderRadius: "20px",
+                background: "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)",
+                color: "#030814",
+                fontWeight: "900",
+                fontSize: "13px",
+                textDecoration: "none",
+                boxShadow: "0 0 16px rgba(255, 215, 0, 0.45)",
+              }}
+            >
+              <span>⚙️</span> Admin งุ่นง่าน
+            </Link>
+
+            <Link
+              href="/"
+              style={{
+                padding: "8px 12px",
+                borderRadius: "8px",
+                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                color: "rgba(255, 255, 255, 0.7)",
+                fontWeight: "700",
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
+            >
+              🏠 หน้าหลัก
+            </Link>
           </div>
-
-          <a
-            href="/trial-foty/admin"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              color: "#94a3b8",
-              padding: "7px 14px",
-              borderRadius: "10px",
-              textDecoration: "none",
-              fontSize: "13px",
-              fontWeight: "600",
-            }}
-          >
-            ⚙️ แอดมิน
-          </a>
         </div>
+      </nav>
 
+      {/* ========================================================
+          2. MAIN CONTENT
+         ======================================================== */}
+      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 24px 80px" }}>
         {/* Hero Header */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <div
@@ -181,39 +357,41 @@ export default function TrialContestantInfoPage() {
               color: "#00e5ff",
               padding: "4px 16px",
               borderRadius: "20px",
-              fontSize: "13px",
-              fontWeight: "700",
-              letterSpacing: "1px",
-              marginBottom: "10px",
+              fontSize: "12px",
+              fontWeight: "900",
+              letterSpacing: "1.5px",
+              marginBottom: "12px",
+              fontFamily: "var(--font-num)",
             }}
           >
             THE TRIAL : FAN OF THE YEAR 2026
           </div>
           <h1
             style={{
-              fontSize: "clamp(26px, 4vw, 36px)",
+              fontSize: "clamp(26px, 3.5vw, 38px)",
               fontWeight: "900",
-              margin: "0 0 10px",
-              background: "linear-gradient(135deg, #ffffff 30%, #ffd700 80%)",
+              margin: "0 0 12px",
+              background: "linear-gradient(135deg, #ffffff 25%, #ffd700 85%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              textShadow: "0 0 20px rgba(0, 229, 255, 0.3)",
+              textShadow: "0 0 24px rgba(0, 229, 255, 0.3)",
             }}
           >
             ข้อมูลผู้เข้าแข่งขัน & กระดานถามทีมงาน
           </h1>
-          <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "650px", margin: "0 auto" }}>
-            ตรวจสอบคำใบ้ Keyword ประจำตัวในหมวดคำถาม-คำตอบ และติดตามข้อซักถามกติกาต่างๆ โดยตรงกับทีมงาน
+          <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "700px", margin: "0 auto", lineHeight: "1.6" }}>
+            ศูนย์รวมข้อมูล Keyword คำใบ้ของผู้เข้าแข่งขันในหมวดคำถาม-คำตอบ และกระดานตอบคำถามชี้แจงกติกาอย่างเป็นทางการจากทีมงาน
           </p>
         </div>
 
-        {/* Main Tabs Selector */}
+        {/* Tab Buttons */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
             gap: "12px",
-            marginBottom: "28px",
+            marginBottom: "32px",
+            flexWrap: "wrap",
           }}
         >
           <button
@@ -221,24 +399,24 @@ export default function TrialContestantInfoPage() {
             style={{
               background:
                 activeTab === "keywords"
-                  ? "linear-gradient(135deg, #00e5ff, #0284c7)"
-                  : "rgba(10, 25, 50, 0.7)",
+                  ? "linear-gradient(135deg, #00e5ff, #0088cc)"
+                  : "rgba(10, 25, 50, 0.75)",
               color: activeTab === "keywords" ? "#020814" : "#cbd5e1",
-              border: activeTab === "keywords" ? "none" : "1px solid rgba(0, 229, 255, 0.3)",
-              padding: "12px 24px",
+              border: activeTab === "keywords" ? "none" : "1px solid rgba(0, 229, 255, 0.35)",
+              padding: "12px 26px",
               borderRadius: "14px",
-              fontSize: "16px",
+              fontSize: "15px",
               fontWeight: "800",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               gap: "8px",
               boxShadow:
-                activeTab === "keywords" ? "0 0 20px rgba(0, 229, 255, 0.4)" : "none",
+                activeTab === "keywords" ? "0 0 24px rgba(0, 229, 255, 0.45)" : "none",
               transition: "all 0.2s ease",
             }}
           >
-            🔑 คำใบ้ Keyword (คำถาม-คำตอบ)
+            <span>🔑</span> Keyword คำใบ้ (คำถาม-คำตอบ)
             <span
               style={{
                 background: activeTab === "keywords" ? "#020814" : "rgba(255, 255, 255, 0.15)",
@@ -247,6 +425,7 @@ export default function TrialContestantInfoPage() {
                 borderRadius: "10px",
                 fontSize: "12px",
                 fontWeight: "900",
+                fontFamily: "var(--font-num)",
               }}
             >
               {keywords.length}
@@ -259,23 +438,23 @@ export default function TrialContestantInfoPage() {
               background:
                 activeTab === "qaBoard"
                   ? "linear-gradient(135deg, #ffd700, #f59e0b)"
-                  : "rgba(10, 25, 50, 0.7)",
+                  : "rgba(10, 25, 50, 0.75)",
               color: activeTab === "qaBoard" ? "#020814" : "#cbd5e1",
-              border: activeTab === "qaBoard" ? "none" : "1px solid rgba(255, 215, 0, 0.3)",
-              padding: "12px 24px",
+              border: activeTab === "qaBoard" ? "none" : "1px solid rgba(255, 215, 0, 0.35)",
+              padding: "12px 26px",
               borderRadius: "14px",
-              fontSize: "16px",
+              fontSize: "15px",
               fontWeight: "800",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               gap: "8px",
               boxShadow:
-                activeTab === "qaBoard" ? "0 0 20px rgba(255, 215, 0, 0.4)" : "none",
+                activeTab === "qaBoard" ? "0 0 24px rgba(255, 215, 0, 0.45)" : "none",
               transition: "all 0.2s ease",
             }}
           >
-            💬 กระดานถามทีมงาน (Staff Q&A)
+            <span>💬</span> กระดานถามทีมงาน (Staff Q&A)
             <span
               style={{
                 background: activeTab === "qaBoard" ? "#020814" : "rgba(255, 255, 255, 0.15)",
@@ -284,6 +463,7 @@ export default function TrialContestantInfoPage() {
                 borderRadius: "10px",
                 fontSize: "12px",
                 fontWeight: "900",
+                fontFamily: "var(--font-num)",
               }}
             >
               {qaBoard.length}
@@ -291,33 +471,33 @@ export default function TrialContestantInfoPage() {
           </button>
         </div>
 
-        {/* Loading state */}
+        {/* Loading Spinner */}
         {loading && (
-          <div style={{ textAlign: "center", padding: "60px 0" }}>
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
             <div
               style={{
                 display: "inline-block",
-                width: "40px",
-                height: "40px",
+                width: "44px",
+                height: "44px",
                 border: "4px solid rgba(0, 229, 255, 0.2)",
                 borderTopColor: "#00e5ff",
                 borderRadius: "50%",
                 animation: "spin 1s linear infinite",
               }}
             />
-            <p style={{ marginTop: "14px", color: "#94a3b8" }}>กำลังโหลดข้อมูล...</p>
+            <p style={{ marginTop: "16px", color: "#94a3b8", fontSize: "14px" }}>กำลังโหลดข้อมูล...</p>
             <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
           </div>
         )}
 
-        {/* TAB 1: KEYWORD คำใบ้ */}
+        {/* TAB 1: KEYWORDS */}
         {!loading && activeTab === "keywords" && (
           <div>
-            {/* Control Bar */}
+            {/* Filter Bar */}
             <div
               style={{
-                background: "rgba(10, 25, 50, 0.6)",
-                border: "1px solid rgba(0, 229, 255, 0.25)",
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.3)",
                 borderRadius: "16px",
                 padding: "16px 20px",
                 marginBottom: "24px",
@@ -326,6 +506,7 @@ export default function TrialContestantInfoPage() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: "16px",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
               }}
             >
               {/* Search */}
@@ -337,13 +518,14 @@ export default function TrialContestantInfoPage() {
                     top: "50%",
                     transform: "translateY(-50%)",
                     color: "#64748b",
+                    fontSize: "14px",
                   }}
                 >
                   🔍
                 </span>
                 <input
                   type="text"
-                  placeholder="ค้นหาชื่อ, ชื่อเล่น, หัวข้อ หรือคำใบ้..."
+                  placeholder="ค้นหาชื่อ, ชื่อเล่น, หัวข้อแฟนพันธุ์แท้ หรือคำใบ้..."
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
                   style={{
@@ -356,23 +538,24 @@ export default function TrialContestantInfoPage() {
                     fontSize: "14px",
                     outline: "none",
                     boxSizing: "border-box",
+                    fontFamily: "inherit",
                   }}
                 />
               </div>
 
-              {/* Status Filters */}
+              {/* Status Chips */}
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
                 <button
                   onClick={() => setKeywordStatusFilter("all")}
                   style={{
-                    background: keywordStatusFilter === "all" ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                    background: keywordStatusFilter === "all" ? "rgba(0, 229, 255, 0.25)" : "rgba(255, 255, 255, 0.05)",
                     border: `1px solid ${keywordStatusFilter === "all" ? "#00e5ff" : "rgba(255, 255, 255, 0.15)"}`,
                     color: keywordStatusFilter === "all" ? "#00e5ff" : "#94a3b8",
-                    padding: "6px 14px",
+                    padding: "7px 14px",
                     borderRadius: "8px",
                     fontSize: "13px",
                     cursor: "pointer",
-                    fontWeight: "600",
+                    fontWeight: "700",
                   }}
                 >
                   ทั้งหมด ({keywords.length})
@@ -380,14 +563,14 @@ export default function TrialContestantInfoPage() {
                 <button
                   onClick={() => setKeywordStatusFilter("ready")}
                   style={{
-                    background: keywordStatusFilter === "ready" ? "rgba(74, 222, 128, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                    background: keywordStatusFilter === "ready" ? "rgba(74, 222, 128, 0.25)" : "rgba(255, 255, 255, 0.05)",
                     border: `1px solid ${keywordStatusFilter === "ready" ? "#4ade80" : "rgba(255, 255, 255, 0.15)"}`,
                     color: keywordStatusFilter === "ready" ? "#4ade80" : "#94a3b8",
-                    padding: "6px 14px",
+                    padding: "7px 14px",
                     borderRadius: "8px",
                     fontSize: "13px",
                     cursor: "pointer",
-                    fontWeight: "600",
+                    fontWeight: "700",
                   }}
                 >
                   ✅ มีคำใบ้แล้ว ({readyKeywordsCount})
@@ -395,29 +578,38 @@ export default function TrialContestantInfoPage() {
                 <button
                   onClick={() => setKeywordStatusFilter("pending")}
                   style={{
-                    background: keywordStatusFilter === "pending" ? "rgba(251, 146, 60, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                    background: keywordStatusFilter === "pending" ? "rgba(251, 146, 60, 0.25)" : "rgba(255, 255, 255, 0.05)",
                     border: `1px solid ${keywordStatusFilter === "pending" ? "#fb923c" : "rgba(255, 255, 255, 0.15)"}`,
                     color: keywordStatusFilter === "pending" ? "#fb923c" : "#94a3b8",
-                    padding: "6px 14px",
+                    padding: "7px 14px",
                     borderRadius: "8px",
                     fontSize: "13px",
                     cursor: "pointer",
-                    fontWeight: "600",
+                    fontWeight: "700",
                   }}
                 >
                   ⏳ รออัปเดต ({keywords.length - readyKeywordsCount})
                 </button>
               </div>
 
-              {/* View Switch */}
-              <div style={{ display: "flex", gap: "6px", background: "rgba(3, 8, 20, 0.6)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+              {/* View Mode Toggle */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "4px",
+                  background: "rgba(3, 8, 20, 0.6)",
+                  padding: "4px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                }}
+              >
                 <button
                   onClick={() => setViewMode("cards")}
                   style={{
                     background: viewMode === "cards" ? "rgba(0, 229, 255, 0.25)" : "transparent",
                     color: viewMode === "cards" ? "#00e5ff" : "#94a3b8",
                     border: "none",
-                    padding: "6px 12px",
+                    padding: "6px 14px",
                     borderRadius: "6px",
                     fontSize: "13px",
                     cursor: "pointer",
@@ -432,7 +624,7 @@ export default function TrialContestantInfoPage() {
                     background: viewMode === "table" ? "rgba(0, 229, 255, 0.25)" : "transparent",
                     color: viewMode === "table" ? "#00e5ff" : "#94a3b8",
                     border: "none",
-                    padding: "6px 12px",
+                    padding: "6px 14px",
                     borderRadius: "6px",
                     fontSize: "13px",
                     cursor: "pointer",
@@ -444,13 +636,13 @@ export default function TrialContestantInfoPage() {
               </div>
             </div>
 
-            {/* Keyword Cards Grid View */}
+            {/* Grid of Cards */}
             {viewMode === "cards" && (
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                  gap: "18px",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))",
+                  gap: "20px",
                 }}
               >
                 {filteredKeywords.map((c, index) => {
@@ -459,50 +651,29 @@ export default function TrialContestantInfoPage() {
                     <div
                       key={c.id || index}
                       style={{
-                        background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(6, 14, 28, 0.95) 100%)",
+                        background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(8, 16, 32, 0.95) 100%)",
                         border: isPending
-                          ? "1px solid rgba(255, 255, 255, 0.12)"
-                          : "1px solid rgba(0, 229, 255, 0.35)",
+                          ? "1px solid rgba(255, 255, 255, 0.14)"
+                          : "1.5px solid rgba(0, 229, 255, 0.35)",
                         borderRadius: "16px",
-                        padding: "18px",
+                        padding: "20px",
                         display: "flex",
                         flexDirection: "column",
-                        gap: "12px",
+                        gap: "14px",
                         boxShadow: isPending
                           ? "0 4px 15px rgba(0, 0, 0, 0.4)"
-                          : "0 6px 20px rgba(0, 229, 255, 0.12)",
+                          : "0 6px 22px rgba(0, 229, 255, 0.14)",
                         transition: "all 0.2s ease",
                       }}
                     >
                       {/* Top: Avatar & Info */}
                       <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
-                        <div
-                          style={{
-                            width: "56px",
-                            height: "56px",
-                            borderRadius: "12px",
-                            overflow: "hidden",
-                            background: "rgba(0, 0, 0, 0.5)",
-                            border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                            flexShrink: 0,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {c.image ? (
-                            <img
-                              src={c.image}
-                              alt={c.name}
-                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                              }}
-                            />
-                          ) : (
-                            <span style={{ fontSize: "24px" }}>👤</span>
-                          )}
-                        </div>
+                        <ContestantAvatar
+                          src={c.image}
+                          name={c.name}
+                          size={54}
+                          borderColor={isPending ? "rgba(255,255,255,0.2)" : "#00e5ff"}
+                        />
 
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
@@ -516,9 +687,9 @@ export default function TrialContestantInfoPage() {
                                   color: "#00e5ff",
                                   border: "1px solid rgba(0, 229, 255, 0.3)",
                                   padding: "1px 8px",
-                                  borderRadius: "12px",
+                                  borderRadius: "10px",
                                   fontSize: "11px",
-                                  fontWeight: "700",
+                                  fontWeight: "800",
                                 }}
                               >
                                 {c.nickname}
@@ -536,6 +707,7 @@ export default function TrialContestantInfoPage() {
                               display: "flex",
                               alignItems: "center",
                               gap: "4px",
+                              fontWeight: "600",
                             }}
                             title={c.topic}
                           >
@@ -552,9 +724,9 @@ export default function TrialContestantInfoPage() {
                             : "linear-gradient(135deg, rgba(0, 229, 255, 0.12), rgba(255, 215, 0, 0.12))",
                           border: isPending
                             ? "1px dashed rgba(255, 255, 255, 0.2)"
-                            : "1px solid rgba(255, 215, 0, 0.5)",
+                            : "1px solid rgba(255, 215, 0, 0.45)",
                           borderRadius: "12px",
-                          padding: "12px 14px",
+                          padding: "14px",
                           textAlign: "center",
                         }}
                       >
@@ -562,19 +734,20 @@ export default function TrialContestantInfoPage() {
                           style={{
                             fontSize: "11px",
                             color: "#94a3b8",
-                            letterSpacing: "0.5px",
-                            marginBottom: "4px",
-                            fontWeight: "600",
+                            letterSpacing: "0.8px",
+                            marginBottom: "6px",
+                            fontWeight: "700",
+                            fontFamily: "var(--font-num)",
                           }}
                         >
                           KEYWORD คำใบ้ (ถาม-ตอบ)
                         </div>
                         <div
                           style={{
-                            fontSize: isPending ? "15px" : "19px",
+                            fontSize: isPending ? "15px" : "20px",
                             fontWeight: "900",
                             color: isPending ? "#94a3b8" : "#ffd700",
-                            textShadow: isPending ? "none" : "0 0 12px rgba(255, 215, 0, 0.5)",
+                            textShadow: isPending ? "none" : "0 0 14px rgba(255, 215, 0, 0.45)",
                             wordBreak: "break-word",
                           }}
                         >
@@ -587,14 +760,15 @@ export default function TrialContestantInfoPage() {
               </div>
             )}
 
-            {/* Keyword Table View */}
+            {/* Table View */}
             {viewMode === "table" && (
               <div
                 style={{
-                  background: "rgba(10, 25, 50, 0.7)",
-                  border: "1px solid rgba(0, 229, 255, 0.25)",
+                  background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                  border: "1px solid rgba(0, 229, 255, 0.3)",
                   borderRadius: "16px",
                   overflow: "hidden",
+                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
                 }}
               >
                 <div style={{ overflowX: "auto" }}>
@@ -602,13 +776,13 @@ export default function TrialContestantInfoPage() {
                     <thead>
                       <tr
                         style={{
-                          background: "rgba(0, 229, 255, 0.1)",
+                          background: "rgba(0, 229, 255, 0.12)",
                           borderBottom: "1px solid rgba(0, 229, 255, 0.3)",
                           color: "#00e5ff",
                           fontWeight: "800",
                         }}
                       >
-                        <th style={{ padding: "14px 16px" }}>#</th>
+                        <th style={{ padding: "14px 16px", width: "50px" }}>#</th>
                         <th style={{ padding: "14px 16px" }}>ผู้เข้าแข่งขัน</th>
                         <th style={{ padding: "14px 16px" }}>ชื่อเล่น</th>
                         <th style={{ padding: "14px 16px" }}>หัวข้อแฟนพันธุ์แท้</th>
@@ -626,38 +800,26 @@ export default function TrialContestantInfoPage() {
                               background: idx % 2 === 0 ? "transparent" : "rgba(255, 255, 255, 0.02)",
                             }}
                           >
-                            <td style={{ padding: "12px 16px", color: "#64748b" }}>{idx + 1}</td>
+                            <td style={{ padding: "12px 16px", color: "#64748b", fontFamily: "var(--font-num)" }}>
+                              {idx + 1}
+                            </td>
                             <td style={{ padding: "12px 16px" }}>
                               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                {c.image ? (
-                                  <img
-                                    src={c.image}
-                                    alt={c.name}
-                                    style={{
-                                      width: "32px",
-                                      height: "32px",
-                                      borderRadius: "6px",
-                                      objectFit: "cover",
-                                      border: "1px solid rgba(0, 229, 255, 0.4)",
-                                    }}
-                                  />
-                                ) : (
-                                  <span style={{ fontSize: "18px" }}>👤</span>
-                                )}
+                                <ContestantAvatar src={c.image} name={c.name} size={34} />
                                 <span style={{ fontWeight: "700", color: "#ffffff" }}>{c.name}</span>
                               </div>
                             </td>
                             <td style={{ padding: "12px 16px", color: "#00e5ff", fontWeight: "700" }}>
                               {c.nickname || "-"}
                             </td>
-                            <td style={{ padding: "12px 16px", color: "#ffd700" }}>{c.topic}</td>
+                            <td style={{ padding: "12px 16px", color: "#ffd700", fontWeight: "600" }}>{c.topic}</td>
                             <td style={{ padding: "12px 16px" }}>
                               <span
                                 style={{
                                   background: isPending ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 215, 0, 0.15)",
                                   color: isPending ? "#94a3b8" : "#ffd700",
                                   border: `1px solid ${isPending ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 215, 0, 0.4)"}`,
-                                  padding: "4px 10px",
+                                  padding: "4px 12px",
                                   borderRadius: "8px",
                                   fontWeight: "800",
                                 }}
@@ -676,23 +838,24 @@ export default function TrialContestantInfoPage() {
           </div>
         )}
 
-        {/* TAB 2: กระดานถามทีมงาน (STAFF Q&A) */}
+        {/* TAB 2: STAFF Q&A BOARD */}
         {!loading && activeTab === "qaBoard" && (
           <div>
-            {/* Filter Controls */}
+            {/* Filter Bar */}
             <div
               style={{
-                background: "rgba(10, 25, 50, 0.6)",
-                border: "1px solid rgba(255, 215, 0, 0.25)",
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+                border: "1px solid rgba(255, 215, 0, 0.3)",
                 borderRadius: "16px",
                 padding: "16px 20px",
                 marginBottom: "24px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "14px",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
               }}
             >
-              {/* Top row: search */}
+              {/* Search */}
               <div style={{ position: "relative", width: "100%" }}>
                 <span
                   style={{
@@ -701,6 +864,7 @@ export default function TrialContestantInfoPage() {
                     top: "50%",
                     transform: "translateY(-50%)",
                     color: "#64748b",
+                    fontSize: "14px",
                   }}
                 >
                   🔍
@@ -720,22 +884,23 @@ export default function TrialContestantInfoPage() {
                     fontSize: "14px",
                     outline: "none",
                     boxSizing: "border-box",
+                    fontFamily: "inherit",
                   }}
                 />
               </div>
 
-              {/* Bottom row: Category filter pills */}
+              {/* Category Pills */}
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: "13px", color: "#94a3b8", fontWeight: "600", marginRight: "4px" }}>
+                <span style={{ fontSize: "13px", color: "#94a3b8", fontWeight: "700", marginRight: "4px" }}>
                   หมวดที่สอบถาม:
                 </span>
                 <button
                   onClick={() => setSelectedCategory("all")}
                   style={{
-                    background: selectedCategory === "all" ? "rgba(255, 215, 0, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                    background: selectedCategory === "all" ? "rgba(255, 215, 0, 0.25)" : "rgba(255, 255, 255, 0.05)",
                     border: `1px solid ${selectedCategory === "all" ? "#ffd700" : "rgba(255, 255, 255, 0.15)"}`,
                     color: selectedCategory === "all" ? "#ffd700" : "#94a3b8",
-                    padding: "6px 14px",
+                    padding: "7px 14px",
                     borderRadius: "8px",
                     fontSize: "13px",
                     cursor: "pointer",
@@ -757,32 +922,32 @@ export default function TrialContestantInfoPage() {
                         background: isSel ? cfg.bg : "rgba(255, 255, 255, 0.05)",
                         border: `1px solid ${isSel ? cfg.border : "rgba(255, 255, 255, 0.15)"}`,
                         color: isSel ? cfg.text : "#94a3b8",
-                        padding: "6px 12px",
+                        padding: "7px 14px",
                         borderRadius: "8px",
                         fontSize: "13px",
                         cursor: "pointer",
                         fontWeight: "700",
                         display: "flex",
                         alignItems: "center",
-                        gap: "5px",
+                        gap: "6px",
                       }}
                     >
                       <span>{cfg.icon}</span>
                       <span>{cat}</span>
-                      <span style={{ fontSize: "11px", opacity: 0.8 }}>({count})</span>
+                      <span style={{ fontSize: "11px", opacity: 0.8, fontFamily: "var(--font-num)" }}>({count})</span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* QA Board Items List */}
+            {/* QA Items */}
             {filteredQa.length === 0 ? (
               <div
                 style={{
                   textAlign: "center",
                   padding: "60px 20px",
-                  background: "rgba(10, 25, 50, 0.4)",
+                  background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
                   borderRadius: "16px",
                   border: "1px dashed rgba(255, 255, 255, 0.15)",
                 }}
@@ -803,7 +968,7 @@ export default function TrialContestantInfoPage() {
                     icon: "📌",
                   };
 
-                  // Match contestant avatar from keywords
+                  // Match avatar
                   const matchedContestant = keywords.find(
                     (k) =>
                       String(k.id) === String(item.contestantId) ||
@@ -818,11 +983,11 @@ export default function TrialContestantInfoPage() {
                         background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(6, 14, 28, 0.95) 100%)",
                         border: "1.5px solid rgba(0, 229, 255, 0.3)",
                         borderRadius: "18px",
-                        padding: "22px",
+                        padding: "24px",
                         boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
                       }}
                     >
-                      {/* Item Top: Contestant Header & Category */}
+                      {/* Top Header */}
                       <div
                         style={{
                           display: "flex",
@@ -836,30 +1001,12 @@ export default function TrialContestantInfoPage() {
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                          <div
-                            style={{
-                              width: "48px",
-                              height: "48px",
-                              borderRadius: "12px",
-                              overflow: "hidden",
-                              background: "#030814",
-                              border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                              flexShrink: 0,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            {avatar ? (
-                              <img
-                                src={avatar}
-                                alt={item.contestantName}
-                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              />
-                            ) : (
-                              <span style={{ fontSize: "22px" }}>👤</span>
-                            )}
-                          </div>
+                          <ContestantAvatar
+                            src={avatar}
+                            name={item.contestantName}
+                            size={50}
+                            borderColor="#00e5ff"
+                          />
 
                           <div>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -874,14 +1021,14 @@ export default function TrialContestantInfoPage() {
                                     padding: "2px 8px",
                                     borderRadius: "10px",
                                     fontSize: "12px",
-                                    fontWeight: "700",
+                                    fontWeight: "800",
                                   }}
                                 >
                                   {item.nickname}
                                 </span>
                               )}
                             </div>
-                            <div style={{ fontSize: "13px", color: "#ffd700", marginTop: "2px" }}>
+                            <div style={{ fontSize: "13px", color: "#ffd700", marginTop: "2px", fontWeight: "600" }}>
                               🏷️ {item.topic}
                             </div>
                           </div>
@@ -907,7 +1054,7 @@ export default function TrialContestantInfoPage() {
                         </div>
                       </div>
 
-                      {/* Question Section */}
+                      {/* Question */}
                       <div
                         style={{
                           background: "rgba(255, 255, 255, 0.03)",
@@ -921,7 +1068,7 @@ export default function TrialContestantInfoPage() {
                           style={{
                             fontSize: "12px",
                             color: "#94a3b8",
-                            fontWeight: "700",
+                            fontWeight: "800",
                             marginBottom: "8px",
                             display: "flex",
                             alignItems: "center",
@@ -933,11 +1080,11 @@ export default function TrialContestantInfoPage() {
                         <DiscordMarkdown content={item.question} />
                       </div>
 
-                      {/* Answer Section */}
+                      {/* Answer */}
                       <div
                         style={{
                           background: "linear-gradient(135deg, rgba(0, 229, 255, 0.07), rgba(255, 215, 0, 0.07))",
-                          border: "1.5px solid rgba(255, 215, 0, 0.35)",
+                          border: "1.5px solid rgba(255, 215, 0, 0.4)",
                           borderRadius: "12px",
                           padding: "16px 18px",
                         }}
@@ -958,7 +1105,7 @@ export default function TrialContestantInfoPage() {
                         <DiscordMarkdown content={item.answer} />
                       </div>
 
-                      {/* Footer: Date */}
+                      {/* Updated Date */}
                       {item.updatedAt && (
                         <div
                           style={{
@@ -966,6 +1113,7 @@ export default function TrialContestantInfoPage() {
                             fontSize: "11px",
                             color: "#64748b",
                             marginTop: "10px",
+                            fontFamily: "var(--font-num)",
                           }}
                         >
                           อัปเดตล่าสุด: {new Date(item.updatedAt).toLocaleString("th-TH")}
@@ -978,7 +1126,7 @@ export default function TrialContestantInfoPage() {
             )}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
