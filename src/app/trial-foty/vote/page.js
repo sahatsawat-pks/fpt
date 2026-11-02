@@ -19,7 +19,6 @@ function RankMultiSelectCard({
   badgeIcon,
   badgeColor = "#00e5ff",
   badgeBg = "rgba(0, 229, 255, 0.15)",
-  ptsLabel,
   selectedIds = [], // Array of IDs (up to 5)
   contestants = [],
   onAddContestant,
@@ -106,18 +105,6 @@ function RankMultiSelectCard({
             }}
           >
             {badgeIcon} {label}
-          </span>
-          <span
-            style={{
-              fontSize: "12px",
-              color: badgeColor,
-              background: "rgba(255, 255, 255, 0.06)",
-              padding: "3px 8px",
-              borderRadius: "6px",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-            }}
-          >
-            {ptsLabel}
           </span>
         </div>
 
@@ -599,19 +586,6 @@ function ChampionDropdownCard({
           >
             🏆 ผู้ที่คิดว่าจะเป็นสุดยอดแฟนพันธุ์แท้แห่งปี (The Champion)
           </span>
-          <span
-            style={{
-              fontSize: "11px",
-              color: "#ffd700",
-              fontWeight: "700",
-              background: "rgba(255, 215, 0, 0.15)",
-              padding: "2px 8px",
-              borderRadius: "4px",
-              border: "1px solid rgba(255, 215, 0, 0.4)",
-            }}
-          >
-            ★ คะแนนพิเศษ 10 แต้ม
-          </span>
         </div>
 
         {selectedContestant && (
@@ -1018,11 +992,11 @@ export default function TrialFotyBallotVotePage() {
   };
 
   const rankConfig = [
-    { key: "1", label: "อันดับที่ 1 (1st Place)", icon: "🥇", color: "#ffd700", bg: "rgba(255, 215, 0, 0.15)", pts: "5 คะแนนต่อคน" },
-    { key: "2", label: "อันดับที่ 2 (2nd Place)", icon: "🥈", color: "#e2e8f0", bg: "rgba(226, 232, 240, 0.15)", pts: "4 คะแนนต่อคน" },
-    { key: "3", label: "อันดับที่ 3 (3rd Place)", icon: "🥉", color: "#cd7f32", bg: "rgba(205, 127, 50, 0.15)", pts: "3 คะแนนต่อคน" },
-    { key: "4", label: "อันดับที่ 4 (4th Place)", icon: "🎖️", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)", pts: "2 คะแนนต่อคน" },
-    { key: "5", label: "อันดับที่ 5 (5th Place)", icon: "🎖️", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)", pts: "1 คะแนนต่อคน" },
+    { key: "1", label: "อันดับที่ 1 (1st Place)", icon: "🥇", color: "#ffd700", bg: "rgba(255, 215, 0, 0.15)" },
+    { key: "2", label: "อันดับที่ 2 (2nd Place)", icon: "🥈", color: "#e2e8f0", bg: "rgba(226, 232, 240, 0.15)" },
+    { key: "3", label: "อันดับที่ 3 (3rd Place)", icon: "🥉", color: "#cd7f32", bg: "rgba(205, 127, 50, 0.15)" },
+    { key: "4", label: "อันดับที่ 4 (4th Place)", icon: "🎖️", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)" },
+    { key: "5", label: "อันดับที่ 5 (5th Place)", icon: "🎖️", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)" },
   ];
 
   return (
@@ -1365,7 +1339,7 @@ export default function TrialFotyBallotVotePage() {
             <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
               <span style={{ color: "#ffd700", fontWeight: "900" }}>2.</span>
               <span>
-                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว (รับคะแนนพิเศษ 10 แต้ม)
+                <strong>เลือกสุดยอดแฟนพันธุ์แท้แห่งปี:</strong> ทายผลผู้ที่จะคว้าตำแหน่งแชมป์สุดยอดแฟนพันธุ์แท้แห่งปีเพียงคนเดียว
               </span>
             </div>
           </div>
@@ -1451,7 +1425,6 @@ export default function TrialFotyBallotVotePage() {
                 badgeIcon={cfg.icon}
                 badgeColor={cfg.color}
                 badgeBg={cfg.bg}
-                ptsLabel={cfg.pts}
                 selectedIds={ballotRanks[cfg.key] || []}
                 contestants={pollList}
                 allRankSelections={ballotRanks}
