@@ -118,16 +118,31 @@ export default function TrialAdminPage() {
         fetch("/api/trial", { cache: "no-store" }),
         fetch("/api/trial-poll", { cache: "no-store" }),
       ]);
+      let roster = [];
       if (resTrial.ok) {
         const json = await resTrial.json();
         if (json.success && Array.isArray(json.data)) {
-          setContestants(json.data);
+          roster = json.data;
+          setContestants(roster);
         }
       }
       if (resPoll.ok) {
         const jsonPoll = await resPoll.json();
         if (jsonPoll.success && Array.isArray(jsonPoll.data)) {
-          setPollItems(jsonPoll.data);
+          // Merge latest photos from roster so poll items always have photos
+          const mergedPoll = jsonPoll.data.map((item) => {
+            const matched = roster.find(
+              (c) =>
+                (c.id && item.id && String(c.id) === String(item.id)) ||
+                (c.name && item.name && c.name.trim() === item.name.trim()) ||
+                (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
+            );
+            return {
+              ...item,
+              image: item.image || matched?.image || "",
+            };
+          });
+          setPollItems(mergedPoll);
         }
         if (jsonPoll.votingOpen !== undefined) {
           setVotingOpen(Boolean(jsonPoll.votingOpen));
@@ -291,10 +306,24 @@ export default function TrialAdminPage() {
     setSavingPoll(true);
     setPollNotice("");
     try {
+      // Ensure photos from contestants are attached to poll items
+      const itemsToSave = pollItems.map((item) => {
+        const matched = contestants.find(
+          (c) =>
+            (c.id && item.id && String(c.id) === String(item.id)) ||
+            (c.name && item.name && c.name.trim() === item.name.trim()) ||
+            (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
+        );
+        return {
+          ...item,
+          image: item.image || matched?.image || "",
+        };
+      });
+
       const res = await fetch("/api/trial-poll", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save_all", items: pollItems }),
+        body: JSON.stringify({ action: "save_all", items: itemsToSave }),
       });
       const data = await res.json();
       if (data.success) {
@@ -311,6 +340,26 @@ export default function TrialAdminPage() {
     } finally {
       setSavingPoll(false);
     }
+  };
+
+  const handleSyncPhotosToPoll = () => {
+    let syncCount = 0;
+    setPollItems((prev) => {
+      return prev.map((item) => {
+        const matched = contestants.find(
+          (c) =>
+            (c.id && item.id && String(c.id) === String(item.id)) ||
+            (c.name && item.name && c.name.trim() === item.name.trim()) ||
+            (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
+        );
+        if (matched?.image && matched.image !== item.image) {
+          syncCount++;
+          return { ...item, image: matched.image };
+        }
+        return item;
+      });
+    });
+    showToast(`ดึงรูปภาพจากรายชื่อผู้เข้าแข่งขันเรียบร้อยแล้ว (พบรูปใหม่ ${syncCount} คน)`, "success");
   };
 
   const handleResetPoll = async () => {
@@ -2493,6 +2542,27 @@ export default function TrialAdminPage() {
 
                   <button
                     type="button"
+                    onClick={handleSyncPhotosToPoll}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: "8px",
+                      background: "rgba(0, 229, 255, 0.15)",
+                      border: "1px solid rgba(0, 229, 255, 0.4)",
+                      color: "#67e8f9",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                    title="ดึงรูปภาพล่าสุดจากรายชื่อผู้เข้าแข่งขันมาอัปเดตในตารางโพลล์ทันที"
+                  >
+                    🔄 ซิงค์รูปภาพจากรายชื่อ
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleResetPoll}
                     disabled={savingPoll}
                     style={{
@@ -2728,6 +2798,13 @@ export default function TrialAdminPage() {
                         {/* Photo Thumbnail */}
                         <td style={{ padding: "8px 4px", textAlign: "center" }}>
                           <div
+                            onClick={() => {
+                              const newUrl = window.prompt(`ใส่ URL รูปภาพสำหรับ ${item.nickname || item.name}:`, photo || "");
+                              if (newUrl !== null) {
+                                handlePollFieldChange(index, "image", newUrl.trim());
+                              }
+                            }}
+                            title="คลิกเพื่อแก้ไข/เปลี่ยนรูปภาพโพลล์"
                             style={{
                               width: "36px",
                               height: "36px",
@@ -2739,6 +2816,7 @@ export default function TrialAdminPage() {
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
+                              cursor: "pointer",
                             }}
                           >
                             {photo ? (
@@ -2749,7 +2827,7 @@ export default function TrialAdminPage() {
                                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
                               />
                             ) : (
-                              <span style={{ fontSize: "16px" }}>👤</span>
+                              <span style={{ fontSize: "14px" }} title="คลิกเพื่อใส่รูปภาพ">📷</span>
                             )}
                           </div>
                         </td>

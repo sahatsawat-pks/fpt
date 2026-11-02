@@ -4,6 +4,21 @@ import path from "path";
 import { getKVData, saveKVData } from "@/lib/kv";
 
 const DATA_FILE = path.join(process.cwd(), "src/app/data/trial-leaderboard.json");
+const POLL_FILE = path.join(process.cwd(), "src/app/data/trial-poll.json");
+
+function readPoll() {
+  try {
+    if (fs.existsSync(POLL_FILE)) return JSON.parse(fs.readFileSync(POLL_FILE, "utf-8"));
+  } catch (e) {}
+  return [];
+}
+
+function writePoll(data) {
+  try {
+    fs.mkdirSync(path.dirname(POLL_FILE), { recursive: true });
+    fs.writeFileSync(POLL_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (e) {}
+}
 
 function readData() {
   try {
@@ -80,6 +95,33 @@ export async function POST(req) {
           updatedAt: new Date().toISOString(),
         };
         await saveKVData("fpt_trial", data, writeData);
+
+        // Sync updated photo/info to fpt_trial_poll as well
+        try {
+          let pollData = await getKVData("fpt_trial_poll", readPoll);
+          if (Array.isArray(pollData) && pollData.length > 0) {
+            let changed = false;
+            const pIdx = pollData.findIndex(
+              (p) =>
+                String(p.id) === String(body.id) ||
+                (p.name && data[idx].name && p.name.trim() === data[idx].name.trim()) ||
+                (p.nickname && data[idx].nickname && p.nickname.trim() === data[idx].nickname.trim())
+            );
+            if (pIdx !== -1) {
+              if (data[idx].image !== undefined) pollData[pIdx].image = data[idx].image;
+              if (data[idx].name !== undefined) pollData[pIdx].name = data[idx].name;
+              if (data[idx].nickname !== undefined) pollData[pIdx].nickname = data[idx].nickname;
+              if (data[idx].topic !== undefined) pollData[pIdx].topic = data[idx].topic;
+              changed = true;
+            }
+            if (changed) {
+              await saveKVData("fpt_trial_poll", pollData, writePoll);
+            }
+          }
+        } catch (errSync) {
+          console.error("Error syncing contestant to trial poll:", errSync);
+        }
+
         return NextResponse.json({ success: true, data, message: "อัปเดตข้อมูลผู้เข้าแข่งขันสำเร็จ" });
       }
     }

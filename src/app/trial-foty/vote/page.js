@@ -862,11 +862,39 @@ export default function TrialFotyBallotVotePage() {
 
   const loadPollData = async () => {
     try {
-      const res = await fetch("/api/trial-poll", { cache: "no-store" });
-      if (res.ok) {
-        const json = await res.json();
+      const [resPoll, resTrial] = await Promise.all([
+        fetch("/api/trial-poll", { cache: "no-store" }),
+        fetch("/api/trial", { cache: "no-store" }).catch(() => null),
+      ]);
+
+      let contestantsList = [];
+      if (resTrial && resTrial.ok) {
+        const jsonTrial = await resTrial.json();
+        if (jsonTrial.success && Array.isArray(jsonTrial.data)) {
+          contestantsList = jsonTrial.data;
+        }
+      }
+
+      if (resPoll && resPoll.ok) {
+        const json = await resPoll.json();
         if (json.success && Array.isArray(json.data)) {
-          setPollList(json.data);
+          // Merge photos directly from contestantsList to ensure 100% sync with admin photos
+          const merged = json.data.map((item) => {
+            const matched = contestantsList.find(
+              (c) =>
+                (c.id && item.id && String(c.id) === String(item.id)) ||
+                (c.name && item.name && c.name.trim() === item.name.trim()) ||
+                (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
+            );
+            return {
+              ...item,
+              image: item.image || matched?.image || "",
+              name: item.name || matched?.name || "",
+              nickname: item.nickname || matched?.nickname || "",
+              topic: item.topic || matched?.topic || "-",
+            };
+          });
+          setPollList(merged);
         }
         if (json.votingOpen !== undefined) {
           setVotingOpen(Boolean(json.votingOpen));

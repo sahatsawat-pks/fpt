@@ -5,6 +5,16 @@ import { getKVData, saveKVData } from "@/lib/kv";
 
 const POLL_FILE = path.join(process.cwd(), "src/app/data/trial-poll.json");
 const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
+const TRIAL_DATA_FILE = path.join(process.cwd(), "src/app/data/trial-leaderboard.json");
+
+function readTrialData() {
+  try {
+    if (fs.existsSync(TRIAL_DATA_FILE)) {
+      return JSON.parse(fs.readFileSync(TRIAL_DATA_FILE, "utf-8"));
+    }
+  } catch (e) {}
+  return [];
+}
 
 function readSettings() {
   try {
@@ -105,11 +115,35 @@ function computePollPercentages(items) {
 }
 
 export async function GET() {
-  const data = await getKVData("fpt_trial_poll", readLocalPoll);
+  const [data, trialContestants] = await Promise.all([
+    getKVData("fpt_trial_poll", readLocalPoll),
+    getKVData("fpt_trial", readTrialData),
+  ]);
   const votingOpen = await getVotingStatus();
+
+  const pollList = Array.isArray(data) && data.length > 0 ? data : getDefaultPoll();
+  const contestants = Array.isArray(trialContestants) ? trialContestants : [];
+
+  // Merge latest photos and contestant info from trial leaderboard into poll items
+  const enrichedPoll = pollList.map((item) => {
+    const matched = contestants.find(
+      (c) =>
+        (c.id && item.id && String(c.id) === String(item.id)) ||
+        (c.name && item.name && c.name.trim() === item.name.trim()) ||
+        (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
+    );
+    return {
+      ...item,
+      image: item.image || matched?.image || "",
+      name: item.name || matched?.name || "",
+      nickname: item.nickname || matched?.nickname || "",
+      topic: item.topic || matched?.topic || "-",
+    };
+  });
+
   return NextResponse.json({
     success: true,
-    data: data || getDefaultPoll(),
+    data: enrichedPoll,
     votingOpen,
   });
 }
@@ -148,28 +182,40 @@ export async function POST(request) {
 
     // Save all items (reorder, manual percent, whatIfScore, etc.)
     if (body.action === "save_all" && Array.isArray(body.items)) {
-      const sanitized = body.items.map((item, idx) => ({
-        pollRank: Number(item.pollRank) || idx + 1,
-        id: item.id ? String(item.id) : String(idx + 1),
-        name: String(item.name || "").trim(),
-        nickname: String(item.nickname || "").trim(),
-        topic: String(item.topic || "").trim(),
-        percent: String(item.percent || "").trim() || "0.00%",
-        votes: Number(item.votes) || 0,
-        whatIfScore: Math.min(100, Math.max(0, Number(item.whatIfScore) || 0)),
-        championVotes: Number(item.championVotes) || 0,
-        rankVotes:
-          item.rankVotes && typeof item.rankVotes === "object"
-            ? {
-                "1": Number(item.rankVotes["1"] || item.rankVotes[1]) || 0,
-                "2": Number(item.rankVotes["2"] || item.rankVotes[2]) || 0,
-                "3": Number(item.rankVotes["3"] || item.rankVotes[3]) || 0,
-                "4": Number(item.rankVotes["4"] || item.rankVotes[4]) || 0,
-                "5": Number(item.rankVotes["5"] || item.rankVotes[5]) || 0,
-              }
-            : { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
-        image: item.image || "",
-      }));
+      const trialContestants = await getKVData("fpt_trial", readTrialData);
+      const contestants = Array.isArray(trialContestants) ? trialContestants : [];
+
+      const sanitized = body.items.map((item, idx) => {
+        const matched = contestants.find(
+          (c) =>
+            (c.id && item.id && String(c.id) === String(item.id)) ||
+            (c.name && item.name && c.name.trim() === item.name.trim()) ||
+            (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
+        );
+
+        return {
+          pollRank: Number(item.pollRank) || idx + 1,
+          id: item.id ? String(item.id) : String(idx + 1),
+          name: String(item.name || matched?.name || "").trim(),
+          nickname: String(item.nickname || matched?.nickname || "").trim(),
+          topic: String(item.topic || matched?.topic || "").trim(),
+          percent: String(item.percent || "").trim() || "0.00%",
+          votes: Number(item.votes) || 0,
+          whatIfScore: Math.min(100, Math.max(0, Number(item.whatIfScore) || 0)),
+          championVotes: Number(item.championVotes) || 0,
+          rankVotes:
+            item.rankVotes && typeof item.rankVotes === "object"
+              ? {
+                  "1": Number(item.rankVotes["1"] || item.rankVotes[1]) || 0,
+                  "2": Number(item.rankVotes["2"] || item.rankVotes[2]) || 0,
+                  "3": Number(item.rankVotes["3"] || item.rankVotes[3]) || 0,
+                  "4": Number(item.rankVotes["4"] || item.rankVotes[4]) || 0,
+                  "5": Number(item.rankVotes["5"] || item.rankVotes[5]) || 0,
+                }
+              : { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
+          image: item.image || matched?.image || "",
+        };
+      });
 
       // Sort by pollRank ascending
       sanitized.sort((a, b) => a.pollRank - b.pollRank);
