@@ -10,220 +10,220 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
-        "นี่คือชื่อภาษาไทยของบอร์ดเกมที่มีชื่อว่าอะไร",
-        "บอร์ดเกมนี้ วางจำหน่ายครั้งแรกในปี ค.ศ. ใด"
+        "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+        "หุ่น Animatronics ที่ได้ยินต่อไปนี้ ปรากฎตัวครั้งแรกในเกมภาคใด",
+        "จงตอบคำถามต่อไปนี้ให้ถูกต้อง"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "Terraforming Mars"
+            "answer": "Freddy Fazbear"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "Ono 99"
+            "answer": "Withered Bonnie"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "King of Tokyo"
+            "answer": "Foxy the Pirate Fox"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "For Sales"
+            "answer": "The Puppet (Marionette)"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "Wingspan (ปีกปักษา)"
+            "answer": "Scrap Baby"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "Cryptid"
+            "answer": "Ennard"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "Metropolys"
+            "answer": "Dee Dee"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "Machi Koro (นครสนุก)"
+            "answer": "Jackie"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "Reiner Knizia (โลกใหม่)"
+            "answer": "Lefty"
         },
         {
-            "question": "นี่คือหน้ากล่องจากบอร์ดเกมที่มีชื่อว่าอะไร",
+            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "UNO Show 'em No Mercy"
+            "answer": "Nightmare Chica"
         },
         {
-            "question": "เกมต่อรถไฟ",
+            "question": "Springtrap",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Ticket To Ride"
+            "answer": "Five Nights at Freddy's 3"
         },
         {
-            "question": "ซูชิ! สายพาน",
+            "question": "Mangle",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Sushi Go!"
+            "answer": "Five Nights at Freddy's 2"
         },
         {
-            "question": "หลบหนีข้ามมหาสมุทร",
+            "question": "Funtime Freddy",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Survive"
+            "answer": "Five Nights at Freddy's: Sister Location"
         },
         {
-            "question": "เกมโค่นอำนาจ",
+            "question": "Mr. Hippo",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Coup"
+            "answer": "Freddy Fazbear's Pizzeria Simulator"
         },
         {
-            "question": "ภารกิจ ปิด คาสิโน !!",
+            "question": "Roxanne Wolf",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Gambler × Gamble !!"
+            "answer": "Five Nights at Freddy's: Security Breach"
         },
         {
-            "question": "อ๊บอ๊บ!",
+            "question": "Plushtrap",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Croak!"
+            "answer": "Five Nights at Freddy's 4"
         },
         {
-            "question": "25-ห้อง ต้อง รอด!",
+            "question": "Nurse Dollie",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Room-25 Ultimate"
+            "answer": "Five Nights at Freddy's: Secret of the Mimic"
         },
         {
-            "question": "นักล่ายุคหิน",
+            "question": "Lolbit",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Dice Age: The Hunt"
+            "answer": "Five Nights at Freddy's: Sister Location"
         },
         {
-            "question": "พฤกษา ผู้พิทักษ์",
+            "question": "Liberty Chica",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Living Forest"
+            "answer": "Five Nights at Freddy's AR: Special Delivery"
         },
         {
-            "question": "หนึ่งคืนปริศนาเกมล่ามนุษย์หมาป่า รุ่งอรุณ",
+            "question": "Golden Freddy",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "One Night: Ultimate Werewolf Daybreak"
+            "answer": "Five Nights at Freddy's"
         },
         {
-            "question": "UNO",
+            "question": "หากไม่นับ Endoskeleton ในเกม Five Nights at Freddy's ภาคแรก มีหุ่น Animatronics ที่ทำร้ายเราได้ทั้งหมดกี่ตัว",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "1971"
+            "answer": "5 ตัว"
         },
         {
-            "question": "Cluedo",
+            "question": "Michael Afton ถูก Hand Unit ตั้งชื่อในเกม Five Nights at Freddy's: Sister Location ว่าอะไร",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "1949"
+            "answer": "Egg Benedict"
         },
         {
-            "question": "The Queen's Dilemma",
+            "question": "เด็กที่เป็นตัวละครหลักประจำเกม Five Nights at Freddy's: Into the Pit มีชื่อว่าอะไร",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "2026"
+            "answer": "Oswald"
         },
         {
-            "question": "Citadels",
+            "question": "วิญญาณเด็กที่กักขัง William Afton ไว้ในมิติ Ultimate Custom Night มีชื่อว่าอะไร",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "2000"
+            "answer": "Cassidy"
         },
         {
-            "question": "Monopoly",
+            "question": "เวลาในการทำงานกะกลางคืนประจำร้าน Freddy Fazbear Pizza คือตั้งแต่เที่ยงคืนถึงกี่โมง",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "1935"
+            "answer": "06.00 น."
         }
     ],
     "qa": {
-        "question": "ในเกม Cluedo เวอร์ชั่น Original มีตัวละครผู้ต้องสงสัยทั้งหมดกี่ตัว มีอาวุธทั้งหมดกี่ชิ้น และ มีห้องให้สำรวจทั้งหมดกี่ห้อง",
-        "answer": "10 ตัว / 9 ชิ้น / 11 ห้อง",
+        "question": "ในเกม Ultimate Custom Night โหมด 50/20 เมื่อหุ่น X.O.R. ปรากฎตัว จะบังคับเพิ่มหุ่น Animatronics อีกกี่ตัว หุ่นแต่ละตัวจะเพิ่มเข้ามาด้วยระยะเวลาที่ห่างกันกี่วินาที",
+        "answer": "6 ตัว / 7 วินาที",
         "choices": [
-            "5 ตัว / 9 ชิ้น / 8 ห้อง",
-            "5 ตัว / 9 ชิ้น / 9 ห้อง",
-            "5 ตัว / 9 ชิ้น / 11 ห้อง",
-            "10 ตัว / 9 ชิ้น / 8 ห้อง",
-            "10 ตัว / 9 ชิ้น / 11 ห้อง"
+            "5 ตัว / 7 วินาที",
+            "5 ตัว / 9 วินาที",
+            "6 ตัว / 7 วินาที",
+            "6 ตัว / 9 วินาที",
+            "ไม่ได้มีการเพิ่มหุ่นเข้ามาใหม่"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
+            4,
             1,
-            2,
-            4
+            2
         ]
     },
     "jigsaw": {
         "mode": "square",
         "image": "public/img/jigsaw.png",
-        "answer": "Rummikub",
-        "question": "หลังจิ๊กซอว์นี้คือบอร์ดเกมที่มีชื่อว่าอะไร?"
+        "answer": "Freddy Fazbear",
+        "question": "หลังจิ๊กซอว์นี้ นี่คือภาพจากตัวละครจากเกม Five Night at Freddy ที่มีชื่อว่าอะไร"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของบอร์ดเกมอะไร",
+        "question": "นี่คือคุณสมบัติของหุ่น Animatronics หรือตัวละครในเกม Five Night at Freddy's ที่มีชื่อว่าอะไร",
         "clues": [
-            "ชื่อเกมมี 3 พยางค์",
-            "เป็นบอร์ดเกมประเภท Racing และ Betting",
-            "เคยชนะรางวัล Spiel des Jahres",
-            "มี 2nd Edition",
-            "แปลไทยโดยร้าน Stronghold"
+            "1 ในตัวละครที่ผู้เล่นจะได้รับบทบาทในเกม",
+            "ไม่ได้สิงร่างในหุ่น Animatronics",
+            "เป็นสมาชิกครอบครัว Afton",
+            "เสียชีวิตแล้ว",
+            "เพศชาย"
         ],
-        "answer": "Camel Up"
+        "answer": "Michael Afton"
     },
     "battle": {
         "player1": {

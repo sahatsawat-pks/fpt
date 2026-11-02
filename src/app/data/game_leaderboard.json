@@ -1,1 +1,78 @@
-[]
+[
+  {
+    "id": "1793629976655",
+    "name": "นัทธภพ ธนวัฒนาเจริญ",
+    "nickname": "นนท์",
+    "topic": "Cardfight Vanguard",
+    "scores": {
+      "3sec": 14,
+      "qa": 25,
+      "jigsaw": 20,
+      "attribute": 0
+    },
+    "totalScore": 59,
+    "image": "",
+    "createdAt": "2026-11-02T14:32:56.765Z",
+    "updatedAt": "2026-11-02T15:35:26.850Z"
+  },
+  {
+    "id": "1793634936579",
+    "name": "เจษฎาพร ศรีมาตย์",
+    "nickname": "ออมสิน",
+    "topic": "Five Night at Freddy's",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "image": "",
+    "createdAt": "2026-11-02T15:55:36.716Z"
+  },
+  {
+    "id": "1793635002863",
+    "name": ".",
+    "nickname": ".",
+    "topic": ".",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "image": "",
+    "createdAt": "2026-11-02T15:56:42.912Z"
+  },
+  {
+    "id": "1793635291832",
+    "name": "เจษฎาพร ศรีมาตย์",
+    "nickname": "ออมสิน",
+    "topic": "Five Night at Freddy's",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "image": "",
+    "createdAt": "2026-11-02T16:01:31.969Z"
+  },
+  {
+    "id": "1793635389630",
+    "name": "เจษฎาพร ศรีมาตย์",
+    "nickname": "ออมสิน",
+    "topic": "Five Night at Freddy's",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "image": "",
+    "createdAt": "2026-11-02T16:03:09.746Z"
+  }
+]

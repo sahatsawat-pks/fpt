@@ -15,17 +15,25 @@ import {
   unregisterMediaElement,
 } from "../soundUtils";
 
+let globalConfigVersion = Date.now();
+
 // Helper: Resolve local folder paths to Next.js public folder serving path
-const resolveImagePath = (path) => {
+const resolveImagePath = (path, version) => {
   if (!path) return "";
-  if (path.startsWith("public/")) {
-    return `/${path.slice(7)}`;
+  let resolved = path;
+  if (resolved.startsWith("public/")) {
+    resolved = `/${resolved.slice(7)}`;
+  } else {
+    const match = resolved.match(/(?:src\/app\/img|app\/img|img)\/(.+)$/);
+    if (match) {
+      resolved = `/img/${match[1]}`;
+    }
   }
-  const match = path.match(/(?:src\/app\/img|app\/img|img)\/(.+)$/);
-  if (match) {
-    return `/img/${match[1]}`;
+  const v = version || globalConfigVersion;
+  if (v && resolved.startsWith("/")) {
+    resolved += (resolved.includes("?") ? "&" : "?") + `v=${v}`;
   }
-  return path;
+  return resolved;
 };
 
 function SoundBar() {
@@ -649,6 +657,59 @@ export default function Home() {
     score: null,
   });
 
+  const [configVersion, setConfigVersion] = useState(() => Date.now());
+
+  // Load saved config from cloud KV on mount (ensuring updates persist across reloads & deployments)
+  useEffect(() => {
+    async function fetchSavedConfig() {
+      try {
+        const res = await fetch("/api/save-config");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && data.config) {
+          const cfg = data.config;
+          if (cfg.jigsaw?.image !== undefined) setJigsawImage(cfg.jigsaw.image);
+          if (cfg.jigsaw?.question !== undefined) setJigsawQuestion(cfg.jigsaw.question);
+          if (cfg.jigsaw?.answer !== undefined) setJigsawAnswer(cfg.jigsaw.answer);
+          if (cfg.jigsaw?.mode !== undefined) setJigsawMode(cfg.jigsaw.mode);
+          if (cfg.threeSeconds) setThreeSecQuestions(cfg.threeSeconds);
+          if (cfg.threeSecondsHeaders) setThreeSecSetHeaders(cfg.threeSecondsHeaders);
+
+          if (cfg.battle?.player1) {
+            if (cfg.battle.player1.threeSecMode) setBattleP1ThreeSecMode(cfg.battle.player1.threeSecMode);
+            if (cfg.battle.player1.jigsawMode) setBattleP1JigsawMode(cfg.battle.player1.jigsawMode);
+            if (cfg.battle.player1.jigsaw?.image !== undefined) setBattleP1JigsawImage(cfg.battle.player1.jigsaw.image);
+            if (cfg.battle.player1.jigsaw?.question !== undefined) setBattleP1JigsawQuestion(cfg.battle.player1.jigsaw.question);
+            if (cfg.battle.player1.jigsaw?.answer !== undefined) setBattleP1JigsawAnswer(cfg.battle.player1.jigsaw.answer);
+            if (cfg.battle.player1.threeSeconds) setBattleP1ThreeSecQuestions(cfg.battle.player1.threeSeconds);
+            if (cfg.battle.player1.threeSecondsHeaders) setBattleP1ThreeSecHeaders(cfg.battle.player1.threeSecondsHeaders);
+            if (cfg.battle.player1.qa) setBattleP1QA(cfg.battle.player1.qa);
+            if (cfg.battle.player1.attribute) setBattleP1Attribute(cfg.battle.player1.attribute);
+          }
+
+          if (cfg.battle?.player2) {
+            if (cfg.battle.player2.threeSecMode) setBattleP2ThreeSecMode(cfg.battle.player2.threeSecMode);
+            if (cfg.battle.player2.jigsawMode) setBattleP2JigsawMode(cfg.battle.player2.jigsawMode);
+            if (cfg.battle.player2.jigsaw?.image !== undefined) setBattleP2JigsawImage(cfg.battle.player2.jigsaw.image);
+            if (cfg.battle.player2.jigsaw?.question !== undefined) setBattleP2JigsawQuestion(cfg.battle.player2.jigsaw.question);
+            if (cfg.battle.player2.jigsaw?.answer !== undefined) setBattleP2JigsawAnswer(cfg.battle.player2.jigsaw.answer);
+            if (cfg.battle.player2.threeSeconds) setBattleP2ThreeSecQuestions(cfg.battle.player2.threeSeconds);
+            if (cfg.battle.player2.threeSecondsHeaders) setBattleP2ThreeSecHeaders(cfg.battle.player2.threeSecondsHeaders);
+            if (cfg.battle.player2.qa) setBattleP2QA(cfg.battle.player2.qa);
+            if (cfg.battle.player2.attribute) setBattleP2Attribute(cfg.battle.player2.attribute);
+          }
+
+          const now = Date.now();
+          globalConfigVersion = now;
+          setConfigVersion(now);
+        }
+      } catch (err) {
+        console.error("Failed to load saved config from KV:", err);
+      }
+    }
+    fetchSavedConfig();
+  }, []);
+
   // ---- Config Operations ----
   const handleSaveConfig = async () => {
     const cleanQA = (qa) => {
@@ -715,7 +776,10 @@ export default function Home() {
 
       const result = await response.json();
       if (result.success) {
-        alert("บันทึกการตั้งค่าลงไฟล์ config.js สำเร็จแล้ว! หน้าเว็บจะรีโหลดและอัปเดตข้อมูลล่าสุด");
+        const now = Date.now();
+        globalConfigVersion = now;
+        setConfigVersion(now);
+        alert("บันทึกการตั้งค่าสำเร็จแล้ว! อัปเดตข้อมูลและรูปภาพล่าสุดเรียบร้อย");
       } else {
         alert("เกิดข้อผิดพลาดในการเขียนไฟล์: " + result.error);
       }

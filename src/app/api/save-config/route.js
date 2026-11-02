@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { saveKVData } from "@/lib/kv";
+import { getKVData, saveKVData } from "@/lib/kv";
+
+export async function GET() {
+  try {
+    const data = await getKVData("fpt_game_config", () => null);
+    return NextResponse.json({ success: true, config: data });
+  } catch (error) {
+    console.error("Error reading game config from KV:", error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
 
 export async function POST(request) {
   try {
