@@ -1595,87 +1595,34 @@ export default function Home() {
   return (
     <main style={{ width: "100%", height: "100%" }}>
       {currentPanel === "setup" && (
-        <div style={{ position: "fixed", top: "16px", right: "20px", zIndex: 999, display: "flex", gap: "10px", alignItems: "center" }}>
+        <div className="game-top-nav">
           <a
             href="/"
-            style={{
-              background: "rgba(10, 25, 50, 0.85)",
-              border: "1px solid rgba(0, 229, 255, 0.4)",
-              color: "#80d0ff",
-              padding: "6px 14px",
-              borderRadius: "16px",
-              fontSize: "13px",
-              fontWeight: "700",
-              textDecoration: "none",
-              backdropFilter: "blur(6px)",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.3)"
-            }}
+            className="game-nav-pill nav-pill-home"
             title="กลับสู่หน้าหลักแฟนพันธุ์แท้ 2026"
           >
-            <span>🏠</span> หน้าหลัก
+            <span>🏠</span> <span>หน้าหลัก</span>
           </a>
           <a
             href="/draw"
-            style={{
-              background: "rgba(255, 215, 0, 0.12)",
-              border: "1px solid rgba(255, 215, 0, 0.4)",
-              color: "#ffd700",
-              padding: "6px 14px",
-              borderRadius: "16px",
-              fontSize: "13px",
-              fontWeight: "700",
-              textDecoration: "none",
-              backdropFilter: "blur(6px)",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.3)"
-            }}
+            className="game-nav-pill nav-pill-draw"
             title="ไปที่ระบบโหลสุ่มลูกบอล"
           >
-            <span>🎲</span> สุ่มลูกบอล
+            <span>🎲</span> <span>สุ่มลูกบอล</span>
           </a>
           <a
             href="/admin"
-            style={{
-              background: "rgba(0, 229, 255, 0.12)",
-              border: "1px solid rgba(0, 229, 255, 0.4)",
-              color: "#00e5ff",
-              padding: "6px 14px",
-              borderRadius: "16px",
-              fontSize: "13px",
-              fontWeight: "700",
-              textDecoration: "none",
-              backdropFilter: "blur(6px)",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.3)"
-            }}
+            className="game-nav-pill nav-pill-admin"
             title="ไปที่ห้องควบคุมแอดมิน"
           >
-            <span>⚙️</span> แอดมิน
+            <span>⚙️</span> <span>แอดมิน</span>
           </a>
           <button
             onClick={handleGameLogout}
-            style={{
-              background: "rgba(255, 77, 79, 0.15)",
-              border: "1px solid rgba(255, 77, 79, 0.4)",
-              color: "#ff7875",
-              padding: "6px 14px",
-              borderRadius: "16px",
-              fontSize: "13px",
-              fontWeight: "700",
-              cursor: "pointer",
-              backdropFilter: "blur(6px)",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.3)"
-            }}
+            className="game-nav-pill nav-pill-logout"
             title="ออกจากระบบควบคุมเกม"
           >
-            🚪 ออกจากระบบ
+            <span>🚪</span> <span>ออกจากระบบ</span>
           </button>
         </div>
       )}
@@ -1691,20 +1638,13 @@ export default function Home() {
             <div className="floating-orb orb3"></div>
           </div>
           <div className="setup-container">
-            <div className="setup-logo" style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "16px" }}>
+            <div className="setup-logo">
               <img
                 src="/img/game_logo.png"
                 alt="FANPANTAE 2026"
-                style={{
-                  maxWidth: "160px",
-                  width: "35%",
-                  height: "auto",
-                  objectFit: "contain",
-                  filter: "drop-shadow(0 0 20px rgba(0, 229, 255, 0.6))",
-                  marginBottom: "8px"
-                }}
+                className="setup-logo-img"
               />
-              <p className="setup-year" style={{ letterSpacing: "2px", fontWeight: "800", margin: 0, color: "rgba(255,255,255,0.8)", fontSize: "13px" }}>
+              <p className="setup-year">
                 FAN OF THE YEAR 2026
               </p>
             </div>
