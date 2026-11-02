@@ -3,12 +3,50 @@ import fs from "fs";
 import path from "path";
 import { getKVData, saveKVData } from "@/lib/kv";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
-    const data = await getKVData("fpt_game_config", () => null);
-    return NextResponse.json({ success: true, config: data });
+    let config = null;
+    let source = "kv";
+
+    // Priority 1: Read directly from local config.js if available
+    try {
+      const filePath = path.join(process.cwd(), "src/app/config.js");
+      if (fs.existsSync(filePath)) {
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const match = fileContent.match(/GAME_CONFIG\s*=\s*(\{[\s\S]*\});?\s*(?:export\s+default)?/);
+        if (match) {
+          try {
+            config = JSON.parse(match[1]);
+            source = "config.js";
+          } catch {
+            config = new Function(`return ${match[1]}`)();
+            source = "config.js";
+          }
+        }
+      }
+    } catch (fsErr) {
+      console.warn("Could not read local config.js:", fsErr.message);
+    }
+
+    // Priority 2: Fall back to KV data
+    if (!config) {
+      config = await getKVData("fpt_game_config", () => null);
+    }
+
+    return NextResponse.json(
+      { success: true, config, source, timestamp: Date.now() },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error) {
-    console.error("Error reading game config from KV:", error);
+    console.error("Error reading game config:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
@@ -47,7 +85,14 @@ export default GAME_CONFIG;
       }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+      { success: true, timestamp: Date.now() },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error writing config file:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

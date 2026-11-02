@@ -20,7 +20,7 @@ let globalConfigVersion = Date.now();
 // Helper: Resolve local folder paths to Next.js public folder serving path
 const resolveImagePath = (path, version) => {
   if (!path) return "";
-  let resolved = path;
+  let resolved = path.trim();
   if (resolved.startsWith("public/")) {
     resolved = `/${resolved.slice(7)}`;
   } else {
@@ -30,8 +30,9 @@ const resolveImagePath = (path, version) => {
     }
   }
   const v = version || globalConfigVersion;
-  if (v && resolved.startsWith("/")) {
-    resolved += (resolved.includes("?") ? "&" : "?") + `v=${v}`;
+  if (v && (resolved.startsWith("/") || resolved.startsWith("http"))) {
+    const clean = resolved.replace(/[?&]v=\d+/, "").replace(/[?&]t=\d+/, "");
+    resolved = clean + (clean.includes("?") ? "&" : "?") + `t=${v}`;
   }
   return resolved;
 };
@@ -659,6 +660,79 @@ export default function Home() {
 
   const [configVersion, setConfigVersion] = useState(() => Date.now());
 
+  // Apply loaded configuration to state
+  const applyLoadedConfig = (cfg, timestamp) => {
+    if (!cfg) return;
+    if (cfg.jigsaw) {
+      if (typeof cfg.jigsaw.image === "string") setJigsawImage(cfg.jigsaw.image);
+      if (typeof cfg.jigsaw.question === "string") setJigsawQuestion(cfg.jigsaw.question);
+      if (typeof cfg.jigsaw.answer === "string") setJigsawAnswer(cfg.jigsaw.answer);
+      if (cfg.jigsaw.mode) setJigsawMode(cfg.jigsaw.mode);
+    }
+    if (Array.isArray(cfg.threeSeconds)) {
+      setThreeSecQuestions(cfg.threeSeconds);
+    }
+    if (Array.isArray(cfg.threeSecondsHeaders)) {
+      setThreeSecSetHeaders(cfg.threeSecondsHeaders);
+    }
+    if (cfg.battle?.player1) {
+      const p1 = cfg.battle.player1;
+      if (p1.threeSecMode) setBattleP1ThreeSecMode(p1.threeSecMode);
+      if (Array.isArray(p1.threeSecondsHeaders)) setBattleP1ThreeSecHeaders(p1.threeSecondsHeaders);
+      if (Array.isArray(p1.threeSeconds)) setBattleP1ThreeSecQuestions(p1.threeSeconds);
+      if (p1.jigsaw) {
+        if (typeof p1.jigsaw.image === "string") setBattleP1JigsawImage(p1.jigsaw.image);
+        if (typeof p1.jigsaw.question === "string") setBattleP1JigsawQuestion(p1.jigsaw.question);
+        if (typeof p1.jigsaw.answer === "string") setBattleP1JigsawAnswer(p1.jigsaw.answer);
+        if (p1.jigsaw.mode) setBattleP1JigsawMode(p1.jigsaw.mode);
+      }
+      if (p1.qa) setBattleP1QA(p1.qa);
+      if (p1.attribute) setBattleP1Attribute(p1.attribute);
+    }
+    if (cfg.battle?.player2) {
+      const p2 = cfg.battle.player2;
+      if (p2.threeSecMode) setBattleP2ThreeSecMode(p2.threeSecMode);
+      if (Array.isArray(p2.threeSecondsHeaders)) setBattleP2ThreeSecHeaders(p2.threeSecondsHeaders);
+      if (Array.isArray(p2.threeSeconds)) setBattleP2ThreeSecQuestions(p2.threeSeconds);
+      if (p2.jigsaw) {
+        if (typeof p2.jigsaw.image === "string") setBattleP2JigsawImage(p2.jigsaw.image);
+        if (typeof p2.jigsaw.question === "string") setBattleP2JigsawQuestion(p2.jigsaw.question);
+        if (typeof p2.jigsaw.answer === "string") setBattleP2JigsawAnswer(p2.jigsaw.answer);
+        if (p2.jigsaw.mode) setBattleP2JigsawMode(p2.jigsaw.mode);
+      }
+      if (p2.qa) setBattleP2QA(p2.qa);
+      if (p2.attribute) setBattleP2Attribute(p2.attribute);
+    }
+
+    // Also sync in-memory GAME_CONFIG object
+    Object.assign(GAME_CONFIG, cfg);
+
+    const ts = timestamp || Date.now();
+    globalConfigVersion = ts;
+    setConfigVersion(ts);
+  };
+
+  const reloadConfigFromSource = async (silent = false) => {
+    try {
+      const res = await fetch(`/api/save-config?t=${Date.now()}`, { cache: "no-store" });
+      const data = await res.json();
+      if (data.success && data.config) {
+        applyLoadedConfig(data.config, data.timestamp);
+        if (!silent) {
+          alert("ดึงข้อมูลล่าสุดจาก config.js และอัปเดตรูปล่าสุดเรียบร้อยแล้ว!");
+        }
+      }
+    } catch (err) {
+      if (!silent) {
+        alert("เกิดข้อผิดพลาดในการดึงข้อมูลจาก config.js: " + err.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    reloadConfigFromSource(true);
+  }, []);
+
   // ---- Config Operations ----
   const handleSaveConfig = async () => {
     const cleanQA = (qa) => {
@@ -728,7 +802,25 @@ export default function Home() {
         const now = Date.now();
         globalConfigVersion = now;
         setConfigVersion(now);
-        alert("บันทึกการตั้งค่าสำเร็จแล้ว! อัปเดตข้อมูลและรูปภาพล่าสุดเรียบร้อย");
+
+        // Preload newly saved images so that browser cache is updated immediately
+        const imagesToPreload = [
+          jigsawImage,
+          battleP1JigsawImage,
+          battleP2JigsawImage,
+          ...(threeSecQuestions || []).map((q) => q.image),
+          ...(battleP1ThreeSecQuestions || []).map((q) => q.image),
+          ...(battleP2ThreeSecQuestions || []).map((q) => q.image),
+        ].filter(Boolean);
+
+        imagesToPreload.forEach((imgPath) => {
+          if (typeof window !== "undefined") {
+            const img = new window.Image();
+            img.src = resolveImagePath(imgPath, now);
+          }
+        });
+
+        alert("บันทึกการตั้งค่าสำเร็จแล้ว! อัปเดตข้อมูลและดึงรูปล่าสุดเรียบร้อย");
       } else {
         alert("เกิดข้อผิดพลาดในการเขียนไฟล์: " + result.error);
       }
@@ -1811,7 +1903,14 @@ export default function Home() {
                   <span className="btn-icon">🏆</span>
                   <span>ตารางคะแนน</span>
                 </button>
-                <button onClick={() => setCurrentPanel("config")} className="btn-config" id="btnConfig">
+                <button
+                  onClick={() => {
+                    reloadConfigFromSource(true);
+                    setCurrentPanel("config");
+                  }}
+                  className="btn-config"
+                  id="btnConfig"
+                >
                   <span className="btn-icon">⚙️</span>
                   <span>ตั้งค่าเกม</span>
                 </button>
@@ -1832,12 +1931,32 @@ export default function Home() {
             <div className="floating-orb orb3"></div>
           </div>
           <div className="config-container">
-            <div className="config-header">
+            <div className="config-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <button className="config-back-btn" onClick={() => setCurrentPanel("setup")}>
                 <span>←</span> กลับ
               </button>
               <h1>⚙️ ตั้งค่าเกม</h1>
-              <div className="config-back-btn" style={{ visibility: "hidden" }}>placeholder</div>
+              <button
+                type="button"
+                className="config-sync-btn"
+                onClick={() => reloadConfigFromSource(false)}
+                title="ดึงข้อมูลคำถามและรูปภาพล่าสุดจากไฟล์ config.js โดยตรง"
+                style={{
+                  background: "rgba(0, 229, 255, 0.15)",
+                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                  color: "#00e5ff",
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                <span>🔄</span> ดึงจาก config.js
+              </button>
             </div>
 
             {/* Config Mode Tabs */}
@@ -1988,6 +2107,22 @@ export default function Home() {
                       else setBattleP2JigsawImage(val);
                     }}
                   />
+                  {(() => {
+                    const currentImg = configMode === "single" ? jigsawImage : configMode === "player1" ? battleP1JigsawImage : battleP2JigsawImage;
+                    if (!currentImg) return null;
+                    return (
+                      <div style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "10px", background: "rgba(0,0,0,0.3)", padding: "8px 12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <img
+                          key={`${currentImg}-${configVersion}`}
+                          src={resolveImagePath(currentImg, configVersion)}
+                          alt="พรีวิวรูปจิ๊กซอว์"
+                          style={{ width: "80px", height: "55px", objectFit: "cover", borderRadius: "6px", border: "1px solid rgba(255,255,255,0.2)" }}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                        <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>รูปปัจจุบันที่จะใช้ในเกม (โหลดสด)</span>
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="q-input-group">
                   <label htmlFor="jigsawQuestion">❓ คำถามของภาพจิ๊กซอว์</label>
@@ -2064,6 +2199,15 @@ export default function Home() {
                             }}
                             placeholder={`เช่น images/q${i + 1}.jpg`}
                           />
+                          {q.image && (
+                            <img
+                              key={`${q.image}-${configVersion}`}
+                              src={resolveImagePath(q.image, configVersion)}
+                              alt=""
+                              style={{ width: "42px", height: "42px", objectFit: "cover", borderRadius: "4px", marginTop: "4px", border: "1px solid rgba(255,255,255,0.2)" }}
+                              onError={(e) => { e.currentTarget.style.display = "none"; }}
+                            />
+                          )}
                         </div>
                         <div className="q-input-group">
                           <label>เสียง / วิดีโอ (เว้นว่างได้)</label>
@@ -2705,7 +2849,8 @@ export default function Home() {
                   )}
                   {currentGame === "jigsaw" && (
                     <JigsawGame
-                      key={`judge-${currentGame}`}
+                      key={`judge-${currentGame}-${configVersion}`}
+                      configVersion={configVersion}
                       jigsawMode={battleLockedState?.jigsawMode || battleLockedState?.config?.jigsaw?.mode || jigsawMode}
                       jigsawImage={battleLockedState?.config?.jigsaw?.image || jigsawImage}
                       jigsawAnswer={battleLockedState?.config?.jigsaw?.answer || jigsawAnswer}
@@ -2747,7 +2892,8 @@ export default function Home() {
                 <>
                   {currentGame === "3sec" && (
                     <ThreeSecondsGame
-                      key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}`}
+                      key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}-${configVersion}`}
+                      configVersion={configVersion}
                       threeSecQuestions={battlePlayerCfg?.threeSeconds || threeSecQuestions}
                       threeSecMode={battlePlayerCfg?.threeSecMode || threeSecMode}
                       threeSecSetHeaders={battlePlayerCfg?.threeSecondsHeaders || threeSecSetHeaders}
@@ -2769,7 +2915,7 @@ export default function Home() {
                   )}
                   {currentGame === "qa" && (
                     <QAGame
-                      key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}`}
+                      key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}-${configVersion}`}
                       qaConfig={battlePlayerCfg?.qa || GAME_CONFIG.qa}
                       battleLockMode={gameMode === "battle" && battleRound === 1 && battleCategory !== "3sec"}
                       onLock={(score) => handleBattleLock(score)}
@@ -2787,7 +2933,8 @@ export default function Home() {
                   )}
                   {currentGame === "jigsaw" && (
                     <JigsawGame
-                      key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}`}
+                      key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}-${configVersion}`}
+                      configVersion={configVersion}
                       jigsawMode={battlePlayerCfg?.jigsaw?.mode || jigsawMode}
                       jigsawImage={battlePlayerCfg?.jigsaw?.image || jigsawImage}
                       jigsawAnswer={battlePlayerCfg?.jigsaw?.answer || jigsawAnswer}
@@ -3477,7 +3624,7 @@ export default function Home() {
 // ==========================================
 // ⏱️ SUB-COMPONENT: GAME 1 (3 SECONDS) - PERFECT VIDEO PLAYBACK & MANUAL TIMER
 // ==========================================
-function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders = [], gameMode, activeScoreOverride, onComplete, onResult, onBack }) {
+function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders = [], gameMode, activeScoreOverride, configVersion, onComplete, onResult, onBack }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [startQ, setStartQ] = useState(0);
   const [endQ, setEndQ] = useState(25);
@@ -3608,7 +3755,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
       return;
     }
 
-    const resolved = resolveImagePath(mediaSource);
+    const resolved = resolveImagePath(mediaSource, configVersion);
     const isVideo = isVideoSource(mediaSource);
 
     // เปิดโหมดแสดงพื้นที่คำถามทันทีเพื่อให้ Tag สื่อปรากฏใน DOM ก่อนสั่ง .play()
@@ -3881,7 +4028,12 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
         ) : hasImage && !isVideo ? (
           <div style={{ display: "flex", gap: "32px", width: "100%", alignItems: "center" }}>
             <div style={{ flex: "1 1 55%", display: "flex", justifyContent: "center" }}>
-              <img src={resolveImagePath(q.image)} alt="คำถาม" style={{ width: "100%", maxHeight: "75vh", objectFit: "contain", borderRadius: "var(--radius)", border: "3px solid rgba(255,255,255,0.15)" }} />
+              <img
+                key={`${q.image}-${configVersion}`}
+                src={resolveImagePath(q.image, configVersion)}
+                alt="คำถาม"
+                style={{ width: "100%", maxHeight: "75vh", objectFit: "contain", borderRadius: "var(--radius)", border: "3px solid rgba(255,255,255,0.15)" }}
+              />
             </div>
             <div style={{ flex: "1 1 45%", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
               {!revealOnly && (
@@ -4400,7 +4552,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, onLock, onCo
 // ==========================================
 // 🧩 SUB-COMPONENT: GAME 3 (JIGSAW)
 // ==========================================
-function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, battleLockMode, judgeMode, lockedState, onLock, onComplete, onResult, onDismissResult, onBack }) {
+function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, battleLockMode, judgeMode, lockedState, configVersion, onLock, onComplete, onResult, onDismissResult, onBack }) {
   const [gameStarted, setGameStarted] = useState(judgeMode || false);
   const [currentPoints, setCurrentPoints] = useState(judgeMode && lockedState ? lockedState.score : 25);
   const [openedPieces, setOpenedPieces] = useState(judgeMode && lockedState ? lockedState.openedPieces : []);
@@ -4566,7 +4718,12 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
         <div className="jigsaw-board-col">
           <div className={`jigsaw-board ${jigsawMode || "square"}`}>
             {hasImage ? (
-              <img src={resolveImagePath(jigsawImage)} className="jigsaw-image" alt="ภาพปริศนา" />
+              <img
+                key={`${jigsawImage}-${configVersion}`}
+                src={resolveImagePath(jigsawImage, configVersion)}
+                className="jigsaw-image"
+                alt="ภาพปริศนา"
+              />
             ) : (
               <div className="jigsaw-no-image">ไม่มีรูปภาพ (กรุณาตั้งค่าในหน้าตั้งค่าเกม)</div>
             )}
