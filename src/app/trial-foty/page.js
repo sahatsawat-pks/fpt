@@ -1962,36 +1962,12 @@ export default function TrialFOTYPage() {
                     ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)
                   </div>
                   <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)", marginTop: "2px" }}>
-                    คะแนนจริงจากการลงสนามเล่นในระบบเกม <strong>(/game)</strong> รวม 4 หมวดการแข่งขัน (หมวดละ 25 คะแนน รวมเต็ม 100 คะแนน)
+                    คะแนนจริงจากการลงสนามอุ่นเครื่อง รวม 4 หมวดการแข่งขัน (หมวดละ 25 คะแนน รวมเต็ม 100 คะแนน)
                   </div>
                   <div style={{ fontSize: "12px", color: "#ffd591", marginTop: "4px", fontWeight: "700" }}>
                     ⚡ สัดส่วนคะแนน: คะแนนรอบอุ่นเครื่องนี้ถูกนำไปคิดเป็น <strong>30%</strong> ของคะแนนในตารางโพลล์มหาชน (อีก 70% มาจากคะแนนโหวต)
                   </div>
                 </div>
-              </div>
-
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                <Link
-                  href="/game"
-                  target="_blank"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "10px 20px",
-                    borderRadius: "10px",
-                    background: "linear-gradient(135deg, #ff8800 0%, #d4380d 100%)",
-                    color: "#ffffff",
-                    fontWeight: "900",
-                    fontSize: "14px",
-                    textDecoration: "none",
-                    boxShadow: "0 0 20px rgba(255, 136, 0, 0.5)",
-                    transition: "transform 0.15s ease",
-                  }}
-                >
-                  <span>🎮 ไปที่ห้องเล่นเกม (/game)</span>
-                  <span>➔</span>
-                </Link>
               </div>
             </div>
 
