@@ -23,6 +23,7 @@ const DEFAULT_SETTINGS = {
   currentPhase: "qualifying", // 'qualifying' | 'finals'
   qualifyingLocked: false,
   trialVotingOpen: true,
+  showWarmupTable: true,
 };
 
 function readSettings() {
@@ -79,6 +80,7 @@ export async function GET(request) {
       currentPhase: settings.currentPhase || "qualifying",
       qualifyingLocked: Boolean(settings.qualifyingLocked),
       trialVotingOpen: settings.trialVotingOpen !== false,
+      showWarmupTable: settings.showWarmupTable !== false,
     });
   }
 
@@ -96,6 +98,7 @@ export async function GET(request) {
     currentPhase: settings.currentPhase || "qualifying",
     qualifyingLocked: Boolean(settings.qualifyingLocked),
     trialVotingOpen: settings.trialVotingOpen !== false,
+    showWarmupTable: settings.showWarmupTable !== false,
   });
 }
 
@@ -223,6 +226,9 @@ export async function POST(request) {
       if (body.trialVotingOpen !== undefined) {
         newSettings.trialVotingOpen = Boolean(body.trialVotingOpen);
       }
+      if (body.showWarmupTable !== undefined) {
+        newSettings.showWarmupTable = Boolean(body.showWarmupTable);
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -246,7 +252,25 @@ export async function POST(request) {
           currentPhase: newSettings.currentPhase,
           qualifyingLocked: newSettings.qualifyingLocked,
           trialVotingOpen: newSettings.trialVotingOpen !== false,
+          showWarmupTable: newSettings.showWarmupTable !== false,
         },
+      });
+    }
+
+    // Toggle warm-up table visibility action
+    if (body.action === "toggle_warmup_table") {
+      const newStatus =
+        body.showWarmupTable !== undefined
+          ? Boolean(body.showWarmupTable)
+          : current.showWarmupTable === false
+          ? true
+          : false;
+      const newSettings = { ...current, showWarmupTable: newStatus };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        showWarmupTable: newStatus,
+        message: newStatus ? "เปิดแสดงตารางรอบอุ่นเครื่องแล้ว" : "ปิดแสดงตารางรอบอุ่นเครื่องแล้ว",
       });
     }
 

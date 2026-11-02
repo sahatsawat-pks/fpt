@@ -1962,7 +1962,7 @@ main {
 /* Responsive for lower-height displays (MacBook, laptops, etc.) */
 @media (max-height: 850px) {
     #setupPanel {
-        padding: 56px 14px 24px;
+        padding: 68px 14px 24px;
     }
     .setup-logo {
         margin-bottom: 12px;
@@ -2016,7 +2016,7 @@ main {
 
 @media (max-height: 680px) {
     #setupPanel {
-        padding: 46px 12px 18px;
+        padding: 60px 12px 18px;
     }
     .setup-logo {
         margin-bottom: 6px;

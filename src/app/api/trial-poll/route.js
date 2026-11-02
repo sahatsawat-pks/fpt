@@ -6,6 +6,16 @@ import { getKVData, saveKVData } from "@/lib/kv";
 const POLL_FILE = path.join(process.cwd(), "src/app/data/trial-poll.json");
 const SETTINGS_FILE = path.join(process.cwd(), "src/app/data/settings.json");
 const TRIAL_DATA_FILE = path.join(process.cwd(), "src/app/data/trial-leaderboard.json");
+const GAME_DATA_FILE = path.join(process.cwd(), "src/app/data/game_leaderboard.json");
+
+function readGameData() {
+  try {
+    if (fs.existsSync(GAME_DATA_FILE)) {
+      return JSON.parse(fs.readFileSync(GAME_DATA_FILE, "utf-8"));
+    }
+  } catch (e) {}
+  return [];
+}
 
 function readTrialData() {
   try {
@@ -115,14 +125,18 @@ function computePollPercentages(items) {
 }
 
 export async function GET() {
-  const [data, trialContestants] = await Promise.all([
+  const [data, trialContestants, gameScores, rawSettings] = await Promise.all([
     getKVData("fpt_trial_poll", readLocalPoll),
     getKVData("fpt_trial", readTrialData),
+    getKVData("fpt_game_leaderboard", readGameData),
+    getKVData("fpt_settings", readSettings),
   ]);
-  const votingOpen = await getVotingStatus();
+  const votingOpen = rawSettings ? rawSettings.trialVotingOpen !== false : true;
+  const showWarmupTable = rawSettings ? rawSettings.showWarmupTable !== false : true;
 
   const pollList = Array.isArray(data) && data.length > 0 ? data : getDefaultPoll();
   const contestants = Array.isArray(trialContestants) ? trialContestants : [];
+  const games = Array.isArray(gameScores) ? gameScores : [];
 
   // Merge latest photos and contestant info from trial leaderboard into poll items
   const enrichedPoll = pollList.map((item) => {
@@ -132,12 +146,20 @@ export async function GET() {
         (c.name && item.name && c.name.trim() === item.name.trim()) ||
         (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
     );
+    const matchedGame = games.find(
+      (g) =>
+        (g.id && item.id && String(g.id) === String(item.id)) ||
+        (g.name && item.name && g.name.trim() === item.name.trim()) ||
+        (g.nickname && item.nickname && g.nickname.trim() === item.nickname.trim())
+    );
     return {
       ...item,
       image: item.image || matched?.image || "",
       name: item.name || matched?.name || "",
       nickname: item.nickname || matched?.nickname || "",
       topic: item.topic || matched?.topic || "-",
+      gameScores: matchedGame?.scores || null,
+      gameTotalScore: matchedGame?.totalScore !== undefined ? matchedGame.totalScore : Number(item.whatIfScore || 0),
     };
   });
 
@@ -145,6 +167,7 @@ export async function GET() {
     success: true,
     data: enrichedPoll,
     votingOpen,
+    showWarmupTable,
   });
 }
 
@@ -166,6 +189,60 @@ export async function POST(request) {
         success: true,
         votingOpen: newStatus,
         message: newStatus ? "🟢 เปิดรับการโหวตโพลล์มหาชนแล้ว" : "🔴 ปิดรับการโหวตโพลล์มหาชนแล้ว",
+      });
+    }
+
+    // Toggle warm-up table visibility on front page
+    if (body.action === "toggle_warmup_table" || body.action === "set_warmup_table") {
+      const rawSettings = await getKVData("fpt_settings", readSettings);
+      const currentStatus = rawSettings ? rawSettings.showWarmupTable !== false : true;
+      const newStatus = body.showWarmupTable !== undefined ? Boolean(body.showWarmupTable) : !currentStatus;
+      const updatedSettings = { ...(rawSettings || {}), showWarmupTable: newStatus };
+
+      writeSettings(updatedSettings);
+      await saveKVData("fpt_settings", updatedSettings, writeSettings);
+
+      return NextResponse.json({
+        success: true,
+        showWarmupTable: newStatus,
+        message: newStatus ? "🟢 เปิดแสดงตารางรอบอุ่นเครื่องในหน้าแรกแล้ว" : "🔴 ซ่อนตารางรอบอุ่นเครื่องในหน้าแรกแล้ว",
+      });
+    }
+
+    // Sync game scores from /game (fpt_game_leaderboard) into whatIfScore (30% weight)
+    if (body.action === "sync_game_scores") {
+      const [currentPoll, gameScores] = await Promise.all([
+        getKVData("fpt_trial_poll", readLocalPoll),
+        getKVData("fpt_game_leaderboard", readGameData),
+      ]);
+      const pollItems = Array.isArray(currentPoll) && currentPoll.length > 0 ? currentPoll : getDefaultPoll();
+      const games = Array.isArray(gameScores) ? gameScores : [];
+
+      let updatedCount = 0;
+      const updatedPoll = pollItems.map((item) => {
+        const matched = games.find(
+          (g) =>
+            (g.id && item.id && String(g.id) === String(item.id)) ||
+            (g.name && item.name && g.name.trim() === item.name.trim()) ||
+            (g.nickname && item.nickname && g.nickname.trim() === item.nickname.trim())
+        );
+        if (matched && matched.totalScore !== undefined && matched.totalScore !== null) {
+          updatedCount++;
+          return {
+            ...item,
+            whatIfScore: Number(matched.totalScore) || 0,
+          };
+        }
+        return item;
+      });
+
+      const recomputed = computePollPercentages(updatedPoll);
+      await saveKVData("fpt_trial_poll", recomputed, writeLocalPoll);
+
+      return NextResponse.json({
+        success: true,
+        message: `ซิงค์คะแนนจากห้องเล่นเกมสำเร็จ (${updatedCount} คน)`,
+        data: recomputed,
       });
     }
 

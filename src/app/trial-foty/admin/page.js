@@ -110,6 +110,9 @@ export default function TrialAdminPage() {
   const [pollNotice, setPollNotice] = useState("");
   const [votingOpen, setVotingOpen] = useState(true);
   const [togglingVoting, setTogglingVoting] = useState(false);
+  const [showWarmupTable, setShowWarmupTable] = useState(true);
+  const [togglingWarmupTable, setTogglingWarmupTable] = useState(false);
+  const [syncingGameScores, setSyncingGameScores] = useState(false);
 
   // ── Trial Info & Staff Q&A States ─────────────────────────────────────────
   const [infoKeywords, setInfoKeywords] = useState([]);
@@ -677,6 +680,9 @@ export default function TrialAdminPage() {
         if (data.trialVotingOpen !== undefined) {
           setVotingOpen(Boolean(data.trialVotingOpen));
         }
+        if (data.showWarmupTable !== undefined) {
+          setShowWarmupTable(Boolean(data.showWarmupTable));
+        }
       }
     } catch (e) {
       console.error(e);
@@ -704,6 +710,56 @@ export default function TrialAdminPage() {
       showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
     } finally {
       setTogglingVoting(false);
+    }
+  };
+
+  const handleToggleWarmupTable = async (newStatus) => {
+    const targetStatus = typeof newStatus === "boolean" ? newStatus : !showWarmupTable;
+    setTogglingWarmupTable(true);
+    try {
+      const res = await fetch("/api/trial-poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "set_warmup_table", showWarmupTable: targetStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowWarmupTable(targetStatus);
+        showToast(targetStatus ? "🟢 เปิดแสดงตารางรอบอุ่นเครื่องในหน้าแรกแล้ว" : "🔴 ปิดซ่อนตารางรอบอุ่นเครื่องในหน้าแรกแล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการเปลี่ยนการแสดงตารางรอบอุ่นเครื่อง", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setTogglingWarmupTable(false);
+    }
+  };
+
+  const handleSyncGameScores = async () => {
+    if (!window.confirm("ต้องการดึงคะแนนรวมจากห้องเล่นเกม (/game) มาเป็นคะแนนรอบอุ่นเครื่อง (What If? 30%) ของผู้เข้าแข่งขันทั้งหมด ใช่หรือไม่?")) {
+      return;
+    }
+    setSyncingGameScores(true);
+    try {
+      const res = await fetch("/api/trial-poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync_game_scores" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPollItems(data.data || []);
+        showToast(data.message || "ซิงค์คะแนนจากห้องเล่นเกมเรียบร้อยแล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการซิงค์คะแนน", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setSyncingGameScores(false);
     }
   };
 
@@ -2832,6 +2888,29 @@ export default function TrialAdminPage() {
 
                   <button
                     type="button"
+                    onClick={handleSyncGameScores}
+                    disabled={syncingGameScores}
+                    style={{
+                      padding: "10px 16px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(0, 229, 255, 0.2) 100%)",
+                      border: "1.5px solid #10b981",
+                      color: "#86efac",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: syncingGameScores ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 0 12px rgba(16, 185, 129, 0.25)",
+                    }}
+                    title="ดึงคะแนน 100 คะแนนเต็มจากห้องเกม (/game) มาอัปเดตเป็นคะแนนรอบอุ่นเครื่อง (30%) และคำนวณ % โพลล์อัตโนมัติ"
+                  >
+                    {syncingGameScores ? "⏳ กำลังซิงค์..." : "🎮 ซิงค์คะแนนจากเกม (/game)"}
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleAutoSortByVotes}
                     style={{
                       padding: "10px 14px",
@@ -3031,6 +3110,107 @@ export default function TrialAdminPage() {
                       : votingOpen
                       ? "🔒 คลิกเพื่อปิดรับโหวต"
                       : "🔓 คลิกเพื่อเปิดรับโหวต"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Warm-up Table on Front Page Toggle Control Box */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "16px 20px",
+                  borderRadius: "14px",
+                  background: showWarmupTable
+                    ? "linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, rgba(6, 40, 80, 0.25) 100%)"
+                    : "linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(127, 29, 29, 0.25) 100%)",
+                  border: showWarmupTable ? "1.5px solid rgba(0, 229, 255, 0.45)" : "1.5px solid rgba(239, 68, 68, 0.45)",
+                  boxShadow: showWarmupTable ? "0 0 16px rgba(0, 229, 255, 0.15)" : "0 0 16px rgba(239, 68, 68, 0.15)",
+                  marginBottom: "16px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingWarmupTable ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showWarmupTable}
+                    disabled={togglingWarmupTable}
+                    onChange={(e) => handleToggleWarmupTable(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingWarmupTable ? "not-allowed" : "pointer",
+                      accentColor: "#00e5ff",
+                    }}
+                  />
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <span
+                        style={{
+                          fontSize: "15px",
+                          fontWeight: "900",
+                          color: showWarmupTable ? "#00e5ff" : "#f87171",
+                        }}
+                      >
+                        {showWarmupTable ? "🔥 เปิดแสดงตารางรอบอุ่นเครื่องในหน้าแรก (Warm-up Table Active)" : "🔴 ปิดซ่อนตารางรอบอุ่นเครื่องในหน้าแรก (Warm-up Table Hidden)"}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: "800",
+                          padding: "2px 8px",
+                          borderRadius: "20px",
+                          background: showWarmupTable ? "rgba(0, 229, 255, 0.2)" : "rgba(248, 113, 113, 0.2)",
+                          color: showWarmupTable ? "#67e8f9" : "#fca5a5",
+                          border: showWarmupTable ? "1px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(248, 113, 113, 0.4)",
+                        }}
+                      >
+                        {showWarmupTable ? "แสดงในหน้าแรก (/trial-foty)" : "ซ่อนจากหน้าแรก"}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {showWarmupTable
+                        ? "ผู้ชมสามารถกดดูแท็บ '🔥 ตารางรอบอุ่นเครื่อง' ที่หน้าแรก (/trial-foty) เพื่อดูคะแนนจากห้องเล่นเกม 4 หมวดเต็ม 100 และสัดส่วน 30% ของโพลล์ได้"
+                        : "ซ่อนแท็บตารางรอบอุ่นเครื่องจากหน้าแรก (/trial-foty) ผู้ชมทั่วไปจะไม่เห็นตารางนี้"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingWarmupTable}
+                    onClick={() => handleToggleWarmupTable(!showWarmupTable)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: showWarmupTable ? "rgba(239, 68, 68, 0.2)" : "rgba(0, 229, 255, 0.2)",
+                      border: showWarmupTable ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(0, 229, 255, 0.5)",
+                      color: showWarmupTable ? "#fca5a5" : "#67e8f9",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingWarmupTable ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {togglingWarmupTable
+                      ? "⏳ กำลังบันทึก..."
+                      : showWarmupTable
+                      ? "🔒 คลิกเพื่อปิดซ่อน"
+                      : "🔓 คลิกเพื่อเปิดแสดง"}
                   </button>
                 </div>
               </div>
@@ -4000,6 +4180,104 @@ export default function TrialAdminPage() {
                       : votingOpen
                       ? "🔒 คลิกเพื่อปิดรับโหวต"
                       : "🔓 คลิกเพื่อเปิดรับโหวต"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Trial Warm-up Table Open / Close Settings Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: showWarmupTable ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1.5px solid rgba(239, 68, 68, 0.4)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+                boxShadow: showWarmupTable ? "0 0 20px rgba(0, 229, 255, 0.12)" : "0 0 20px rgba(239, 68, 68, 0.12)",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#00e5ff", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>🔥</span> แสดง-ซ่อนตารางรอบอุ่นเครื่องในหน้าแรก (What If? Standings)
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                ควบคุมการเปิดหรือปิดแท็บ <strong>"🔥 ตารางรอบอุ่นเครื่อง (What If?)"</strong> ในหน้าแรก <code>/trial-foty</code> ซึ่งแสดงคะแนนการเล่น 4 หมวดเต็ม 100 จากห้องเกม <code>/game</code> และสัดส่วนคะแนน 30% ในโพลล์
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  background: showWarmupTable ? "rgba(0, 229, 255, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                  border: showWarmupTable ? "1px solid rgba(0, 229, 255, 0.35)" : "1px solid rgba(239, 68, 68, 0.35)",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingWarmupTable ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showWarmupTable}
+                    disabled={togglingWarmupTable}
+                    onChange={(e) => handleToggleWarmupTable(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingWarmupTable ? "not-allowed" : "pointer",
+                      accentColor: "#00e5ff",
+                    }}
+                  />
+                  <div>
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "900",
+                        color: showWarmupTable ? "#00e5ff" : "#f87171",
+                      }}
+                    >
+                      {showWarmupTable ? "🔥 เปิดแสดงตารางรอบอุ่นเครื่องในหน้าแรก" : "🔴 ปิดซ่อนตารางรอบอุ่นเครื่องในหน้าแรก"}
+                    </span>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {showWarmupTable
+                        ? "ผู้ชมสามารถกดดูแท็บ '🔥 ตารางรอบอุ่นเครื่อง' บนหน้า /trial-foty ได้ตามปกติ"
+                        : "ซ่อนแท็บตารางรอบอุ่นเครื่องจากหน้าแรก (/trial-foty)"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingWarmupTable}
+                    onClick={() => handleToggleWarmupTable(!showWarmupTable)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: showWarmupTable ? "rgba(239, 68, 68, 0.2)" : "rgba(0, 229, 255, 0.2)",
+                      border: showWarmupTable ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(0, 229, 255, 0.5)",
+                      color: showWarmupTable ? "#fca5a5" : "#67e8f9",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingWarmupTable ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    {togglingWarmupTable
+                      ? "⏳ กำลังบันทึก..."
+                      : showWarmupTable
+                      ? "🔒 คลิกเพื่อปิดซ่อน"
+                      : "🔓 คลิกเพื่อเปิดแสดง"}
                   </button>
                 </div>
               </div>
