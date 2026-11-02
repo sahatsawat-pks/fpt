@@ -2484,28 +2484,6 @@ export default function Home() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowLeaderboardModal(true)}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  background: "rgba(0, 229, 255, 0.12)",
-                  border: "1px solid rgba(0, 229, 255, 0.35)",
-                  borderRadius: "8px",
-                  padding: "6px 12px",
-                  color: "#00e5ff",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  fontWeight: "700",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s ease"
-                }}
-                title="เปิดดูตารางคะแนนรวม"
-              >
-                🏆 ตารางคะแนน
-              </button>
-              <button
-                type="button"
                 onClick={handleResetCurrentGameSession}
                 style={{
                   display: "inline-flex",
@@ -2525,49 +2503,6 @@ export default function Home() {
                 title="เริ่มผู้เข้าแข่งขันคนใหม่ / ออกจากรอบปัจจุบัน"
               >
                 🔄 เริ่มคนใหม่
-              </button>
-              <a
-                href="/"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  background: "rgba(10, 25, 50, 0.85)",
-                  border: "1px solid rgba(0, 229, 255, 0.4)",
-                  borderRadius: "8px",
-                  padding: "6px 12px",
-                  color: "#80d0ff",
-                  fontSize: "13px",
-                  fontWeight: "700",
-                  whiteSpace: "nowrap",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease"
-                }}
-                title="กลับสู่หน้าหลักแฟนพันธุ์แท้ 2026"
-              >
-                🏠 หน้าหลัก
-              </a>
-              <button
-                type="button"
-                onClick={handleGameLogout}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  background: "rgba(255, 77, 79, 0.15)",
-                  border: "1px solid rgba(255, 77, 79, 0.4)",
-                  borderRadius: "8px",
-                  padding: "6px 12px",
-                  color: "#ff7875",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  fontWeight: "700",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s ease"
-                }}
-                title="ออกจากระบบควบคุมเกม"
-              >
-                🚪 ออกจากระบบ
               </button>
             </div>
           </header>
