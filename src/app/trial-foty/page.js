@@ -474,6 +474,25 @@ export default function TrialFOTYPage() {
             </button>
 
             <Link
+              href="/trial-foty/info"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 14px",
+                borderRadius: "8px",
+                background: "rgba(0, 229, 255, 0.15)",
+                border: "1px solid rgba(0, 229, 255, 0.4)",
+                color: "#00e5ff",
+                fontWeight: "700",
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
+            >
+              ℹ️ คำใบ้ & ถามทีมงาน
+            </Link>
+
+            <Link
               href="/trial-foty/vote"
               style={{
                 display: "inline-flex",

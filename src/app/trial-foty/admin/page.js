@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import DiscordMarkdown from "@/app/components/DiscordMarkdown";
 
 function getOptimizedImageUrl(src, targetSize = 120) {
   if (!src || typeof src !== "string") return "";
@@ -110,13 +111,66 @@ export default function TrialAdminPage() {
   const [votingOpen, setVotingOpen] = useState(true);
   const [togglingVoting, setTogglingVoting] = useState(false);
 
+  // ── Trial Info & Staff Q&A States ─────────────────────────────────────────
+  const [infoKeywords, setInfoKeywords] = useState([]);
+  const [infoQaBoard, setInfoQaBoard] = useState([]);
+  const [loadingInfo, setLoadingInfo] = useState(false);
+  const [keywordAdminSearch, setKeywordAdminSearch] = useState("");
+  const [savingKeywordId, setSavingKeywordId] = useState(null);
+  const [savingAllKeywords, setSavingAllKeywords] = useState(false);
+
+  // Staff Q&A Form States
+  const [qaForm, setQaForm] = useState({
+    id: null,
+    contestantId: "",
+    category: "คำถาม-คำตอบ",
+    question: "",
+    answer: "",
+  });
+  const [qaContestantSearch, setQaContestantSearch] = useState("");
+  const [showQaDropdown, setShowQaDropdown] = useState(false);
+  const [savingQa, setSavingQa] = useState(false);
+  const [deletingQaId, setDeletingQaId] = useState(null);
+  const [qaCategoryFilter, setQaCategoryFilter] = useState("all");
+  const [qaAdminSearch, setQaAdminSearch] = useState("");
+
+  const fetchTrialInfo = async (roster = contestants) => {
+    try {
+      setLoadingInfo(true);
+      const res = await fetch("/api/trial-info", { cache: "no-store" });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          const photoMap = new Map();
+          (roster || []).forEach((c) => {
+            if (c.image) {
+              photoMap.set(String(c.id), c.image);
+              if (c.name) photoMap.set(c.name.trim(), c.image);
+            }
+          });
+          const mergedKeywords = (json.keywords || []).map((k) => ({
+            ...k,
+            image: photoMap.get(String(k.id)) || photoMap.get(k.name?.trim()) || k.image || "",
+          }));
+          setInfoKeywords(mergedKeywords);
+          setInfoQaBoard(json.qaBoard || []);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to fetch trial info:", e);
+    } finally {
+      setLoadingInfo(false);
+    }
+  };
+
   // Fetch contestants from API
   const fetchContestants = async () => {
     try {
       setLoading(true);
-      const [resTrial, resPoll] = await Promise.all([
+      const [resTrial, resPoll, resInfo] = await Promise.all([
         fetch("/api/trial", { cache: "no-store" }),
         fetch("/api/trial-poll", { cache: "no-store" }),
+        fetch("/api/trial-info", { cache: "no-store" }),
       ]);
       let roster = [];
       if (resTrial.ok) {
@@ -146,6 +200,24 @@ export default function TrialAdminPage() {
         }
         if (jsonPoll.votingOpen !== undefined) {
           setVotingOpen(Boolean(jsonPoll.votingOpen));
+        }
+      }
+      if (resInfo.ok) {
+        const jsonInfo = await resInfo.json();
+        if (jsonInfo.success) {
+          const photoMap = new Map();
+          roster.forEach((c) => {
+            if (c.image) {
+              photoMap.set(String(c.id), c.image);
+              if (c.name) photoMap.set(c.name.trim(), c.image);
+            }
+          });
+          const mergedKeywords = (jsonInfo.keywords || []).map((k) => ({
+            ...k,
+            image: photoMap.get(String(k.id)) || photoMap.get(k.name?.trim()) || k.image || "",
+          }));
+          setInfoKeywords(mergedKeywords);
+          setInfoQaBoard(jsonInfo.qaBoard || []);
         }
       }
     } catch {
@@ -385,6 +457,190 @@ export default function TrialAdminPage() {
       alert("เกิดข้อผิดพลาดในการรีเซ็ตผลโพลล์");
     } finally {
       setSavingPoll(false);
+    }
+  };
+
+  // ── Keywords & Q&A Board Handlers ──────────────────────────────────────────
+  const handleKeywordChange = (id, newKeyword) => {
+    setInfoKeywords((prev) =>
+      prev.map((item) => (String(item.id) === String(id) ? { ...item, keyword: newKeyword } : item))
+    );
+  };
+
+  const handleSaveKeyword = async (id, keyword) => {
+    try {
+      setSavingKeywordId(id);
+      const res = await fetch("/api/trial-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update_keyword", id, keyword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("บันทึกคำใบ้สำเร็จ", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการบันทึกคำใบ้", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setSavingKeywordId(null);
+    }
+  };
+
+  const handleSaveAllKeywords = async () => {
+    try {
+      setSavingAllKeywords(true);
+      const res = await fetch("/api/trial-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save_keywords", keywords: infoKeywords }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("บันทึกคำใบ้ของผู้เข้าแข่งขันทั้งหมดเรียบร้อยแล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการบันทึกคำใบ้", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setSavingAllKeywords(false);
+    }
+  };
+
+  const handleSelectQaContestant = (c) => {
+    setQaForm((prev) => ({
+      ...prev,
+      contestantId: String(c.id),
+    }));
+    setShowQaDropdown(false);
+  };
+
+  const handleSaveQa = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!qaForm.contestantId) {
+      alert("กรุณาเลือกผู้เข้าแข่งขัน");
+      return;
+    }
+    if (!qaForm.question?.trim()) {
+      alert("กรุณากรอกคำถามจากผู้เข้าแข่งขัน");
+      return;
+    }
+    if (!qaForm.answer?.trim()) {
+      alert("กรุณากรอกคำตอบจากทีมงาน");
+      return;
+    }
+
+    // Match contestant info
+    const matched =
+      contestants.find((c) => String(c.id) === String(qaForm.contestantId)) ||
+      infoKeywords.find((k) => String(k.id) === String(qaForm.contestantId));
+
+    const payload = {
+      contestantId: String(qaForm.contestantId),
+      contestantName: matched?.name || "",
+      nickname: matched?.nickname || "",
+      topic: matched?.topic || "",
+      category: qaForm.category || "คำถาม-คำตอบ",
+      question: qaForm.question.trim(),
+      answer: qaForm.answer.trim(),
+    };
+
+    if (qaForm.id) {
+      payload.id = qaForm.id;
+    }
+
+    try {
+      setSavingQa(true);
+      const res = await fetch("/api/trial-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: qaForm.id ? "update_qa" : "add_qa",
+          qa: payload,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || "บันทึกเรียบร้อยแล้ว", "success");
+        if (Array.isArray(data.qaBoard)) {
+          setInfoQaBoard(data.qaBoard);
+        } else {
+          fetchTrialInfo();
+        }
+        // Reset form
+        setQaForm({
+          id: null,
+          contestantId: "",
+          category: "คำถาม-คำตอบ",
+          question: "",
+          answer: "",
+        });
+      } else {
+        showToast(data.error || "บันทึกไม่สำเร็จ", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
+    } finally {
+      setSavingQa(false);
+    }
+  };
+
+  const handleEditQa = (item) => {
+    setQaForm({
+      id: item.id,
+      contestantId: String(item.contestantId),
+      category: item.category || "คำถาม-คำตอบ",
+      question: item.question || "",
+      answer: item.answer || "",
+    });
+    // Scroll smoothly to form
+    const formElem = document.getElementById("adminQaFormSection");
+    if (formElem) {
+      formElem.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleCancelEditQa = () => {
+    setQaForm({
+      id: null,
+      contestantId: "",
+      category: "คำถาม-คำตอบ",
+      question: "",
+      answer: "",
+    });
+  };
+
+  const handleDeleteQa = async (id) => {
+    if (!window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบคำถาม-ตอบนี้ออกจากกระดาน?")) {
+      return;
+    }
+    try {
+      setDeletingQaId(id);
+      const res = await fetch("/api/trial-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_qa", id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("ลบคำถาม-ตอบเรียบร้อยแล้ว", "success");
+        if (Array.isArray(data.qaBoard)) {
+          setInfoQaBoard(data.qaBoard);
+        } else {
+          setInfoQaBoard((prev) => prev.filter((item) => item.id !== id));
+        }
+        if (qaForm.id === id) {
+          handleCancelEditQa();
+        }
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการลบ", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setDeletingQaId(null);
     }
   };
 
@@ -1122,6 +1378,26 @@ export default function TrialAdminPage() {
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link
+            href="/trial-foty/info"
+            target="_blank"
+            style={{
+              padding: "6px 14px",
+              borderRadius: "8px",
+              background: "rgba(255, 215, 0, 0.15)",
+              color: "#ffd700",
+              fontSize: "13px",
+              textDecoration: "none",
+              border: "1px solid rgba(255, 215, 0, 0.4)",
+              fontWeight: "700",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            ℹ️ หน้าข้อมูลผู้เข้าแข่งขัน & ถามทีมงาน ↗
+          </Link>
+
+          <Link
             href="/trial-foty"
             style={{
               padding: "6px 14px",
@@ -1272,6 +1548,48 @@ export default function TrialAdminPage() {
             }}
           >
             👥 รายชื่อผู้เข้าแข่งขัน & ผูกรูป ({contestants.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("keywords")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "keywords" ? "rgba(0, 229, 255, 0.12)" : "transparent",
+              color: activeTab === "keywords" ? "#00e5ff" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "keywords" ? "2px solid #00e5ff" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            🔑 Keyword คำใบ้ (ถาม-ตอบ) ({infoKeywords.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("qaBoard")}
+            style={{
+              padding: "12px 20px",
+              fontSize: "15px",
+              fontWeight: "700",
+              background: activeTab === "qaBoard" ? "rgba(255, 215, 0, 0.15)" : "transparent",
+              color: activeTab === "qaBoard" ? "#ffd700" : "rgba(255,255,255,0.6)",
+              border: "none",
+              borderBottom: activeTab === "qaBoard" ? "2px solid #ffd700" : "2px solid transparent",
+              cursor: "pointer",
+              borderRadius: "6px 6px 0 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            💬 กระดานถามทีมงาน ({infoQaBoard.length})
           </button>
 
           <button
@@ -3846,6 +4164,950 @@ export default function TrialAdminPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 5: KEYWORD คำใบ้ (ถาม-ตอบ)
+           ======================================================== */}
+        {activeTab === "keywords" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            {/* Header & Controls */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                borderRadius: "16px",
+                padding: "20px 24px",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "16px",
+              }}
+            >
+              <div>
+                <h2 style={{ fontSize: "18px", fontWeight: "800", color: "#00e5ff", margin: "0 0 6px" }}>
+                  🔑 จัดการคำใบ้ Keyword รอบถาม-คำตอบ (The Trial 40 คน)
+                </h2>
+                <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.6)", margin: 0 }}>
+                  แอดมินสามารถแก้ไข Keyword คำใบ้ของผู้เข้าแข่งขันแต่ละท่านได้โดยตรง และกดบันทึกเป็นรายคนหรือบันทึกทั้งหมด
+                </p>
+              </div>
+
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                <Link
+                  href="/trial-foty/info"
+                  target="_blank"
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: "8px",
+                    background: "rgba(0, 229, 255, 0.15)",
+                    border: "1px solid rgba(0, 229, 255, 0.4)",
+                    color: "#00e5ff",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  👁️ ดูกระดานหน้าเว็บ ↗
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleSaveAllKeywords}
+                  disabled={savingAllKeywords}
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(135deg, #00e5ff, #0088cc)",
+                    border: "none",
+                    color: "#030814",
+                    fontSize: "13px",
+                    fontWeight: "800",
+                    cursor: savingAllKeywords ? "not-allowed" : "pointer",
+                    boxShadow: "0 0 16px rgba(0, 229, 255, 0.4)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  {savingAllKeywords ? "⏳ กำลังบันทึก..." : "💾 บันทึกคำใบ้ทั้งหมด"}
+                </button>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div
+              style={{
+                background: "rgba(0, 15, 30, 0.7)",
+                border: "1px solid rgba(0, 229, 255, 0.25)",
+                borderRadius: "12px",
+                padding: "12px 18px",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.5)" }}>🔍</span>
+              <input
+                type="text"
+                placeholder="ค้นหาชื่อ, ชื่อเล่น, หัวข้อ หรือคำใบ้..."
+                value={keywordAdminSearch}
+                onChange={(e) => setKeywordAdminSearch(e.target.value)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: "14px",
+                  outline: "none",
+                  width: "100%",
+                }}
+              />
+              {keywordAdminSearch && (
+                <button
+                  onClick={() => setKeywordAdminSearch("")}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "#94a3b8",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  ล้าง
+                </button>
+              )}
+            </div>
+
+            {/* Keyword Table */}
+            <div
+              style={{
+                background: "rgba(10, 20, 40, 0.6)",
+                border: "1px solid rgba(0, 229, 255, 0.2)",
+                borderRadius: "16px",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "14px" }}>
+                  <thead>
+                    <tr
+                      style={{
+                        background: "rgba(0, 229, 255, 0.1)",
+                        borderBottom: "1px solid rgba(0, 229, 255, 0.3)",
+                        color: "#00e5ff",
+                        fontWeight: "800",
+                      }}
+                    >
+                      <th style={{ padding: "14px 16px", width: "50px" }}>#</th>
+                      <th style={{ padding: "14px 16px", width: "70px" }}>รูป</th>
+                      <th style={{ padding: "14px 16px", width: "200px" }}>ชื่อ-นามสกุล</th>
+                      <th style={{ padding: "14px 16px", width: "100px" }}>ชื่อเล่น</th>
+                      <th style={{ padding: "14px 16px" }}>หัวข้อแฟนพันธุ์แท้</th>
+                      <th style={{ padding: "14px 16px", width: "260px" }}>Keyword คำใบ้ (ถาม-ตอบ)</th>
+                      <th style={{ padding: "14px 16px", width: "110px", textAlign: "center" }}>จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {infoKeywords
+                      .filter((item) => {
+                        const q = keywordAdminSearch.trim().toLowerCase();
+                        if (!q) return true;
+                        return (
+                          (item.name && item.name.toLowerCase().includes(q)) ||
+                          (item.nickname && item.nickname.toLowerCase().includes(q)) ||
+                          (item.topic && item.topic.toLowerCase().includes(q)) ||
+                          (item.keyword && item.keyword.toLowerCase().includes(q))
+                        );
+                      })
+                      .map((k, idx) => {
+                        const isSaving = savingKeywordId === k.id;
+                        return (
+                          <tr
+                            key={k.id || idx}
+                            style={{
+                              borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+                              background: idx % 2 === 0 ? "transparent" : "rgba(255, 255, 255, 0.02)",
+                            }}
+                          >
+                            <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.5)" }}>
+                              #{k.id}
+                            </td>
+                            <td style={{ padding: "12px 16px" }}>
+                              <div
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  background: "#030814",
+                                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <AdminPhotoPreview src={k.image} name={k.name} size={36} />
+                              </div>
+                            </td>
+                            <td style={{ padding: "12px 16px", fontWeight: "700", color: "#ffffff" }}>
+                              {k.name}
+                            </td>
+                            <td style={{ padding: "12px 16px", color: "#00e5ff", fontWeight: "700" }}>
+                              {k.nickname || "-"}
+                            </td>
+                            <td style={{ padding: "12px 16px", color: "#ffd700" }}>
+                              🏷️ {k.topic}
+                            </td>
+                            <td style={{ padding: "12px 16px" }}>
+                              <input
+                                type="text"
+                                value={k.keyword || ""}
+                                onChange={(e) => handleKeywordChange(k.id, e.target.value)}
+                                placeholder="เช่น ภัยพิบัติ หรือ [ยังไม่มี]"
+                                style={{
+                                  width: "100%",
+                                  background: "rgba(0, 0, 0, 0.5)",
+                                  border: "1px solid rgba(0, 229, 255, 0.35)",
+                                  borderRadius: "6px",
+                                  padding: "7px 12px",
+                                  color: "#ffd700",
+                                  fontWeight: "700",
+                                  fontSize: "14px",
+                                  outline: "none",
+                                  boxSizing: "border-box",
+                                }}
+                              />
+                            </td>
+                            <td style={{ padding: "12px 16px", textAlign: "center" }}>
+                              <button
+                                type="button"
+                                onClick={() => handleSaveKeyword(k.id, k.keyword)}
+                                disabled={isSaving}
+                                style={{
+                                  padding: "6px 14px",
+                                  borderRadius: "6px",
+                                  background: isSaving
+                                    ? "rgba(255, 255, 255, 0.1)"
+                                    : "rgba(0, 229, 255, 0.2)",
+                                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                                  color: "#00e5ff",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                  cursor: isSaving ? "not-allowed" : "pointer",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {isSaving ? "⏳" : "💾 บันทึก"}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 6: กระดานถามทีมงาน (STAFF Q&A BOARD)
+           ======================================================== */}
+        {activeTab === "qaBoard" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            {/* Header */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.8) 0%, rgba(10, 20, 40, 0.9) 100%)",
+                border: "1px solid rgba(255, 215, 0, 0.35)",
+                borderRadius: "16px",
+                padding: "20px 24px",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "16px",
+              }}
+            >
+              <div>
+                <h2 style={{ fontSize: "18px", fontWeight: "800", color: "#ffd700", margin: "0 0 6px" }}>
+                  💬 จัดการกระดานถามทีมงาน (Staff Q&A Board)
+                </h2>
+                <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.6)", margin: 0 }}>
+                  เพิ่ม/แก้ไข/ลบ ข้อซักถามของผู้เข้าแข่งขัน พร้อมคำตอบอย่างเป็นทางการจากทีมงาน (รองรับการก็อปปี้ format จาก Discord มาแปะได้ทันที)
+                </p>
+              </div>
+
+              <Link
+                href="/trial-foty/info"
+                target="_blank"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  background: "rgba(255, 215, 0, 0.15)",
+                  border: "1px solid rgba(255, 215, 0, 0.4)",
+                  color: "#ffd700",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                👁️ ดูกระดานหน้าเว็บ ↗
+              </Link>
+            </div>
+
+            {/* QA Editor Form */}
+            <div
+              id="adminQaFormSection"
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(6, 14, 28, 0.95) 100%)",
+                border: "1.5px solid rgba(0, 229, 255, 0.35)",
+                borderRadius: "16px",
+                padding: "24px",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "20px",
+                  paddingBottom: "12px",
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                <h3 style={{ margin: 0, fontSize: "17px", color: qaForm.id ? "#ffd700" : "#00e5ff", fontWeight: "800" }}>
+                  {qaForm.id ? "✏️ แก้ไขข้อซักถาม-ตอบ" : "➕ เพิ่มข้อซักถาม-ตอบใหม่"}
+                </h3>
+                {qaForm.id && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEditQa}
+                    style={{
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      color: "#94a3b8",
+                      padding: "4px 12px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ยกเลิกการแก้ไข
+                  </button>
+                )}
+              </div>
+
+              <form onSubmit={handleSaveQa} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                {/* Field 1: Contestant Selector Dropdown */}
+                <div>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "700", color: "#e2e8f0", marginBottom: "8px" }}>
+                    👤 หัวข้อผู้เข้าแข่งขัน:
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    {(() => {
+                      const sel =
+                        contestants.find((c) => String(c.id) === String(qaForm.contestantId)) ||
+                        infoKeywords.find((k) => String(k.id) === String(qaForm.contestantId));
+                      return (
+                        <div
+                          onClick={() => setShowQaDropdown((prev) => !prev)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: "12px",
+                            padding: "10px 16px",
+                            borderRadius: "10px",
+                            background: "rgba(0, 15, 30, 0.9)",
+                            border: showQaDropdown ? "1.5px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.4)",
+                            cursor: "pointer",
+                            minHeight: "52px",
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          {!sel ? (
+                            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>
+                              -- กรุณาเลือกผู้เข้าแข่งขันที่สอบถาม --
+                            </span>
+                          ) : (
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1, minWidth: 0 }}>
+                              <span
+                                style={{
+                                  padding: "3px 8px",
+                                  borderRadius: "6px",
+                                  background: "rgba(0, 229, 255, 0.15)",
+                                  border: "1px solid #00e5ff",
+                                  color: "#00e5ff",
+                                  fontSize: "12px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                #{sel.id}
+                              </span>
+                              <div
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "50%",
+                                  overflow: "hidden",
+                                  background: "#030814",
+                                  border: "1.5px solid #00e5ff",
+                                  flexShrink: 0,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <AdminPhotoPreview src={sel.image} name={sel.name} size={36} />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <strong style={{ fontSize: "15px", color: "#ffffff" }}>
+                                    {sel.name}
+                                  </strong>
+                                  {sel.nickname && (
+                                    <span style={{ fontSize: "13px", color: "#00e5ff", fontWeight: "700" }}>
+                                      ({sel.nickname})
+                                    </span>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: "12px", color: "#ffd700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  🏷️ {sel.topic}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          <span style={{ color: "#00e5ff", fontSize: "14px" }}>
+                            {showQaDropdown ? "▲" : "▼"}
+                          </span>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Dropdown Menu */}
+                    {showQaDropdown && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "100%",
+                          left: 0,
+                          right: 0,
+                          marginTop: "6px",
+                          background: "#040d1a",
+                          border: "1.5px solid #00e5ff",
+                          borderRadius: "12px",
+                          boxShadow: "0 12px 36px rgba(0, 0, 0, 0.8)",
+                          zIndex: 200,
+                          maxHeight: "320px",
+                          display: "flex",
+                          flexDirection: "column",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div style={{ padding: "10px 12px", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
+                          <input
+                            type="text"
+                            placeholder="ค้นหาชื่อ, ชื่อเล่น หรือหัวข้อ..."
+                            value={qaContestantSearch}
+                            onChange={(e) => setQaContestantSearch(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              width: "100%",
+                              background: "rgba(0, 0, 0, 0.6)",
+                              border: "1px solid rgba(0, 229, 255, 0.3)",
+                              borderRadius: "8px",
+                              padding: "8px 12px",
+                              color: "#ffffff",
+                              fontSize: "13px",
+                              outline: "none",
+                              boxSizing: "border-box",
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ overflowY: "auto", flex: 1 }}>
+                          {contestants
+                            .filter((c) => {
+                              const q = qaContestantSearch.trim().toLowerCase();
+                              if (!q) return true;
+                              return (
+                                (c.name && c.name.toLowerCase().includes(q)) ||
+                                (c.nickname && c.nickname.toLowerCase().includes(q)) ||
+                                (c.topic && c.topic.toLowerCase().includes(q))
+                              );
+                            })
+                            .map((c) => (
+                              <div
+                                key={c.id}
+                                onClick={() => handleSelectQaContestant(c)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  padding: "10px 14px",
+                                  cursor: "pointer",
+                                  borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                                  background:
+                                    String(qaForm.contestantId) === String(c.id)
+                                      ? "rgba(0, 229, 255, 0.15)"
+                                      : "transparent",
+                                  transition: "background 0.15s ease",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    padding: "2px 6px",
+                                    borderRadius: "4px",
+                                    background: "rgba(0, 229, 255, 0.1)",
+                                    color: "#00e5ff",
+                                    fontSize: "11px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  #{c.id}
+                                </span>
+                                <div
+                                  style={{
+                                    width: "30px",
+                                    height: "30px",
+                                    borderRadius: "50%",
+                                    overflow: "hidden",
+                                    background: "#030814",
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <AdminPhotoPreview src={c.image} name={c.name} size={30} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff" }}>
+                                    {c.name} {c.nickname ? `(${c.nickname})` : ""}
+                                  </div>
+                                  <div style={{ fontSize: "11px", color: "#ffd700", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {c.topic}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Field 2: Category Selector */}
+                <div>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "700", color: "#e2e8f0", marginBottom: "8px" }}>
+                    หมวดที่ผู้เข้าแข่งขันสอบถาม:
+                  </label>
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                    {[
+                      { key: "3 วินาที", icon: "⏱️", color: "#38bdf8" },
+                      { key: "คำถาม-คำตอบ", icon: "❓", color: "#c084fc" },
+                      { key: "จิ๊กซอว์", icon: "🧩", color: "#fb923c" },
+                      { key: "คุณสมบัติ", icon: "🔍", color: "#4ade80" },
+                    ].map((cat) => {
+                      const isSel = qaForm.category === cat.key;
+                      return (
+                        <button
+                          key={cat.key}
+                          type="button"
+                          onClick={() => setQaForm((prev) => ({ ...prev, category: cat.key }))}
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: "10px",
+                            background: isSel ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                            border: `1.5px solid ${isSel ? cat.color : "rgba(255, 255, 255, 0.15)"}`,
+                            color: isSel ? cat.color : "#94a3b8",
+                            fontSize: "13px",
+                            fontWeight: "800",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          <span>{cat.icon}</span>
+                          <span>{cat.key}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Field 3: Question Textarea + Live Discord Preview */}
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "700", color: "#e2e8f0" }}>
+                      🙋‍♂️ คำถามจากผู้เข้าแข่งขัน:
+                    </label>
+                    <span style={{ fontSize: "11px", color: "#64748b" }}>
+                      รองรับ Discord: **หนา**, *เอียง*, __ขีดเส้นใต้__, ||สปอยล์||, `โค้ด`, &gt; อ้างอิง
+                    </span>
+                  </div>
+                  <textarea
+                    rows={4}
+                    placeholder="พิมพ์คำถาม หรือก็อปปี้ format ข้อความจาก Discord มาแปะได้ทันที..."
+                    value={qaForm.question}
+                    onChange={(e) => setQaForm((prev) => ({ ...prev, question: e.target.value }))}
+                    style={{
+                      width: "100%",
+                      background: "rgba(0, 15, 30, 0.8)",
+                      border: "1px solid rgba(0, 229, 255, 0.35)",
+                      borderRadius: "10px",
+                      padding: "12px 14px",
+                      color: "#ffffff",
+                      fontSize: "14px",
+                      outline: "none",
+                      boxSizing: "border-box",
+                      fontFamily: "inherit",
+                      lineHeight: 1.5,
+                    }}
+                  />
+                  {qaForm.question.trim() && (
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px dashed rgba(0, 229, 255, 0.3)",
+                        borderRadius: "8px",
+                        padding: "10px 14px",
+                      }}
+                    >
+                      <div style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700", marginBottom: "4px" }}>
+                        👁️ ตัวอย่างข้อความคำถาม (Live Preview):
+                      </div>
+                      <DiscordMarkdown content={qaForm.question} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Field 4: Staff Answer Textarea + Live Discord Preview */}
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "700", color: "#ffd700" }}>
+                      🛡️ คำตอบจากทีมงาน:
+                    </label>
+                    <span style={{ fontSize: "11px", color: "#64748b" }}>
+                      คำชี้แจงกติกาหรือคำตอบอย่างเป็นทางการ
+                    </span>
+                  </div>
+                  <textarea
+                    rows={5}
+                    placeholder="พิมพ์คำตอบจากทีมงาน..."
+                    value={qaForm.answer}
+                    onChange={(e) => setQaForm((prev) => ({ ...prev, answer: e.target.value }))}
+                    style={{
+                      width: "100%",
+                      background: "rgba(0, 15, 30, 0.8)",
+                      border: "1px solid rgba(255, 215, 0, 0.35)",
+                      borderRadius: "10px",
+                      padding: "12px 14px",
+                      color: "#ffffff",
+                      fontSize: "14px",
+                      outline: "none",
+                      boxSizing: "border-box",
+                      fontFamily: "inherit",
+                      lineHeight: 1.5,
+                    }}
+                  />
+                  {qaForm.answer.trim() && (
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px dashed rgba(255, 215, 0, 0.3)",
+                        borderRadius: "8px",
+                        padding: "10px 14px",
+                      }}
+                    >
+                      <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700", marginBottom: "4px" }}>
+                        👁️ ตัวอย่างข้อความคำตอบ (Live Preview):
+                      </div>
+                      <DiscordMarkdown content={qaForm.answer} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Submit Action */}
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "8px" }}>
+                  {qaForm.id && (
+                    <button
+                      type="button"
+                      onClick={handleCancelEditQa}
+                      style={{
+                        padding: "10px 20px",
+                        borderRadius: "8px",
+                        background: "rgba(255, 255, 255, 0.08)",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        color: "#94a3b8",
+                        fontSize: "14px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ยกเลิก
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={savingQa}
+                    style={{
+                      padding: "11px 28px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(135deg, #ffd700, #f59e0b)",
+                      border: "none",
+                      color: "#030814",
+                      fontSize: "14px",
+                      fontWeight: "900",
+                      cursor: savingQa ? "not-allowed" : "pointer",
+                      boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
+                    }}
+                  >
+                    {savingQa ? "⏳ กำลังบันทึก..." : qaForm.id ? "💾 บันทึกการแก้ไข" : "💾 บันทึกและขึ้นกระดาน"}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* List of Existing QA Items */}
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                  marginBottom: "16px",
+                }}
+              >
+                <h3 style={{ margin: 0, fontSize: "16px", color: "#ffffff", fontWeight: "800" }}>
+                  📋 รายการข้อซักถามทั้งหมด ({infoQaBoard.length} รายการ)
+                </h3>
+
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <input
+                    type="text"
+                    placeholder="ค้นหาตามชื่อ/หัวข้อ/ข้อความ..."
+                    value={qaAdminSearch}
+                    onChange={(e) => setQaAdminSearch(e.target.value)}
+                    style={{
+                      background: "rgba(0, 15, 30, 0.8)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "8px",
+                      padding: "6px 12px",
+                      color: "#ffffff",
+                      fontSize: "13px",
+                      outline: "none",
+                    }}
+                  />
+                  <select
+                    value={qaCategoryFilter}
+                    onChange={(e) => setQaCategoryFilter(e.target.value)}
+                    style={{
+                      background: "rgba(0, 15, 30, 0.8)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "8px",
+                      padding: "6px 12px",
+                      color: "#ffffff",
+                      fontSize: "13px",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="all">ทุกหมวด</option>
+                    <option value="3 วินาที">⏱️ 3 วินาที</option>
+                    <option value="คำถาม-คำตอบ">❓ คำถาม-คำตอบ</option>
+                    <option value="จิ๊กซอว์">🧩 จิ๊กซอว์</option>
+                    <option value="คุณสมบัติ">🔍 คุณสมบัติ</option>
+                  </select>
+                </div>
+              </div>
+
+              {infoQaBoard.length === 0 ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "40px 20px",
+                    background: "rgba(10, 20, 40, 0.4)",
+                    borderRadius: "14px",
+                    border: "1px dashed rgba(255, 255, 255, 0.15)",
+                    color: "#94a3b8",
+                  }}
+                >
+                  ยังไม่มีข้อซักถามในระบบ
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  {infoQaBoard
+                    .filter((item) => {
+                      if (qaCategoryFilter !== "all" && item.category !== qaCategoryFilter) return false;
+                      const q = qaAdminSearch.trim().toLowerCase();
+                      if (!q) return true;
+                      return (
+                        (item.contestantName && item.contestantName.toLowerCase().includes(q)) ||
+                        (item.nickname && item.nickname.toLowerCase().includes(q)) ||
+                        (item.topic && item.topic.toLowerCase().includes(q)) ||
+                        (item.question && item.question.toLowerCase().includes(q)) ||
+                        (item.answer && item.answer.toLowerCase().includes(q))
+                      );
+                    })
+                    .map((item) => {
+                      const matched =
+                        contestants.find((c) => String(c.id) === String(item.contestantId)) ||
+                        infoKeywords.find((k) => String(k.id) === String(item.contestantId));
+                      const isDeleting = deletingQaId === item.id;
+
+                      return (
+                        <div
+                          key={item.id}
+                          style={{
+                            background: "rgba(10, 20, 40, 0.75)",
+                            border: "1px solid rgba(0, 229, 255, 0.25)",
+                            borderRadius: "14px",
+                            padding: "18px 20px",
+                          }}
+                        >
+                          {/* Header */}
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              flexWrap: "wrap",
+                              gap: "10px",
+                              marginBottom: "12px",
+                              paddingBottom: "10px",
+                              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                              <div
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  background: "#030814",
+                                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <AdminPhotoPreview
+                                  src={matched?.image}
+                                  name={item.contestantName}
+                                  size={36}
+                                />
+                              </div>
+                              <div>
+                                <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>
+                                  {item.contestantName} {item.nickname ? `(${item.nickname})` : ""}
+                                </div>
+                                <div style={{ fontSize: "12px", color: "#ffd700" }}>
+                                  🏷️ {item.topic}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <span
+                                style={{
+                                  background: "rgba(0, 229, 255, 0.15)",
+                                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                                  color: "#00e5ff",
+                                  padding: "3px 10px",
+                                  borderRadius: "8px",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                }}
+                              >
+                                หมวด: {item.category}
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={() => handleEditQa(item)}
+                                style={{
+                                  background: "rgba(255, 215, 0, 0.15)",
+                                  border: "1px solid rgba(255, 215, 0, 0.4)",
+                                  color: "#ffd700",
+                                  padding: "4px 10px",
+                                  borderRadius: "6px",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                ✏️ แก้ไข
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteQa(item.id)}
+                                disabled={isDeleting}
+                                style={{
+                                  background: "rgba(239, 68, 68, 0.15)",
+                                  border: "1px solid rgba(239, 68, 68, 0.4)",
+                                  color: "#fca5a5",
+                                  padding: "4px 10px",
+                                  borderRadius: "6px",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                  cursor: isDeleting ? "not-allowed" : "pointer",
+                                }}
+                              >
+                                {isDeleting ? "⏳" : "🗑️ ลบ"}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Question */}
+                          <div
+                            style={{
+                              background: "rgba(0, 0, 0, 0.3)",
+                              padding: "10px 14px",
+                              borderRadius: "8px",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "700", marginBottom: "4px" }}>
+                              คำถาม:
+                            </div>
+                            <DiscordMarkdown content={item.question} />
+                          </div>
+
+                          {/* Answer */}
+                          <div
+                            style={{
+                              background: "rgba(255, 215, 0, 0.05)",
+                              border: "1px solid rgba(255, 215, 0, 0.2)",
+                              padding: "10px 14px",
+                              borderRadius: "8px",
+                            }}
+                          >
+                            <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700", marginBottom: "4px" }}>
+                              คำตอบจากทีมงาน:
+                            </div>
+                            <DiscordMarkdown content={item.answer} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
             </div>
           </div>
         )}
