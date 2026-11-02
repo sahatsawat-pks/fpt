@@ -16,63 +16,19 @@
     "updatedAt": "2026-11-02T15:35:26.850Z"
   },
   {
-    "id": "1793634936579",
-    "name": "เจษฎาพร ศรีมาตย์",
-    "nickname": "ออมสิน",
-    "topic": "Five Night at Freddy's",
-    "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
-    },
-    "totalScore": 0,
-    "image": "",
-    "createdAt": "2026-11-02T15:55:36.716Z"
-  },
-  {
-    "id": "1793635002863",
-    "name": ".",
-    "nickname": ".",
-    "topic": ".",
-    "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
-    },
-    "totalScore": 0,
-    "image": "",
-    "createdAt": "2026-11-02T15:56:42.912Z"
-  },
-  {
-    "id": "1793635291832",
-    "name": "เจษฎาพร ศรีมาตย์",
-    "nickname": "ออมสิน",
-    "topic": "Five Night at Freddy's",
-    "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
-    },
-    "totalScore": 0,
-    "image": "",
-    "createdAt": "2026-11-02T16:01:31.969Z"
-  },
-  {
     "id": "1793635389630",
     "name": "เจษฎาพร ศรีมาตย์",
     "nickname": "ออมสิน",
     "topic": "Five Night at Freddy's",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 9,
+      "qa": 0,
+      "jigsaw": 20,
+      "attribute": 0
     },
-    "totalScore": 0,
+    "totalScore": 29,
     "image": "",
-    "createdAt": "2026-11-02T16:03:09.746Z"
+    "createdAt": "2026-11-02T16:03:09.746Z",
+    "updatedAt": "2026-11-02T17:01:39.567Z"
   }
 ]

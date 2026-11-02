@@ -1,229 +1,229 @@
 /*
- * ============================================
- *  CONFIG - สุดยอดแฟนพันธุ์แห่งปี 2026
- * ============================================
+- ============================================
+-  CONFIG - สุดยอดแฟนพันธุ์แห่งปี 2026
+- ============================================
  *
- *  แก้ไขข้อมูลด้านล่างเพื่อกำหนดคำถามและคำตอบ
- *  สำหรับแต่ละหมวดของเกม
+-  แก้ไขข้อมูลด้านล่างเพื่อกำหนดคำถามและคำตอบ
+-  สำหรับแต่ละหมวดของเกม
  *
  */
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
-        "หุ่น Animatronics ที่ได้ยินต่อไปนี้ ปรากฎตัวครั้งแรกในเกมภาคใด",
-        "จงตอบคำถามต่อไปนี้ให้ถูกต้อง"
+        "นี่คือตัวละครที่มีชื่อว่าอะไร",
+        "นี่คือคุณสมบัติของตัวละครที่มีชื่อว่าอะไร",
+        "นี่คือภาพจากคดีที่มีชื่อว่าอะไร"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "Freddy Fazbear"
+            "answer": "โมริ โคโกโร่"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "Withered Bonnie"
+            "answer": "โมริ รัน"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "Foxy the Pirate Fox"
+            "answer": "คิซากิ เอริ"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "The Puppet (Marionette)"
+            "answer": "รัม"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "Scrap Baby"
+            "answer": "ซึบุรายะ มิซึฮิโกะ"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "Ennard"
+            "answer": "นากาโมริ กินโซ"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "Dee Dee"
+            "answer": "เคียวโงคุ มาโคโตะ"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "Jackie"
+            "answer": "เคียนติ"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "Lefty"
+            "answer": "มิยาโมโตะ ยูมิ"
         },
         {
-            "question": "นี่คือหุ่น Animatronics ที่มีชื่อว่าอะไร",
+            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "Nightmare Chica"
+            "answer": "ฮัตโตริ เฮย์จิ"
         },
         {
-            "question": "Springtrap",
+            "question": "คู่ปรับตลอดกาลของโคนัน ผู้มีฉายาว่า \"1412\"",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's 3"
+            "answer": "จอมโจรคิด (คุโรบะ ไคโตะ)"
         },
         {
-            "question": "Mangle",
+            "question": "นักประดิษฐ์ข้างบ้านคุโด้ ผู้สร้างอุปกรณ์อัจฉริยะมามากล้น",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's 2"
+            "answer": "อากาสะ ฮิโรชิ"
         },
         {
-            "question": "Funtime Freddy",
+            "question": "สมาชิกขององค์กรชุดดำ ที่ดวงสุดซวย หยิบกระเป๋าผิดไปโดนระเบิดตาย",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's: Sister Location"
+            "answer": "Tequila (เตกีล่า)"
         },
         {
-            "question": "Mr. Hippo",
+            "question": "เจ้าหน้าที่ FBI ที่ต้องหนีหัวซุกหัวซุน จนต้องโกนหัวเพื่อหนีจากองค์กรชุดดำ",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Freddy Fazbear's Pizzeria Simulator"
+            "answer": "อังเดร คาเมล"
         },
         {
-            "question": "Roxanne Wolf",
+            "question": "เจ้าหนุ่มจอมซุ่มซ่าม ที่ทั้งพ่อและพี่ เป็นคนจากสำนักข่าวกองกลางทั้งคู่",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's: Security Breach"
+            "answer": "ฮอนโด เอย์ซูเกะ"
         },
         {
-            "question": "Plushtrap",
+            "question": "ตัวละครเพียงตัวเดียวในเรื่อง ที่มีชื่อ-นามสกุลตรงกับชื่อนักพากย์ญี่ปุ่นเป๊ะ ๆ",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's 4"
+            "answer": "ทาคางิ วาตารุ"
         },
         {
-            "question": "Nurse Dollie",
+            "question": "1 ในขบวนการนักสืบเยาวชน ที่มีนักพากย์เดียวกับทาคางิ วาตารุ",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's: Secret of the Mimic"
+            "answer": "โคจิมะ เก็นตะ"
         },
         {
-            "question": "Lolbit",
+            "question": "สมาชิกองค์กรชุดดำที่ปรากฎตัวครั้งแรกในเดอะมูฟวี่ 26 แล้วก็ตายในภาคเดียวกัน",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's: Sister Location"
+            "answer": "Pinga (ปิงก้า)"
         },
         {
-            "question": "Liberty Chica",
+            "question": "ฆาตกรผู้เปลี่ยนความคิดโคนันไปตลอดกาล จากการโดนไล่ต้อน สู่การฆ่าตัวตายพร้อมเปียโนใต้แสงจันทร์",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's AR: Special Delivery"
+            "answer": "อาซาอิ นารูมิ / อาโซ่ เซย์จิ"
         },
         {
-            "question": "Golden Freddy",
+            "question": "ไม่มีใครรู้ว่าเขาคือใคร แต่ตัวตนสีดำเมี่ยมนี้ ดันมีชื่อเรียกทางการด้วย",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Five Nights at Freddy's"
+            "answer": "ฮันซาวะ"
         },
         {
-            "question": "หากไม่นับ Endoskeleton ในเกม Five Nights at Freddy's ภาคแรก มีหุ่น Animatronics ที่ทำร้ายเราได้ทั้งหมดกี่ตัว",
-            "image": null,
+            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
+            "image": "public/img/21.png",
             "audio": null,
             "video": null,
-            "answer": "5 ตัว"
+            "answer": "คดีฆาตกรรมบนรถไฟเหาะ"
         },
         {
-            "question": "Michael Afton ถูก Hand Unit ตั้งชื่อในเกม Five Nights at Freddy's: Sister Location ว่าอะไร",
-            "image": null,
+            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
+            "image": "public/img/22.png",
             "audio": null,
             "video": null,
-            "answer": "Egg Benedict"
+            "answer": "คดีฆาตกรรมเปียโนโซนาต้า แสงจันทร์"
         },
         {
-            "question": "เด็กที่เป็นตัวละครหลักประจำเกม Five Nights at Freddy's: Into the Pit มีชื่อว่าอะไร",
-            "image": null,
+            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
+            "image": "public/img/23.png",
             "audio": null,
             "video": null,
-            "answer": "Oswald"
+            "answer": "กรมตำรวจสั่นคลอน ตัวประกัน 12 ล้านคน"
         },
         {
-            "question": "วิญญาณเด็กที่กักขัง William Afton ไว้ในมิติ Ultimate Custom Night มีชื่อว่าอะไร",
-            "image": null,
+            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
+            "image": "public/img/24.png",
             "audio": null,
             "video": null,
-            "answer": "Cassidy"
+            "answer": "การกลับมาของสีแดงเข้ม"
         },
         {
-            "question": "เวลาในการทำงานกะกลางคืนประจำร้าน Freddy Fazbear Pizza คือตั้งแต่เที่ยงคืนถึงกี่โมง",
-            "image": null,
+            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
+            "image": "public/img/25.png",
             "audio": null,
             "video": null,
-            "answer": "06.00 น."
+            "answer": "คดีฆาตกรรมในห้องสมุด"
         }
     ],
     "qa": {
-        "question": "ในเกม Ultimate Custom Night โหมด 50/20 เมื่อหุ่น X.O.R. ปรากฎตัว จะบังคับเพิ่มหุ่น Animatronics อีกกี่ตัว หุ่นแต่ละตัวจะเพิ่มเข้ามาด้วยระยะเวลาที่ห่างกันกี่วินาที",
-        "answer": "6 ตัว / 7 วินาที",
+        "question": "\"Karasuma Renya\" มีการพูดถึงครั้งแรกในมังงะเล่มที่เท่าไหร่, File ที่เท่าไหร่ และในฉบับอนิเมะ มีการพูดถึงครั้งแรกในตอนที่มีชื่อว่าอะไร",
+        "answer": "เล่มที่ 30 / File 300 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
         "choices": [
-            "5 ตัว / 7 วินาที",
-            "5 ตัว / 9 วินาที",
-            "6 ตัว / 7 วินาที",
-            "6 ตัว / 9 วินาที",
-            "ไม่ได้มีการเพิ่มหุ่นเข้ามาใหม่"
+            "เล่มที่ 10 / File 100 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
+            "เล่มที่ 20 / File 200 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
+            "เล่มที่ 30 / File 300 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
+            "เล่มที่ 40 / File 400 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
+            "เล่มที่ 50 / File 500 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
-            4,
             1,
-            2
+            2,
+            4
         ]
     },
     "jigsaw": {
         "mode": "square",
         "image": "public/img/jigsaw.png",
-        "answer": "Freddy Fazbear",
-        "question": "หลังจิ๊กซอว์นี้ นี่คือภาพจากตัวละครจากเกม Five Night at Freddy ที่มีชื่อว่าอะไร"
+        "answer": "มัตสึดะ จิมเปย์",
+        "question": "หลังจิ๊กซอว์นี้ นี่คือตัวละครในยอดนักสืบจิ๋วโคนันที่มีชื่อว่าอะไร"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของหุ่น Animatronics หรือตัวละครในเกม Five Night at Freddy's ที่มีชื่อว่าอะไร",
+        "question": "นี่คือคุณสมบัติของตัวละครที่มีชื่อว่าอะไร",
         "clues": [
-            "1 ในตัวละครที่ผู้เล่นจะได้รับบทบาทในเกม",
-            "ไม่ได้สิงร่างในหุ่น Animatronics",
-            "เป็นสมาชิกครอบครัว Afton",
-            "เสียชีวิตแล้ว",
-            "เพศชาย"
+            "1 ในสมาชิกองค์กรชุดดำ",
+            "ยังมีชีวิตอยู่",
+            "เป็นนักวิทยาศาสตร์",
+            "เพศหญิง",
+            "1 ในผู้ถูกกินยาพิษ APTX4869"
         ],
-        "answer": "Michael Afton"
+        "answer": "Sherry"
     },
     "battle": {
         "player1": {
