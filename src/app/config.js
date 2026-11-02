@@ -10,220 +10,220 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือตัวละครที่มีชื่อว่าอะไร",
-        "นี่คือคุณสมบัติของตัวละครที่มีชื่อว่าอะไร",
-        "นี่คือภาพจากคดีที่มีชื่อว่าอะไร"
+        "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+        "ไอดอลต่อไปนี้ประจำสังกัดใด?",
+        "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "โมริ โคโกโร่"
+            "answer": "Takatsuki Yayoi"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "โมริ รัน"
+            "answer": "Kisaragi Chihaya"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "คิซากิ เอริ"
+            "answer": "Futaba Anzu"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "รัม"
+            "answer": "Kanzaki Ranko"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "ซึบุรายะ มิซึฮิโกะ"
+            "answer": "Kikuchi Makoto"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "นากาโมริ กินโซ"
+            "answer": "Mizushima Saki"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "เคียวโงคุ มาโคโตะ"
+            "answer": "Pierre"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "เคียนติ"
+            "answer": "Shinosawa Hiro"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "มิยาโมโตะ ยูมิ"
+            "answer": "Higuchi Madoka"
         },
         {
-            "question": "นี่คือตัวละครที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "ฮัตโตริ เฮย์จิ"
+            "answer": "Hoshimachi Suisei"
         },
         {
-            "question": "คู่ปรับตลอดกาลของโคนัน ผู้มีฉายาว่า \"1412\"",
+            "question": "Amami Haruka",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "จอมโจรคิด (คุโรบะ ไคโตะ)"
+            "answer": "765 Production"
         },
         {
-            "question": "นักประดิษฐ์ข้างบ้านคุโด้ ผู้สร้างอุปกรณ์อัจฉริยะมามากล้น",
+            "question": "Honda Mio",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "อากาสะ ฮิโรชิ"
+            "answer": "CINDERELLA GIRLS"
         },
         {
-            "question": "สมาชิกขององค์กรชุดดำ ที่ดวงสุดซวย หยิบกระเป๋าผิดไปโดนระเบิดตาย",
+            "question": "Tokugawa Matsuri",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Tequila (เตกีล่า)"
+            "answer": "MILLION LIVE!"
         },
         {
-            "question": "เจ้าหน้าที่ FBI ที่ต้องหนีหัวซุกหัวซุน จนต้องโกนหัวเพื่อหนีจากองค์กรชุดดำ",
+            "question": "Tsukimura Temari",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "อังเดร คาเมล"
+            "answer": "Hatsuboshi Gakuen"
         },
         {
-            "question": "เจ้าหนุ่มจอมซุ่มซ่าม ที่ทั้งพ่อและพี่ เป็นคนจากสำนักข่าวกองกลางทั้งคู่",
+            "question": "Ikaruga Luca",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "ฮอนโด เอย์ซูเกะ"
+            "answer": "283 Production"
         },
         {
-            "question": "ตัวละครเพียงตัวเดียวในเรื่อง ที่มีชื่อ-นามสกุลตรงกับชื่อนักพากย์ญี่ปุ่นเป๊ะ ๆ",
+            "question": "Himeno Kanon",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "ทาคางิ วาตารุ"
+            "answer": "315 Production"
         },
         {
-            "question": "1 ในขบวนการนักสืบเยาวชน ที่มีนักพากย์เดียวกับทาคางิ วาตารุ",
+            "question": "Shika",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "โคจิมะ เก็นตะ"
+            "answer": "961 Produciton"
         },
         {
-            "question": "สมาชิกองค์กรชุดดำที่ปรากฎตัวครั้งแรกในเดอะมูฟวี่ 26 แล้วก็ตายในภาคเดียวกัน",
+            "question": "Akizuki Ryo",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Pinga (ปิงก้า)"
+            "answer": "876 / 315 Production"
         },
         {
-            "question": "ฆาตกรผู้เปลี่ยนความคิดโคนันไปตลอดกาล จากการโดนไล่ต้อน สู่การฆ่าตัวตายพร้อมเปียโนใต้แสงจันทร์",
+            "question": "Okuzora Mayumi",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "อาซาอิ นารูมิ / อาโซ่ เซย์จิ"
+            "answer": "0936 Production"
         },
         {
-            "question": "ไม่มีใครรู้ว่าเขาคือใคร แต่ตัวตนสีดำเมี่ยมนี้ ดันมีชื่อเรียกทางการด้วย",
+            "question": "Minase Iori",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "ฮันซาวะ"
+            "answer": "765 Production"
         },
         {
-            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
-            "image": "public/img/21.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "image": null,
+            "audio": "public/audio/21.mp3",
             "video": null,
-            "answer": "คดีฆาตกรรมบนรถไฟเหาะ"
+            "answer": "GO MY WAY!!"
         },
         {
-            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
-            "image": "public/img/22.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "image": null,
+            "audio": "public/audio/22.mp3",
             "video": null,
-            "answer": "คดีฆาตกรรมเปียโนโซนาต้า แสงจันทร์"
+            "answer": "Step!"
         },
         {
-            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
-            "image": "public/img/23.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "image": null,
+            "audio": "public/audio/23.mp3",
             "video": null,
-            "answer": "กรมตำรวจสั่นคลอน ตัวประกัน 12 ล้านคน"
+            "answer": "Trinity Field"
         },
         {
-            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
-            "image": "public/img/24.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "image": null,
+            "audio": "public/audio/24.mp3",
             "video": null,
-            "answer": "การกลับมาของสีแดงเข้ม"
+            "answer": "vs.BELIEVERS"
         },
         {
-            "question": "นี่คือภาพจากคดีที่มีชื่อว่าอะไร",
-            "image": "public/img/25.png",
-            "audio": null,
+            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "image": null,
+            "audio": "public/audio/25.mp3",
             "video": null,
-            "answer": "คดีฆาตกรรมในห้องสมุด"
+            "answer": "READY!!"
         }
     ],
     "qa": {
-        "question": "\"Karasuma Renya\" มีการพูดถึงครั้งแรกในมังงะเล่มที่เท่าไหร่, File ที่เท่าไหร่ และในฉบับอนิเมะ มีการพูดถึงครั้งแรกในตอนที่มีชื่อว่าอะไร",
-        "answer": "เล่มที่ 30 / File 300 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
+        "question": "ยูนิต Virtual Idol เพียงหนึ่งเดียวที่ปรากฏใน THE iDOLM@STER มีชื่อว่าอะไร / อยู่ภายใต้สังกัดใด / สมาชิกประกอบไปด้วยใครบ้าง?",
+        "answer": "PROJECT vα-liv / 876 Production / Kamizuru Cosmo, Tomori Manaka, Letora",
         "choices": [
-            "เล่มที่ 10 / File 100 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
-            "เล่มที่ 20 / File 200 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
-            "เล่มที่ 30 / File 300 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
-            "เล่มที่ 40 / File 400 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด",
-            "เล่มที่ 50 / File 500 / รวมพลยอดนักสืบ! คุโด้ ชินอิจิ ปะทะ จอมโจรคิด"
+            "PROJECT vα-liv / 961 Production / Kamizuru Uchuu, Tomori Manaka, Letoria",
+            "PROJECT vα-liv / 961 Production / Uesugi Uchuu, Akarisato Manaka, Letora",
+            "PROJECT vα-liv / 876 Production / Uesugi Cosmo, Tomori Aika, Letoria",
+            "PROJECT vα-liv / 876 Production / Kamizuru Cosmo, Tomori Manaka, Letora",
+            "PROJECT vα-liv / 876 Production / Kamizuru Cosmo, Akarisato Aika, Letoria"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
-            1,
+            3,
             2,
-            4
+            1
         ]
     },
     "jigsaw": {
-        "mode": "square",
+        "mode": "portrait",
         "image": "public/img/jigsaw.png",
-        "answer": "มัตสึดะ จิมเปย์",
-        "question": "หลังจิ๊กซอว์นี้ นี่คือตัวละครในยอดนักสืบจิ๋วโคนันที่มีชื่อว่าอะไร"
+        "answer": "Hoshii Miki",
+        "question": "หลังจิ๊กซอว์นี้คือตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของตัวละครที่มีชื่อว่าอะไร",
+        "question": "นี่คือคุณสมบัติของตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
         "clues": [
-            "1 ในสมาชิกองค์กรชุดดำ",
-            "ยังมีชีวิตอยู่",
-            "เป็นนักวิทยาศาสตร์",
-            "เพศหญิง",
-            "1 ในผู้ถูกกินยาพิษ APTX4869"
+            "ชื่อ-นามสกุลรวมกันมี 5 พยางค์",
+            "ตาสีแดง",
+            "เกิดเดือนเมษายน",
+            "อยู่ในภาค CINDERELLA GIRLS กลุ่ม Cool",
+            "ผมสีเทา"
         ],
-        "answer": "Sherry"
+        "answer": "Kanzaki Ranko"
     },
     "battle": {
         "player1": {

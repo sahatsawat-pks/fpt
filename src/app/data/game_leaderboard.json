@@ -30,5 +30,36 @@
     "image": "",
     "createdAt": "2026-11-02T16:03:09.746Z",
     "updatedAt": "2026-11-02T17:01:39.567Z"
+  },
+  {
+    "id": "1793640592540",
+    "name": "นันทวัฒน์ สาริกา",
+    "nickname": "นัท",
+    "topic": "ยอดนักสืบจิ๋วโคนัน",
+    "scores": {
+      "3sec": 15,
+      "qa": 20,
+      "jigsaw": 0,
+      "attribute": 0
+    },
+    "totalScore": 35,
+    "image": "",
+    "createdAt": "2026-11-02T17:29:52.610Z",
+    "updatedAt": "2026-11-02T18:45:07.544Z"
+  },
+  {
+    "id": "1793646675313",
+    "name": "ธีรวีร์ จรูญศรีโชติ",
+    "nickname": "ชีส",
+    "topic": "iDOLM@STER",
+    "scores": {
+      "3sec": null,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "image": "",
+    "createdAt": "2026-11-02T19:11:15.518Z"
   }
 ]

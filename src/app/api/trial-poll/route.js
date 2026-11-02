@@ -94,31 +94,56 @@ function writeLocalPoll(data) {
 
 /**
  * Recalculate poll percentages:
- * 70% from Popular Votes (share of total vote points)
- * 30% from Warm-up Round What If? Score (share of total What If points, or out of 100)
+ * 70% from Popular Votes (share of total vote points, normalized)
+ * 30% from Warm-up Round What If? Score (30% weight out of 100 points)
+ * Total Score = (Vote 70%) + (What If 30%)
  */
 function computePollPercentages(items) {
   const totalVotes = items.reduce((sum, item) => sum + (Number(item.votes) || 0), 0);
   const totalWhatIf = items.reduce((sum, item) => sum + (Number(item.whatIfScore) || 0), 0);
+  const maxVotes = Math.max(...items.map((it) => Number(it.votes) || 0), 0);
 
-  return items.map((item) => {
+  // Compute 70% vote score and 30% What-If score for each contestant
+  const scoredItems = items.map((item) => {
     const v = Number(item.votes) || 0;
-    const w = Number(item.whatIfScore) || 0;
+    const w = Math.min(100, Math.max(0, Number(item.whatIfScore) || 0));
 
-    let finalPct = 0;
-    if (totalVotes > 0 && totalWhatIf > 0) {
-      const voteShare = (v / totalVotes) * 100;
-      const whatIfShare = (w / totalWhatIf) * 100;
-      finalPct = voteShare * 0.7 + whatIfShare * 0.3;
+    // What If (30% weight, max 30 points from 100)
+    const whatIfPts = (w / 100) * 30;
+
+    // Popular Vote (70% weight, max 70 points normalized to top vote)
+    let votePts70 = 0;
+    if (maxVotes > 0) {
+      votePts70 = (v / maxVotes) * 70;
     } else if (totalVotes > 0) {
-      finalPct = (v / totalVotes) * 100;
-    } else if (totalWhatIf > 0) {
-      finalPct = (w / totalWhatIf) * 100;
+      votePts70 = (v / totalVotes) * 70;
     }
+
+    // Total Score (out of 100)
+    const totalScore = Number((votePts70 + whatIfPts).toFixed(2));
 
     return {
       ...item,
       whatIfScore: w,
+      votes: v,
+      totalScore,
+    };
+  });
+
+  const sumTotalScores = scoredItems.reduce((sum, it) => sum + (it.totalScore || 0), 0);
+
+  return scoredItems.map((item) => {
+    let finalPct = 0;
+    if (sumTotalScores > 0) {
+      finalPct = (item.totalScore / sumTotalScores) * 100;
+    } else if (totalVotes > 0) {
+      finalPct = (item.votes / totalVotes) * 100;
+    } else if (totalWhatIf > 0) {
+      finalPct = (item.whatIfScore / totalWhatIf) * 100;
+    }
+
+    return {
+      ...item,
       percent: `${finalPct.toFixed(2)}%`,
     };
   });
@@ -279,6 +304,7 @@ export async function POST(request) {
           percent: String(item.percent || "").trim() || "0.00%",
           votes: Number(item.votes) || 0,
           whatIfScore: Math.min(100, Math.max(0, Number(item.whatIfScore) || 0)),
+          totalScore: Number(item.totalScore) || 0,
           championVotes: Number(item.championVotes) || 0,
           rankVotes:
             item.rankVotes && typeof item.rankVotes === "object"

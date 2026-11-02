@@ -346,6 +346,7 @@ export default function TrialAdminPage() {
   const handleAutoCalculatePercent = () => {
     const totalVotes = pollItems.reduce((sum, it) => sum + (Number(it.votes) || 0), 0);
     const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
+    const maxVotes = Math.max(...pollItems.map((it) => Number(it.votes) || 0), 0);
 
     if (totalVotes === 0 && totalWhatIf === 0) {
       showToast("ยังไม่มีคะแนนโหวตหรือคะแนนรอบอุ่นเครื่องในระบบ", "info");
@@ -353,30 +354,48 @@ export default function TrialAdminPage() {
     }
 
     setPollItems((prev) => {
-      const computed = prev.map((item) => {
+      // Step 1: Calculate totalScore (70% vote score + 30% What-If score out of 100)
+      const scoredItems = prev.map((item) => {
         const v = Number(item.votes) || 0;
-        const w = Number(item.whatIfScore) || 0;
+        const w = Math.min(100, Math.max(0, Number(item.whatIfScore) || 0));
 
-        let finalPct = 0;
-        if (totalVotes > 0 && totalWhatIf > 0) {
-          const voteShare = (v / totalVotes) * 100;
-          const whatIfShare = (w / totalWhatIf) * 100;
-          finalPct = voteShare * 0.7 + whatIfShare * 0.3;
+        // What If 30% (เต็ม 30 คะแนนจาก 100)
+        const whatIfPts = (w / 100) * 30;
+
+        // โพลล์มหาชน 70% (เต็ม 70 คะแนน เทียบสัดส่วนกับผู้ได้โหวตสูงสุด)
+        let votePts70 = 0;
+        if (maxVotes > 0) {
+          votePts70 = (v / maxVotes) * 70;
         } else if (totalVotes > 0) {
-          finalPct = (v / totalVotes) * 100;
+          votePts70 = (v / totalVotes) * 70;
+        }
+
+        const totalScore = Number((votePts70 + whatIfPts).toFixed(2));
+        return { ...item, whatIfScore: w, votes: v, totalScore };
+      });
+
+      const sumTotalScores = scoredItems.reduce((sum, it) => sum + (it.totalScore || 0), 0);
+
+      // Step 2: Compute percentage share in poll
+      const computed = scoredItems.map((item) => {
+        let finalPct = 0;
+        if (sumTotalScores > 0) {
+          finalPct = (item.totalScore / sumTotalScores) * 100;
+        } else if (totalVotes > 0) {
+          finalPct = (item.votes / totalVotes) * 100;
         } else if (totalWhatIf > 0) {
-          finalPct = (w / totalWhatIf) * 100;
+          finalPct = (item.whatIfScore / totalWhatIf) * 100;
         }
 
         return { ...item, percent: `${finalPct.toFixed(2)}%` };
       });
 
-      // Sort by percent descending
-      computed.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
+      // Sort by totalScore descending (then by percent)
+      computed.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
       return computed.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
     });
 
-    showToast("คำนวณ % โพลล์ (โหวต 70% + What If 30%) และจัดอันดับเรียบร้อยแล้ว");
+    showToast("คำนวณคะแนนรวม (โหวต 70% + What If 30%) และ % โพลล์เรียบร้อยแล้ว");
   };
 
   const handleAutoSortByVotes = () => {
@@ -2839,7 +2858,7 @@ export default function TrialAdminPage() {
                   </h2>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: 0, lineHeight: "1.6" }}>
                     ตารางนี้จะแสดงบนหน้าตารางคะแนน (/trial-foty) และหน้าโหวต (/trial-foty/vote)<br />
-                    💡 <strong>สูตรคะแนนโพลล์:</strong> คะแนนโหวตมหาชน (70%) + คะแนนรอบอุ่นเครื่อง What If? (30% เต็ม 100)<br />คุณสามารถใส่คะแนน What If?, แก้ไขคะแนนโหวต หรือกดปุ่ม <strong>"🧮 คำนวณ % โพลล์"</strong> แล้วกด <strong>"บันทึกผลโพลล์ทั้งหมด"</strong>
+                    💡 <strong>สูตรคะแนนโพลล์:</strong> คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100) คิดเป็นสัดส่วน <strong>30%</strong> (เต็ม 30 แต้ม) + คะแนนโหวตมหาชน คิดเป็นสัดส่วน <strong>70%</strong> (เต็ม 70 แต้ม) = <strong>คะแนนรวมเต็ม 100 แต้ม</strong><br />คุณสามารถใส่คะแนน What If?, แก้ไขคะแนนโหวต หรือกดปุ่ม <strong>"🧮 คำนวณ % โพลล์"</strong> แล้วกด <strong>"บันทึกผลโพลล์ทั้งหมด"</strong>
                   </p>
                 </div>
 
@@ -3247,26 +3266,29 @@ export default function TrialAdminPage() {
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "70px", color: "#ffd700", fontWeight: "800" }}>อันดับ</th>
                     <th rowSpan={2} style={{ padding: "10px 4px", textAlign: "center", width: "48px", color: "#80d0ff" }}>รูป</th>
                     <th rowSpan={2} style={{ padding: "10px 10px", textAlign: "left", minWidth: "160px", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "150px", minWidth: "150px", color: "#80d0ff" }}>ชื่อเล่น</th>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", minWidth: "180px", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
-                    <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "95px", color: "#ffd700", fontWeight: "900", background: "rgba(255, 215, 0, 0.1)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100) คิดเป็น 30% ของโพลล์">
-                      What If?<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#fef08a" }}>(เต็ม 100)</span>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "140px", minWidth: "140px", color: "#80d0ff" }}>ชื่อเล่น</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", minWidth: "170px", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
+                    <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "100px", color: "#ff8800", fontWeight: "900", background: "rgba(255, 136, 0, 0.12)", borderLeft: "1px solid rgba(255, 136, 0, 0.4)" }} title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100) คิดเป็นสัดส่วน 30% ของคะแนนรวม">
+                      What If?<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#ffedd5" }}>(30% • เต็ม 100)</span>
                     </th>
-                    <th colSpan={6} style={{ padding: "8px", textAlign: "center", color: "#ffd700", background: "rgba(255, 215, 0, 0.12)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)", borderRight: "1px solid rgba(255, 215, 0, 0.3)", fontWeight: "900", fontSize: "13px" }}>
-                      📊 จำนวนคนโหวตแยกอันดับ (Vote Breakdown - 70%)
+                    <th colSpan={7} style={{ padding: "8px", textAlign: "center", color: "#ffd700", background: "rgba(255, 215, 0, 0.12)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)", borderRight: "1px solid rgba(255, 215, 0, 0.3)", fontWeight: "900", fontSize: "13px" }}>
+                      📊 คะแนนโหวตมหาชน (70%)
                     </th>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "80px", color: "#67e8f9", fontWeight: "800" }}>คะแนนรวม</th>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "85px", color: "#ffd700", fontWeight: "800" }}>คิดเป็น %</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "105px", color: "#ffd700", fontWeight: "900", background: "rgba(255, 215, 0, 0.08)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="คะแนนรวมสุทธิเต็ม 100 (คำนวณจาก โพลล์มหาชน 70% + What If 30%)">
+                      ⭐ คะแนนรวม<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#fef08a" }}>(เต็ม 100)</span>
+                    </th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "85px", color: "#67e8f9", fontWeight: "900" }}>คิดเป็น %</th>
                     <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "76px", color: "#80d0ff" }}>เลื่อน</th>
                     <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "45px", color: "#80d0ff" }}>ลบ</th>
                   </tr>
                   <tr style={{ background: "rgba(255, 215, 0, 0.06)", borderBottom: "1px solid rgba(0, 229, 255, 0.2)" }}>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#ffd700", fontSize: "12px", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="อันดับ 1 (5 คะแนน)">🥇 #1</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#e2e8f0", fontSize: "12px" }} title="อันดับ 2 (4 คะแนน)">🥈 #2</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#cd7f32", fontSize: "12px" }} title="อันดับ 3 (3 คะแนน)">🥉 #3</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#38bdf8", fontSize: "12px" }} title="อันดับ 4 (2 คะแนน)">🎖️ #4</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#a855f7", fontSize: "12px" }} title="อันดับ 5 (1 คะแนน)">🎖️ #5</th>
-                    <th style={{ padding: "6px 2px", textAlign: "center", width: "52px", color: "#ffd700", fontSize: "12px", borderRight: "1px solid rgba(255, 215, 0, 0.3)" }} title="สุดยอดแฟนพันธุ์แท้ (10 คะแนน)">🏆 แชมป์</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#ffd700", fontSize: "12px", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="อันดับ 1 (5 คะแนน)">🥇 #1</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#e2e8f0", fontSize: "12px" }} title="อันดับ 2 (4 คะแนน)">🥈 #2</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#cd7f32", fontSize: "12px" }} title="อันดับ 3 (3 คะแนน)">🥉 #3</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#38bdf8", fontSize: "12px" }} title="อันดับ 4 (2 คะแนน)">🎖️ #4</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "48px", color: "#a855f7", fontSize: "12px" }} title="อันดับ 5 (1 คะแนน)">🎖️ #5</th>
+                    <th style={{ padding: "6px 2px", textAlign: "center", width: "50px", color: "#ffd700", fontSize: "12px" }} title="สุดยอดแฟนพันธุ์แท้ (10 คะแนน)">🏆 แชมป์</th>
+                    <th style={{ padding: "6px 4px", textAlign: "center", width: "70px", color: "#67e8f9", fontSize: "12px", borderRight: "1px solid rgba(255, 215, 0, 0.3)", fontWeight: "800" }} title="คะแนนรวมดิบเฉพาะจากการโหวตมหาชน">🗳️ รวมโหวต</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -3401,30 +3423,35 @@ export default function TrialAdminPage() {
                           />
                         </td>
 
-                        {/* What If Score Input (เต็ม 100) */}
-                        <td style={{ padding: "6px 4px", textAlign: "center", background: "rgba(255, 215, 0, 0.04)", borderLeft: "1px solid rgba(255, 215, 0, 0.2)" }}>
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={item.whatIfScore ?? 0}
-                            onChange={(e) => {
-                              const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                              handlePollFieldChange(index, "whatIfScore", val);
-                            }}
-                            title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100)"
-                            style={{
-                              width: "56px",
-                              padding: "6px 2px",
-                              borderRadius: "6px",
-                              background: "#050b14",
-                              border: "1px solid rgba(255, 215, 0, 0.6)",
-                              color: "#ffd700",
-                              fontSize: "13px",
-                              fontWeight: "900",
-                              textAlign: "center",
-                            }}
-                          />
+                        {/* What If Score Input (เต็ม 100, คิดเป็น 30%) */}
+                        <td style={{ padding: "6px 4px", textAlign: "center", background: "rgba(255, 136, 0, 0.05)", borderLeft: "1px solid rgba(255, 136, 0, 0.3)" }}>
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={item.whatIfScore ?? 0}
+                              onChange={(e) => {
+                                const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                handlePollFieldChange(index, "whatIfScore", val);
+                              }}
+                              title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100 คะแนน คิดเป็น 30% ของคะแนนรวม)"
+                              style={{
+                                width: "56px",
+                                padding: "6px 2px",
+                                borderRadius: "6px",
+                                background: "#050b14",
+                                border: "1px solid rgba(255, 136, 0, 0.7)",
+                                color: "#ff8800",
+                                fontSize: "13px",
+                                fontWeight: "900",
+                                textAlign: "center",
+                              }}
+                            />
+                            <span style={{ fontSize: "10px", color: "#fb923c", fontWeight: "700" }}>
+                              = {((Number(item.whatIfScore) || 0) * 0.3).toFixed(1)}/30
+                            </span>
+                          </div>
                         </td>
 
                         {/* Rank 1 votes */}
@@ -3538,7 +3565,7 @@ export default function TrialAdminPage() {
                         </td>
 
                         {/* Champion votes */}
-                        <td style={{ padding: "6px 2px", textAlign: "center", borderRight: "1px solid rgba(255, 215, 0, 0.15)" }}>
+                        <td style={{ padding: "6px 2px", textAlign: "center" }}>
                           <input
                             type="number"
                             min="0"
@@ -3559,17 +3586,17 @@ export default function TrialAdminPage() {
                           />
                         </td>
 
-                        {/* Total Score Input */}
-                        <td style={{ padding: "8px 6px", textAlign: "center" }}>
+                        {/* Raw Vote Sum */}
+                        <td style={{ padding: "6px 4px", textAlign: "center", borderRight: "1px solid rgba(255, 215, 0, 0.2)" }}>
                           <input
                             type="number"
                             min="0"
                             value={item.votes ?? 0}
                             onChange={(e) => handlePollFieldChange(index, "votes", Math.max(0, parseInt(e.target.value) || 0))}
-                            title="คะแนนรวมทั้งหมด (คำนวณจากโหวตอัตโนมัติ หรือแก้ไขได้)"
+                            title="คะแนนดิบจากการโหวตมหาชน (คำนวณจากจำนวนคนโหวตอัตโนมัติ หรือแก้ไขได้)"
                             style={{
-                              width: "65px",
-                              padding: "6px 4px",
+                              width: "56px",
+                              padding: "6px 2px",
                               borderRadius: "6px",
                               background: "#050b14",
                               border: "1px solid rgba(0, 229, 255, 0.4)",
@@ -3581,22 +3608,47 @@ export default function TrialAdminPage() {
                           />
                         </td>
 
+                        {/* Total Combined Score (Vote 70% + What If 30%) */}
+                        <td style={{ padding: "6px 6px", textAlign: "center", background: "rgba(255, 215, 0, 0.04)", borderLeft: "1px solid rgba(255, 215, 0, 0.2)" }}>
+                          {(() => {
+                            const w = Number(item.whatIfScore) || 0;
+                            const v = Number(item.votes) || 0;
+                            const maxV = Math.max(...pollItems.map((it) => Number(it.votes) || 0), 0);
+                            const votePts70 = maxV > 0 ? (v / maxV) * 70 : 0;
+                            const whatIfPts30 = (w / 100) * 30;
+                            const displayTotal = item.totalScore !== undefined && item.totalScore !== null
+                              ? Number(item.totalScore).toFixed(1)
+                              : (votePts70 + whatIfPts30).toFixed(1);
+
+                            return (
+                              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                                <span style={{ fontSize: "14px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 8px rgba(255,215,0,0.3)" }}>
+                                  {displayTotal}
+                                </span>
+                                <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)" }}>
+                                  (โหวต {votePts70.toFixed(1)} + WI {whatIfPts30.toFixed(1)})
+                                </span>
+                              </div>
+                            );
+                          })()}
+                        </td>
+
                         {/* Percent Input */}
-                        <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                        <td style={{ padding: "8px 6px", textAlign: "center" }}>
                           <input
                             type="text"
                             value={item.percent || ""}
                             onChange={(e) => handlePollFieldChange(index, "percent", e.target.value)}
                             placeholder="0.00%"
                             style={{
-                              width: "90px",
-                              padding: "8px 6px",
+                              width: "80px",
+                              padding: "6px 4px",
                               borderRadius: "6px",
                               background: "#050b14",
-                              border: "1px solid rgba(255, 215, 0, 0.4)",
-                              color: "#ffd700",
+                              border: "1px solid rgba(0, 229, 255, 0.4)",
+                              color: "#67e8f9",
                               fontSize: "13px",
-                              fontWeight: "700",
+                              fontWeight: "800",
                               textAlign: "center",
                             }}
                           />
