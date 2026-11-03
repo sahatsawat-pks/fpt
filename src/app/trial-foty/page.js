@@ -368,9 +368,10 @@ export default function TrialFOTYPage() {
 
   // Filtered Poll
   const filteredPoll = useMemo(() => {
+    const list = [...pollList].sort((a, b) => (Number(a.pollRank) || 999) - (Number(b.pollRank) || 999));
     const q = pollSearchQuery.trim().toLowerCase();
-    if (!q) return pollList;
-    return pollList.filter(
+    if (!q) return list;
+    return list.filter(
       (p) =>
         p.name?.toLowerCase().includes(q) ||
         p.nickname?.toLowerCase().includes(q) ||

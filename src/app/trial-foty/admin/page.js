@@ -384,10 +384,18 @@ export default function TrialAdminPage() {
 
   const handleAutoSortByVotes = () => {
     setPollItems((prev) => {
-      const sorted = [...prev].sort((a, b) => (Number(b.votes) || 0) - (Number(a.votes) || 0));
+      const sorted = [...prev].sort((a, b) => {
+        const pB = parseFloat(b.percent) || Number(b.totalScore) || 0;
+        const pA = parseFloat(a.percent) || Number(a.totalScore) || 0;
+        if (pB !== pA) return pB - pA;
+        const vB = Number(b.votes) || 0;
+        const vA = Number(a.votes) || 0;
+        if (vB !== vA) return vB - vA;
+        return (Number(b.whatIfScore) || 0) - (Number(a.whatIfScore) || 0);
+      });
       return sorted.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
     });
-    showToast("จัดเรียงอันดับโพลล์ตามคะแนนโหวต (มากไปน้อย) แล้ว");
+    showToast("จัดเรียงอันดับโพลล์ตามคะแนนโพลล์ % รวม (มากไปน้อย) แล้ว");
   };
 
   const handleSaveAllPoll = async () => {
@@ -2928,9 +2936,9 @@ export default function TrialAdminPage() {
                       alignItems: "center",
                       gap: "6px",
                     }}
-                    title="เรียงอันดับ 1 ถึง 40 ตามคะแนนโหวตมากไปน้อย"
+                    title="เรียงอันดับ 1 ถึง 40 ตามคะแนนโพลล์ % รวม (โหวต + What If) จากมากไปน้อย"
                   >
-                    📶 จัดอันดับตามคะแนนโหวต
+                    📶 จัดอันดับตามคะแนนโพลล์
                   </button>
 
                   <button
