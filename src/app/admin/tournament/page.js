@@ -762,11 +762,18 @@ export default function AdminTournamentPage() {
   // Open Edit Match Modal
   const handleOpenEditMatch = (match) => {
     setEditingMatch(match);
+    const hasAnyScores = ["3sec", "qa", "jigsaw", "attribute"].some(
+      (c) =>
+        (match.player1?.scores?.[c] !== null && match.player1?.scores?.[c] !== undefined && match.player1?.scores?.[c] !== "") ||
+        (match.player2?.scores?.[c] !== null && match.player2?.scores?.[c] !== undefined && match.player2?.scores?.[c] !== "")
+    );
+    const initialStatus = match.status || (hasAnyScores ? "completed" : "scheduled");
+
     setMatchFormData({
       id: match.id,
       matchNumber: match.matchNumber,
       group: match.group,
-      status: match.status || "completed",
+      status: initialStatus,
       winner: match.winner || null,
       player1: {
         name: match.player1?.name || "",
@@ -803,9 +810,9 @@ export default function AdminTournamentPage() {
     });
   };
 
-  // Auto Calculate points for current match in modal
-  const handleAutoCalculate = () => {
-    if (!matchFormData) return;
+  // Helper: compute category points (GP), raw sums, and LP
+  const computeMatchCalculations = (currentFormData, explicitStatus = null) => {
+    if (!currentFormData) return null;
     const cats = ["3sec", "qa", "jigsaw", "attribute"];
     let cp1 = 0;
     let cp2 = 0;
@@ -813,26 +820,38 @@ export default function AdminTournamentPage() {
     const parseNum = (v) => (v === "" || v === null || v === undefined ? null : Number(v));
 
     const s1 = {
-      "3sec": parseNum(matchFormData.player1.scores["3sec"]),
-      qa: parseNum(matchFormData.player1.scores.qa),
-      jigsaw: parseNum(matchFormData.player1.scores.jigsaw),
-      attribute: parseNum(matchFormData.player1.scores.attribute),
+      "3sec": parseNum(currentFormData.player1?.scores?.["3sec"]),
+      qa: parseNum(currentFormData.player1?.scores?.qa),
+      jigsaw: parseNum(currentFormData.player1?.scores?.jigsaw),
+      attribute: parseNum(currentFormData.player1?.scores?.attribute),
     };
 
     const s2 = {
-      "3sec": parseNum(matchFormData.player2.scores["3sec"]),
-      qa: parseNum(matchFormData.player2.scores.qa),
-      jigsaw: parseNum(matchFormData.player2.scores.jigsaw),
-      attribute: parseNum(matchFormData.player2.scores.attribute),
+      "3sec": parseNum(currentFormData.player2?.scores?.["3sec"]),
+      qa: parseNum(currentFormData.player2?.scores?.qa),
+      jigsaw: parseNum(currentFormData.player2?.scores?.jigsaw),
+      attribute: parseNum(currentFormData.player2?.scores?.attribute),
     };
 
+    let completedCatsCount = 0;
+
     cats.forEach((c) => {
-      const v1 = s1[c] ?? 0;
-      const v2 = s2[c] ?? 0;
-      if (s1[c] !== null || s2[c] !== null) {
+      const v1 = s1[c];
+      const v2 = s2[c];
+      if (v1 !== null && v2 !== null) {
+        completedCatsCount++;
         if (v1 > v2) cp1 += 1;
         else if (v2 > v1) cp2 += 1;
         else if (v1 > 0 && v1 === v2) {
+          cp1 += 1;
+          cp2 += 1;
+        }
+      } else if (v1 !== null || v2 !== null) {
+        const num1 = v1 ?? 0;
+        const num2 = v2 ?? 0;
+        if (num1 > num2) cp1 += 1;
+        else if (num2 > num1) cp2 += 1;
+        else if (num1 > 0 && num1 === num2) {
           cp1 += 1;
           cp2 += 1;
         }
@@ -841,60 +860,115 @@ export default function AdminTournamentPage() {
 
     const sum1 = cats.reduce((acc, c) => acc + (s1[c] || 0), 0);
     const sum2 = cats.reduce((acc, c) => acc + (s2[c] || 0), 0);
+    const hasAnyScore = cats.some((c) => s1[c] !== null || s2[c] !== null);
+    const isAll4Completed = completedCatsCount === 4;
 
     let winner = null;
-    let lp1 = 0;
-    let lp2 = 0;
+    let lp1 = "";
+    let lp2 = "";
+    let status = explicitStatus || currentFormData.status || "scheduled";
 
-    if (cp1 > cp2) {
-      winner = "player1";
-      if (cp1 >= 4 && cp2 === 0) {
-        lp1 = 5;
-        lp2 = -1;
-      } else if (cp1 >= 4) {
-        lp1 = 4;
-        lp2 = 0;
-      } else {
-        lp1 = 3;
-        lp2 = 0;
+    if (isAll4Completed) {
+      // กรอกครบทั้ง 4 หมวดแล้ว -> คำนวณแต้มลีก (League Point) ตามกฎ และปรับเป็นแข่งขันเสร็จสิ้น
+      status = explicitStatus || "completed";
+      if (cp1 > cp2) {
+        winner = "player1";
+        if (cp1 >= 4 && cp2 === 0) {
+          lp1 = 5;
+          lp2 = -1;
+        } else if (cp1 >= 4) {
+          lp1 = 4;
+          lp2 = 0;
+        } else {
+          lp1 = 3;
+          lp2 = 0;
+        }
+      } else if (cp2 > cp1) {
+        winner = "player2";
+        if (cp2 >= 4 && cp1 === 0) {
+          lp2 = 5;
+          lp1 = -1;
+        } else if (cp2 >= 4) {
+          lp2 = 4;
+          lp1 = 0;
+        } else {
+          lp2 = 3;
+          lp1 = 0;
+        }
+      } else if (cp1 === cp2 && (sum1 > 0 || sum2 > 0)) {
+        winner = "draw";
+        lp1 = 1;
+        lp2 = 1;
       }
-    } else if (cp2 > cp1) {
-      winner = "player2";
-      if (cp2 >= 4 && cp1 === 0) {
-        lp2 = 5;
-        lp1 = -1;
-      } else if (cp2 >= 4) {
-        lp2 = 4;
-        lp1 = 0;
-      } else {
-        lp2 = 3;
-        lp1 = 0;
-      }
-    } else if (cp1 === cp2 && (sum1 > 0 || sum2 > 0)) {
-      winner = "draw";
-      lp1 = 1;
-      lp2 = 1;
+    } else if (hasAnyScore) {
+      // ยังไม่ครบ 4 หมวด -> อัปเดต GP และคะแนนรวมดิบ แต่แต้มลีก LP ยังไม่คำนวณ!
+      status = explicitStatus || (currentFormData.status === "completed" ? "completed" : "in_progress");
+      winner = null;
+      lp1 = "";
+      lp2 = "";
+    } else {
+      status = explicitStatus || "scheduled";
+      winner = null;
+      lp1 = "";
+      lp2 = "";
     }
 
-    setMatchFormData((prev) => ({
-      ...prev,
+    return {
+      ...currentFormData,
+      status,
       winner,
-      status: "completed",
+      completedCatsCount,
+      isAll4Completed,
+      hasAnyScore,
       player1: {
-        ...prev.player1,
+        ...currentFormData.player1,
         sum: sum1,
         categoryPoints: cp1,
-        leaguePoint: lp1,
+        leaguePoint: lp1 !== "" ? lp1 : (status === "completed" ? currentFormData.player1.leaguePoint : ""),
       },
       player2: {
-        ...prev.player2,
+        ...currentFormData.player2,
         sum: sum2,
         categoryPoints: cp2,
-        leaguePoint: lp2,
+        leaguePoint: lp2 !== "" ? lp2 : (status === "completed" ? currentFormData.player2.leaguePoint : ""),
       },
-    }));
+    };
+  };
 
-    showToast("คำนวณแต้มหมวดและแต้มลีกเรียบร้อยแล้ว!", "info");
+  // Real-time score input handler
+  const handleScoreChange = (playerKey, catKey, rawVal) => {
+    setMatchFormData((prev) => {
+      if (!prev) return prev;
+      const updated = {
+        ...prev,
+        [playerKey]: {
+          ...prev[playerKey],
+          scores: {
+            ...prev[playerKey].scores,
+            [catKey]: rawVal,
+          },
+        },
+      };
+      const computed = computeMatchCalculations(updated);
+      return computed || updated;
+    });
+  };
+
+  // Auto Calculate points for current match in modal (can be clicked repeatedly anytime)
+  const handleAutoCalculate = () => {
+    if (!matchFormData) return;
+    const computed = computeMatchCalculations(matchFormData);
+    if (!computed) return;
+
+    setMatchFormData(computed);
+
+    if (computed.isAll4Completed) {
+      showToast(`✅ กรอกครบ 4 หมวดแล้ว! คำนวณแต้มหมวด (GP ${computed.player1.categoryPoints}-${computed.player2.categoryPoints}) และแต้มลีก (LP) เรียบร้อย`, "success");
+    } else if (computed.hasAnyScore) {
+      showToast(`⚡ อัปเดตแต้มหมวดสด: GP ${computed.player1.categoryPoints} - ${computed.player2.categoryPoints} (เสร็จ ${computed.completedCatsCount}/4 หมวด • แต้มลีก LP จะคำนวณเมื่อแข่งครบ 4 หมวด)`, "info");
+    } else {
+      showToast("ยังไม่มีคะแนนกรอกในหมวดใดเลย", "info");
+    }
   };
 
   // Save Match Form
@@ -1531,6 +1605,7 @@ export default function AdminTournamentPage() {
                 {matchdays.map((md) => {
                   const isSelected = md.id === selectedMatchday;
                   const completedCount = md.matches.filter((m) => m.status === "completed").length;
+                  const inProgressCount = md.matches.filter((m) => m.status === "in_progress").length;
                   return (
                     <button
                       key={md.id}
@@ -1550,6 +1625,7 @@ export default function AdminTournamentPage() {
                       <div style={{ fontSize: "13px", fontWeight: "800" }}>{md.name}</div>
                       <div style={{ fontSize: "11px", color: isSelected ? "#00e5ff" : "rgba(255,255,255,0.5)", marginTop: "2px" }}>
                         {md.dateRange ? `${md.dateRange} • ` : ""}เสร็จ {completedCount}/{md.matches.length} คู่
+                        {inProgressCount > 0 ? ` (กำลังแข่ง ${inProgressCount})` : ""}
                       </div>
                     </button>
                   );
@@ -1635,6 +1711,7 @@ export default function AdminTournamentPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(440px, 1fr))", gap: "16px" }}>
               {filteredMatches.map((match) => {
                 const isCompleted = match.status === "completed";
+                const isInProgress = match.status === "in_progress";
                 const p1 = match.player1;
                 const p2 = match.player2;
 
@@ -1643,9 +1720,14 @@ export default function AdminTournamentPage() {
                     key={match.id}
                     className="admin-card-panel"
                     style={{
-                      background: "rgba(10, 22, 40, 0.75)",
+                      background: isInProgress ? "rgba(16, 28, 52, 0.9)" : "rgba(10, 22, 40, 0.75)",
                       borderRadius: "14px",
-                      border: "1px solid rgba(0, 229, 255, 0.2)",
+                      border: isCompleted
+                        ? "1px solid rgba(0, 229, 255, 0.2)"
+                        : isInProgress
+                        ? "1.5px solid #f59e0b"
+                        : "1px solid rgba(255, 255, 255, 0.1)",
+                      boxShadow: isInProgress ? "0 0 16px rgba(245, 158, 11, 0.25)" : "none",
                       overflow: "hidden",
                       padding: "16px",
                       display: "flex",
@@ -1663,15 +1745,26 @@ export default function AdminTournamentPage() {
                       </div>
 
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span style={{ fontSize: "11px", color: isCompleted ? "#10b981" : "#94a3b8", fontWeight: "700" }}>
-                          {isCompleted ? "● แข่งขันแล้ว" : "○ รอดำเนินการ"}
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            color: isCompleted ? "#10b981" : isInProgress ? "#fbbf24" : "#94a3b8",
+                            fontWeight: "800",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                          }}
+                        >
+                          {isCompleted ? "● แข่งขันแล้ว" : isInProgress ? "🟡 กำลังแข่งขัน" : "○ รอดำเนินการ"}
                         </span>
                         <button
                           onClick={() => handleOpenEditMatch(match)}
                           style={{
                             padding: "5px 12px",
                             borderRadius: "6px",
-                            background: "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)",
+                            background: isInProgress
+                              ? "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+                              : "linear-gradient(135deg, #00e5ff 0%, #0284c7 100%)",
                             border: "none",
                             color: "#060c18",
                             fontWeight: "800",
@@ -1691,16 +1784,30 @@ export default function AdminTournamentPage() {
                           {p1.nickname || p1.name || "ยังไม่ระบุ"}
                         </div>
                         <div style={{ fontSize: "11px", color: "#38bdf8", marginTop: "2px" }}>{p1.topic || "-"}</div>
-                        {isCompleted && (
+                        {isCompleted ? (
                           <div style={{ marginTop: "4px", fontSize: "11px", color: "rgba(255,255,255,0.7)" }}>
                             ดิบ: <strong>{p1.sum}</strong> • GP: <strong style={{ color: "#00e5ff" }}>{p1.categoryPoints}</strong> • ลีก: <strong style={{ color: "#10b981" }}>{p1.leaguePoint} LP</strong>
                           </div>
-                        )}
+                        ) : isInProgress ? (
+                          <div style={{ marginTop: "4px", fontSize: "11px", color: "#fbbf24" }}>
+                            ดิบ: <strong>{p1.sum ?? 0}</strong> • GP: <strong style={{ color: "#00e5ff" }}>{p1.categoryPoints ?? 0}</strong> (สด)
+                          </div>
+                        ) : null}
                       </div>
 
                       <div style={{ textAlign: "center", padding: "0 8px" }}>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>คะแนน GP</div>
-                        <div style={{ fontSize: "20px", fontWeight: "900", color: "#ffffff", fontFamily: "'Orbitron', sans-serif" }}>
+                        <div style={{ fontSize: "11px", color: isInProgress ? "#fbbf24" : "rgba(255,255,255,0.4)", fontWeight: isInProgress ? "700" : "400" }}>
+                          {isInProgress ? "คะแนน GP (สด)" : "คะแนน GP"}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "20px",
+                            fontWeight: "900",
+                            color: isInProgress ? "#fbbf24" : "#ffffff",
+                            fontFamily: "'Orbitron', sans-serif",
+                            textShadow: isInProgress ? "0 0 10px rgba(245, 158, 11, 0.6)" : "none",
+                          }}
+                        >
                           {p1.categoryPoints ?? 0} - {p2.categoryPoints ?? 0}
                         </div>
                       </div>
@@ -1710,11 +1817,15 @@ export default function AdminTournamentPage() {
                           {p2.nickname || p2.name || "ยังไม่ระบุ"}
                         </div>
                         <div style={{ fontSize: "11px", color: "#38bdf8", marginTop: "2px" }}>{p2.topic || "-"}</div>
-                        {isCompleted && (
+                        {isCompleted ? (
                           <div style={{ marginTop: "4px", fontSize: "11px", color: "rgba(255,255,255,0.7)" }}>
-                            ดิบ: <strong>{p2.sum}</strong> • GP: <strong style={{ color: "#00e5ff" }}>{p2.categoryPoints}</strong> • ลีก: <strong style={{ color: "#10b981" }}>{p2.leaguePoint} LP</strong>
+                            ดิบ: <strong>{p2.sum}</strong> • GP: <strong style={{ color: "#ffd700" }}>{p2.categoryPoints}</strong> • ลีก: <strong style={{ color: "#10b981" }}>{p2.leaguePoint} LP</strong>
                           </div>
-                        )}
+                        ) : isInProgress ? (
+                          <div style={{ marginTop: "4px", fontSize: "11px", color: "#fbbf24" }}>
+                            ดิบ: <strong>{p2.sum ?? 0}</strong> • GP: <strong style={{ color: "#ffd700" }}>{p2.categoryPoints ?? 0}</strong> (สด)
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -2088,29 +2199,56 @@ export default function AdminTournamentPage() {
             </div>
 
             {/* Status & Quick Auto-Calc Bar */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", background: "rgba(6, 12, 24, 0.7)", padding: "10px 14px", borderRadius: "10px", marginBottom: "18px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", background: "rgba(6, 12, 24, 0.7)", padding: "10px 14px", borderRadius: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>สถานะ:</span>
+                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", fontWeight: "700" }}>สถานะ:</span>
                 <select
                   value={matchFormData.status}
-                  onChange={(e) => setMatchFormData({ ...matchFormData, status: e.target.value })}
+                  onChange={(e) => {
+                    const newStatus = e.target.value;
+                    setMatchFormData((prev) => {
+                      const computed = computeMatchCalculations(prev, newStatus);
+                      return computed ? { ...computed, status: newStatus } : { ...prev, status: newStatus };
+                    });
+                  }}
                   style={{
-                    padding: "4px 8px",
+                    padding: "5px 10px",
                     borderRadius: "6px",
-                    background: "rgba(15, 23, 42, 0.8)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    color: "#ffffff",
+                    background: matchFormData.status === "completed" ? "rgba(16, 185, 129, 0.25)" : matchFormData.status === "in_progress" ? "rgba(245, 158, 11, 0.25)" : "rgba(15, 23, 42, 0.8)",
+                    border: matchFormData.status === "completed" ? "1px solid #10b981" : matchFormData.status === "in_progress" ? "1px solid #f59e0b" : "1px solid rgba(255,255,255,0.2)",
+                    color: matchFormData.status === "completed" ? "#86efac" : matchFormData.status === "in_progress" ? "#fbbf24" : "#ffffff",
                     fontSize: "12px",
+                    fontWeight: "800",
+                    cursor: "pointer",
                   }}
                 >
-                  <option value="completed">แข่งขันเสร็จสิ้น (Completed)</option>
-                  <option value="scheduled">ยังไม่แข่งขัน (Scheduled)</option>
+                  <option value="completed">🟢 แข่งขันเสร็จสิ้น (Completed)</option>
+                  <option value="in_progress">🟡 กำลังแข่งขัน (In Progress / Live)</option>
+                  <option value="scheduled">⚪ ยังไม่แข่งขัน (Scheduled)</option>
                 </select>
               </div>
+
+              {/* In Progress Live Indicator */}
+              {matchFormData.status === "in_progress" && (
+                <div style={{ fontSize: "12px", color: "#fbbf24", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>⚡</span> กำลังแข่งขัน • สกอร์สด: GP {matchFormData.player1.categoryPoints ?? 0} - {matchFormData.player2.categoryPoints ?? 0}
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>(แต้มลีก LP คำนวณเมื่อครบ 4 หมวด)</span>
+                </div>
+              )}
+
+              {matchFormData.status === "completed" && (
+                <div style={{ fontSize: "12px", color: "#86efac", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>✅</span> แข่งขันเสร็จสิ้น: GP {matchFormData.player1.categoryPoints ?? 0} - {matchFormData.player2.categoryPoints ?? 0}
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>
+                    (ลีก: {matchFormData.player1.leaguePoint !== "" ? `${matchFormData.player1.leaguePoint} LP` : "-"} vs {matchFormData.player2.leaguePoint !== "" ? `${matchFormData.player2.leaguePoint} LP` : "-"})
+                  </span>
+                </div>
+              )}
 
               <button
                 type="button"
                 onClick={handleAutoCalculate}
+                title="กดคำนวณแต้มหมวด (GP) ได้เรื่อย ๆ ตามรอบแข่งขันจริง และคำนวณแต้มลีก (LP) ให้อัตโนมัติเมื่อครบ 4 หมวด"
                 style={{
                   padding: "6px 14px",
                   borderRadius: "8px",
@@ -2123,6 +2261,7 @@ export default function AdminTournamentPage() {
                   display: "flex",
                   alignItems: "center",
                   gap: "4px",
+                  boxShadow: "0 0 10px rgba(16, 185, 129, 0.3)",
                 }}
               >
                 <span>⚡</span> คำนวณแต้มอัตโนมัติ (Auto Calc)
@@ -2310,7 +2449,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player1.scores["3sec"]}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, scores: { ...matchFormData.player1.scores, "3sec": e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player1", "3sec", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2319,7 +2459,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player1.scores.qa}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, scores: { ...matchFormData.player1.scores, qa: e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player1", "qa", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2328,7 +2469,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player1.scores.jigsaw}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, scores: { ...matchFormData.player1.scores, jigsaw: e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player1", "jigsaw", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2337,7 +2479,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player1.scores.attribute}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, scores: { ...matchFormData.player1.scores, attribute: e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player1", "attribute", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2347,7 +2490,10 @@ export default function AdminTournamentPage() {
                 {/* GP & LP summary */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
-                    <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>คะแนน (GP)</label>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                      <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>คะแนน (GP)</label>
+                      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>ดิบ: {matchFormData.player1.sum ?? 0}</span>
+                    </div>
                     <input
                       type="number"
                       value={matchFormData.player1.categoryPoints}
@@ -2361,8 +2507,24 @@ export default function AdminTournamentPage() {
                       type="number"
                       value={matchFormData.player1.leaguePoint}
                       onChange={(e) => setMatchFormData({ ...matchFormData, player1: { ...matchFormData.player1, leaguePoint: e.target.value } })}
-                      style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#10b981", fontSize: "14px", fontWeight: "900", textAlign: "center" }}
+                      placeholder={matchFormData.status === "in_progress" ? "รอครบ 4 หมวด" : "-"}
+                      style={{
+                        width: "100%",
+                        padding: "6px",
+                        borderRadius: "6px",
+                        background: "#070c18",
+                        border: matchFormData.player1.leaguePoint !== "" && matchFormData.player1.leaguePoint !== null && matchFormData.player1.leaguePoint !== undefined ? "1px solid rgba(16, 185, 129, 0.4)" : "1px dashed rgba(255,255,255,0.2)",
+                        color: "#10b981",
+                        fontSize: "14px",
+                        fontWeight: "900",
+                        textAlign: "center"
+                      }}
                     />
+                    {matchFormData.status === "in_progress" && (
+                      <div style={{ fontSize: "10px", color: "#fbbf24", marginTop: "3px", textAlign: "center" }}>
+                        (คำนวณเมื่อครบ 4 หมวด)
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2546,7 +2708,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player2.scores["3sec"]}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, scores: { ...matchFormData.player2.scores, "3sec": e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player2", "3sec", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2555,7 +2718,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player2.scores.qa}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, scores: { ...matchFormData.player2.scores, qa: e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player2", "qa", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2564,7 +2728,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player2.scores.jigsaw}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, scores: { ...matchFormData.player2.scores, jigsaw: e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player2", "jigsaw", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2573,7 +2738,8 @@ export default function AdminTournamentPage() {
                       <input
                         type="number"
                         value={matchFormData.player2.scores.attribute}
-                        onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, scores: { ...matchFormData.player2.scores, attribute: e.target.value } } })}
+                        onChange={(e) => handleScoreChange("player2", "attribute", e.target.value)}
+                        placeholder="-"
                         style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(255,255,255,0.15)", color: "#ffffff", fontSize: "13px", fontWeight: "700", textAlign: "center" }}
                       />
                     </div>
@@ -2583,7 +2749,10 @@ export default function AdminTournamentPage() {
                 {/* GP & LP summary */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
-                    <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>คะแนน (GP)</label>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                      <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>คะแนน (GP)</label>
+                      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>ดิบ: {matchFormData.player2.sum ?? 0}</span>
+                    </div>
                     <input
                       type="number"
                       value={matchFormData.player2.categoryPoints}
@@ -2597,8 +2766,24 @@ export default function AdminTournamentPage() {
                       type="number"
                       value={matchFormData.player2.leaguePoint}
                       onChange={(e) => setMatchFormData({ ...matchFormData, player2: { ...matchFormData.player2, leaguePoint: e.target.value } })}
-                      style={{ width: "100%", padding: "6px", borderRadius: "6px", background: "#070c18", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#10b981", fontSize: "14px", fontWeight: "900", textAlign: "center" }}
+                      placeholder={matchFormData.status === "in_progress" ? "รอครบ 4 หมวด" : "-"}
+                      style={{
+                        width: "100%",
+                        padding: "6px",
+                        borderRadius: "6px",
+                        background: "#070c18",
+                        border: matchFormData.player2.leaguePoint !== "" && matchFormData.player2.leaguePoint !== null && matchFormData.player2.leaguePoint !== undefined ? "1px solid rgba(16, 185, 129, 0.4)" : "1px dashed rgba(255,255,255,0.2)",
+                        color: "#10b981",
+                        fontSize: "14px",
+                        fontWeight: "900",
+                        textAlign: "center"
+                      }}
                     />
+                    {matchFormData.status === "in_progress" && (
+                      <div style={{ fontSize: "10px", color: "#fbbf24", marginTop: "3px", textAlign: "center" }}>
+                        (คำนวณเมื่อครบ 4 หมวด)
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

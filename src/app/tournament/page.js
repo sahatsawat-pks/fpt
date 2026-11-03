@@ -142,6 +142,8 @@ export default function TournamentPage() {
             if (m.winner === "draw") outcome = "draw";
             else if ((isP1 && m.winner === "player1") || (!isP1 && m.winner === "player2")) outcome = "win";
             else outcome = "lose";
+          } else if (m.status === "in_progress") {
+            outcome = "in_progress";
           }
           list.push({
             matchdayName: md.name,
@@ -907,6 +909,7 @@ export default function TournamentPage() {
               {matchdays.map((md) => {
                 const isSelected = md.id === selectedMatchday;
                 const completedCount = md.matches.filter((m) => m.status === "completed").length;
+                const inProgressCount = md.matches.filter((m) => m.status === "in_progress").length;
                 return (
                   <button
                     key={md.id}
@@ -932,8 +935,9 @@ export default function TournamentPage() {
                     <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
                       {md.dateRange || "รอประกาศวันแข่ง"}
                     </div>
-                    <div style={{ fontSize: "11px", marginTop: "4px", color: completedCount === md.matches.length && md.matches.length > 0 ? "#86efac" : "#94a3b8", fontWeight: "700" }}>
+                    <div style={{ fontSize: "11px", marginTop: "4px", color: completedCount === md.matches.length && md.matches.length > 0 ? "#86efac" : inProgressCount > 0 ? "#fbbf24" : "#94a3b8", fontWeight: "700" }}>
                       {completedCount}/{md.matches.length} คู่เสร็จสิ้น
+                      {inProgressCount > 0 ? ` (กำลังแข่ง ${inProgressCount})` : ""}
                     </div>
                   </button>
                 );
@@ -1689,6 +1693,15 @@ export default function TournamentPage() {
                             ดิบ: {m.me.sum} vs {m.opponent.sum} • ได้ {m.me.leaguePoint > 0 ? `+${m.me.leaguePoint}` : m.me.leaguePoint} LP
                           </div>
                         </>
+                      ) : m.status === "in_progress" ? (
+                        <>
+                          <div style={{ fontSize: "15px", fontWeight: "900", color: "#fbbf24" }}>
+                            ⚡ กำลังแข่ง (GP {m.me.categoryPoints ?? 0} - {m.opponent.categoryPoints ?? 0})
+                          </div>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>
+                            ดิบ: {m.me.sum ?? 0} vs {m.opponent.sum ?? 0} (สด)
+                          </div>
+                        </>
                       ) : (
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", padding: "4px 8px", borderRadius: "6px", background: "rgba(255,255,255,0.06)" }}>
                           รอดำเนินการ
@@ -2399,6 +2412,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
 function FanpantaeMatchCard({ match, onSelectContestant }) {
   const [showSpreadsheet, setShowSpreadsheet] = useState(false);
   const isCompleted = match.status === "completed";
+  const isInProgress = match.status === "in_progress";
   const p1 = match.player1;
   const p2 = match.player2;
 
@@ -2413,7 +2427,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
   const catResults = categories.map((cat) => {
     const v1 = typeof cat.s1 === "number" ? cat.s1 : null;
     const v2 = typeof cat.s2 === "number" ? cat.s2 : null;
-    if (!isCompleted || (v1 === null && v2 === null)) {
+    if ((!isCompleted && !isInProgress) || (v1 === null && v2 === null)) {
       return { ...cat, v1: "-", v2: "-", cp1: "-", cp2: "-", p1Won: false, p2Won: false, tied: false, pct1: 50, pct2: 50 };
     }
     const s1 = v1 ?? 0;
@@ -2447,7 +2461,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
   // Cell coloring helper mimicking dark tournament cyber-sports theme
   const getScoreCellStyle = (val, isWon, isLost) => {
-    if (!isCompleted || val === "-" || val === null || val === undefined) {
+    if ((!isCompleted && !isInProgress) || val === "-" || val === null || val === undefined) {
       return {
         background: "rgba(255, 255, 255, 0.03)",
         border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -2498,18 +2512,28 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
       style={{
         background: "linear-gradient(150deg, rgba(16, 32, 60, 0.92) 0%, rgba(6, 14, 30, 0.98) 100%)",
         borderRadius: "18px",
-        border: isCompleted ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0.12)",
+        border: isCompleted
+          ? "1.5px solid rgba(0, 229, 255, 0.4)"
+          : isInProgress
+          ? "1.5px solid #f59e0b"
+          : "1px solid rgba(255, 255, 255, 0.12)",
         overflow: "hidden",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.55)",
+        boxShadow: isInProgress
+          ? "0 0 20px rgba(245, 158, 11, 0.25), 0 10px 30px rgba(0,0,0,0.55)"
+          : "0 10px 30px rgba(0,0,0,0.55)",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-3px)";
-        e.currentTarget.style.boxShadow = "0 14px 35px rgba(0, 229, 255, 0.25)";
+        e.currentTarget.style.boxShadow = isInProgress
+          ? "0 0 24px rgba(245, 158, 11, 0.4), 0 14px 35px rgba(0,0,0,0.6)"
+          : "0 14px 35px rgba(0, 229, 255, 0.25)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.55)";
+        e.currentTarget.style.boxShadow = isInProgress
+          ? "0 0 20px rgba(245, 158, 11, 0.25), 0 10px 30px rgba(0,0,0,0.55)"
+          : "0 10px 30px rgba(0,0,0,0.55)";
       }}
     >
       {/* 1. MATCH TOP BAR */}
@@ -2560,6 +2584,24 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
             >
               ● แข่งขันเสร็จสิ้น
             </span>
+          ) : isInProgress ? (
+            <span
+              style={{
+                fontSize: "11px",
+                color: "#fbbf24",
+                fontWeight: "800",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "rgba(245, 158, 11, 0.15)",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                border: "1px solid rgba(245, 158, 11, 0.4)",
+                boxShadow: "0 0 10px rgba(245, 158, 11, 0.3)",
+              }}
+            >
+              <span>⚡</span> กำลังแข่งขัน (Live)
+            </span>
           ) : (
             <span
               style={{
@@ -2600,6 +2642,10 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   🤝 เสมอกัน
                 </span>
               )}
+            </div>
+          ) : isInProgress ? (
+            <div style={{ fontSize: "13px", fontWeight: "800", color: "#fbbf24", display: "flex", alignItems: "center", gap: "6px" }}>
+              <span>⚡ สกอร์สด:</span> GP {p1.categoryPoints ?? 0} - {p2.categoryPoints ?? 0}
             </div>
           ) : (
             <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>รอการแข่งขันตามกำหนดการ</div>
@@ -2781,7 +2827,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       fontWeight: "800",
                     }}
                   >
-                    ดิบ: {isCompleted ? (p1.sum ?? 0) : "-"}
+                    ดิบ: {isCompleted || isInProgress ? (p1.sum ?? 0) : "-"}
                   </span>
                   <span
                     style={{
@@ -2794,7 +2840,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       fontWeight: "900",
                     }}
                   >
-                    ลีก: {isCompleted ? (p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : (p1.leaguePoint ?? 0)) : "-"} LP
+                    ลีก: {isCompleted ? `${p1.leaguePoint > 0 ? `+${p1.leaguePoint}` : (p1.leaguePoint ?? 0)} LP` : isInProgress ? "รอจบแมตช์" : "-"}
                   </span>
                 </div>
               </div>
@@ -2807,8 +2853,8 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                 padding: "8px 24px",
                 background: "linear-gradient(180deg, rgba(3, 8, 20, 0.95) 0%, rgba(9, 20, 42, 0.9) 100%)",
                 borderRadius: "14px",
-                border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                boxShadow: "0 0 25px rgba(0, 229, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+                border: isInProgress ? "1.5px solid #f59e0b" : "1.5px solid rgba(0, 229, 255, 0.4)",
+                boxShadow: isInProgress ? "0 0 25px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)" : "0 0 25px rgba(0, 229, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
                 minWidth: "160px",
               }}
             >
@@ -2817,12 +2863,12 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   fontSize: "10px",
                   fontWeight: "900",
                   letterSpacing: "1px",
-                  color: "#94a3b8",
+                  color: isInProgress ? "#fbbf24" : "#94a3b8",
                   textTransform: "uppercase",
                   marginBottom: "4px",
                 }}
               >
-                คะแนน (GP)
+                {isInProgress ? "คะแนน (GP) • LIVE" : "คะแนน (GP)"}
               </div>
 
               {/* Big Duel Score Numbers */}
@@ -2832,19 +2878,23 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                     fontSize: "36px",
                     fontWeight: "900",
                     fontFamily: "var(--font-orbitron), sans-serif",
-                    color: isCompleted ? (isP1Winner ? "#86efac" : isP2Winner ? "#fca5a5" : "#ffffff") : "rgba(255,255,255,0.4)",
-                    textShadow: isP1Winner ? "0 0 15px rgba(134, 239, 172, 0.8)" : "none",
+                    color: isCompleted
+                      ? (isP1Winner ? "#86efac" : isP2Winner ? "#fca5a5" : "#ffffff")
+                      : isInProgress
+                      ? "#00e5ff"
+                      : "rgba(255,255,255,0.4)",
+                    textShadow: isP1Winner ? "0 0 15px rgba(134, 239, 172, 0.8)" : isInProgress ? "0 0 12px rgba(0, 229, 255, 0.6)" : "none",
                     lineHeight: 1,
                   }}
                 >
-                  {isCompleted ? (p1.categoryPoints ?? 0) : "-"}
+                  {isCompleted || isInProgress ? (p1.categoryPoints ?? 0) : "-"}
                 </span>
 
                 <span
                   style={{
                     fontSize: "18px",
                     fontWeight: "900",
-                    color: "#00e5ff",
+                    color: isInProgress ? "#fbbf24" : "#00e5ff",
                     opacity: 0.8,
                     padding: "0 2px",
                   }}
@@ -2857,12 +2907,16 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                     fontSize: "36px",
                     fontWeight: "900",
                     fontFamily: "var(--font-orbitron), sans-serif",
-                    color: isCompleted ? (isP2Winner ? "#ffd700" : isP1Winner ? "#fca5a5" : "#ffffff") : "rgba(255,255,255,0.4)",
-                    textShadow: isP2Winner ? "0 0 15px rgba(255, 215, 0, 0.8)" : "none",
+                    color: isCompleted
+                      ? (isP2Winner ? "#ffd700" : isP1Winner ? "#fca5a5" : "#ffffff")
+                      : isInProgress
+                      ? "#ffd700"
+                      : "rgba(255,255,255,0.4)",
+                    textShadow: isP2Winner ? "0 0 15px rgba(255, 215, 0, 0.8)" : isInProgress ? "0 0 12px rgba(255, 215, 0, 0.6)" : "none",
                     lineHeight: 1,
                   }}
                 >
-                  {isCompleted ? (p2.categoryPoints ?? 0) : "-"}
+                  {isCompleted || isInProgress ? (p2.categoryPoints ?? 0) : "-"}
                 </span>
               </div>
 
@@ -2877,6 +2931,17 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                   }}
                 >
                   ดิบ: <strong>{p1.sum ?? 0}</strong> vs <strong>{p2.sum ?? 0}</strong>
+                </div>
+              ) : isInProgress ? (
+                <div
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: "800",
+                    color: "#fbbf24",
+                    marginTop: "4px",
+                  }}
+                >
+                  ⚡ ดิบ {p1.sum ?? 0} vs {p2.sum ?? 0} (สด)
                 </div>
               ) : (
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "4px" }}>
@@ -2961,7 +3026,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       fontWeight: "800",
                     }}
                   >
-                    ดิบ: {isCompleted ? (p2.sum ?? 0) : "-"}
+                    ดิบ: {isCompleted || isInProgress ? (p2.sum ?? 0) : "-"}
                   </span>
                   <span
                     style={{
@@ -2974,7 +3039,7 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
                       fontWeight: "900",
                     }}
                   >
-                    ลีก: {isCompleted ? (p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : (p2.leaguePoint ?? 0)) : "-"} LP
+                    ลีก: {isCompleted ? `${p2.leaguePoint > 0 ? `+${p2.leaguePoint}` : (p2.leaguePoint ?? 0)} LP` : isInProgress ? "รอจบแมตช์" : "-"}
                   </span>
                 </div>
               </div>
