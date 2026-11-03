@@ -304,8 +304,8 @@ export default function TrialFOTYPage() {
       contestants && contestants.length > 0
         ? contestants
         : fallbackPollData && fallbackPollData.length > 0
-        ? fallbackPollData
-        : [];
+          ? fallbackPollData
+          : [];
     if (list.length === 0) return [[], [], [], [], [], []];
     const cols = [[], [], [], [], [], []];
     list.forEach((c, idx) => {
@@ -799,15 +799,15 @@ export default function TrialFOTYPage() {
             {activeTableTab === "standings"
               ? "ตารางคะแนนการแข่งขัน งุ่นง่าน Of The Year 2026"
               : activeTableTab === "warmup"
-              ? "ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)"
-              : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
+                ? "ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)"
+                : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
           </h2>
           <p style={{ fontSize: "15px", color: "rgba(255, 255, 255, 0.65)", margin: 0 }}>
             {activeTableTab === "standings"
               ? "คะแนนสดอัปเดตแบบเรียลไทม์ 4 หมวดการแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 อันดับแรก"
               : activeTableTab === "warmup"
-              ? "คะแนนจากการลงสนามแข่งในห้องเกม (/game) เต็ม 100 คะแนน คิดเป็นสัดส่วน 30% ของตารางโพลล์มหาชน"
-              : "อันดับความนิยมและผลสำรวจความคิดเห็นของแฟนพันธุ์แท้แห่งปี 2026"}
+                ? "คะแนนจากการลงสนามแข่งในห้องเกม (/game) เต็ม 100 คะแนน คิดเป็นสัดส่วน 30% ของตารางโพลล์มหาชน"
+                : "อันดับความนิยมและผลสำรวจความคิดเห็นของแฟนพันธุ์แท้แห่งปี 2026"}
           </p>
         </div>
 
@@ -1572,18 +1572,18 @@ export default function TrialFOTYPage() {
                       const borderColor = isPlaying
                         ? "#00e5ff"
                         : isTopSafe
-                        ? "#ffd700"
-                        : isEliminated
-                        ? "#ff4d4f"
-                        : "rgba(148, 163, 184, 0.4)";
+                          ? "#ffd700"
+                          : isEliminated
+                            ? "#ff4d4f"
+                            : "rgba(148, 163, 184, 0.4)";
 
                       const glowShadow = isPlaying
                         ? "0 0 16px rgba(0, 229, 255, 0.7)"
                         : isTopSafe
-                        ? "0 0 14px rgba(255, 215, 0, 0.45)"
-                        : isEliminated
-                        ? "0 0 14px rgba(255, 77, 79, 0.45)"
-                        : "0 0 8px rgba(0, 0, 0, 0.5)";
+                          ? "0 0 14px rgba(255, 215, 0, 0.45)"
+                          : isEliminated
+                            ? "0 0 14px rgba(255, 77, 79, 0.45)"
+                            : "0 0 8px rgba(0, 0, 0, 0.5)";
 
                       const prevItem = index > 0 ? filteredStandings[index - 1] : null;
                       const showCutoffLine =
@@ -1691,18 +1691,18 @@ export default function TrialFOTYPage() {
                                 background: isPlaying
                                   ? "linear-gradient(180deg, #022030 0%, #001018 100%)"
                                   : isTopSafe
-                                  ? "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)"
-                                  : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                                    ? "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)"
+                                    : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
                                 border: isPlaying
                                   ? "2.5px solid #00e5ff"
                                   : isTopSafe
-                                  ? "2.5px solid #fff566"
-                                  : "2.5px solid rgba(255, 255, 255, 0.3)",
+                                    ? "2.5px solid #fff566"
+                                    : "2.5px solid rgba(255, 255, 255, 0.3)",
                                 boxShadow: isPlaying
                                   ? "0 0 14px rgba(0, 229, 255, 0.7)"
                                   : isTopSafe
-                                  ? "0 0 14px rgba(255, 215, 0, 0.6)"
-                                  : "0 0 6px rgba(0,0,0,0.5)",
+                                    ? "0 0 14px rgba(255, 215, 0, 0.6)"
+                                    : "0 0 6px rgba(0,0,0,0.5)",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -2603,18 +2603,18 @@ export default function TrialFOTYPage() {
                                   background: isRank1
                                     ? "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)"
                                     : isTop5
-                                    ? "linear-gradient(180deg, #fa8c16 0%, #ad4e00 100%)"
-                                    : "linear-gradient(180deg, #2b1406 0%, #120802 100%)",
+                                      ? "linear-gradient(180deg, #fa8c16 0%, #ad4e00 100%)"
+                                      : "linear-gradient(180deg, #2b1406 0%, #120802 100%)",
                                   border: isRank1
                                     ? "2.5px solid #ffa940"
                                     : isTop5
-                                    ? "2px solid #ff8800"
-                                    : "1.5px solid rgba(255, 136, 0, 0.35)",
+                                      ? "2px solid #ff8800"
+                                      : "1.5px solid rgba(255, 136, 0, 0.35)",
                                   boxShadow: isRank1
                                     ? "0 0 18px rgba(255, 136, 0, 0.75)"
                                     : isTop5
-                                    ? "0 0 14px rgba(255, 136, 0, 0.45)"
-                                    : "0 0 8px rgba(0, 0, 0, 0.5)",
+                                      ? "0 0 14px rgba(255, 136, 0, 0.45)"
+                                      : "0 0 8px rgba(0, 0, 0, 0.5)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
@@ -2704,23 +2704,24 @@ export default function TrialFOTYPage() {
                                     </span>
                                   </div>
 
-                                  {/* 30% Weight Status Tag */}
-                                  <div style={{ marginLeft: "auto", flexShrink: 0 }}>
-                                    <span
-                                      style={{
-                                        display: "inline-block",
-                                        padding: "3px 9px",
-                                        borderRadius: "8px",
-                                        fontSize: "11px",
-                                        fontWeight: "800",
-                                        background: isTop5 ? "rgba(255, 136, 0, 0.18)" : "rgba(255, 136, 0, 0.08)",
-                                        border: isTop5 ? "1px solid #ff8800" : "1px solid rgba(255, 136, 0, 0.35)",
-                                        color: isTop5 ? "#ffa940" : "#ffb86c",
-                                      }}
-                                    >
-                                      {isTop5 ? "🔥 TOP 5 (30% โพลล์)" : "30% โพลล์"}
-                                    </span>
-                                  </div>
+                                  {isTop5 && (
+                                    <div style={{ marginLeft: "auto", flexShrink: 0 }}>
+                                      <span
+                                        style={{
+                                          display: "inline-block",
+                                          padding: "3px 9px",
+                                          borderRadius: "8px",
+                                          fontSize: "11px",
+                                          fontWeight: "800",
+                                          background: "rgba(255, 136, 0, 0.18)",
+                                          border: "1px solid #ff8800",
+                                          color: "#ffa940",
+                                        }}
+                                      >
+                                        🔥 TOP 5
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
 
@@ -3274,8 +3275,8 @@ export default function TrialFOTYPage() {
                     const glowShadow = isRank1
                       ? "0 0 18px rgba(255, 215, 0, 0.6)"
                       : isTop5
-                      ? "0 0 14px rgba(255, 215, 0, 0.45)"
-                      : "0 0 8px rgba(0, 0, 0, 0.5)";
+                        ? "0 0 14px rgba(255, 215, 0, 0.45)"
+                        : "0 0 8px rgba(0, 0, 0, 0.5)";
 
                     return (
                       <div
