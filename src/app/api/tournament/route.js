@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { saveKVData } from "@/lib/kv";
+import { getKVData, saveKVData } from "@/lib/kv";
 import {
   readTournamentData as readData,
   writeTournamentData as writeData,

@@ -33,14 +33,6 @@ export default function TournamentClient({ initialData }) {
   const [selectedContestant, setSelectedContestant] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Sync if server props update
-  useEffect(() => {
-    if (initialData) {
-      setData(initialData);
-      setLoading(false);
-    }
-  }, [initialData]);
-
   // Fetch latest data from API if initialData was not provided
   useEffect(() => {
     if (initialData) return;
