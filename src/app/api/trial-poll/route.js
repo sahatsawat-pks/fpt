@@ -94,56 +94,43 @@ function writeLocalPoll(data) {
 
 /**
  * Recalculate poll percentages:
- * 70% from Popular Votes (share of total vote points, normalized)
- * 30% from Warm-up Round What If? Score (30% weight out of 100 points)
- * Total Score = (Vote 70%) + (What If 30%)
+ * 30% from Warm-up Round What If? Score: (contestant whatIf / total whatIf) * 30%
+ * 70% from Popular Votes: (contestant votes / total votes) * 70%
+ * Total Poll % = (Vote 70%) + (What If 30%) = 100% total
  */
 function computePollPercentages(items) {
   const totalVotes = items.reduce((sum, item) => sum + (Number(item.votes) || 0), 0);
   const totalWhatIf = items.reduce((sum, item) => sum + (Number(item.whatIfScore) || 0), 0);
-  const maxVotes = Math.max(...items.map((it) => Number(it.votes) || 0), 0);
 
-  // Compute 70% vote score and 30% What-If score for each contestant
-  const scoredItems = items.map((item) => {
+  return items.map((item) => {
     const v = Number(item.votes) || 0;
     const w = Math.min(100, Math.max(0, Number(item.whatIfScore) || 0));
 
-    // What If (30% weight, max 30 points from 100)
-    const whatIfPts = (w / 100) * 30;
+    let voteShare70 = 0;
+    let whatIfShare30 = 0;
+    let finalPct = 0;
 
-    // Popular Vote (70% weight, max 70 points normalized to top vote)
-    let votePts70 = 0;
-    if (maxVotes > 0) {
-      votePts70 = (v / maxVotes) * 70;
+    if (totalVotes > 0 && totalWhatIf > 0) {
+      // 30% จากสัดส่วนคะแนน What If ต่อคะแนนรวมของทุกคน (w / totalWhatIf * 30%)
+      whatIfShare30 = (w / totalWhatIf) * 30;
+      // 70% จากสัดส่วนคะแนนโหวตมหาชนต่อคะแนนโหวตรวมของทุกคน (v / totalVotes * 70%)
+      voteShare70 = (v / totalVotes) * 70;
+      finalPct = voteShare70 + whatIfShare30;
     } else if (totalVotes > 0) {
-      votePts70 = (v / totalVotes) * 70;
+      voteShare70 = (v / totalVotes) * 100;
+      finalPct = voteShare70;
+    } else if (totalWhatIf > 0) {
+      whatIfShare30 = (w / totalWhatIf) * 100;
+      finalPct = whatIfShare30;
     }
 
-    // Total Score (out of 100)
-    const totalScore = Number((votePts70 + whatIfPts).toFixed(2));
+    const totalScore = Number(finalPct.toFixed(2));
 
     return {
       ...item,
       whatIfScore: w,
       votes: v,
       totalScore,
-    };
-  });
-
-  const sumTotalScores = scoredItems.reduce((sum, it) => sum + (it.totalScore || 0), 0);
-
-  return scoredItems.map((item) => {
-    let finalPct = 0;
-    if (sumTotalScores > 0) {
-      finalPct = (item.totalScore / sumTotalScores) * 100;
-    } else if (totalVotes > 0) {
-      finalPct = (item.votes / totalVotes) * 100;
-    } else if (totalWhatIf > 0) {
-      finalPct = (item.whatIfScore / totalWhatIf) * 100;
-    }
-
-    return {
-      ...item,
       percent: `${finalPct.toFixed(2)}%`,
     };
   });

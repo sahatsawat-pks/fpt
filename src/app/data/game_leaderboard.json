@@ -53,13 +53,14 @@
     "nickname": "ชีส",
     "topic": "iDOLM@STER",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 3,
+      "qa": 0,
+      "jigsaw": 25,
+      "attribute": 0
     },
-    "totalScore": 0,
+    "totalScore": 28,
     "image": "",
-    "createdAt": "2026-11-02T19:11:15.518Z"
+    "createdAt": "2026-11-02T19:11:15.518Z",
+    "updatedAt": "2026-11-02T20:21:22.598Z"
   }
 ]

@@ -346,7 +346,6 @@ export default function TrialAdminPage() {
   const handleAutoCalculatePercent = () => {
     const totalVotes = pollItems.reduce((sum, it) => sum + (Number(it.votes) || 0), 0);
     const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
-    const maxVotes = Math.max(...pollItems.map((it) => Number(it.votes) || 0), 0);
 
     if (totalVotes === 0 && totalWhatIf === 0) {
       showToast("ยังไม่มีคะแนนโหวตหรือคะแนนรอบอุ่นเครื่องในระบบ", "info");
@@ -354,48 +353,44 @@ export default function TrialAdminPage() {
     }
 
     setPollItems((prev) => {
-      // Step 1: Calculate totalScore (70% vote score + 30% What-If score out of 100)
-      const scoredItems = prev.map((item) => {
+      const computed = prev.map((item) => {
         const v = Number(item.votes) || 0;
         const w = Math.min(100, Math.max(0, Number(item.whatIfScore) || 0));
 
-        // What If 30% (เต็ม 30 คะแนนจาก 100)
-        const whatIfPts = (w / 100) * 30;
-
-        // โพลล์มหาชน 70% (เต็ม 70 คะแนน เทียบสัดส่วนกับผู้ได้โหวตสูงสุด)
-        let votePts70 = 0;
-        if (maxVotes > 0) {
-          votePts70 = (v / maxVotes) * 70;
-        } else if (totalVotes > 0) {
-          votePts70 = (v / totalVotes) * 70;
-        }
-
-        const totalScore = Number((votePts70 + whatIfPts).toFixed(2));
-        return { ...item, whatIfScore: w, votes: v, totalScore };
-      });
-
-      const sumTotalScores = scoredItems.reduce((sum, it) => sum + (it.totalScore || 0), 0);
-
-      // Step 2: Compute percentage share in poll
-      const computed = scoredItems.map((item) => {
+        let voteShare70 = 0;
+        let whatIfShare30 = 0;
         let finalPct = 0;
-        if (sumTotalScores > 0) {
-          finalPct = (item.totalScore / sumTotalScores) * 100;
+
+        if (totalVotes > 0 && totalWhatIf > 0) {
+          // 30% จากคะแนนทุกคนรวมกันแล้วหารคะแนนที่ได้ (w / totalWhatIf * 30%)
+          whatIfShare30 = (w / totalWhatIf) * 30;
+          // 70% จากคะแนนโหวตทุกคนรวมกันแล้วหารคะแนนโหวตที่ได้ (v / totalVotes * 70%)
+          voteShare70 = (v / totalVotes) * 70;
+          finalPct = voteShare70 + whatIfShare30;
         } else if (totalVotes > 0) {
-          finalPct = (item.votes / totalVotes) * 100;
+          voteShare70 = (v / totalVotes) * 100;
+          finalPct = voteShare70;
         } else if (totalWhatIf > 0) {
-          finalPct = (item.whatIfScore / totalWhatIf) * 100;
+          whatIfShare30 = (w / totalWhatIf) * 100;
+          finalPct = whatIfShare30;
         }
 
-        return { ...item, percent: `${finalPct.toFixed(2)}%` };
+        const totalScore = Number(finalPct.toFixed(2));
+        return {
+          ...item,
+          whatIfScore: w,
+          votes: v,
+          totalScore,
+          percent: `${finalPct.toFixed(2)}%`,
+        };
       });
 
-      // Sort by totalScore descending (then by percent)
-      computed.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+      // Sort by percent descending
+      computed.sort((a, b) => parseFloat(b.percent) - parseFloat(a.percent));
       return computed.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
     });
 
-    showToast("คำนวณคะแนนรวม (โหวต 70% + What If 30%) และ % โพลล์เรียบร้อยแล้ว");
+    showToast("คำนวณ % โพลล์ (โหวต 70% + What If 30%) และจัดอันดับเรียบร้อยแล้ว");
   };
 
   const handleAutoSortByVotes = () => {
@@ -2858,7 +2853,7 @@ export default function TrialAdminPage() {
                   </h2>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: 0, lineHeight: "1.6" }}>
                     ตารางนี้จะแสดงบนหน้าตารางคะแนน (/trial-foty) และหน้าโหวต (/trial-foty/vote)<br />
-                    💡 <strong>สูตรคะแนนโพลล์:</strong> คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100) คิดเป็นสัดส่วน <strong>30%</strong> (เต็ม 30 แต้ม) + คะแนนโหวตมหาชน คิดเป็นสัดส่วน <strong>70%</strong> (เต็ม 70 แต้ม) = <strong>คะแนนรวมเต็ม 100 แต้ม</strong><br />คุณสามารถใส่คะแนน What If?, แก้ไขคะแนนโหวต หรือกดปุ่ม <strong>"🧮 คำนวณ % โพลล์"</strong> แล้วกด <strong>"บันทึกผลโพลล์ทั้งหมด"</strong>
+                    💡 <strong>สูตรคะแนนโพลล์:</strong> สัดส่วนรอบอุ่นเครื่อง What If? (30%) คิดจาก [คะแนนคนนี้ ÷ คะแนนรวมทุกคน] × 30% + สัดส่วนโพลล์มหาชน (70%) คิดจาก [คะแนนโหวตคนนี้ ÷ คะแนนโหวตรวมทุกคน] × 70% รวมกันทั้งสิ้น <strong>100%</strong><br />คุณสามารถใส่คะแนน What If?, แก้ไขคะแนนโหวต หรือกดปุ่ม <strong>"🧮 คำนวณ % โพลล์"</strong> แล้วกด <strong>"บันทึกผลโพลล์ทั้งหมด"</strong>
                   </p>
                 </div>
 
@@ -3274,8 +3269,8 @@ export default function TrialAdminPage() {
                     <th colSpan={7} style={{ padding: "8px", textAlign: "center", color: "#ffd700", background: "rgba(255, 215, 0, 0.12)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)", borderRight: "1px solid rgba(255, 215, 0, 0.3)", fontWeight: "900", fontSize: "13px" }}>
                       📊 คะแนนโหวตมหาชน (70%)
                     </th>
-                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "105px", color: "#ffd700", fontWeight: "900", background: "rgba(255, 215, 0, 0.08)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="คะแนนรวมสุทธิเต็ม 100 (คำนวณจาก โพลล์มหาชน 70% + What If 30%)">
-                      ⭐ คะแนนรวม<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#fef08a" }}>(เต็ม 100)</span>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "105px", color: "#ffd700", fontWeight: "900", background: "rgba(255, 215, 0, 0.08)", borderLeft: "1px solid rgba(255, 215, 0, 0.3)" }} title="คะแนนรวมโพลล์ (คำนวณจาก โพลล์มหาชน 70% + What If 30%)">
+                      ⭐ คะแนนรวม<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#fef08a" }}>(โพลล์ 100%)</span>
                     </th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "center", width: "85px", color: "#67e8f9", fontWeight: "900" }}>คิดเป็น %</th>
                     <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "76px", color: "#80d0ff" }}>เลื่อน</th>
@@ -3448,9 +3443,15 @@ export default function TrialAdminPage() {
                                 textAlign: "center",
                               }}
                             />
-                            <span style={{ fontSize: "10px", color: "#fb923c", fontWeight: "700" }}>
-                              = {((Number(item.whatIfScore) || 0) * 0.3).toFixed(1)}/30
-                            </span>
+                            {(() => {
+                              const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
+                              const whatIfPct30 = totalWhatIf > 0 ? ((Number(item.whatIfScore) || 0) / totalWhatIf) * 30 : 0;
+                              return (
+                                <span style={{ fontSize: "10px", color: "#fb923c", fontWeight: "700" }} title="สัดส่วนในโควต้า 30% ของโพลล์ (คะแนนคนนี้ ÷ คะแนนรวมทุกคน x 30%)">
+                                  = {whatIfPct30.toFixed(2)}%
+                                </span>
+                              );
+                            })()}
                           </div>
                         </td>
 
@@ -3613,20 +3614,34 @@ export default function TrialAdminPage() {
                           {(() => {
                             const w = Number(item.whatIfScore) || 0;
                             const v = Number(item.votes) || 0;
-                            const maxV = Math.max(...pollItems.map((it) => Number(it.votes) || 0), 0);
-                            const votePts70 = maxV > 0 ? (v / maxV) * 70 : 0;
-                            const whatIfPts30 = (w / 100) * 30;
-                            const displayTotal = item.totalScore !== undefined && item.totalScore !== null
-                              ? Number(item.totalScore).toFixed(1)
-                              : (votePts70 + whatIfPts30).toFixed(1);
+                            const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
+                            const totalVotes = pollItems.reduce((sum, it) => sum + (Number(it.votes) || 0), 0);
+
+                            let voteShare70 = 0;
+                            let whatIfShare30 = 0;
+                            let totalPct = 0;
+
+                            if (totalVotes > 0 && totalWhatIf > 0) {
+                              whatIfShare30 = (w / totalWhatIf) * 30;
+                              voteShare70 = (v / totalVotes) * 70;
+                              totalPct = voteShare70 + whatIfShare30;
+                            } else if (totalVotes > 0) {
+                              voteShare70 = (v / totalVotes) * 100;
+                              totalPct = voteShare70;
+                            } else if (totalWhatIf > 0) {
+                              whatIfShare30 = (w / totalWhatIf) * 100;
+                              totalPct = whatIfShare30;
+                            }
+
+                            const displayTotal = item.percent ? parseFloat(item.percent).toFixed(2) : totalPct.toFixed(2);
 
                             return (
                               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
                                 <span style={{ fontSize: "14px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 8px rgba(255,215,0,0.3)" }}>
-                                  {displayTotal}
+                                  {displayTotal}%
                                 </span>
                                 <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)" }}>
-                                  (โหวต {votePts70.toFixed(1)} + WI {whatIfPts30.toFixed(1)})
+                                  (โหวต {voteShare70.toFixed(2)}% + WI {whatIfShare30.toFixed(2)}%)
                                 </span>
                               </div>
                             );
