@@ -106,24 +106,14 @@ function computePollPercentages(items) {
     const v = Number(item.votes) || 0;
     const w = Math.min(100, Math.max(0, Number(item.whatIfScore) || 0));
 
-    let voteShare70 = 0;
-    let whatIfShare30 = 0;
-    let finalPct = 0;
+    // What If (30% เต็ม): สัดส่วนคะแนน What If คนนี้ ÷ รวมทุกคน x 30%
+    const whatIfShare30 = totalWhatIf > 0 ? (w / totalWhatIf) * 30 : 0;
 
-    if (totalVotes > 0 && totalWhatIf > 0) {
-      // 30% จากสัดส่วนคะแนน What If ต่อคะแนนรวมของทุกคน (w / totalWhatIf * 30%)
-      whatIfShare30 = (w / totalWhatIf) * 30;
-      // 70% จากสัดส่วนคะแนนโหวตมหาชนต่อคะแนนโหวตรวมของทุกคน (v / totalVotes * 70%)
-      voteShare70 = (v / totalVotes) * 70;
-      finalPct = voteShare70 + whatIfShare30;
-    } else if (totalVotes > 0) {
-      voteShare70 = (v / totalVotes) * 100;
-      finalPct = voteShare70;
-    } else if (totalWhatIf > 0) {
-      whatIfShare30 = (w / totalWhatIf) * 100;
-      finalPct = whatIfShare30;
-    }
+    // คะแนนโหวตมหาชน (70% เต็ม): สัดส่วนคะแนนโหวตคนนี้ ÷ รวมโหวตทุกคน x 70%
+    const voteShare70 = totalVotes > 0 ? (v / totalVotes) * 70 : 0;
 
+    // บวกกันโต้งๆ เลย ไม่ต้องปรับเพิ่ม (เช่น นนท์ได้ 11.72% ก็ใช้ 11.72% เลย)
+    const finalPct = whatIfShare30 + voteShare70;
     const totalScore = Number(finalPct.toFixed(2));
 
     return {
@@ -248,7 +238,9 @@ export async function POST(request) {
         return item;
       });
 
-      const recomputed = computePollPercentages(updatedPoll);
+      let recomputed = computePollPercentages(updatedPoll);
+      recomputed.sort((a, b) => parseFloat(b.percent || b.totalScore || 0) - parseFloat(a.percent || a.totalScore || 0));
+      recomputed = recomputed.map((item, idx) => ({ ...item, pollRank: idx + 1 }));
       await saveKVData("fpt_trial_poll", recomputed, writeLocalPoll);
 
       return NextResponse.json({

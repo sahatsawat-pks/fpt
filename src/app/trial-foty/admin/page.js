@@ -357,23 +357,12 @@ export default function TrialAdminPage() {
         const v = Number(item.votes) || 0;
         const w = Math.min(100, Math.max(0, Number(item.whatIfScore) || 0));
 
-        let voteShare70 = 0;
-        let whatIfShare30 = 0;
-        let finalPct = 0;
-
-        if (totalVotes > 0 && totalWhatIf > 0) {
-          // 30% จากคะแนนทุกคนรวมกันแล้วหารคะแนนที่ได้ (w / totalWhatIf * 30%)
-          whatIfShare30 = (w / totalWhatIf) * 30;
-          // 70% จากคะแนนโหวตทุกคนรวมกันแล้วหารคะแนนโหวตที่ได้ (v / totalVotes * 70%)
-          voteShare70 = (v / totalVotes) * 70;
-          finalPct = voteShare70 + whatIfShare30;
-        } else if (totalVotes > 0) {
-          voteShare70 = (v / totalVotes) * 100;
-          finalPct = voteShare70;
-        } else if (totalWhatIf > 0) {
-          whatIfShare30 = (w / totalWhatIf) * 100;
-          finalPct = whatIfShare30;
-        }
+        // 30% จากคะแนนรอบอุ่นเครื่อง What If (w / totalWhatIf * 30%)
+        const whatIfShare30 = totalWhatIf > 0 ? (w / totalWhatIf) * 30 : 0;
+        // 70% จากคะแนนโหวตมหาชน (v / totalVotes * 70%)
+        const voteShare70 = totalVotes > 0 ? (v / totalVotes) * 70 : 0;
+        // บวกกันโต้งๆ เลย ไม่ต้องปรับเพิ่ม (เช่น นนท์ได้ 11.72% ก็ใช้ 11.72% เลย)
+        const finalPct = whatIfShare30 + voteShare70;
 
         const totalScore = Number(finalPct.toFixed(2));
         return {
@@ -3617,21 +3606,9 @@ export default function TrialAdminPage() {
                             const totalWhatIf = pollItems.reduce((sum, it) => sum + (Number(it.whatIfScore) || 0), 0);
                             const totalVotes = pollItems.reduce((sum, it) => sum + (Number(it.votes) || 0), 0);
 
-                            let voteShare70 = 0;
-                            let whatIfShare30 = 0;
-                            let totalPct = 0;
-
-                            if (totalVotes > 0 && totalWhatIf > 0) {
-                              whatIfShare30 = (w / totalWhatIf) * 30;
-                              voteShare70 = (v / totalVotes) * 70;
-                              totalPct = voteShare70 + whatIfShare30;
-                            } else if (totalVotes > 0) {
-                              voteShare70 = (v / totalVotes) * 100;
-                              totalPct = voteShare70;
-                            } else if (totalWhatIf > 0) {
-                              whatIfShare30 = (w / totalWhatIf) * 100;
-                              totalPct = whatIfShare30;
-                            }
+                            const whatIfShare30 = totalWhatIf > 0 ? (w / totalWhatIf) * 30 : 0;
+                            const voteShare70 = totalVotes > 0 ? (v / totalVotes) * 70 : 0;
+                            const totalPct = voteShare70 + whatIfShare30;
 
                             const displayTotal = item.percent ? parseFloat(item.percent).toFixed(2) : totalPct.toFixed(2);
 
