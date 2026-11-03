@@ -363,7 +363,7 @@ export async function POST(request) {
         idList.forEach((cId) => {
           if (!cId) return;
           const target = current.find(
-            (item) => String(item.id) === String(cId) || String(item.pollRank) === String(cId)
+            (item) => String(item.id) === String(cId) || (item.name && String(item.name) === String(cId))
           );
           if (target) {
             target.votes = (Number(target.votes) || 0) + weight;
@@ -376,7 +376,7 @@ export async function POST(request) {
       // Add champion vote (10 คะแนนพิเศษ)
       if (championId) {
         const champTarget = current.find(
-          (item) => String(item.id) === String(championId) || String(item.pollRank) === String(championId)
+          (item) => String(item.id) === String(championId) || (item.name && String(item.name) === String(championId))
         );
         if (champTarget) {
           champTarget.votes = (Number(champTarget.votes) || 0) + 10; // เพิ่ม 10 คะแนนพิเศษสำหรับตำแหน่งแชมป์

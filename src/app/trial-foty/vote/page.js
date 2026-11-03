@@ -60,7 +60,7 @@ function RankMultiSelectCard({
   const selectedContestantsList = useMemo(() => {
     return selectedIds
       .map((id) =>
-        contestants.find((c) => String(c.id) === String(id) || String(c.pollRank) === String(id))
+        contestants.find((c) => String(c.id) === String(id) || (c.name && String(c.name) === String(id)))
       )
       .filter(Boolean);
   }, [selectedIds, contestants]);
@@ -131,7 +131,7 @@ function RankMultiSelectCard({
           }}
         >
           {selectedContestantsList.map((c, idx) => {
-            const cId = String(c.id || c.pollRank);
+            const cId = String(c.id || c.name);
             return (
               <div
                 key={cId}
@@ -370,7 +370,7 @@ function RankMultiSelectCard({
             </div>
           ) : (
             filteredContestants.map((c) => {
-              const cId = String(c.id || c.pollRank);
+              const cId = String(c.id || c.name);
               const isSelectedInThisRank = selectedIds.includes(cId);
 
               // Check if selected in another rank
@@ -535,7 +535,7 @@ function ChampionDropdownCard({
 
   const selectedContestant = useMemo(() => {
     if (!selectedId) return null;
-    return contestants.find((c) => String(c.id) === String(selectedId) || String(c.pollRank) === String(selectedId));
+    return contestants.find((c) => String(c.id) === String(selectedId) || (c.name && String(c.name) === String(selectedId)));
   }, [selectedId, contestants]);
 
   const filteredContestants = useMemo(() => {
@@ -753,7 +753,7 @@ function ChampionDropdownCard({
             </div>
           ) : (
             filteredContestants.map((c) => {
-              const cId = String(c.id || c.pollRank);
+              const cId = String(c.id || c.name);
               const isCurrent = String(selectedId) === cId;
               return (
                 <div
@@ -1017,7 +1017,7 @@ export default function TrialFotyBallotVotePage() {
 
   const getCandidateById = (id) => {
     if (!id) return null;
-    return pollList.find((c) => String(c.id) === String(id) || String(c.pollRank) === String(id));
+    return pollList.find((c) => String(c.id) === String(id) || (c.name && String(c.name) === String(id)));
   };
 
   const rankConfig = [
