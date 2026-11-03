@@ -769,7 +769,7 @@ export default function AdminTournamentPage() {
     );
     const initialStatus = match.status || (hasAnyScores ? "completed" : "scheduled");
 
-    setMatchFormData({
+    const initialFormData = {
       id: match.id,
       matchNumber: match.matchNumber,
       group: match.group,
@@ -807,7 +807,11 @@ export default function AdminTournamentPage() {
         categoryPoints: match.player2?.categoryPoints ?? 0,
         leaguePoint: match.player2?.leaguePoint ?? "",
       },
-    });
+    };
+
+    // Auto-calculate to ensure raw sum bonus (+1 GP) and LP are up-to-date
+    const computed = computeMatchCalculations(initialFormData, initialStatus);
+    setMatchFormData(computed || initialFormData);
   };
 
   // Helper: compute category points (GP), raw sums, and LP
@@ -868,40 +872,62 @@ export default function AdminTournamentPage() {
     let lp2 = "";
     let status = explicitStatus || currentFormData.status || "scheduled";
 
+    let finalGp1 = cp1;
+    let finalGp2 = cp2;
+    let rawSumBonusWinner = null;
+
     if (isAll4Completed) {
-      // กรอกครบทั้ง 4 หมวดแล้ว -> คำนวณแต้มลีก (League Point) ตามกฎ และปรับเป็นแข่งขันเสร็จสิ้น
+      // กรอกครบทั้ง 4 หมวดแล้ว:
+      // ถ้าคะแนนหมวด (Game Point) ไม่เสมอ (cp1 !== cp2)
+      // ผู้ที่มี "คะแนนรวมดิบ 4 หมวด" สูงกว่า จะได้เพิ่มอีก +1 Game Point!
+      if (cp1 !== cp2) {
+        if (sum1 > sum2) {
+          finalGp1 += 1;
+          rawSumBonusWinner = "player1";
+        } else if (sum2 > sum1) {
+          finalGp2 += 1;
+          rawSumBonusWinner = "player2";
+        }
+      }
+
       status = explicitStatus || "completed";
-      if (cp1 > cp2) {
+      if (finalGp1 > finalGp2) {
         winner = "player1";
-        if (cp1 >= 4 && cp2 === 0) {
+        if (finalGp1 >= 4 && finalGp2 === 0) {
           lp1 = 5;
-          lp2 = -1;
-        } else if (cp1 >= 4) {
+          lp2 = -2;
+        } else if (finalGp1 >= 4) {
           lp1 = 4;
           lp2 = 0;
+        } else if (finalGp1 === 3 && finalGp2 === 0) {
+          lp1 = 3;
+          lp2 = -1;
         } else {
           lp1 = 3;
           lp2 = 0;
         }
-      } else if (cp2 > cp1) {
+      } else if (finalGp2 > finalGp1) {
         winner = "player2";
-        if (cp2 >= 4 && cp1 === 0) {
+        if (finalGp2 >= 4 && finalGp1 === 0) {
           lp2 = 5;
-          lp1 = -1;
-        } else if (cp2 >= 4) {
+          lp1 = -2;
+        } else if (finalGp2 >= 4) {
           lp2 = 4;
           lp1 = 0;
+        } else if (finalGp2 === 3 && finalGp1 === 0) {
+          lp2 = 3;
+          lp1 = -1;
         } else {
           lp2 = 3;
           lp1 = 0;
         }
-      } else if (cp1 === cp2 && (sum1 > 0 || sum2 > 0)) {
+      } else if (finalGp1 === finalGp2 && (sum1 > 0 || sum2 > 0)) {
         winner = "draw";
         lp1 = 1;
         lp2 = 1;
       }
     } else if (hasAnyScore) {
-      // ยังไม่ครบ 4 หมวด -> อัปเดต GP และคะแนนรวมดิบ แต่แต้มลีก LP ยังไม่คำนวณ!
+      // ยังไม่ครบ 4 หมวด -> อัปเดต GP จากหมวดที่แข่งเสร็จแล้วและคะแนนรวมดิบ แต่แต้มลีก LP ยังไม่คำนวณ
       status = explicitStatus || (currentFormData.status === "completed" ? "completed" : "in_progress");
       winner = null;
       lp1 = "";
@@ -920,16 +946,18 @@ export default function AdminTournamentPage() {
       completedCatsCount,
       isAll4Completed,
       hasAnyScore,
+      rawSumBonusWinner,
+      categoryPointsBeforeBonus: { player1: cp1, player2: cp2 },
       player1: {
         ...currentFormData.player1,
         sum: sum1,
-        categoryPoints: cp1,
+        categoryPoints: finalGp1,
         leaguePoint: lp1 !== "" ? lp1 : (status === "completed" ? currentFormData.player1.leaguePoint : ""),
       },
       player2: {
         ...currentFormData.player2,
         sum: sum2,
-        categoryPoints: cp2,
+        categoryPoints: finalGp2,
         leaguePoint: lp2 !== "" ? lp2 : (status === "completed" ? currentFormData.player2.leaguePoint : ""),
       },
     };
@@ -963,9 +991,13 @@ export default function AdminTournamentPage() {
     setMatchFormData(computed);
 
     if (computed.isAll4Completed) {
-      showToast(`✅ กรอกครบ 4 หมวดแล้ว! คำนวณแต้มหมวด (GP ${computed.player1.categoryPoints}-${computed.player2.categoryPoints}) และแต้มลีก (LP) เรียบร้อย`, "success");
+      const bonusText = computed.rawSumBonusWinner
+        ? ` (+1 GP รวมดิบ: ${computed.rawSumBonusWinner === "player1" ? (computed.player1.nickname || "ฝั่งซ้าย") : (computed.player2.nickname || "ฝั่งขวา")})`
+        : "";
+      const resultText = computed.winner === "draw" ? "ผลเสมอ" : `ผู้ชนะ: ${computed.winner === "player1" ? (computed.player1.nickname || "ฝั่งซ้าย") : (computed.player2.nickname || "ฝั่งขวา")}`;
+      showToast(`✅ กรอกครบ 4 หมวดแล้ว! GP รวม: ${computed.player1.categoryPoints}-${computed.player2.categoryPoints}${bonusText} • แต้มลีก: ${computed.player1.leaguePoint} vs ${computed.player2.leaguePoint} LP (${resultText})`, "success");
     } else if (computed.hasAnyScore) {
-      showToast(`⚡ อัปเดตแต้มหมวดสด: GP ${computed.player1.categoryPoints} - ${computed.player2.categoryPoints} (เสร็จ ${computed.completedCatsCount}/4 หมวด • แต้มลีก LP จะคำนวณเมื่อแข่งครบ 4 หมวด)`, "info");
+      showToast(`⚡ อัปเดตแต้มสด: GP ${computed.player1.categoryPoints} - ${computed.player2.categoryPoints} (เสร็จ ${computed.completedCatsCount}/4 หมวด • แต้มลีก LP และแต้มรวมดิบจะคำนวณเมื่อแข่งครบ 4 หมวด)`, "info");
     } else {
       showToast("ยังไม่มีคะแนนกรอกในหมวดใดเลย", "info");
     }
@@ -2237,11 +2269,16 @@ export default function AdminTournamentPage() {
               )}
 
               {matchFormData.status === "completed" && (
-                <div style={{ fontSize: "12px", color: "#86efac", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                <div style={{ fontSize: "12px", color: "#86efac", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                   <span>✅</span> แข่งขันเสร็จสิ้น: GP {matchFormData.player1.categoryPoints ?? 0} - {matchFormData.player2.categoryPoints ?? 0}
-                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)" }}>
                     (ลีก: {matchFormData.player1.leaguePoint !== "" ? `${matchFormData.player1.leaguePoint} LP` : "-"} vs {matchFormData.player2.leaguePoint !== "" ? `${matchFormData.player2.leaguePoint} LP` : "-"})
                   </span>
+                  {matchFormData.rawSumBonusWinner && (
+                    <span style={{ fontSize: "11px", color: "#ffd700", background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "1px 6px", borderRadius: "4px" }}>
+                      ⭐ ได้ +1 GP จากคะแนนรวมดิบ ({matchFormData.rawSumBonusWinner === "player1" ? (matchFormData.player1.nickname || "ฝั่งซ้าย") : (matchFormData.player2.nickname || "ฝั่งขวา")})
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -2491,7 +2528,14 @@ export default function AdminTournamentPage() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>คะแนน (GP)</label>
+                      <label style={{ fontSize: "11px", color: "#00e5ff", fontWeight: "700" }}>
+                        คะแนน (GP)
+                        {matchFormData.rawSumBonusWinner === "player1" && (
+                          <span style={{ marginLeft: "4px", fontSize: "10px", color: "#ffd700", fontWeight: "800" }}>
+                            (+1 รวมดิบ)
+                          </span>
+                        )}
+                      </label>
                       <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>ดิบ: {matchFormData.player1.sum ?? 0}</span>
                     </div>
                     <input
@@ -2750,7 +2794,14 @@ export default function AdminTournamentPage() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                   <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>คะแนน (GP)</label>
+                      <label style={{ fontSize: "11px", color: "#ffd700", fontWeight: "700" }}>
+                        คะแนน (GP)
+                        {matchFormData.rawSumBonusWinner === "player2" && (
+                          <span style={{ marginLeft: "4px", fontSize: "10px", color: "#ffd700", fontWeight: "800" }}>
+                            (+1 รวมดิบ)
+                          </span>
+                        )}
+                      </label>
                       <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>ดิบ: {matchFormData.player2.sum ?? 0}</span>
                     </div>
                     <input
