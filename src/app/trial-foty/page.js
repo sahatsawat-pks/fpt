@@ -184,10 +184,10 @@ function evaluatePlayerStatus(player, denseLeaderboard, targetTotalPlayers = 24)
     };
   }
 
-  if (player.waitingNextMatch) {
+  if (player.waitingNextMatch || player.rank === null) {
     return {
       statusClass: "status-waiting",
-      statusLabel: "รอลุ้นผลรอบถัดไป",
+      statusLabel: player.waitingNextMatch ? "รอลุ้นผลรอบถัดไป" : "รอลงแข่งขัน",
       badgeColor: "#818cf8",
       isGuaranteedQualified: false,
       isEliminated: false,
@@ -2505,72 +2505,8 @@ export default function TrialFOTYPage() {
                         const scoreJigsaw = scores.jigsaw !== undefined && scores.jigsaw !== null ? scores.jigsaw : null;
                         const scoreAttr = scores.attribute !== undefined && scores.attribute !== null ? scores.attribute : null;
 
-                        const prevItem = index > 0 ? filteredWarmup[index - 1] : null;
-                        const showCutoffLine =
-                          prevItem &&
-                          (Number(prevItem.warmupRank) || 0) <= 5 &&
-                          (Number(item.warmupRank) || 0) > 5;
-
                         return (
                           <Fragment key={item.id || item.name}>
-                            {/* Cutoff Line after Top 5 (Orange Glowing Beam) */}
-                            {showCutoffLine && (
-                              <div
-                                style={{
-                                  margin: "14px 0 10px 0",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "12px",
-                                  position: "relative",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    flex: 1,
-                                    height: "2px",
-                                    background: "linear-gradient(90deg, rgba(255, 136, 0, 0) 0%, #ff8800 100%)",
-                                    boxShadow: "0 0 10px rgba(255, 136, 0, 0.8)",
-                                  }}
-                                />
-                                <div
-                                  style={{
-                                    transform: "skewX(-16deg)",
-                                    background: "linear-gradient(135deg, #2b1406 0%, #0d0601 100%)",
-                                    border: "1.5px solid #ff8800",
-                                    boxShadow: "0 0 16px rgba(255, 136, 0, 0.45)",
-                                    padding: "4px 16px",
-                                    borderRadius: "8px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "8px",
-                                    flexShrink: 0,
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      transform: "skewX(16deg)",
-                                      fontSize: "12px",
-                                      fontWeight: "900",
-                                      fontStyle: "italic",
-                                      letterSpacing: "0.8px",
-                                      color: "#ffa940",
-                                      textShadow: "0 0 10px rgba(255, 136, 0, 0.7)",
-                                    }}
-                                  >
-                                    ⚡ เส้นคัดเข้ารอบ 5 อันดับแรก (TOP 5 QUALIFYING CUTOFF)
-                                  </span>
-                                </div>
-                                <div
-                                  style={{
-                                    flex: 1,
-                                    height: "2px",
-                                    background: "linear-gradient(90deg, #ff8800 0%, rgba(255, 136, 0, 0) 100%)",
-                                    boxShadow: "0 0 10px rgba(255, 136, 0, 0.8)",
-                                  }}
-                                />
-                              </div>
-                            )}
-
                             <div
                               className="table-row-entrance"
                               onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
