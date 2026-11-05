@@ -2460,6 +2460,32 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
     return { ...cat, v1: s1, v2: s2, cp1, cp2, p1Won, p2Won, tied, pct1, pct2 };
   });
 
+  // Calculate Bonus / Award / Penalty badges
+  const cats = ["3sec", "qa", "jigsaw", "attribute"];
+  const count25_1 = isCompleted ? cats.filter((c) => Number(p1.scores?.[c]) === 25).length : 0;
+  const count25_2 = isCompleted ? cats.filter((c) => Number(p2.scores?.[c]) === 25).length : 0;
+  const rawSumWinner = match.rawSumBonusWinner;
+  const beforeBonusCp1 = match.categoryPointsBeforeBonus?.player1 ?? (p1.categoryPoints - (rawSumWinner === "player1" ? 1 : 0));
+  const beforeBonusCp2 = match.categoryPointsBeforeBonus?.player2 ?? (p2.categoryPoints - (rawSumWinner === "player2" ? 1 : 0));
+
+  const hasAward1 = match.awards?.player1 || (isCompleted && ((count25_1 >= 2 && beforeBonusCp1 === 4) || count25_1 >= 3));
+  const hasAward2 = match.awards?.player2 || (isCompleted && ((count25_2 >= 2 && beforeBonusCp2 === 4) || count25_2 >= 3));
+  const awardLabel = hasAward1
+    ? (match.awards?.player1?.name || (p1.nickname ? `รางวัล${p1.nickname}` : "รางวัลกร"))
+    : hasAward2
+    ? (match.awards?.player2?.name || (p2.nickname ? `รางวัล${p2.nickname}` : "รางวัลกร"))
+    : null;
+
+  const zero1 = isCompleted ? cats.filter((c) => p1.scores?.[c] !== null && p1.scores?.[c] !== undefined && Number(p1.scores[c]) === 0).length : 0;
+  const zero2 = isCompleted ? cats.filter((c) => p2.scores?.[c] !== null && p2.scores?.[c] !== undefined && Number(p2.scores[c]) === 0).length : 0;
+  const hasPenalty1 = match.penalties?.player1 || (isCompleted && zero1 >= 3);
+  const hasPenalty2 = match.penalties?.player2 || (isCompleted && zero2 >= 3);
+  const penaltyLabel = hasPenalty1
+    ? (match.penalties?.player1?.name || (p1.nickname ? `หักค่า${p1.nickname}` : "หักค่าปัน"))
+    : hasPenalty2
+    ? (match.penalties?.player2?.name || (p2.nickname ? `หักค่า${p2.nickname}` : "หักค่าปัน"))
+    : null;
+
   // Cell coloring helper mimicking dark tournament cyber-sports theme
   const getScoreCellStyle = (val, isWon, isLost) => {
     if ((!isCompleted && !isInProgress) || val === "-" || val === null || val === undefined) {
@@ -2923,16 +2949,37 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
               {/* Raw Comparison sub-text */}
               {isCompleted ? (
-                <div
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: "700",
-                    color: "rgba(224, 242, 254, 0.75)",
-                    marginTop: "6px",
-                  }}
-                >
-                  ดิบ: <strong>{p1.sum ?? 0}</strong> vs <strong>{p2.sum ?? 0}</strong>
-                </div>
+                <>
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: "700",
+                      color: "rgba(224, 242, 254, 0.75)",
+                      marginTop: "6px",
+                    }}
+                  >
+                    ดิบ: <strong>{p1.sum ?? 0}</strong> vs <strong>{p2.sum ?? 0}</strong>
+                  </div>
+                  {(rawSumWinner || awardLabel || penaltyLabel) && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "3px", alignItems: "center", marginTop: "5px" }}>
+                      {rawSumWinner && (
+                        <span style={{ fontSize: "9px", color: "#ffd700", background: "rgba(255,215,0,0.12)", border: "1px solid rgba(255,215,0,0.25)", padding: "1px 5px", borderRadius: "4px" }}>
+                          ⭐ +1 GP รวมดิบ ({rawSumWinner === "player1" ? p1.nickname : p2.nickname})
+                        </span>
+                      )}
+                      {awardLabel && (
+                        <span style={{ fontSize: "9px", color: "#38bdf8", background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.25)", padding: "1px 5px", borderRadius: "4px" }}>
+                          🎁 {awardLabel} (+1 LP)
+                        </span>
+                      )}
+                      {penaltyLabel && (
+                        <span style={{ fontSize: "9px", color: "#f87171", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 5px", borderRadius: "4px" }}>
+                          ⚠️ {penaltyLabel} (-1 LP)
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </>
               ) : isInProgress ? (
                 <div
                   style={{

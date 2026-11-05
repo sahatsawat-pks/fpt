@@ -29,7 +29,7 @@ export function writeTournamentData(data) {
 }
 
 // Calculate match category points & winner
-export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP = null) {
+export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP = null, p1Nickname = "", p2Nickname = "") {
   const categories = ["3sec", "qa", "jigsaw", "attribute"];
   let cp1 = 0;
   let cp2 = 0;
@@ -65,57 +65,112 @@ export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP 
   const sum1 = categories.reduce((acc, cat) => acc + (typeof p1Scores?.[cat] === "number" ? p1Scores[cat] : 0), 0);
   const sum2 = categories.reduce((acc, cat) => acc + (typeof p2Scores?.[cat] === "number" ? p2Scores[cat] : 0), 0);
 
+  let finalGp1 = cp1;
+  let finalGp2 = cp2;
+  let rawSumBonusWinner = null;
+
+  // Raw sum bonus: If cp1 !== cp2, player with higher raw sum gets +1 GP
+  if (cp1 !== cp2) {
+    if (sum1 > sum2) {
+      finalGp1 += 1;
+      rawSumBonusWinner = "player1";
+    } else if (sum2 > sum1) {
+      finalGp2 += 1;
+      rawSumBonusWinner = "player2";
+    }
+  }
+
+  // Count 25s
+  const count25_1 = categories.filter((c) => Number(p1Scores?.[c]) === 25).length;
+  const count25_2 = categories.filter((c) => Number(p2Scores?.[c]) === 25).length;
+
+  // Award conditions (เดิมชื่อ "รางวัลปาร์ค" เปลี่ยนเป็น "รางวัลกร" หรือรางวัลตามชื่อเล่น):
+  // 1) ได้ 25 เต็ม 2 หมวดและจบด้วย 4 GP ก่อนคำนวณคะแนนรวมดิบ
+  // 2) ได้ 25 เต็ม 3 หมวด ไม่ว่าหมวดที่เหลือจะได้เท่าใด
+  const isAward1 = (count25_1 >= 2 && cp1 === 4) || count25_1 >= 3;
+  const isAward2 = (count25_2 >= 2 && cp2 === 4) || count25_2 >= 3;
+
+  // Penalty conditions (หักค่าตามด้วยชื่อเล่น ตอนนี้เป็น "หักค่าปัน"):
+  // ได้คะแนน 0 อย่างน้อย 3 หมวด หัก 1 League Point
+  const zeroCount_1 = categories.filter((c) => p1Scores?.[c] !== null && p1Scores?.[c] !== undefined && Number(p1Scores[c]) === 0).length;
+  const zeroCount_2 = categories.filter((c) => p2Scores?.[c] !== null && p2Scores?.[c] !== undefined && Number(p2Scores[c]) === 0).length;
+  const isPenalty1 = zeroCount_1 >= 3;
+  const isPenalty2 = zeroCount_2 >= 3;
+
   let winner = null;
   let autoLp1 = 0;
   let autoLp2 = 0;
 
-  if (cp1 > cp2) {
+  if (finalGp1 > finalGp2) {
     winner = "player1";
-    if (cp1 >= 4 && cp2 === 0) {
+    if (finalGp1 >= 4 && finalGp2 === 0) {
       autoLp1 = 5;
-      autoLp2 = -2;
-    } else if (cp1 >= 4) {
+      autoLp2 = -1;
+    } else if (finalGp1 >= 4) {
       autoLp1 = 4;
       autoLp2 = 0;
-    } else if (cp1 === 3 && cp2 === 0) {
+    } else if (finalGp1 === 3 && finalGp2 === 0) {
       autoLp1 = 3;
       autoLp2 = -1;
     } else {
       autoLp1 = 3;
       autoLp2 = 0;
     }
-  } else if (cp2 > cp1) {
+  } else if (finalGp2 > finalGp1) {
     winner = "player2";
-    if (cp2 >= 4 && cp1 === 0) {
+    if (finalGp2 >= 4 && finalGp1 === 0) {
       autoLp2 = 5;
-      autoLp1 = -2;
-    } else if (cp2 >= 4) {
+      autoLp1 = -1;
+    } else if (finalGp2 >= 4) {
       autoLp2 = 4;
       autoLp1 = 0;
-    } else if (cp2 === 3 && cp1 === 0) {
+    } else if (finalGp2 === 3 && finalGp1 === 0) {
       autoLp2 = 3;
       autoLp1 = -1;
     } else {
       autoLp2 = 3;
       autoLp1 = 0;
     }
-  } else if (cp1 === cp2 && (sum1 > 0 || sum2 > 0)) {
+  } else if (finalGp1 === finalGp2 && (sum1 > 0 || sum2 > 0)) {
     winner = "draw";
     autoLp1 = 1;
     autoLp2 = 1;
   }
 
+  // Apply award bonus (+1 LP)
+  if (isAward1) autoLp1 += 1;
+  if (isAward2) autoLp2 += 1;
+
+  // Apply penalty deduction (-1 LP)
+  if (isPenalty1) autoLp1 -= 1;
+  if (isPenalty2) autoLp2 -= 1;
+
   const lp1 = manualP1LP !== null && manualP1LP !== undefined && manualP1LP !== "" ? Number(manualP1LP) : autoLp1;
   const lp2 = manualP2LP !== null && manualP2LP !== undefined && manualP2LP !== "" ? Number(manualP2LP) : autoLp2;
 
+  const award1Name = p1Nickname ? `รางวัล${p1Nickname}` : "รางวัลกร";
+  const award2Name = p2Nickname ? `รางวัล${p2Nickname}` : "รางวัลกร";
+  const penalty1Name = p1Nickname ? `หักค่า${p1Nickname}` : "หักค่าปัน";
+  const penalty2Name = p2Nickname ? `หักค่า${p2Nickname}` : "หักค่าปัน";
+
   return {
-    cp1,
-    cp2,
+    cp1: finalGp1,
+    cp2: finalGp2,
+    categoryPointsBeforeBonus: { player1: cp1, player2: cp2 },
+    rawSumBonusWinner,
     sum1,
     sum2,
     winner,
     lp1,
     lp2,
+    awards: {
+      player1: isAward1 ? { name: award1Name, bonus: 1, reason: count25_1 >= 3 ? "ได้ 25 เต็ม 3 หมวด" : "ได้ 25 เต็ม 2 หมวดและชนะ 4 GP ก่อนรวมดิบ" } : null,
+      player2: isAward2 ? { name: award2Name, bonus: 1, reason: count25_2 >= 3 ? "ได้ 25 เต็ม 3 หมวด" : "ได้ 25 เต็ม 2 หมวดและชนะ 4 GP ก่อนรวมดิบ" } : null,
+    },
+    penalties: {
+      player1: isPenalty1 ? { name: penalty1Name, penalty: -1, reason: "ได้ 0 อย่างน้อย 3 หมวด" } : null,
+      player2: isPenalty2 ? { name: penalty2Name, penalty: -1, reason: "ได้ 0 อย่างน้อย 3 หมวด" } : null,
+    },
     categoryResults,
   };
 }

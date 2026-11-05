@@ -875,6 +875,8 @@ export default function AdminTournamentPage() {
     let finalGp1 = cp1;
     let finalGp2 = cp2;
     let rawSumBonusWinner = null;
+    let awards = { player1: null, player2: null };
+    let penalties = { player1: null, player2: null };
 
     if (isAll4Completed) {
       // กรอกครบทั้ง 4 หมวดแล้ว:
@@ -891,11 +893,13 @@ export default function AdminTournamentPage() {
       }
 
       status = explicitStatus || "completed";
+
+      // 1. Base League Points (LP)
       if (finalGp1 > finalGp2) {
         winner = "player1";
         if (finalGp1 >= 4 && finalGp2 === 0) {
           lp1 = 5;
-          lp2 = -2;
+          lp2 = -1;
         } else if (finalGp1 >= 4) {
           lp1 = 4;
           lp2 = 0;
@@ -910,7 +914,7 @@ export default function AdminTournamentPage() {
         winner = "player2";
         if (finalGp2 >= 4 && finalGp1 === 0) {
           lp2 = 5;
-          lp1 = -2;
+          lp1 = -1;
         } else if (finalGp2 >= 4) {
           lp2 = 4;
           lp1 = 0;
@@ -925,6 +929,64 @@ export default function AdminTournamentPage() {
         winner = "draw";
         lp1 = 1;
         lp2 = 1;
+      }
+
+      // 2. เงื่อนไขรางวัลพิเศษ (เดิมชื่อ "รางวัลปาร์ค" เปลี่ยนเป็น "รางวัลกร" หรือรางวัลตามชื่อเล่นคนที่ทำได้)
+      // ทำได้ 2 แบบ:
+      // แบบที่ 1: ได้ 25 เต็ม 2 หมวดและจบด้วย 4 Game Point ก่อนคำนวณคะแนนรวม (cp === 4) รับเพิ่ม 1 League Point
+      // แบบที่ 2: ได้ 25 เต็ม 3 หมวดโดยไม่สนอีกหมวดนึง (จาก 3/4 หมวดไหนก็ได้) รับเพิ่ม 1 League Point
+      const count25_1 = cats.filter((c) => Number(s1[c]) === 25).length;
+      const count25_2 = cats.filter((c) => Number(s2[c]) === 25).length;
+
+      const isAward1 = (count25_1 >= 2 && cp1 === 4) || count25_1 >= 3;
+      const isAward2 = (count25_2 >= 2 && cp2 === 4) || count25_2 >= 3;
+
+      if (isAward1) {
+        lp1 = (Number(lp1) || 0) + 1;
+        const awardName = currentFormData.player1?.nickname ? `รางวัล${currentFormData.player1.nickname}` : "รางวัลกร";
+        awards.player1 = {
+          name: awardName,
+          bonus: 1,
+          reason: count25_1 >= 3 ? "ได้ 25 เต็ม 3 หมวด" : "ได้ 25 เต็ม 2 หมวดและชนะ 4 GP ก่อนรวมดิบ",
+        };
+      }
+
+      if (isAward2) {
+        lp2 = (Number(lp2) || 0) + 1;
+        const awardName = currentFormData.player2?.nickname ? `รางวัล${currentFormData.player2.nickname}` : "รางวัลกร";
+        awards.player2 = {
+          name: awardName,
+          bonus: 1,
+          reason: count25_2 >= 3 ? "ได้ 25 เต็ม 3 หมวด" : "ได้ 25 เต็ม 2 หมวดและชนะ 4 GP ก่อนรวมดิบ",
+        };
+      }
+
+      // 3. เงื่อนไขหักค่า (หักค่าตามด้วยชื่อเล่น ตอนนี้เป็น "หักค่าปัน")
+      // ได้คะแนน 0 อย่างน้อย 3 หมวด หัก 1 League Point
+      const zeroCount_1 = cats.filter((c) => s1[c] !== null && Number(s1[c]) === 0).length;
+      const zeroCount_2 = cats.filter((c) => s2[c] !== null && Number(s2[c]) === 0).length;
+
+      const isPenalty1 = zeroCount_1 >= 3;
+      const isPenalty2 = zeroCount_2 >= 3;
+
+      if (isPenalty1) {
+        lp1 = (Number(lp1) || 0) - 1;
+        const penaltyName = currentFormData.player1?.nickname ? `หักค่า${currentFormData.player1.nickname}` : "หักค่าปัน";
+        penalties.player1 = {
+          name: penaltyName,
+          penalty: -1,
+          reason: "ได้ 0 อย่างน้อย 3 หมวด",
+        };
+      }
+
+      if (isPenalty2) {
+        lp2 = (Number(lp2) || 0) - 1;
+        const penaltyName = currentFormData.player2?.nickname ? `หักค่า${currentFormData.player2.nickname}` : "หักค่าปัน";
+        penalties.player2 = {
+          name: penaltyName,
+          penalty: -1,
+          reason: "ได้ 0 อย่างน้อย 3 หมวด",
+        };
       }
     } else if (hasAnyScore) {
       // ยังไม่ครบ 4 หมวด -> อัปเดต GP จากหมวดที่แข่งเสร็จแล้วและคะแนนรวมดิบ แต่แต้มลีก LP ยังไม่คำนวณ
@@ -947,6 +1009,8 @@ export default function AdminTournamentPage() {
       isAll4Completed,
       hasAnyScore,
       rawSumBonusWinner,
+      awards,
+      penalties,
       categoryPointsBeforeBonus: { player1: cp1, player2: cp2 },
       player1: {
         ...currentFormData.player1,
@@ -994,8 +1058,18 @@ export default function AdminTournamentPage() {
       const bonusText = computed.rawSumBonusWinner
         ? ` (+1 GP รวมดิบ: ${computed.rawSumBonusWinner === "player1" ? (computed.player1.nickname || "ฝั่งซ้าย") : (computed.player2.nickname || "ฝั่งขวา")})`
         : "";
+      const awardTexts = [];
+      if (computed.awards?.player1) awardTexts.push(`🎁 ${computed.awards.player1.name} (+1 LP)`);
+      if (computed.awards?.player2) awardTexts.push(`🎁 ${computed.awards.player2.name} (+1 LP)`);
+      const penaltyTexts = [];
+      if (computed.penalties?.player1) penaltyTexts.push(`⚠️ ${computed.penalties.player1.name} (-1 LP)`);
+      if (computed.penalties?.player2) penaltyTexts.push(`⚠️ ${computed.penalties.player2.name} (-1 LP)`);
+
+      const extras = [...awardTexts, ...penaltyTexts].join(" ");
+      const extraMsg = extras ? ` • ${extras}` : "";
+
       const resultText = computed.winner === "draw" ? "ผลเสมอ" : `ผู้ชนะ: ${computed.winner === "player1" ? (computed.player1.nickname || "ฝั่งซ้าย") : (computed.player2.nickname || "ฝั่งขวา")}`;
-      showToast(`✅ กรอกครบ 4 หมวดแล้ว! GP รวม: ${computed.player1.categoryPoints}-${computed.player2.categoryPoints}${bonusText} • แต้มลีก: ${computed.player1.leaguePoint} vs ${computed.player2.leaguePoint} LP (${resultText})`, "success");
+      showToast(`✅ คำนวณครบ 4 หมวดแล้ว! GP รวม: ${computed.player1.categoryPoints}-${computed.player2.categoryPoints}${bonusText} • แต้มลีก: ${computed.player1.leaguePoint} vs ${computed.player2.leaguePoint} LP (${resultText})${extraMsg}`, "success");
     } else if (computed.hasAnyScore) {
       showToast(`⚡ อัปเดตแต้มสด: GP ${computed.player1.categoryPoints} - ${computed.player2.categoryPoints} (เสร็จ ${computed.completedCatsCount}/4 หมวด • แต้มลีก LP และแต้มรวมดิบจะคำนวณเมื่อแข่งครบ 4 หมวด)`, "info");
     } else {
@@ -1017,8 +1091,14 @@ export default function AdminTournamentPage() {
         matchId: editingMatch.id,
         matchData: {
           ...matchFormData,
+          rawSumBonusWinner: matchFormData.rawSumBonusWinner || null,
+          awards: matchFormData.awards || null,
+          penalties: matchFormData.penalties || null,
+          categoryPointsBeforeBonus: matchFormData.categoryPointsBeforeBonus || null,
           player1: {
             ...matchFormData.player1,
+            award: matchFormData.awards?.player1 || null,
+            penalty: matchFormData.penalties?.player1 || null,
             set: matchFormData.player1.set || "auto",
             scores: {
               "3sec": parseScore(matchFormData.player1.scores["3sec"]),
@@ -1032,6 +1112,8 @@ export default function AdminTournamentPage() {
           },
           player2: {
             ...matchFormData.player2,
+            award: matchFormData.awards?.player2 || null,
+            penalty: matchFormData.penalties?.player2 || null,
             set: matchFormData.player2.set || "auto",
             scores: {
               "3sec": parseScore(matchFormData.player2.scores["3sec"]),
@@ -1842,6 +1924,25 @@ export default function AdminTournamentPage() {
                         >
                           {p1.categoryPoints ?? 0} - {p2.categoryPoints ?? 0}
                         </div>
+                        {isCompleted && (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "2px", alignItems: "center", marginTop: "4px" }}>
+                            {match.rawSumBonusWinner && (
+                              <span style={{ fontSize: "9px", color: "#ffd700", background: "rgba(255,215,0,0.12)", border: "1px solid rgba(255,215,0,0.25)", padding: "1px 4px", borderRadius: "3px" }}>
+                                ⭐ +1 GP รวมดิบ ({match.rawSumBonusWinner === "player1" ? p1.nickname : p2.nickname})
+                              </span>
+                            )}
+                            {(match.awards?.player1 || match.awards?.player2) && (
+                              <span style={{ fontSize: "9px", color: "#38bdf8", background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.25)", padding: "1px 4px", borderRadius: "3px" }}>
+                                🎁 {match.awards?.player1 ? match.awards.player1.name : match.awards.player2.name} (+1 LP)
+                              </span>
+                            )}
+                            {(match.penalties?.player1 || match.penalties?.player2) && (
+                              <span style={{ fontSize: "9px", color: "#f87171", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 4px", borderRadius: "3px" }}>
+                                ⚠️ {match.penalties?.player1 ? match.penalties.player1.name : match.penalties.player2.name} (-1 LP)
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       <div style={{ flex: 1, textAlign: "center" }}>
@@ -2277,6 +2378,26 @@ export default function AdminTournamentPage() {
                   {matchFormData.rawSumBonusWinner && (
                     <span style={{ fontSize: "11px", color: "#ffd700", background: "rgba(255, 215, 0, 0.15)", border: "1px solid rgba(255, 215, 0, 0.35)", padding: "1px 6px", borderRadius: "4px" }}>
                       ⭐ ได้ +1 GP จากคะแนนรวมดิบ ({matchFormData.rawSumBonusWinner === "player1" ? (matchFormData.player1.nickname || "ฝั่งซ้าย") : (matchFormData.player2.nickname || "ฝั่งขวา")})
+                    </span>
+                  )}
+                  {matchFormData.awards?.player1 && (
+                    <span style={{ fontSize: "11px", color: "#38bdf8", background: "rgba(56, 189, 248, 0.15)", border: "1px solid rgba(56, 189, 248, 0.35)", padding: "1px 6px", borderRadius: "4px" }}>
+                      🎁 {matchFormData.awards.player1.name} (+1 LP: {matchFormData.awards.player1.reason})
+                    </span>
+                  )}
+                  {matchFormData.awards?.player2 && (
+                    <span style={{ fontSize: "11px", color: "#38bdf8", background: "rgba(56, 189, 248, 0.15)", border: "1px solid rgba(56, 189, 248, 0.35)", padding: "1px 6px", borderRadius: "4px" }}>
+                      🎁 {matchFormData.awards.player2.name} (+1 LP: {matchFormData.awards.player2.reason})
+                    </span>
+                  )}
+                  {matchFormData.penalties?.player1 && (
+                    <span style={{ fontSize: "11px", color: "#f87171", background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.35)", padding: "1px 6px", borderRadius: "4px" }}>
+                      ⚠️ {matchFormData.penalties.player1.name} (-1 LP: {matchFormData.penalties.player1.reason})
+                    </span>
+                  )}
+                  {matchFormData.penalties?.player2 && (
+                    <span style={{ fontSize: "11px", color: "#f87171", background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.35)", padding: "1px 6px", borderRadius: "4px" }}>
+                      ⚠️ {matchFormData.penalties.player2.name} (-1 LP: {matchFormData.penalties.player2.reason})
                     </span>
                   )}
                 </div>
