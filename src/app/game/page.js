@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import GAME_CONFIG from "../config";
+import contestantPhotos from "../data/contestant_photos.json";
 import {
   SOUND_PATHS,
   playAudio,
@@ -17,10 +18,45 @@ import {
 
 let globalConfigVersion = Date.now();
 
+// Dynamic size and protocol optimization for Google Photos / external images
+export function getOptimizedImageUrl(src, targetSize = 80) {
+  if (!src || typeof src !== "string") return "";
+  let s = src.trim();
+  if (s.startsWith("http://")) {
+    s = s.replace("http://", "https://");
+  }
+  if (s.includes("?authuser=")) {
+    s = s.split("?authuser=")[0];
+  }
+  if (s.includes("googleusercontent.com") && s.includes("=")) {
+    const base = s.split("=")[0];
+    const sz = Math.min(Math.max(targetSize, 40), 600);
+    return `${base}=s${sz}-c`;
+  }
+  return s;
+}
+
+// Helper: Resolve contestant Google Photos URL by name or nickname fallback
+export function resolveContestantPhoto(name, nickname, explicitPhoto) {
+  if (explicitPhoto && typeof explicitPhoto === "string" && explicitPhoto.startsWith("http")) {
+    return explicitPhoto;
+  }
+  const cleanName = (name || "").trim();
+  const cleanNick = (nickname || "").trim();
+  return (
+    (cleanName && contestantPhotos[cleanName]) ||
+    (cleanNick && contestantPhotos[cleanNick]) ||
+    (explicitPhoto && typeof explicitPhoto === "string" ? explicitPhoto : "")
+  );
+}
+
 // Helper: Resolve local folder paths to Next.js public folder serving path
 const resolveImagePath = (path, version) => {
   if (!path) return "";
   let resolved = path.trim();
+  if (resolved.startsWith("http://") || resolved.startsWith("https://")) {
+    return resolved;
+  }
   if (resolved.startsWith("public/")) {
     resolved = `/${resolved.slice(7)}`;
   } else {
@@ -30,7 +66,7 @@ const resolveImagePath = (path, version) => {
     }
   }
   const v = version || globalConfigVersion;
-  if (v && (resolved.startsWith("/") || resolved.startsWith("http"))) {
+  if (v && resolved.startsWith("/")) {
     const clean = resolved.replace(/[?&]v=\d+/, "").replace(/[?&]t=\d+/, "");
     resolved = clean + (clean.includes("?") ? "&" : "?") + `t=${v}`;
   }
@@ -396,7 +432,7 @@ function ContestantPresetSelector({ onSelectContestant, label = "นำเข้
             name: c.name,
             nickname: c.nickname,
             topic: c.topic,
-            photo: c.image,
+            photo: resolveContestantPhoto(c.name, c.nickname, c.image),
             sourceLabel: "แฟนพันธุ์แท้แห่งปี",
           }));
         }
@@ -409,7 +445,7 @@ function ContestantPresetSelector({ onSelectContestant, label = "นำเข้
             name: c.name,
             nickname: c.nickname,
             topic: c.topic,
-            photo: c.image,
+            photo: resolveContestantPhoto(c.name, c.nickname, c.image),
             sourceLabel: "งุ่นง่าน Of The Year",
           }));
         }
@@ -424,7 +460,7 @@ function ContestantPresetSelector({ onSelectContestant, label = "นำเข้
               id: c.id || c.name,
               name: c.name,
               nickname: c.nickname,
-              photo: c.photo,
+              photo: resolveContestantPhoto(c.name, c.nickname, c.photo),
               group: c.group,
               topics: topicList,
               topic: topicList[0] || "",
@@ -450,6 +486,7 @@ function ContestantPresetSelector({ onSelectContestant, label = "นำเข้
       name: c.name,
       nickname: c.nickname || "",
       topic: chosenTopic,
+      photo: c.photo || resolveContestantPhoto(c.name, c.nickname),
     });
   };
 
@@ -460,6 +497,7 @@ function ContestantPresetSelector({ onSelectContestant, label = "นำเข้
         name: selectedContestant.name,
         nickname: selectedContestant.nickname || "",
         topic: newTopic,
+        photo: selectedContestant.photo || resolveContestantPhoto(selectedContestant.name, selectedContestant.nickname),
       });
     }
   };
@@ -650,13 +688,14 @@ function ContestantPresetSelector({ onSelectContestant, label = "นำเข้
                         >
                           {c.photo ? (
                             <img
-                              src={c.photo}
+                              src={getOptimizedImageUrl(c.photo, 60)}
                               alt=""
-                              style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover", border: "1px solid #00e5ff" }}
+                              referrerPolicy="no-referrer"
+                              style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover", border: "1px solid #00e5ff", flexShrink: 0 }}
                               onError={(e) => { e.target.style.display = "none"; }}
                             />
                           ) : (
-                            <span style={{ fontSize: "16px" }}>👤</span>
+                            <span style={{ fontSize: "16px", width: "28px", textAlign: "center", flexShrink: 0 }}>👤</span>
                           )}
                           <div style={{ flex: 1, textAlign: "left", lineHeight: 1.25 }}>
                             <div style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff" }}>
@@ -789,9 +828,11 @@ export default function Home() {
   // ---- Setup Form State ----
   const [contestantName, setContestantName] = useState("");
   const [contestantNickname, setContestantNickname] = useState("");
+  const [contestantPhoto, setContestantPhoto] = useState("");
   const [topic, setTopic] = useState("");
   const [playerNicknames, setPlayerNicknames] = useState({ player1: "", player2: "" });
   const [playerTopics, setPlayerTopics] = useState({ player1: "", player2: "" });
+  const [playerPhotos, setPlayerPhotos] = useState({ player1: "", player2: "" });
   const [activePlayerRecordId, setActivePlayerRecordId] = useState(null);
   const [activeBattleRecordIds, setActiveBattleRecordIds] = useState({ player1: null, player2: null });
 
@@ -1764,6 +1805,7 @@ export default function Home() {
         topic: playerTopics.player1 || "",
         scores: p1Scores,
         totalScore: p1Total,
+        image: playerPhotos.player1 || resolveContestantPhoto(playerNames.player1, playerNicknames.player1) || "",
       });
     } else if (targetMode === "battle-p2") {
       const p2Scores = {
@@ -1780,6 +1822,7 @@ export default function Home() {
         topic: playerTopics.player2 || "",
         scores: p2Scores,
         totalScore: p2Total,
+        image: playerPhotos.player2 || resolveContestantPhoto(playerNames.player2, playerNicknames.player2) || "",
       });
     } else {
       const singleScores = {
@@ -1796,6 +1839,7 @@ export default function Home() {
         topic: topic || "",
         scores: singleScores,
         totalScore: sTotal,
+        image: contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname) || "",
       });
     }
     setShowSaveScoreModal(true);
@@ -1809,10 +1853,14 @@ export default function Home() {
     }
 
     try {
+      const payload = {
+        ...saveScoreForm,
+        image: saveScoreForm.image || contestantPhoto || resolveContestantPhoto(saveScoreForm.name, saveScoreForm.nickname) || "",
+      };
       const res = await fetch("/api/game-scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(saveScoreForm),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
@@ -2238,6 +2286,7 @@ export default function Home() {
                       setContestantName(c.name || "");
                       setContestantNickname(c.nickname || "");
                       setTopic(c.topic || "");
+                      setContestantPhoto(c.photo || resolveContestantPhoto(c.name, c.nickname) || "");
                     }}
                   />
                   <div className="form-group">
@@ -2289,6 +2338,7 @@ export default function Home() {
                         setPlayerNames((prev) => ({ ...prev, player1: c.name || "" }));
                         setPlayerNicknames((prev) => ({ ...prev, player1: c.nickname || "" }));
                         setPlayerTopics((prev) => ({ ...prev, player1: c.topic || "" }));
+                        setPlayerPhotos((prev) => ({ ...prev, player1: c.photo || resolveContestantPhoto(c.name, c.nickname) || "" }));
                       }}
                     />
                     <div className="form-group">
@@ -2333,6 +2383,7 @@ export default function Home() {
                         setPlayerNames((prev) => ({ ...prev, player2: c.name || "" }));
                         setPlayerNicknames((prev) => ({ ...prev, player2: c.nickname || "" }));
                         setPlayerTopics((prev) => ({ ...prev, player2: c.topic || "" }));
+                        setPlayerPhotos((prev) => ({ ...prev, player2: c.photo || resolveContestantPhoto(c.name, c.nickname) || "" }));
                       }}
                     />
                     <div className="form-group">
@@ -3067,7 +3118,15 @@ export default function Home() {
                   </>
                 )}
               </div>
-              <div className="contestant-box">
+              <div className="contestant-box" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                {gameMode === "single" && (contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname)) && (
+                  <img
+                    src={getOptimizedImageUrl(contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname), 60)}
+                    alt={contestantName}
+                    referrerPolicy="no-referrer"
+                    style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover", border: "1px solid var(--gold)", flexShrink: 0 }}
+                  />
+                )}
                 <span className="contestant-name" id="contestantDisplay">
                   {gameMode === "battle" ? `${playerNames.player1} vs ${playerNames.player2}` : contestantName || "ผู้เข้าแข่งขัน"}
                 </span>
@@ -3150,14 +3209,24 @@ export default function Home() {
               {gameMode === "single" && activePlayerEvaluation && (
                 <div className={`live-standing-card ${activePlayerEvaluation.statusClass}`}>
                   <div className="standing-card-top">
-                    <div className="standing-player-meta">
-                      <div className="standing-name-row">
-                        <span className="standing-name">{contestantName || "ผู้เข้าแข่งขัน"}</span>
-                        {contestantNickname && <span className="standing-nickname">({contestantNickname})</span>}
-                        <span className="standing-topic-pill">📌 {topic || "ไม่ระบุหัวข้อ"}</span>
-                      </div>
-                      <div className="standing-sub-text">
-                        เล่นแล้ว {4 - activePlayerEvaluation.unplayedCount} / 4 หมวด • คะแนนรวมปัจจุบัน <strong style={{ color: "var(--gold)" }}>{totalScore}</strong> / 100 คะแนน
+                    <div className="standing-player-meta" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                      {(contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname)) && (
+                        <img
+                          src={getOptimizedImageUrl(contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname), 100)}
+                          alt={contestantName}
+                          referrerPolicy="no-referrer"
+                          style={{ width: "52px", height: "52px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--gold)", flexShrink: 0, boxShadow: "0 0 10px rgba(255,215,0,0.4)" }}
+                        />
+                      )}
+                      <div>
+                        <div className="standing-name-row">
+                          <span className="standing-name">{contestantName || "ผู้เข้าแข่งขัน"}</span>
+                          {contestantNickname && <span className="standing-nickname">({contestantNickname})</span>}
+                          <span className="standing-topic-pill">📌 {topic || "ไม่ระบุหัวข้อ"}</span>
+                        </div>
+                        <div className="standing-sub-text">
+                          เล่นแล้ว {4 - activePlayerEvaluation.unplayedCount} / 4 หมวด • คะแนนรวมปัจจุบัน <strong style={{ color: "var(--gold)" }}>{totalScore}</strong> / 100 คะแนน
+                        </div>
                       </div>
                     </div>
                     <div className="standing-rank-group">
@@ -3825,6 +3894,20 @@ export default function Home() {
               <button className="leaderboard-close-btn" onClick={() => setShowSaveScoreModal(false)}>✕</button>
             </div>
             <form onSubmit={handleSaveScoreSubmit} style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: "16px" }}>
+              {(saveScoreForm.image || resolveContestantPhoto(saveScoreForm.name, saveScoreForm.nickname)) && (
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "rgba(255,255,255,0.05)", padding: "10px 14px", borderRadius: "10px", border: "1px solid rgba(255,215,0,0.3)" }}>
+                  <img
+                    src={getOptimizedImageUrl(saveScoreForm.image || resolveContestantPhoto(saveScoreForm.name, saveScoreForm.nickname), 100)}
+                    alt={saveScoreForm.name}
+                    referrerPolicy="no-referrer"
+                    style={{ width: "44px", height: "44px", borderRadius: "50%", objectFit: "cover", border: "1px solid var(--gold)", flexShrink: 0 }}
+                  />
+                  <div>
+                    <div style={{ fontWeight: "700", color: "#fff", fontSize: "15px" }}>{saveScoreForm.name} {saveScoreForm.nickname ? `(${saveScoreForm.nickname})` : ""}</div>
+                    <div style={{ fontSize: "12px", color: "var(--gold-light)" }}>📌 {saveScoreForm.topic}</div>
+                  </div>
+                </div>
+              )}
               <div className="form-group" style={{ marginBottom: "12px" }}>
                 <label style={{ fontSize: "14px", fontWeight: "700", color: "var(--gold-light)", display: "block", marginBottom: "6px" }}>
                   👤 ชื่อผู้เข้าแข่งขัน
@@ -4061,10 +4144,20 @@ export default function Home() {
                             </span>
                           </td>
                           <td style={{ fontWeight: "700", color: isEliminated ? "rgba(255,255,255,0.7)" : "#fff" }}>
-                            {item.name}
-                            {isActiveContestant && (
-                              <span className="active-player-tag">👈 กำลังแข่ง</span>
-                            )}
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              {(item.image || resolveContestantPhoto(item.name, item.nickname)) && (
+                                <img
+                                  src={getOptimizedImageUrl(item.image || resolveContestantPhoto(item.name, item.nickname), 60)}
+                                  alt={item.name}
+                                  referrerPolicy="no-referrer"
+                                  style={{ width: "30px", height: "30px", borderRadius: "50%", objectFit: "cover", border: "1px solid rgba(255,215,0,0.5)", flexShrink: 0 }}
+                                />
+                              )}
+                              <span>{item.name}</span>
+                              {isActiveContestant && (
+                                <span className="active-player-tag">👈 กำลังแข่ง</span>
+                              )}
+                            </div>
                           </td>
                           <td style={{ color: isEliminated ? "rgba(255,215,0,0.6)" : "var(--gold-light)" }}>{item.nickname || "-"}</td>
                           <td style={{ color: isEliminated ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.75)" }}>{item.topic}</td>
