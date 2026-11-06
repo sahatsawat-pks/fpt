@@ -150,7 +150,7 @@ main {
     z-index: 2;
     text-align: center;
     width: 100%;
-    max-width: 500px;
+    max-width: 580px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -160,30 +160,37 @@ main {
 
 .setup-logo {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
+    gap: 18px;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .setup-logo-img {
-    max-width: 140px;
-    max-height: 100px;
+    max-width: 125px;
+    max-height: 90px;
     width: auto;
     height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.5));
-    margin-bottom: 6px;
+    filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.55));
+    margin-bottom: 0;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .setup-year {
-    font-family: var(--font-num);
+    font-family: 'Orbitron', var(--font-orbitron), 'Kanit', sans-serif;
     letter-spacing: 2px;
-    font-weight: 800;
+    font-weight: 900;
     margin: 0;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 13px;
-    text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+    font-size: clamp(20px, 3.2vw, 28px);
+    line-height: 1.15;
+    background: linear-gradient(90deg, #00e5ff 0%, #7dd3fc 40%, #ffffff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.45));
 }
 
 .setup-form {
@@ -1966,14 +1973,15 @@ main {
     }
     .setup-logo {
         margin-bottom: 12px;
+        gap: 14px;
     }
     .setup-logo-img {
-        max-width: 110px;
-        max-height: 80px;
-        margin-bottom: 4px;
+        max-width: 100px;
+        max-height: 75px;
+        margin-bottom: 0;
     }
     .setup-year {
-        font-size: 11px;
+        font-size: 20px;
         letter-spacing: 1.5px;
     }
     .setup-form {
@@ -2019,14 +2027,17 @@ main {
         padding: 60px 12px 18px;
     }
     .setup-logo {
-        margin-bottom: 6px;
+        margin-bottom: 8px;
+        gap: 10px;
     }
     .setup-logo-img {
-        max-width: 75px;
-        max-height: 55px;
+        max-width: 80px;
+        max-height: 60px;
+        margin-bottom: 0;
     }
     .setup-year {
-        font-size: 10px;
+        font-size: 16px;
+        letter-spacing: 1px;
     }
     .setup-form {
         padding: 14px 16px;

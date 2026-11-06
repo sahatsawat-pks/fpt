@@ -263,14 +263,21 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23, act
 
   if (activePlayer && String(activePlayer.id) !== String(item.id)) {
     if (activePlayer.totalScore > scoreForElimCheck) {
-      const canTieExisting = compDistinctScoresAboveForElim.some(
-        (sc) => sc >= activePlayer.totalScore && sc <= activePlayer.maxPossibleScore
-      );
-      if (!canTieExisting) {
+      if (!compDistinctScoresAboveForElim.includes(activePlayer.totalScore)) {
         guaranteedDistinctAbove += 1;
       }
     }
   }
+
+  // Count total completed/guaranteed players strictly above scoreForElimCheck
+  const totalPlayersAbove =
+    otherCompletedPlayers.filter((p) => (Number(p.totalScore) || 0) > scoreForElimCheck).length +
+    (activePlayer && String(activePlayer.id) !== String(item.id) && activePlayer.totalScore > scoreForElimCheck ? 1 : 0);
+
+  const isGuaranteedEliminated =
+    guaranteedDistinctAbove >= 5 ||
+    totalPlayersAbove >= 5 ||
+    (isCompleted && item.rank > 5);
 
   let isEliminated = false;
   let isGuaranteedQualified = false;
@@ -293,13 +300,13 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23, act
       riskCount === 0
         ? `การันตีอันดับ ${item.rank} ใน 5 คนสุดท้ายแล้ว`
         : `การันตีอันดับใน 5 คนสุดท้ายแล้ว (มีผู้เข้าแข่งขันที่อาจทำคะแนนแซงได้ไม่เกิน ${Math.max(0, 4 - compDistinctScoresAboveCurrent.length)} คน)`;
-  } else if (guaranteedDistinctAbove >= 5) {
-    // 2. ถ้ามีอย่างน้อย 5 อันดับคะแนนที่สูงกว่าแน่นอนแล้ว -> การันตีตกรอบ
+  } else if (isGuaranteedEliminated) {
+    // 2. ถ้ามีอย่างน้อย 5 คน/อันดับคะแนนที่สูงกว่าแน่นอนแล้ว หรือคะแนนสิ้นสุดและหลุด 5 อันดับแรก -> การันตีตกรอบ
     isEliminated = true;
     statusText = "🔴 ตกรอบ";
     statusClass = "status-eliminated";
     if (isCompleted) {
-      reason = "มีผู้ทำคะแนนสูงกว่า 5 อันดับแน่นอนแล้ว (ตกรอบ)";
+      reason = "มีผู้ทำคะแนนสูงกว่า 5 คน/อันดับแน่นอนแล้ว (ตกรอบ)";
     } else {
       reason = rank5Info
         ? `คะแนนสูงสุดที่ทำได้ (${maxPossibleScore} คะแนน) ไม่สามารถขึ้นไปติด 5 อันดับแรกได้แล้ว (ตกรอบ)`
@@ -341,6 +348,379 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23, act
     statusClass,
     reason,
   };
+}
+
+// ==========================================
+// 👥 PRESET CONTESTANT SELECTOR (Optional)
+// ==========================================
+function ContestantPresetSelector({ onSelectContestant, label = "นำเข้าข้อมูลผู้เข้าแข่งขันอัตโนมัติ (Optional)" }) {
+  const [selectedSource, setSelectedSource] = useState(""); // "" | "fpt" | "trial" | "tournament"
+  const [loading, setLoading] = useState(false);
+  const [contestants, setContestants] = useState([]);
+  const [selectedContestant, setSelectedContestant] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const handleSourceChange = async (sourceKey) => {
+    setSelectedSource(sourceKey);
+    setSelectedContestant(null);
+    setSelectedTopic("");
+    setSearch("");
+    if (!sourceKey) {
+      setContestants([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      let items = [];
+      if (sourceKey === "fpt") {
+        const res = await fetch("/api/scores");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          items = json.data.map((c) => ({
+            id: c.id || c.name,
+            name: c.name,
+            nickname: c.nickname,
+            topic: c.topic,
+            photo: c.image,
+            sourceLabel: "แฟนพันธุ์แท้แห่งปี",
+          }));
+        }
+      } else if (sourceKey === "trial") {
+        const res = await fetch("/api/trial");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          items = json.data.map((c) => ({
+            id: c.id || c.name,
+            name: c.name,
+            nickname: c.nickname,
+            topic: c.topic,
+            photo: c.image,
+            sourceLabel: "งุ่นง่าน Of The Year",
+          }));
+        }
+      } else if (sourceKey === "tournament") {
+        const res = await fetch("/api/tournament");
+        const json = await res.json();
+        if (json.success && json.data) {
+          const list = json.data.contestants || [];
+          items = list.map((c) => {
+            const topicList = (c.topics || []).map((t) => (typeof t === "string" ? t : t.topic)).filter(Boolean);
+            return {
+              id: c.id || c.name,
+              name: c.name,
+              nickname: c.nickname,
+              photo: c.photo,
+              group: c.group,
+              topics: topicList,
+              topic: topicList[0] || "",
+              sourceLabel: "Tournament",
+            };
+          });
+        }
+      }
+      setContestants(items);
+    } catch (e) {
+      console.error("Failed to load preset contestants:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChoose = (c) => {
+    setSelectedContestant(c);
+    const chosenTopic = c.topic || (c.topics && c.topics[0]) || "";
+    setSelectedTopic(chosenTopic);
+    setIsOpen(false);
+    onSelectContestant({
+      name: c.name,
+      nickname: c.nickname || "",
+      topic: chosenTopic,
+    });
+  };
+
+  const handleTopicChange = (newTopic) => {
+    setSelectedTopic(newTopic);
+    if (selectedContestant) {
+      onSelectContestant({
+        name: selectedContestant.name,
+        nickname: selectedContestant.nickname || "",
+        topic: newTopic,
+      });
+    }
+  };
+
+  const handleClear = () => {
+    setSelectedSource("");
+    setSelectedContestant(null);
+    setSelectedTopic("");
+    setContestants([]);
+    setSearch("");
+  };
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return contestants;
+    return contestants.filter(
+      (c) =>
+        (c.name || "").toLowerCase().includes(q) ||
+        (c.nickname || "").toLowerCase().includes(q) ||
+        (c.topic || "").toLowerCase().includes(q) ||
+        (c.topics || []).some((t) => (t || "").toLowerCase().includes(q))
+    );
+  }, [contestants, search]);
+
+  return (
+    <div
+      className="preset-quick-select-card"
+      style={{
+        background: "linear-gradient(135deg, rgba(8, 24, 48, 0.75) 0%, rgba(3, 12, 28, 0.85) 100%)",
+        border: "1px dashed rgba(0, 229, 255, 0.4)",
+        borderRadius: "14px",
+        padding: "12px 14px",
+        marginBottom: "16px",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+        <span style={{ fontSize: "12px", fontWeight: "800", color: "#00e5ff", display: "flex", alignItems: "center", gap: "6px" }}>
+          <span>⚡</span> {label}
+        </span>
+        {selectedSource && (
+          <button
+            type="button"
+            onClick={handleClear}
+            style={{
+              background: "none",
+              border: "none",
+              color: "rgba(255,255,255,0.45)",
+              fontSize: "11px",
+              cursor: "pointer",
+              padding: "2px 6px",
+            }}
+          >
+            ✕ ล้างค่า
+          </button>
+        )}
+      </div>
+
+      <div style={{ display: "flex", gap: "8px", flexDirection: "column" }}>
+        {/* Source Dropdown */}
+        <select
+          value={selectedSource}
+          onChange={(e) => handleSourceChange(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            borderRadius: "8px",
+            background: "rgba(2, 6, 18, 0.95)",
+            border: "1px solid rgba(0, 229, 255, 0.3)",
+            color: selectedSource ? "#ffffff" : "rgba(255,255,255,0.6)",
+            fontSize: "13px",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          <option value="" style={{ background: "#0b1528", color: "#888" }}>-- เลือกประเภทรายชื่อผู้เข้าแข่งขัน --</option>
+          <option value="fpt" style={{ background: "#0b1528", color: "#fff" }}>👑 แฟนพันธุ์แท้แห่งปี (อิงจากหน้าหลัก)</option>
+          <option value="trial" style={{ background: "#0b1528", color: "#fff" }}>🔥 งุ่นง่าน Of The Year (อิงจาก trial-foty)</option>
+          <option value="tournament" style={{ background: "#0b1528", color: "#fff" }}>⚔️ Tournament (อิงจากหน้า tournament)</option>
+        </select>
+
+        {loading && (
+          <div style={{ fontSize: "12px", color: "#00e5ff", textAlign: "center", padding: "6px 0" }}>
+            ⏳ กำลังโหลดรายชื่อ...
+          </div>
+        )}
+
+        {/* Contestant Searchable Dropdown */}
+        {selectedSource && !loading && contestants.length > 0 && (
+          <div ref={dropdownRef} style={{ position: "relative", width: "100%" }}>
+            <div
+              onClick={() => {
+                setIsOpen(!isOpen);
+                setSearch("");
+              }}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "8px",
+                background: "rgba(2, 6, 18, 0.95)",
+                border: isOpen ? "1.5px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.3)",
+                color: selectedContestant ? "#ffffff" : "rgba(255,255,255,0.6)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: "13px",
+                fontWeight: "600",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {selectedContestant ? (
+                  <>
+                    <span style={{ color: "#ffd700", fontWeight: "800" }}>{selectedContestant.nickname || "ผู้แข่ง"}</span>
+                    <span>•</span>
+                    <span style={{ color: "#ffffff" }}>{selectedContestant.name}</span>
+                    {selectedContestant.topic && (
+                      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>({selectedContestant.topic})</span>
+                    )}
+                  </>
+                ) : (
+                  <span>🔍 เลือกผู้เข้าแข่งขัน ({contestants.length} คน)...</span>
+                )}
+              </div>
+              <span style={{ fontSize: "10px", color: "#00e5ff", marginLeft: "8px" }}>{isOpen ? "▲" : "▼"}</span>
+            </div>
+
+            {isOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 4px)",
+                  left: 0,
+                  right: 0,
+                  zIndex: 200,
+                  background: "#081428",
+                  border: "1.5px solid #00e5ff",
+                  borderRadius: "10px",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(0,229,255,0.3)",
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ padding: "8px", borderBottom: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.2)" }}>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="ค้นหาชื่อเล่น, ชื่อจริง หรือหัวข้อ..."
+                    autoFocus
+                    style={{
+                      width: "100%",
+                      padding: "6px 10px",
+                      borderRadius: "6px",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(0,229,255,0.3)",
+                      color: "#fff",
+                      fontSize: "12px",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+                <div style={{ maxHeight: "220px", overflowY: "auto" }}>
+                  {filtered.length === 0 ? (
+                    <div style={{ padding: "12px", textAlign: "center", fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
+                      ไม่พบรายชื่อที่ค้นหา
+                    </div>
+                  ) : (
+                    filtered.map((c) => {
+                      const isSel = selectedContestant && selectedContestant.name === c.name;
+                      return (
+                        <div
+                          key={c.id || c.name}
+                          onClick={() => handleChoose(c)}
+                          style={{
+                            padding: "8px 12px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            cursor: "pointer",
+                            background: isSel ? "rgba(0, 229, 255, 0.2)" : "transparent",
+                            borderBottom: "1px solid rgba(255,255,255,0.04)",
+                            transition: "background 0.15s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSel) e.currentTarget.style.background = "rgba(0, 229, 255, 0.1)";
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSel) e.currentTarget.style.background = "transparent";
+                          }}
+                        >
+                          {c.photo ? (
+                            <img
+                              src={c.photo}
+                              alt=""
+                              style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover", border: "1px solid #00e5ff" }}
+                              onError={(e) => { e.target.style.display = "none"; }}
+                            />
+                          ) : (
+                            <span style={{ fontSize: "16px" }}>👤</span>
+                          )}
+                          <div style={{ flex: 1, textAlign: "left", lineHeight: 1.25 }}>
+                            <div style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff" }}>
+                              {c.nickname && <span style={{ color: "#ffd700", marginRight: "6px" }}>{c.nickname}</span>}
+                              {c.name}
+                              {c.group && (
+                                <span style={{ marginLeft: "6px", fontSize: "10px", padding: "1px 5px", borderRadius: "4px", background: c.group === "A" ? "rgba(0,229,255,0.2)" : "rgba(255,215,0,0.2)", color: c.group === "A" ? "#00e5ff" : "#ffd700" }}>
+                                  กลุ่ม {c.group}
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
+                              🎯 {c.topic || (c.topics ? c.topics.join(" • ") : "ไม่มีหัวข้อ")}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 3. If Tournament and contestant has multiple topics, provide topic dropdown */}
+        {selectedContestant && selectedContestant.topics && selectedContestant.topics.length > 1 && (
+          <div style={{ marginTop: "4px" }}>
+            <label style={{ display: "block", fontSize: "11px", color: "#ffd700", fontWeight: "700", marginBottom: "4px" }}>
+              🎯 เลือกหัวข้อที่แข่งขัน (Tournament):
+            </label>
+            <select
+              value={selectedTopic}
+              onChange={(e) => handleTopicChange(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "6px 10px",
+                borderRadius: "6px",
+                background: "rgba(2, 6, 18, 0.95)",
+                border: "1px solid #ffd700",
+                color: "#ffd700",
+                fontSize: "12px",
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            >
+              {selectedContestant.topics.map((t, idx) => (
+                <option key={idx} value={t} style={{ background: "#0b1528", color: "#fff" }}>
+                  หัวข้อที่ {idx + 1}: {t}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Feedback pill */}
+        {selectedContestant && (
+          <div style={{ fontSize: "11px", color: "#86efac", background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: "6px", padding: "4px 8px", marginTop: "2px", display: "flex", alignItems: "center", gap: "6px" }}>
+            <span>✓</span> นำเข้าข้อมูลแล้ว: <strong>{selectedContestant.nickname ? `${selectedContestant.nickname} • ` : ""}{selectedContestant.name}</strong> ({selectedTopic})
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -399,6 +779,9 @@ export default function Home() {
     sessionStorage.removeItem("fpt_game_auth");
     setIsAuthenticated(false);
   };
+
+  // ---- Subtitle / Branding State ----
+  const [gameSubtitle, setGameSubtitle] = useState("FAN OF THE YEAR 2026");
 
   // ---- Panel State ----
   const [currentPanel, setCurrentPanel] = useState("setup"); // 'setup', 'config', 'game'
@@ -495,6 +878,13 @@ export default function Home() {
         }
       } catch (e) {}
     }
+
+    try {
+      const savedSub = localStorage.getItem("fpt_game_subtitle");
+      if (savedSub && savedSub.trim()) {
+        setGameSubtitle(savedSub.trim());
+      }
+    } catch (e) {}
 
     try {
       const savedTotal = localStorage.getItem("fpt_total_contestants");
@@ -1581,7 +1971,12 @@ export default function Home() {
 
   const activePlayerRank = activeLeaderboardEntry?.rank || provisionalRank;
   const rank5Info = getRank5Info(denseRankedLeaderboard);
-  const isPushedRank5 = activePlayerRank !== null && activePlayerRank < 5 && rank5Info !== null;
+  const isPushedRank5 =
+    isAllCategoriesCompleted &&
+    activePlayerRank !== null &&
+    activePlayerRank <= 5 &&
+    rank5Info !== null &&
+    totalScore > rank5Info.score;
 
   if (authChecking) {
     return (
@@ -1768,12 +2163,45 @@ export default function Home() {
             <div className="setup-logo">
               <img
                 src="/img/game_logo.png"
-                alt="FANPANTAE 2026"
+                alt="FANPANTAE"
                 className="setup-logo-img"
               />
-              <p className="setup-year">
-                FAN OF THE YEAR 2026
-              </p>
+              <div style={{ textAlign: "left", flex: 1, minWidth: 0 }}>
+                <h1 className="setup-year">
+                  {gameSubtitle || "FAN OF THE YEAR 2026"}
+                </h1>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase" }}>
+                    Official Competition
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = prompt("แก้ไขข้อความชื่อการแข่งขัน (Game Subtitle):", gameSubtitle || "FAN OF THE YEAR 2026");
+                      if (next !== null && next.trim()) {
+                        setGameSubtitle(next.trim());
+                        try { localStorage.setItem("fpt_game_subtitle", next.trim()); } catch (e) {}
+                      }
+                    }}
+                    title="คลิกเพื่อแก้ไขชื่อการแข่งขัน"
+                    style={{
+                      background: "rgba(0, 229, 255, 0.12)",
+                      border: "1px solid rgba(0, 229, 255, 0.35)",
+                      color: "#00e5ff",
+                      borderRadius: "6px",
+                      padding: "2px 7px",
+                      fontSize: "11px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "3px"
+                    }}
+                  >
+                    ✏️ แก้ไข
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="setup-form">
               <div className="form-group">
@@ -1804,6 +2232,14 @@ export default function Home() {
 
               {gameMode === "single" ? (
                 <>
+                  <ContestantPresetSelector
+                    label="นำเข้าข้อมูลผู้เข้าแข่งขันอัตโนมัติ (Optional)"
+                    onSelectContestant={(c) => {
+                      setContestantName(c.name || "");
+                      setContestantNickname(c.nickname || "");
+                      setTopic(c.topic || "");
+                    }}
+                  />
                   <div className="form-group">
                     <label htmlFor="contestantName">
                       <span className="label-icon">👤</span> ชื่อจริง-นามสกุล
@@ -1847,6 +2283,14 @@ export default function Home() {
                     <h3 style={{ color: "var(--gold)", marginBottom: "12px", display: "flex", alignItems: "center", gap: "6px" }}>
                       <span>👤</span> ผู้เล่น 1
                     </h3>
+                    <ContestantPresetSelector
+                      label="นำเข้าข้อมูลผู้เล่น 1 (Optional)"
+                      onSelectContestant={(c) => {
+                        setPlayerNames((prev) => ({ ...prev, player1: c.name || "" }));
+                        setPlayerNicknames((prev) => ({ ...prev, player1: c.nickname || "" }));
+                        setPlayerTopics((prev) => ({ ...prev, player1: c.topic || "" }));
+                      }}
+                    />
                     <div className="form-group">
                       <label htmlFor="player1Name">ชื่อจริง-นามสกุล</label>
                       <input
@@ -1883,6 +2327,14 @@ export default function Home() {
                     <h3 style={{ color: "var(--gold)", marginBottom: "12px", display: "flex", alignItems: "center", gap: "6px" }}>
                       <span>👤</span> ผู้เล่น 2
                     </h3>
+                    <ContestantPresetSelector
+                      label="นำเข้าข้อมูลผู้เล่น 2 (Optional)"
+                      onSelectContestant={(c) => {
+                        setPlayerNames((prev) => ({ ...prev, player2: c.name || "" }));
+                        setPlayerNicknames((prev) => ({ ...prev, player2: c.nickname || "" }));
+                        setPlayerTopics((prev) => ({ ...prev, player2: c.topic || "" }));
+                      }}
+                    />
                     <div className="form-group">
                       <label htmlFor="player2Name">ชื่อจริง-นามสกุล</label>
                       <input
@@ -1980,6 +2432,65 @@ export default function Home() {
                 <span>🔄</span> ดึงจาก config.js
               </button>
             </div>
+
+            {/* Header Subtitle Setting */}
+            <section className="config-section" style={{ marginBottom: "20px" }}>
+              <h2 className="config-section-title">
+                <span className="section-icon">🏷️</span>
+                ชื่อรายการ / ชื่อการแข่งขัน (Header Subtitle)
+              </h2>
+              <div style={{ background: "rgba(0, 0, 0, 0.25)", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                <label style={{ display: "block", fontSize: "13px", color: "rgba(255, 255, 255, 0.75)", marginBottom: "8px", fontWeight: "600" }}>
+                  ข้อความข้างโลโก้ในหน้าเกม (ค่าเริ่มต้น: FAN OF THE YEAR 2026)
+                </label>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  <input
+                    type="text"
+                    value={gameSubtitle}
+                    onChange={(e) => {
+                      setGameSubtitle(e.target.value);
+                      try {
+                        localStorage.setItem("fpt_game_subtitle", e.target.value);
+                      } catch (err) {}
+                    }}
+                    placeholder="FAN OF THE YEAR 2026"
+                    style={{
+                      flex: 1,
+                      minWidth: "240px",
+                      padding: "10px 14px",
+                      borderRadius: "8px",
+                      background: "rgba(0, 0, 0, 0.5)",
+                      border: "1.5px solid #00e5ff",
+                      color: "#fff",
+                      fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
+                      fontSize: "16px",
+                      fontWeight: "800",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGameSubtitle("FAN OF THE YEAR 2026");
+                      try {
+                        localStorage.setItem("fpt_game_subtitle", "FAN OF THE YEAR 2026");
+                      } catch (err) {}
+                    }}
+                    style={{
+                      padding: "10px 16px",
+                      borderRadius: "8px",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      color: "rgba(255, 255, 255, 0.8)",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                    }}
+                  >
+                    คืนค่าเริ่มต้น
+                  </button>
+                </div>
+              </div>
+            </section>
 
             {/* Config Mode Tabs */}
             <div className="config-tabs">
