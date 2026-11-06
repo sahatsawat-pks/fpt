@@ -4344,7 +4344,8 @@ function BroadcastQuestionBar({
         <div
           style={{
             transform: "skewX(-16deg)",
-            height: "76px",
+            minHeight: "76px",
+            alignSelf: "stretch",
             minWidth: "128px",
             padding: "0 18px",
             background: "linear-gradient(135deg, #07152e 0%, #020713 100%)",
@@ -4412,7 +4413,8 @@ function BroadcastQuestionBar({
             transform: "skewX(-16deg)",
             width: "140px",
             minWidth: "140px",
-            height: "76px",
+            minHeight: "76px",
+            alignSelf: "stretch",
             background: "linear-gradient(180deg, #3a2605 0%, #171002 50%, #2b1c03 100%)",
             border: "2px solid #ffd700",
             borderBottom: "3.5px solid #ffb700",
@@ -4423,7 +4425,7 @@ function BroadcastQuestionBar({
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            padding: "4px 8px",
+            padding: "8px",
           }}
         >
           {/* Top Label */}
