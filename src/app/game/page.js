@@ -4401,6 +4401,45 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
 }
 
 // ==========================================
+// 📺 FANPANTAE SCORE TO GET PILL (คะแนนที่จะได้)
+// ==========================================
+function ScoreToGetPill({ points, id }) {
+  return (
+    <div
+      style={{
+        transform: "skewX(-16deg)",
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "4px 18px",
+        borderRadius: "8px",
+        border: "1.5px solid rgba(255, 215, 0, 0.6)",
+        background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+      }}
+    >
+      <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px" }}>
+        <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
+          คะแนนที่จะได้
+        </span>
+        <span
+          id={id}
+          style={{
+            fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
+            fontStyle: "normal",
+            fontWeight: "900",
+            fontSize: "24px",
+            color: "#ffd700",
+            lineHeight: 1,
+          }}
+        >
+          {points}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
 // 📺 FANPANTAE BROADCAST QUESTION & SCORE BAR
 // ==========================================
 function BroadcastQuestionBar({
@@ -4418,7 +4457,8 @@ function BroadcastQuestionBar({
             alignItems: "center",
             justifyContent: "flex-end",
             marginBottom: "8px",
-            padding: "0 6px",
+            padding: 0,
+            transform: "translateX(14px)",
           }}
         >
           {topRightSlot}
@@ -4479,7 +4519,7 @@ function BroadcastQuestionBar({
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
-            padding: "10px 28px",
+            padding: "8px 24px",
             overflow: "hidden",
           }}
         >
@@ -4489,10 +4529,11 @@ function BroadcastQuestionBar({
               width: "100%",
               color: "#ffffff",
               fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-              fontSize: "clamp(20px, 2.2vw, 28px)",
+              fontSize: "clamp(15px, 1.6vw, 21px)",
               fontWeight: "700",
-              lineHeight: "1.35",
+              lineHeight: "1.32",
               textShadow: "0 2px 8px rgba(0, 0, 0, 0.9)",
+              wordBreak: "break-word",
             }}
           >
             {question || "รอเปิดคำถาม..."}
@@ -5546,37 +5587,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
       <BroadcastQuestionBar
         question={cfg.question || "เลือกคำตอบที่ถูกต้อง"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "4px 18px",
-              borderRadius: "8px",
-              border: "1.5px solid rgba(255, 215, 0, 0.6)",
-              background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
-              คะแนนที่จะได้
-            </span>
-            <span
-              id="qaPointsDisplay"
-              style={{
-                fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
-                fontStyle: "normal",
-                fontWeight: "900",
-                fontSize: "24px",
-                color: "#ffd700",
-                lineHeight: 1,
-              }}
-            >
-              {currentPoints}
-            </span>
-          </div>
-        }
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="qaPointsDisplay" />}
       />
 
       <div className="qa-choices-grid" id="qaChoicesGrid">
@@ -5821,37 +5832,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
       <BroadcastQuestionBar
         question={jigsawQuestion && jigsawQuestion.trim() !== "" ? jigsawQuestion : "นี่คือภาพของอะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "4px 18px",
-              borderRadius: "8px",
-              border: "1.5px solid rgba(255, 215, 0, 0.6)",
-              background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
-              คะแนนที่จะได้
-            </span>
-            <span
-              id="jigsawPointsDisplay"
-              style={{
-                fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
-                fontStyle: "normal",
-                fontWeight: "900",
-                fontSize: "24px",
-                color: "#ffd700",
-                lineHeight: 1,
-              }}
-            >
-              {currentPoints}
-            </span>
-          </div>
-        }
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="jigsawPointsDisplay" />}
       />
 
       {/* Jigsaw Board Centered (เหมือนถาม-ตอบ) */}
@@ -6182,37 +6163,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
       <BroadcastQuestionBar
         question={cfg.question || "จากคุณสมบัติต่อไปนี้คือใคร หรืออะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "4px 18px",
-              borderRadius: "8px",
-              border: "1.5px solid rgba(255, 215, 0, 0.6)",
-              background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
-              คะแนนที่จะได้
-            </span>
-            <span
-              id="attrPointsDisplay"
-              style={{
-                fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
-                fontStyle: "normal",
-                fontWeight: "900",
-                fontSize: "24px",
-                color: "#ffd700",
-                lineHeight: 1,
-              }}
-            >
-              {currentPoints}
-            </span>
-          </div>
-        }
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="attrPointsDisplay" />}
       />
 
       <div className="attr-clues-list" id="attrCluesList">
