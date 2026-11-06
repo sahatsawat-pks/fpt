@@ -2216,37 +2216,6 @@ export default function Home() {
                 <h1 className="setup-year">
                   {gameSubtitle || "FAN OF THE YEAR 2026"}
                 </h1>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
-                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase" }}>
-                    Official Competition
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = prompt("แก้ไขข้อความชื่อการแข่งขัน (Game Subtitle):", gameSubtitle || "FAN OF THE YEAR 2026");
-                      if (next !== null && next.trim()) {
-                        setGameSubtitle(next.trim());
-                        try { localStorage.setItem("fpt_game_subtitle", next.trim()); } catch (e) {}
-                      }
-                    }}
-                    title="คลิกเพื่อแก้ไขชื่อการแข่งขัน"
-                    style={{
-                      background: "rgba(0, 229, 255, 0.12)",
-                      border: "1px solid rgba(0, 229, 255, 0.35)",
-                      color: "#00e5ff",
-                      borderRadius: "6px",
-                      padding: "2px 7px",
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      cursor: "pointer",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "3px"
-                    }}
-                  >
-                    ✏️ แก้ไข
-                  </button>
-                </div>
               </div>
             </div>
             <div className="setup-form">
@@ -4444,6 +4413,88 @@ function ScoreToGetPill({ points, id }) {
 }
 
 // ==========================================
+// 📺 FANPANTAE 3-SEC REVEALED ANSWER BADGE
+// ==========================================
+function ThreeSecAnswerBadge({ answer, isRoundCorrect, style = {} }) {
+  const isCorrect = isRoundCorrect === true;
+  const isWrong = isRoundCorrect === false;
+
+  const borderColor = isCorrect
+    ? "#00e676"
+    : isWrong
+      ? "#ff1744"
+      : "rgba(0, 229, 255, 0.65)";
+
+  const background = isCorrect
+    ? "linear-gradient(135deg, rgba(6, 42, 22, 0.95) 0%, rgba(2, 22, 11, 0.98) 100%)"
+    : isWrong
+      ? "linear-gradient(135deg, rgba(48, 8, 16, 0.95) 0%, rgba(24, 3, 7, 0.98) 100%)"
+      : "linear-gradient(135deg, rgba(12, 28, 58, 0.95) 0%, rgba(5, 12, 28, 0.98) 100%)";
+
+  const glowShadow = isCorrect
+    ? "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 230, 118, 0.45), inset 0 0 10px rgba(0, 230, 118, 0.2)"
+    : isWrong
+      ? "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 23, 68, 0.45), inset 0 0 10px rgba(255, 23, 68, 0.2)"
+      : "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 18px rgba(0, 229, 255, 0.35), inset 0 0 10px rgba(0, 229, 255, 0.15)";
+
+  const textShadow = isCorrect
+    ? "0 2px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 230, 118, 0.5)"
+    : isWrong
+      ? "0 2px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 23, 68, 0.5)"
+      : "0 2px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 229, 255, 0.4)";
+
+  const rawAnswer = answer !== undefined && answer !== null ? String(answer) : "";
+  const textLength = rawAnswer.length;
+  const fontSize =
+    textLength > 30
+      ? "clamp(14px, 1.4vw, 17px)"
+      : textLength > 16
+        ? "clamp(16px, 1.6vw, 20px)"
+        : "clamp(18px, 1.8vw, 22px)";
+
+  return (
+    <div
+      className={`host-answer-display-revealed ${isCorrect ? "correct" : isWrong ? "wrong" : "skipped"}`}
+      style={{
+        transform: "skewX(-16deg)",
+        background,
+        border: `2px solid ${borderColor}`,
+        borderRadius: "8px",
+        height: "56px",
+        padding: "0 32px",
+        boxSizing: "border-box",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: glowShadow,
+        animation: "revealSkewPop 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+        maxWidth: "96%",
+        margin: 0,
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          transform: "skewX(16deg)",
+          fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+          fontSize,
+          fontWeight: "800",
+          color: "#ffffff",
+          textShadow,
+          lineHeight: 1.2,
+          textAlign: "center",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {rawAnswer}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
 // 📺 FANPANTAE BROADCAST QUESTION & SCORE BAR
 // ==========================================
 function BroadcastQuestionBar({
@@ -5015,11 +5066,10 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 )}
 
                 {answerRevealed && (
-                  <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                    margin: 0, padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                  }}>
-                    <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-                  </div>
+                  <ThreeSecAnswerBadge
+                    answer={q?.answer}
+                    isRoundCorrect={isRoundCorrect}
+                  />
                 )}
               </div>
             </div>
@@ -5035,11 +5085,10 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             )}
 
             {answerRevealed && (
-              <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                margin: 0, padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-              }}>
-                <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-              </div>
+              <ThreeSecAnswerBadge
+                answer={q?.answer}
+                isRoundCorrect={isRoundCorrect}
+              />
             )}
           </div>
         ) : hasImage ? (
@@ -5090,11 +5139,10 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 )}
 
                 {answerRevealed && (
-                  <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                    margin: 0, padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                  }}>
-                    <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-                  </div>
+                  <ThreeSecAnswerBadge
+                    answer={q?.answer}
+                    isRoundCorrect={isRoundCorrect}
+                  />
                 )}
               </div>
             </div>
@@ -5226,25 +5274,11 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
 
               {/* Revealed Answer directly under the sub-question bar */}
               {answerRevealed && (
-                <div
-                  className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`}
-                  style={{
-                    margin: 0,
-                    padding: "12px 28px",
-                    borderRadius: "var(--radius)",
-                    fontSize: "22px",
-                    fontWeight: "800",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "10px",
-                    animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                  }}
-                >
-                  <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>
-                    {q?.answer}
-                  </span>
-                </div>
+                <ThreeSecAnswerBadge
+                  answer={q?.answer}
+                  isRoundCorrect={isRoundCorrect}
+                  style={{ marginTop: "4px" }}
+                />
               )}
             </div>
 

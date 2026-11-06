@@ -1931,6 +1931,11 @@ main {
     to { transform: scale(1); opacity: 1; }
 }
 
+@keyframes revealSkewPop {
+    0% { transform: skewX(-16deg) scale(0.9); opacity: 0; }
+    100% { transform: skewX(-16deg) scale(1); opacity: 1; }
+}
+
 /* ============================
    SCORE ANIMATION
    ============================ */
