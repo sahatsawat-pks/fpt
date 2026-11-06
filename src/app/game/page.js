@@ -4421,20 +4421,19 @@ function BroadcastQuestionBar({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "space-between",
             flexShrink: 0,
-            padding: "8px",
+            padding: "8px 10px 10px 10px",
           }}
         >
-          {/* Top Label */}
+          {/* Top Label: Slanted Black Pill (inherits outer slant -16deg) */}
           <div
             style={{
-              transform: "skewX(16deg)",
               background: "#000000",
               border: "1.5px solid #ffd700",
               borderRadius: "4px",
               padding: "2px 14px",
-              marginBottom: "2px",
+              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.75)",
             }}
           >
             <span
@@ -4443,24 +4442,26 @@ function BroadcastQuestionBar({
                 fontWeight: "800",
                 color: "#ffffff",
                 fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                letterSpacing: "2.5px",
+                letterSpacing: "2px",
+                display: "block",
+                lineHeight: 1.2,
+                whiteSpace: "nowrap",
               }}
             >
               คะแนนสะสม
             </span>
           </div>
 
-          {/* 3D Extruded Orbitron Score Number */}
+          {/* 3D Extruded Orbitron Score Number (inherits outer slant -16deg) */}
           <div
             style={{
-              transform: "skewX(16deg)",
-              fontFamily: "'Orbitron', sans-serif",
-              fontStyle: "italic",
+              fontFamily: "var(--font-orbitron), 'Orbitron', sans-serif",
               fontWeight: "900",
-              fontSize: "44px",
+              fontSize: "40px",
               color: "#ffffff",
               textShadow: "1px 1px 0px #8b6914, 2px 2px 0px #6e520d, 3px 3px 0px #4d3807, 4px 4px 6px rgba(0, 0, 0, 0.95)",
               lineHeight: 1,
+              margin: "auto 0",
             }}
           >
             {accumulatedScore ?? 0}
