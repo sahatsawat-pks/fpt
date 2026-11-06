@@ -5108,6 +5108,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 maxWidth: "680px",
                 width: "100%",
                 flex: "1 1 420px",
+                height: "56px",
               }}
             >
               {/* Question Number Badge (Cyan style) */}
@@ -5117,7 +5118,9 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                   background: "linear-gradient(135deg, rgba(8, 24, 52, 0.95) 0%, rgba(3, 10, 24, 0.98) 100%)",
                   border: "2px solid #00e5ff",
                   borderRadius: "8px",
-                  padding: "10px 18px",
+                  padding: "0 18px",
+                  height: "56px",
+                  boxSizing: "border-box",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -5136,7 +5139,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                   <span
                     style={{
                       fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                      fontSize: "18px",
+                      fontSize: "17px",
                       fontWeight: "700",
                       color: "rgba(255, 255, 255, 0.85)",
                     }}
@@ -5146,7 +5149,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                   <span
                     style={{
                       fontFamily: "var(--font-orbitron), 'Orbitron', 'Kanit', sans-serif",
-                      fontSize: "26px",
+                      fontSize: "24px",
                       fontWeight: "900",
                       color: "#00e5ff",
                       textShadow: "0 0 12px rgba(0, 229, 255, 0.7)",
@@ -5164,30 +5167,41 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 style={{
                   transform: "skewX(-16deg)",
                   flex: 1,
-                  minHeight: "56px",
+                  height: "56px",
+                  boxSizing: "border-box",
                   background: "linear-gradient(135deg, rgba(12, 28, 58, 0.95) 0%, rgba(5, 12, 28, 0.98) 100%)",
                   border: "2px solid rgba(0, 229, 255, 0.45)",
                   borderRadius: "8px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "10px 24px",
+                  padding: "0 22px",
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.2)",
+                  overflow: "hidden",
                 }}
               >
                 <div
                   style={{
                     transform: "skewX(16deg)",
                     fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                    fontSize: "clamp(22px, 2.4vw, 30px)",
+                    fontSize:
+                      (q?.question?.length || 0) > 30
+                        ? "clamp(14px, 1.4vw, 17px)"
+                        : (q?.question?.length || 0) > 16
+                          ? "clamp(16px, 1.6vw, 19px)"
+                          : "clamp(18px, 1.8vw, 22px)",
                     fontWeight: "800",
                     color: "#ffffff",
                     textShadow: "0 2px 8px rgba(0, 0, 0, 0.8)",
                     textAlign: "center",
-                    minHeight: "36px",
+                    lineHeight: "1.2",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    width: "100%",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                 >
                   {roundActive ? (q?.question ? q.question.replace(new RegExp(`^${qNum}[.)\\s\\-]+\\s*`), "") : "") : ""}
