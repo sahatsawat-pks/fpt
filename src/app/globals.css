@@ -3751,7 +3751,7 @@ main {
 .game-score-card .jigsaw-points-display,
 .game-score-card .attr-points-display {
     font-family: 'Orbitron', var(--font-orbitron), sans-serif !important;
-    font-style: italic;
+    font-style: normal !important;
     font-weight: 900;
     line-height: 1.05;
     margin: 0;
