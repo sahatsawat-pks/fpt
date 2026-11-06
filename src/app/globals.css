@@ -27,6 +27,7 @@ button, input, select, textarea, optgroup {
     --accent-glow: #67e8f9;
     --gold: #ffd700;
     --gold-light: #fef08a;
+    --gold-dark: #d4a017;
     --blue: #0077b6;
     --blue-bright: #00e5ff;
     --blue-dark: #020712;
@@ -2303,9 +2304,11 @@ main {
 }
 
 .config-tab.active {
-    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-    color: #000;
-    border-color: transparent;
+    background: linear-gradient(135deg, #ffd700 0%, #f59e0b 100%);
+    color: #030814;
+    font-weight: 800;
+    border-color: #ffd700;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
 }
 
 .config-back-btn:hover {
