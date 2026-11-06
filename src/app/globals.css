@@ -3757,6 +3757,11 @@ main {
     margin: 0;
 }
 
+.broadcast-timer-container,
+.broadcast-timer-container * {
+    transition: none !important;
+}
+
 .game-score-card .qa-points-display {
     font-size: 54px;
 }

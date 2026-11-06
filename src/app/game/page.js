@@ -4270,6 +4270,7 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
             <polygon
               points={`114,28 ${114 + fillW},28 ${101 + fillW},48 101,48`}
               fill={badgeState === "red" && currentSecond === "X" ? "#ff1744" : "url(#timerFillGrad)"}
+              style={{ transition: "none !important" }}
             />
           </g>
         )}
@@ -4568,7 +4569,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
         setTimeLeft(0.0);
         // เมื่อเหลือ 0 วิ จะหยุดเวลาไว้ตรงนั้น พิธีกรยังสามารถกด ถูก / ผิด / ข้าม ได้ปกติ
       }
-    }, 50);
+    }, 20);
   };
 
   const isVideoSource = (source) => {
