@@ -4380,10 +4380,8 @@ function BroadcastQuestionBar({
             flex: 1,
             minHeight: "76px",
             background: "linear-gradient(90deg, #070e1c 0%, #0d1a33 50%, #050b17 100%)",
-            border: "2px solid rgba(0, 229, 255, 0.45)",
-            borderBottom: "3px solid #00e5ff",
-            borderLeft: "3.5px solid #00e5ff",
-            boxShadow: "0 4px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 229, 255, 0.25)",
+            border: "2.5px solid #00e5ff",
+            boxShadow: "0 0 20px rgba(0, 229, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
@@ -4415,10 +4413,9 @@ function BroadcastQuestionBar({
             minWidth: "140px",
             minHeight: "76px",
             alignSelf: "stretch",
-            background: "linear-gradient(180deg, #3a2605 0%, #171002 50%, #2b1c03 100%)",
-            border: "2px solid #ffd700",
-            borderBottom: "3.5px solid #ffb700",
-            boxShadow: "0 0 24px rgba(255, 215, 0, 0.4), inset 0 0 12px rgba(255, 215, 0, 0.2)",
+            background: "linear-gradient(180deg, #d4a017 0%, #aa7c0a 20%, #3a2503 60%, #150d00 100%)",
+            border: "3px solid #ffd700",
+            boxShadow: "0 0 24px rgba(255, 215, 0, 0.5), inset 0 0 12px rgba(255, 215, 0, 0.3)",
             borderRadius: "8px",
             display: "flex",
             flexDirection: "column",
@@ -4433,35 +4430,35 @@ function BroadcastQuestionBar({
             style={{
               transform: "skewX(16deg)",
               background: "#000000",
-              border: "1px solid #ffd700",
+              border: "1.5px solid #ffd700",
               borderRadius: "4px",
-              padding: "1px 10px",
+              padding: "2px 14px",
               marginBottom: "2px",
             }}
           >
             <span
               style={{
-                fontSize: "11px",
+                fontSize: "12px",
                 fontWeight: "800",
-                color: "#ffd700",
+                color: "#ffffff",
                 fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                letterSpacing: "0.5px",
+                letterSpacing: "2.5px",
               }}
             >
               คะแนนสะสม
             </span>
           </div>
 
-          {/* Orbitron Score Number */}
+          {/* 3D Extruded Orbitron Score Number */}
           <div
             style={{
               transform: "skewX(16deg)",
               fontFamily: "'Orbitron', sans-serif",
               fontStyle: "italic",
               fontWeight: "900",
-              fontSize: "36px",
+              fontSize: "44px",
               color: "#ffffff",
-              textShadow: "0 0 16px rgba(255, 215, 0, 0.95), 0 2px 4px rgba(0, 0, 0, 0.9)",
+              textShadow: "1px 1px 0px #8b6914, 2px 2px 0px #6e520d, 3px 3px 0px #4d3807, 4px 4px 6px rgba(0, 0, 0, 0.95)",
               lineHeight: 1,
             }}
           >
@@ -5365,9 +5362,34 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
         question={cfg.question || "เลือกคำตอบที่ถูกต้อง"}
         accumulatedScore={accumulatedScore ?? 0}
         topRightSlot={
-          <div className="game-score-card qa-score-card-compact" style={{ margin: 0, padding: "4px 18px", borderRadius: "10px", border: "1.5px solid rgba(255, 215, 0, 0.6)", background: "linear-gradient(135deg, rgba(26, 35, 126, 0.65) 0%, rgba(13, 20, 64, 0.9) 100%)" }}>
-            <div className="game-score-badge-label" style={{ fontSize: "11px", marginBottom: "1px", color: "rgba(255, 255, 255, 0.9)" }}>คะแนนที่จะได้</div>
-            <div className="qa-points-display" id="qaPointsDisplay" style={{ fontSize: "28px", fontFamily: "'Orbitron', var(--font-orbitron), sans-serif", fontStyle: "normal", fontWeight: "900", color: "#ffd700" }}>{currentPoints}</div>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "4px 18px",
+              borderRadius: "8px",
+              border: "1.5px solid rgba(255, 215, 0, 0.6)",
+              background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
+              คะแนนที่จะได้
+            </span>
+            <span
+              id="qaPointsDisplay"
+              style={{
+                fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
+                fontStyle: "normal",
+                fontWeight: "900",
+                fontSize: "24px",
+                color: "#ffd700",
+                lineHeight: 1,
+              }}
+            >
+              {currentPoints}
+            </span>
           </div>
         }
       />
@@ -5609,72 +5631,95 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
   }
 
   return (
-    <div className="jigsaw-container">
-      {/* 📺 Broadcast Question Bar */}
+    <div className="jigsaw-container" style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+      {/* 📺 Broadcast Question Bar with one-line คะแนนที่จะได้ */}
       <BroadcastQuestionBar
         question={jigsawQuestion && jigsawQuestion.trim() !== "" ? jigsawQuestion : "นี่คือภาพของอะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
+        topRightSlot={
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "4px 18px",
+              borderRadius: "8px",
+              border: "1.5px solid rgba(255, 215, 0, 0.6)",
+              background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
+              คะแนนที่จะได้
+            </span>
+            <span
+              id="jigsawPointsDisplay"
+              style={{
+                fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
+                fontStyle: "normal",
+                fontWeight: "900",
+                fontSize: "24px",
+                color: "#ffd700",
+                lineHeight: 1,
+              }}
+            >
+              {currentPoints}
+            </span>
+          </div>
+        }
       />
 
-      <div className="jigsaw-main-area">
-        {/* Left Column: Jigsaw Board (เหมือนฝั่งรูปภาพของ 3 วินาที) */}
-        <div className="jigsaw-board-col">
-          <div className={`jigsaw-board ${jigsawMode || "square"}`}>
-            {hasImage ? (
-              <img
-                key={`${jigsawImage}-${configVersion}`}
-                src={resolveImagePath(jigsawImage, configVersion)}
-                className="jigsaw-image"
-                alt="ภาพปริศนา"
-              />
-            ) : (
-              <div className="jigsaw-no-image">ไม่มีรูปภาพ (กรุณาตั้งค่าในหน้าตั้งค่าเกม)</div>
-            )}
-            <div className="jigsaw-grid" id="jigsawGrid">
-              {[...Array(25)].map((_, i) => {
-                const isOpened = openedPieces.includes(i);
-                return (
-                  <div
-                    className={`jigsaw-piece ${isOpened ? "opened" : ""} ${judgeMode ? "disabled" : ""}`}
-                    key={i}
-                    id={`jPiece${i}`}
-                    onClick={judgeMode ? null : () => handleOpenPiece(i)}
-                    title={judgeMode ? "" : (isOpened ? "" : `คลิกเพื่อเปิดช่อง ${i + 1}`)}
-                  >
-                    {isOpened ? "" : i + 1}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Score Card + Answer Status */}
-        <div className="jigsaw-info-col">
-          <div className="game-score-card jigsaw-score-card">
-            <div className="game-score-badge-label">คะแนนที่จะได้</div>
-            <div className="jigsaw-points-display" id="jigsawPointsDisplay" style={{ fontFamily: "'Orbitron', var(--font-orbitron), sans-serif", fontStyle: "normal", fontWeight: "900" }}>{currentPoints}</div>
-          </div>
-
-          {answered && (
-            <div style={{
-              padding: "14px 24px",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "2px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: "var(--radius)",
-              fontSize: "18px",
-              fontWeight: "800",
-              textAlign: "center",
-              color: "var(--gold-light)",
-              animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-              width: "100%",
-              maxWidth: "460px"
-            }}>
-              บันทึกผลการแข่งขันแล้ว
-            </div>
+      {/* Jigsaw Board Centered (เหมือนถาม-ตอบ) */}
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", margin: "10px 0" }}>
+        <div className={`jigsaw-board ${jigsawMode || "square"}`}>
+          {hasImage ? (
+            <img
+              key={`${jigsawImage}-${configVersion}`}
+              src={resolveImagePath(jigsawImage, configVersion)}
+              className="jigsaw-image"
+              alt="ภาพปริศนา"
+            />
+          ) : (
+            <div className="jigsaw-no-image">ไม่มีรูปภาพ (กรุณาตั้งค่าในหน้าตั้งค่าเกม)</div>
           )}
+          <div className="jigsaw-grid" id="jigsawGrid">
+            {[...Array(25)].map((_, i) => {
+              const isOpened = openedPieces.includes(i);
+              return (
+                <div
+                  className={`jigsaw-piece ${isOpened ? "opened" : ""} ${judgeMode ? "disabled" : ""}`}
+                  key={i}
+                  id={`jPiece${i}`}
+                  onClick={judgeMode ? null : () => handleOpenPiece(i)}
+                  title={judgeMode ? "" : (isOpened ? "" : `คลิกเพื่อเปิดช่อง ${i + 1}`)}
+                >
+                  {isOpened ? "" : i + 1}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      {/* บันทึกคะแนนอยู่ด้านล่างภาพหลังกดถูกหรือผิดแล้ว */}
+      {answered && (
+        <div style={{
+          marginTop: "16px",
+          padding: "14px 28px",
+          background: "rgba(255, 255, 255, 0.05)",
+          border: "2px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: "var(--radius)",
+          fontSize: "20px",
+          fontWeight: "800",
+          textAlign: "center",
+          color: "var(--gold-light)",
+          animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          width: "100%",
+          maxWidth: "460px"
+        }}>
+          บันทึกผลการแข่งขันแล้ว
+        </div>
+      )}
 
       <div className="jigsaw-controls" id="jigsawControls" style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "12px", width: "100%" }}>
         {!answered ? (
@@ -5953,9 +5998,34 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
         question={cfg.question || "จากคุณสมบัติต่อไปนี้คือใคร หรืออะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
         topRightSlot={
-          <div className="game-score-card attr-score-card-compact" style={{ margin: 0, padding: "4px 18px", borderRadius: "10px", border: "1.5px solid rgba(255, 215, 0, 0.6)", background: "linear-gradient(135deg, rgba(26, 35, 126, 0.65) 0%, rgba(13, 20, 64, 0.9) 100%)" }}>
-            <div className="game-score-badge-label" style={{ fontSize: "11px", marginBottom: "1px", color: "rgba(255, 255, 255, 0.9)" }}>คะแนนที่จะได้</div>
-            <div className="attr-points-display" id="attrPointsDisplay" style={{ fontSize: "28px", fontFamily: "'Orbitron', var(--font-orbitron), sans-serif", fontStyle: "normal", fontWeight: "900", color: "#ffd700" }}>{currentPoints}</div>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "4px 18px",
+              borderRadius: "8px",
+              border: "1.5px solid rgba(255, 215, 0, 0.6)",
+              background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
+              คะแนนที่จะได้
+            </span>
+            <span
+              id="attrPointsDisplay"
+              style={{
+                fontFamily: "'Orbitron', var(--font-orbitron), sans-serif",
+                fontStyle: "normal",
+                fontWeight: "900",
+                fontSize: "24px",
+                color: "#ffd700",
+                lineHeight: 1,
+              }}
+            >
+              {currentPoints}
+            </span>
           </div>
         }
       />
