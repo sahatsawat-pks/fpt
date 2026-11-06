@@ -4446,11 +4446,13 @@ function ThreeSecAnswerBadge({ answer, isRoundCorrect, style = {} }) {
   const rawAnswer = answer !== undefined && answer !== null ? String(answer) : "";
   const textLength = rawAnswer.length;
   const fontSize =
-    textLength > 30
-      ? "clamp(14px, 1.4vw, 17px)"
-      : textLength > 16
-        ? "clamp(16px, 1.6vw, 20px)"
-        : "clamp(18px, 1.8vw, 22px)";
+    textLength > 45
+      ? "clamp(12px, 1.2vw, 15px)"
+      : textLength > 30
+        ? "clamp(14px, 1.4vw, 17px)"
+        : textLength > 18
+          ? "clamp(16px, 1.6vw, 19px)"
+          : "clamp(18px, 1.8vw, 22px)";
 
   return (
     <div
@@ -4461,14 +4463,15 @@ function ThreeSecAnswerBadge({ answer, isRoundCorrect, style = {} }) {
         border: `2px solid ${borderColor}`,
         borderRadius: "8px",
         height: "56px",
-        padding: "0 32px",
+        padding: "0 28px",
         boxSizing: "border-box",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         boxShadow: glowShadow,
         animation: "revealSkewPop 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards",
-        maxWidth: "96%",
+        width: "fit-content",
+        maxWidth: "100%",
         margin: 0,
         ...style,
       }}
@@ -4484,8 +4487,6 @@ function ThreeSecAnswerBadge({ answer, isRoundCorrect, style = {} }) {
           lineHeight: 1.2,
           textAlign: "center",
           whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
         }}
       >
         {rawAnswer}
@@ -5052,12 +5053,12 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
           !roundActive ? (
             <div style={{ minHeight: "140px", display: "flex", alignItems: "center", justifyContent: "center" }} />
           ) : (
-            <div style={{ display: "flex", gap: "36px", width: "100%", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
-              <div className="video-player-wrapper" style={{ width: "100%", maxWidth: "600px", overflow: "hidden", borderRadius: "12px", background: "#000", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+            <div style={{ display: "flex", gap: "28px", width: "100%", maxWidth: "1160px", alignItems: "center", justifyContent: "center", flexWrap: "nowrap" }}>
+              <div className="video-player-wrapper" style={{ flex: "1 1 auto", minWidth: 0, maxWidth: "680px", overflow: "hidden", borderRadius: "12px", background: "#000", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
                 <video ref={videoPlayerRef} playsInline controls style={{ width: "100%", maxHeight: "340px", display: "block" }} />
               </div>
 
-              <div style={{ minWidth: "260px", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+              <div style={{ flex: "0 0 auto", minWidth: "280px", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
                 {!revealOnly && (
                   <ThreeSecTimerBar
                     timeLeft={timeLeft}
@@ -5076,7 +5077,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
           )
         ) : isAudio ? (
           /* เคส 2: คำถามเสียง -> โผล่นาฬิกา 3 วิอยู่ตรงกลางโดด ๆ ไม่มีแถบคำถามรอง */
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", minHeight: "180px", gap: "24px" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", maxWidth: "1160px", minHeight: "180px", gap: "24px" }}>
             {!revealOnly && (
               <ThreeSecTimerBar
                 timeLeft={timeLeft}
@@ -5103,34 +5104,44 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
               <div style={{ fontSize: "22px", fontWeight: "800", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
             </div>
           ) : (
-            <div style={{ display: "flex", gap: "36px", width: "100%", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "32px", width: "100%", maxWidth: "1160px", alignItems: "center", justifyContent: "center", flexWrap: "nowrap" }}>
               {/* Image snugly framed for all aspect ratios */}
               <div style={{
-                display: "inline-block",
+                flex: "1 1 auto",
+                minWidth: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 lineHeight: 0,
-                borderRadius: "14px",
-                overflow: "hidden",
-                border: "3px solid rgba(0, 229, 255, 0.5)",
-                boxShadow: "0 10px 36px rgba(0, 0, 0, 0.85), 0 0 24px rgba(0, 229, 255, 0.25)",
-                background: "#020713",
               }}>
-                <img
-                  key={`${q.image}-${configVersion}`}
-                  src={resolveImagePath(q.image, configVersion)}
-                  alt="คำถาม"
-                  style={{
-                    display: "block",
-                    maxWidth: "min(640px, 52vw)",
-                    maxHeight: "56vh",
-                    width: "auto",
-                    height: "auto",
-                    objectFit: "contain",
-                  }}
-                />
+                <div style={{
+                  display: "inline-block",
+                  lineHeight: 0,
+                  borderRadius: "14px",
+                  overflow: "hidden",
+                  border: "3px solid rgba(0, 229, 255, 0.5)",
+                  boxShadow: "0 10px 36px rgba(0, 0, 0, 0.85), 0 0 24px rgba(0, 229, 255, 0.25)",
+                  background: "#020713",
+                  maxWidth: "100%",
+                }}>
+                  <img
+                    key={`${q.image}-${configVersion}`}
+                    src={resolveImagePath(q.image, configVersion)}
+                    alt="คำถาม"
+                    style={{
+                      display: "block",
+                      maxWidth: "min(640px, 100%)",
+                      maxHeight: "52vh",
+                      width: "auto",
+                      height: "auto",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Right column: Timer & Revealed Answer */}
-              <div style={{ minWidth: "260px", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+              <div style={{ flex: "0 0 auto", minWidth: "280px", display: "flex", flexDirection: "column", alignItems: "center", gap: "18px" }}>
                 {!revealOnly && (
                   <ThreeSecTimerBar
                     timeLeft={timeLeft}
@@ -5149,7 +5160,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
           )
         ) : (
           /* เคส 4: คำถามข้อความ -> แถบคำถามย่อย + เฉลยอยู่ใต้แถบคำถามย่อย (ทางซ้าย) และ นาฬิกา 3 วิทางขวา */
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: "24px", width: "100%", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: "24px", width: "100%", maxWidth: "1160px", flexWrap: "nowrap" }}>
             {/* Left Column: Sub-bar + Revealed Answer underneath */}
             <div
               style={{
@@ -5157,9 +5168,9 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 flexDirection: "column",
                 alignItems: "center",
                 gap: "14px",
-                maxWidth: "680px",
+                flex: 1,
+                minWidth: 0,
                 width: "100%",
-                flex: "1 1 420px",
               }}
             >
               {/* Unified 2-part Sub-bar for sub-question */}
@@ -5230,6 +5241,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                   style={{
                     transform: "skewX(-16deg)",
                     flex: 1,
+                    minWidth: 0,
                     height: "56px",
                     boxSizing: "border-box",
                     background: "linear-gradient(135deg, rgba(12, 28, 58, 0.95) 0%, rgba(5, 12, 28, 0.98) 100%)",
@@ -5238,37 +5250,46 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "0 22px",
+                    padding: "0 24px",
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.2)",
-                    overflow: "hidden",
                   }}
                 >
-                  <div
-                    style={{
-                      transform: "skewX(16deg)",
-                      fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                      fontSize:
-                        (q?.question?.length || 0) > 30
+                  {(() => {
+                    const cleanText = roundActive
+                      ? (q?.question ? q.question.replace(new RegExp(`^${qNum}[.)\\s\\-]+\\s*`), "") : "")
+                      : "";
+                    const qLen = cleanText.length;
+                    const fontSize =
+                      qLen > 65
+                        ? "clamp(12px, 1.2vw, 15px)"
+                        : qLen > 45
                           ? "clamp(14px, 1.4vw, 17px)"
-                          : (q?.question?.length || 0) > 16
+                          : qLen > 28
                             ? "clamp(16px, 1.6vw, 19px)"
-                            : "clamp(18px, 1.8vw, 22px)",
-                      fontWeight: "800",
-                      color: "#ffffff",
-                      textShadow: "0 2px 8px rgba(0, 0, 0, 0.8)",
-                      textAlign: "center",
-                      lineHeight: "1.2",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "100%",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {roundActive ? (q?.question ? q.question.replace(new RegExp(`^${qNum}[.)\\s\\-]+\\s*`), "") : "") : ""}
-                  </div>
+                            : "clamp(18px, 1.8vw, 22px)";
+
+                    return (
+                      <div
+                        style={{
+                          transform: "skewX(16deg)",
+                          fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+                          fontSize,
+                          fontWeight: "800",
+                          color: "#ffffff",
+                          textShadow: "0 2px 8px rgba(0, 0, 0, 0.8)",
+                          textAlign: "center",
+                          lineHeight: "1.2",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "100%",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {cleanText}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -5283,7 +5304,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             </div>
 
             {/* Right: Timer bar */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, marginTop: "10px" }}>
               {!revealOnly && (
                 <ThreeSecTimerBar
                   timeLeft={timeLeft}
