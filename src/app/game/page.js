@@ -4176,109 +4176,131 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
     badgeState = "red";
   }
 
-  const badgeBg =
-    badgeState === "red"
-      ? "linear-gradient(180deg, #e60000 0%, #8b0000 100%)"
-      : badgeState === "blue"
-      ? "linear-gradient(180deg, #025cc9 0%, #013485 100%)"
-      : "linear-gradient(180deg, #333333 0%, #161616 100%)";
+  const badgeGradId =
+    badgeState === "red" ? "timerBadgeRed" : badgeState === "blue" ? "timerBadgeBlue" : "timerBadgeGray";
 
-  const badgeGlow =
-    badgeState === "red"
-      ? "0 0 20px rgba(230, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4)"
-      : badgeState === "blue"
-      ? "0 0 18px rgba(0, 153, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)"
-      : "0 0 12px rgba(0, 153, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)";
+  const slotW = 196;
+  const fillW = Math.max(0, Math.min(slotW, slotW * (fillPercent / 100)));
 
   return (
     <div
-      className={`broadcast-timer-unit ${isWrong ? "wrong" : ""}`}
+      className={`broadcast-timer-container ${isWrong ? "wrong" : ""}`}
       style={{
         display: "inline-flex",
         alignItems: "center",
-        filter: "drop-shadow(0 6px 16px rgba(0, 0, 0, 0.8))",
+        justifyContent: "center",
+        width: "350px",
+        maxWidth: "92vw",
       }}
     >
-      {/* 1. Left Slanted Trapezoid Number Badge */}
-      <div
-        style={{
-          transform: "skewX(-20deg)",
-          width: "66px",
-          height: "52px",
-          background: badgeBg,
-          border: "2.5px solid #00aaff",
-          boxShadow: badgeGlow,
-          borderRadius: "8px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          zIndex: 2,
-          transition: "background 0.15s ease, box-shadow 0.15s ease",
-        }}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 350 76"
+        style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}
       >
-        <span
-          style={{
-            transform: "skewX(20deg)",
-            fontFamily: "'Orbitron', sans-serif",
-            fontStyle: "italic",
-            fontWeight: "900",
-            fontSize: "32px",
-            color: "#ffffff",
-            textShadow: "0 2px 6px rgba(0, 0, 0, 0.9)",
-            lineHeight: 1,
-            userSelect: "none",
-          }}
-        >
-          {currentSecond}
-        </span>
-      </div>
+        <defs>
+          {/* Blue bar metallic broadcast gradient */}
+          <linearGradient id="timerBlueBarGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0060b6" />
+            <stop offset="30%" stopColor="#0087e4" />
+            <stop offset="65%" stopColor="#0252a5" />
+            <stop offset="100%" stopColor="#012d6a" />
+          </linearGradient>
 
-      {/* 2. Right Slanted Blue Bezel with Recessed Slot */}
-      <div
-        style={{
-          transform: "skewX(-20deg)",
-          width: "240px",
-          height: "52px",
-          marginLeft: "-8px",
-          background: "linear-gradient(180deg, #0b67c2 0%, #06418d 50%, #042557 100%)",
-          border: "2.5px solid #00aaff",
-          boxShadow: "0 0 20px rgba(0, 170, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
-          borderRadius: "8px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 18px 0 22px",
-          zIndex: 1,
-        }}
-      >
-        {/* Recessed Black Track */}
-        <div
-          style={{
-            width: "100%",
-            height: "20px",
-            background: "#000000",
-            boxShadow: "inset 0 2px 6px rgba(0, 0, 0, 0.95)",
-            border: "1px solid rgba(0, 30, 80, 0.8)",
-            borderRadius: "3px",
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
-          {/* Gradient Fill (Red -> Orange -> Yellow) */}
-          <div
-            style={{
-              width: `${fillPercent}%`,
-              height: "100%",
-              background: isWrong
-                ? "#ff1744"
-                : "linear-gradient(90deg, #ff1a00 0%, #ff5e00 28%, #ffa200 60%, #ffd200 100%)",
-              boxShadow: "0 0 14px rgba(255, 162, 0, 0.85)",
-              transition: isWrong ? "none" : "width 0.05s linear",
-            }}
-          />
-        </div>
-      </div>
+          {/* Idle Gray badge gradient (matching TV show idle badge) */}
+          <linearGradient id="timerBadgeGray" x1="0.3" y1="0" x2="0.7" y2="1">
+            <stop offset="0%" stopColor="#838385" />
+            <stop offset="50%" stopColor="#5d5d5d" />
+            <stop offset="100%" stopColor="#242626" />
+          </linearGradient>
+
+          {/* Blue badge gradient (1 & 2 sec) */}
+          <linearGradient id="timerBadgeBlue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0358d6" />
+            <stop offset="45%" stopColor="#012b84" />
+            <stop offset="100%" stopColor="#001242" />
+          </linearGradient>
+
+          {/* Red badge gradient (3 sec / time up / wrong) */}
+          <linearGradient id="timerBadgeRed" x1="0.2" y1="0" x2="0.8" y2="1">
+            <stop offset="0%" stopColor="#e81e00" />
+            <stop offset="50%" stopColor="#8a0900" />
+            <stop offset="100%" stopColor="#220200" />
+          </linearGradient>
+
+          {/* Fill progress gradient (Red -> Orange -> Yellow) */}
+          <linearGradient id="timerFillGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#ff1a00" />
+            <stop offset="30%" stopColor="#ff6600" />
+            <stop offset="70%" stopColor="#ffba00" />
+            <stop offset="100%" stopColor="#ffea00" />
+          </linearGradient>
+
+          <clipPath id="timerSlotClip">
+            {/* Slanted slot at 33°: Top: 114 to 310, Bottom: 101 to 297, Height 20 (y: 28 to 48) */}
+            <polygon points="114,28 310,28 297,48 101,48" />
+          </clipPath>
+
+          <filter id="timerCyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="3.5" floodColor="#00a0f0" floodOpacity="0.65" />
+          </filter>
+        </defs>
+
+        {/* 1. Blue Bar (starts behind badge at x~50, ends at x=344) */}
+        <path
+          d="M 50 13 L 338 13 Q 344 13 342 18 L 313.5 61.5 Q 312 63 306 63 L 18 63 Z"
+          fill="url(#timerBlueBarGrad)"
+          stroke="#0099ff"
+          strokeWidth="3"
+          strokeLinejoin="round"
+          filter="url(#timerCyanGlow)"
+        />
+
+        {/* 2. Recessed Black Slot (inside blue bar) */}
+        <polygon
+          points="114,28 310,28 297,48 101,48"
+          fill="#000000"
+          stroke="rgba(0, 30, 80, 0.85)"
+          strokeWidth="1.5"
+        />
+
+        {/* 3. Progress Fill (slanted inside slotClip) */}
+        {fillW > 0 && (
+          <g clipPath="url(#timerSlotClip)">
+            <polygon
+              points={`114,28 ${114 + fillW},28 ${101 + fillW},48 101,48`}
+              fill={badgeState === "red" && currentSecond === "X" ? "#ff1744" : "url(#timerFillGrad)"}
+            />
+          </g>
+        )}
+
+        {/* 4. Left Badge (taller than blue bar, overhangs top and bottom at 33° slant) */}
+        <path
+          d="M 52 4 L 126 4 Q 131 4 129 9 L 90.5 68 Q 88.5 72 83 72 L 9.5 72 Q 4.5 72 6.5 67 L 45 8 Q 47 4 52 4 Z"
+          fill={`url(#${badgeGradId})`}
+          stroke="#0099ff"
+          strokeWidth="3.5"
+          strokeLinejoin="round"
+          filter="url(#timerCyanGlow)"
+        />
+
+        {/* 5. Number inside Badge (Orbitron Italic) */}
+        {currentSecond && (
+          <text
+            x="68"
+            y="52"
+            textAnchor="middle"
+            fontFamily="'Orbitron', sans-serif"
+            fontStyle="italic"
+            fontWeight="900"
+            fontSize="38"
+            fill="#ffffff"
+            style={{ filter: "drop-shadow(0px 2px 5px rgba(0,0,0,0.9))", userSelect: "none" }}
+          >
+            {currentSecond}
+          </text>
+        )}
+      </svg>
     </div>
   );
 }
