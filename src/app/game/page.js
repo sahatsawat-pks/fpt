@@ -4179,7 +4179,7 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
   const badgeGradId =
     badgeState === "red" ? "timerBadgeRed" : badgeState === "blue" ? "timerBadgeBlue" : "timerBadgeGray";
 
-  const slotW = 196;
+  const slotW = 172;
   const fillW = Math.max(0, Math.min(slotW, slotW * (fillPercent / 100)));
 
   return (
@@ -4237,8 +4237,8 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
           </linearGradient>
 
           <clipPath id="timerSlotClip">
-            {/* Slanted slot at 33°: Top: 114 to 310, Bottom: 101 to 297, Height 20 (y: 28 to 48) */}
-            <polygon points="114,28 310,28 297,48 101,48" />
+            {/* Slanted slot at 33°: Top: 140 to 312, Bottom: 127 to 299, Height 20 (y: 28 to 48) */}
+            <polygon points="140,28 312,28 299,48 127,48" />
           </clipPath>
 
           <filter id="timerCyanGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -4246,9 +4246,9 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
           </filter>
         </defs>
 
-        {/* 1. Blue Bar (starts behind badge at x~50, ends at x=344) */}
+        {/* 1. Blue Bar (starts behind badge at x~80/55, ends at x=342/306) */}
         <path
-          d="M 50 13 L 338 13 Q 344 13 342 18 L 313.5 61.5 Q 312 63 306 63 L 18 63 Z"
+          d="M 80 13 L 338 13 Q 344 13 342 18 L 313.5 61.5 Q 312 63 306 63 L 55 63 Z"
           fill="url(#timerBlueBarGrad)"
           stroke="#0099ff"
           strokeWidth="3"
@@ -4256,11 +4256,11 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
           filter="url(#timerCyanGlow)"
         />
 
-        {/* 2. Recessed Black Slot (inside blue bar) */}
+        {/* 2. Recessed Black Slot (inside blue bar, with a generous blue gap from the badge) */}
         <polygon
-          points="114,28 310,28 297,48 101,48"
+          points="140,28 312,28 299,48 127,48"
           fill="#000000"
-          stroke="rgba(0, 30, 80, 0.85)"
+          stroke="rgba(0, 20, 60, 0.9)"
           strokeWidth="1.5"
         />
 
@@ -4268,7 +4268,7 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
         {fillW > 0 && (
           <g clipPath="url(#timerSlotClip)">
             <polygon
-              points={`114,28 ${114 + fillW},28 ${101 + fillW},48 101,48`}
+              points={`140,28 ${140 + fillW},28 ${127 + fillW},48 127,48`}
               fill={badgeState === "red" && currentSecond === "X" ? "#ff1744" : "url(#timerFillGrad)"}
               style={{ transition: "none !important" }}
             />
@@ -4285,18 +4285,19 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
           filter="url(#timerCyanGlow)"
         />
 
-        {/* 5. Number inside Badge (Orbitron Italic) */}
+        {/* 5. Number inside Badge (Orbitron Italic, vertically & horizontally centered) */}
         {currentSecond && (
           <text
-            x="68"
-            y="52"
+            x="66"
+            y="38"
             textAnchor="middle"
-            fontFamily="'Orbitron', sans-serif"
+            dominantBaseline="central"
+            fontFamily="var(--font-orbitron), 'Orbitron', sans-serif"
             fontStyle="italic"
             fontWeight="900"
             fontSize="38"
             fill="#ffffff"
-            style={{ filter: "drop-shadow(0px 2px 5px rgba(0,0,0,0.9))", userSelect: "none" }}
+            style={{ filter: "drop-shadow(0px 2px 6px rgba(0,0,0,0.95))", userSelect: "none" }}
           >
             {currentSecond}
           </text>
