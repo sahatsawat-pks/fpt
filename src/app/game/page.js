@@ -5100,134 +5100,161 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             </div>
           )
         ) : (
-          /* เคส 4: คำถามข้อความ -> แถบคำถามย่อยทางซ้าย + นาฬิกา 3 วิทางขวา */
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "24px", width: "100%", flexWrap: "wrap" }}>
-            {/* Unified 2-part Sub-bar for sub-question */}
+          /* เคส 4: คำถามข้อความ -> แถบคำถามย่อย + เฉลยอยู่ใต้แถบคำถามย่อย (ทางซ้าย) และ นาฬิกา 3 วิทางขวา */
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: "24px", width: "100%", flexWrap: "wrap" }}>
+            {/* Left Column: Sub-bar + Revealed Answer underneath */}
             <div
               style={{
                 display: "flex",
-                alignItems: "stretch",
-                justifyContent: "center",
-                gap: "10px",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "14px",
                 maxWidth: "680px",
                 width: "100%",
                 flex: "1 1 420px",
-                height: "56px",
               }}
             >
-              {/* Question Number Badge (Cyan style) */}
+              {/* Unified 2-part Sub-bar for sub-question */}
               <div
                 style={{
-                  transform: "skewX(-16deg)",
-                  background: "linear-gradient(135deg, rgba(8, 24, 52, 0.95) 0%, rgba(3, 10, 24, 0.98) 100%)",
-                  border: "2px solid #00e5ff",
-                  borderRadius: "8px",
-                  padding: "0 18px",
-                  height: "56px",
-                  boxSizing: "border-box",
                   display: "flex",
-                  alignItems: "center",
+                  alignItems: "stretch",
                   justifyContent: "center",
-                  flexShrink: 0,
-                  boxShadow: "0 0 16px rgba(0, 229, 255, 0.35), inset 0 0 10px rgba(0, 229, 255, 0.15)",
+                  gap: "10px",
+                  width: "100%",
+                  height: "56px",
+                  marginTop: "10px",
                 }}
               >
+                {/* Question Number Badge (Cyan style) */}
                 <div
                   style={{
-                    transform: "skewX(16deg)",
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: "6px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                      fontSize: "17px",
-                      fontWeight: "700",
-                      color: "rgba(255, 255, 255, 0.85)",
-                    }}
-                  >
-                    ข้อ
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-orbitron), 'Orbitron', 'Kanit', sans-serif",
-                      fontSize: "24px",
-                      fontWeight: "900",
-                      color: "#00e5ff",
-                      textShadow: "0 0 12px rgba(0, 229, 255, 0.7)",
-                      letterSpacing: "1px",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {qNum}
-                  </span>
-                </div>
-              </div>
-
-              {/* Sub-Question Bar (displays question when roundActive, empty bar waiting for question) */}
-              <div
-                style={{
-                  transform: "skewX(-16deg)",
-                  flex: 1,
-                  height: "56px",
-                  boxSizing: "border-box",
-                  background: "linear-gradient(135deg, rgba(12, 28, 58, 0.95) 0%, rgba(5, 12, 28, 0.98) 100%)",
-                  border: "2px solid rgba(0, 229, 255, 0.45)",
-                  borderRadius: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 22px",
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.2)",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    transform: "skewX(16deg)",
-                    fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                    fontSize:
-                      (q?.question?.length || 0) > 30
-                        ? "clamp(14px, 1.4vw, 17px)"
-                        : (q?.question?.length || 0) > 16
-                          ? "clamp(16px, 1.6vw, 19px)"
-                          : "clamp(18px, 1.8vw, 22px)",
-                    fontWeight: "800",
-                    color: "#ffffff",
-                    textShadow: "0 2px 8px rgba(0, 0, 0, 0.8)",
-                    textAlign: "center",
-                    lineHeight: "1.2",
+                    transform: "skewX(-16deg)",
+                    background: "linear-gradient(135deg, rgba(8, 24, 52, 0.95) 0%, rgba(3, 10, 24, 0.98) 100%)",
+                    border: "2px solid #00e5ff",
+                    borderRadius: "8px",
+                    padding: "0 18px",
+                    height: "56px",
+                    boxSizing: "border-box",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    width: "100%",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+                    flexShrink: 0,
+                    boxShadow: "0 0 16px rgba(0, 229, 255, 0.35), inset 0 0 10px rgba(0, 229, 255, 0.15)",
                   }}
                 >
-                  {roundActive ? (q?.question ? q.question.replace(new RegExp(`^${qNum}[.)\\s\\-]+\\s*`), "") : "") : ""}
+                  <div
+                    style={{
+                      transform: "skewX(16deg)",
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: "6px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+                        fontSize: "17px",
+                        fontWeight: "700",
+                        color: "rgba(255, 255, 255, 0.85)",
+                      }}
+                    >
+                      ข้อ
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-orbitron), 'Orbitron', 'Kanit', sans-serif",
+                        fontSize: "24px",
+                        fontWeight: "900",
+                        color: "#00e5ff",
+                        textShadow: "0 0 12px rgba(0, 229, 255, 0.7)",
+                        letterSpacing: "1px",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {qNum}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Sub-Question Bar (displays question when roundActive, empty bar waiting for question) */}
+                <div
+                  style={{
+                    transform: "skewX(-16deg)",
+                    flex: 1,
+                    height: "56px",
+                    boxSizing: "border-box",
+                    background: "linear-gradient(135deg, rgba(12, 28, 58, 0.95) 0%, rgba(5, 12, 28, 0.98) 100%)",
+                    border: "2px solid rgba(0, 229, 255, 0.45)",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 22px",
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.2)",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      transform: "skewX(16deg)",
+                      fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+                      fontSize:
+                        (q?.question?.length || 0) > 30
+                          ? "clamp(14px, 1.4vw, 17px)"
+                          : (q?.question?.length || 0) > 16
+                            ? "clamp(16px, 1.6vw, 19px)"
+                            : "clamp(18px, 1.8vw, 22px)",
+                      fontWeight: "800",
+                      color: "#ffffff",
+                      textShadow: "0 2px 8px rgba(0, 0, 0, 0.8)",
+                      textAlign: "center",
+                      lineHeight: "1.2",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {roundActive ? (q?.question ? q.question.replace(new RegExp(`^${qNum}[.)\\s\\-]+\\s*`), "") : "") : ""}
+                  </div>
                 </div>
               </div>
+
+              {/* Revealed Answer directly under the sub-question bar */}
+              {answerRevealed && (
+                <div
+                  className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`}
+                  style={{
+                    margin: 0,
+                    padding: "12px 28px",
+                    borderRadius: "var(--radius)",
+                    fontSize: "22px",
+                    fontWeight: "800",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "10px",
+                    animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>
+                    {q?.answer}
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Right: Timer bar & Revealed Answer */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", flexShrink: 0 }}>
+            {/* Right: Timer bar */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
               {!revealOnly && (
                 <ThreeSecTimerBar
                   timeLeft={timeLeft}
                   isRoundCorrect={isRoundCorrect}
                 />
-              )}
-
-              {answerRevealed && (
-                <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                  margin: 0, padding: "12px 24px", borderRadius: "var(--radius)", fontSize: "20px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                }}>
-                  <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-                </div>
               )}
             </div>
           </div>
