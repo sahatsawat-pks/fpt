@@ -88,6 +88,80 @@ export default function TournamentClient({ initialData }) {
     return cols.map((col) => [...col, ...col, ...col, ...col]);
   }, [data]);
 
+  // Current latest holders of Tournament Award & Penalty
+  const currentAwardInfo = useMemo(() => {
+    let latestAward = null;
+    let latestPenalty = null;
+    const mds = data?.matchdays || [];
+    for (let i = mds.length - 1; i >= 0; i--) {
+      const matches = mds[i].matches || [];
+      for (let j = matches.length - 1; j >= 0; j--) {
+        const m = matches[j];
+        if (m.status !== "completed") continue;
+        const p1 = m.player1;
+        const p2 = m.player2;
+        const cats = ["3sec", "qa", "jigsaw", "attribute"];
+
+        // Award check
+        if (!latestAward) {
+          const count25_1 = cats.filter((c) => Number(p1?.scores?.[c]) === 25).length;
+          const count25_2 = cats.filter((c) => Number(p2?.scores?.[c]) === 25).length;
+          const rawSumWinner = m.rawSumBonusWinner;
+          const cp1 = m.categoryPointsBeforeBonus?.player1 ?? (p1?.categoryPoints - (rawSumWinner === "player1" ? 1 : 0));
+          const cp2 = m.categoryPointsBeforeBonus?.player2 ?? (p2?.categoryPoints - (rawSumWinner === "player2" ? 1 : 0));
+          if (m.awards?.player2 || (count25_2 >= 2 && cp2 === 4) || count25_2 >= 3) {
+            latestAward = {
+              name: m.awards?.player2?.name || (p2.nickname ? `รางวัล${p2.nickname}` : "รางวัลกร"),
+              holderName: p2.name || "วรงกร แจ่มปัญญา",
+              holderNickname: p2.nickname || "กร",
+              photo: p2.photo,
+              matchId: m.id,
+              matchdayName: mds[i].name,
+            };
+          } else if (m.awards?.player1 || (count25_1 >= 2 && cp1 === 4) || count25_1 >= 3) {
+            latestAward = {
+              name: m.awards?.player1?.name || (p1.nickname ? `รางวัล${p1.nickname}` : "รางวัลกร"),
+              holderName: p1.name || "วรงกร แจ่มปัญญา",
+              holderNickname: p1.nickname || "กร",
+              photo: p1.photo,
+              matchId: m.id,
+              matchdayName: mds[i].name,
+            };
+          }
+        }
+
+        // Penalty check
+        if (!latestPenalty) {
+          const zero1 = cats.filter((c) => p1?.scores?.[c] !== null && p1?.scores?.[c] !== undefined && Number(p1.scores[c]) === 0).length;
+          const zero2 = cats.filter((c) => p2?.scores?.[c] !== null && p2?.scores?.[c] !== undefined && Number(p2.scores[c]) === 0).length;
+          if (m.penalties?.player2 || zero2 >= 3) {
+            latestPenalty = {
+              name: m.penalties?.player2?.name || (p2.nickname ? `หักค่า${p2.nickname}` : "หักค่าปัน"),
+              holderName: p2.name || "ปฏิปัน อัศวภูไชย",
+              holderNickname: p2.nickname || "ปัน",
+              photo: p2.photo,
+              matchId: m.id,
+              matchdayName: mds[i].name,
+            };
+          } else if (m.penalties?.player1 || zero1 >= 3) {
+            latestPenalty = {
+              name: m.penalties?.player1?.name || (p1.nickname ? `หักค่า${p1.nickname}` : "หักค่าปัน"),
+              holderName: p1.name || "ปฏิปัน อัศวภูไชย",
+              holderNickname: p1.nickname || "ปัน",
+              photo: p1.photo,
+              matchId: m.id,
+              matchdayName: mds[i].name,
+            };
+          }
+        }
+      }
+    }
+    return {
+      award: latestAward || { name: "รางวัลกร", holderNickname: "กร", holderName: "วรงกร แจ่มปัญญา", photo: "" },
+      penalty: latestPenalty || { name: "หักค่าปัน", holderNickname: "ปัน", holderName: "ปฏิปัน อัศวภูไชย", photo: "" },
+    };
+  }, [data]);
+
   // Filtered matches for current matchday
   const filteredMatches = useMemo(() => {
     if (!currentMD?.matches) return [];
@@ -765,6 +839,97 @@ export default function TournamentClient({ initialData }) {
               </div>
               <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff" }}>
                 B: <strong style={{ color: "#ffd700" }}>พีม (11 LP)</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Tournament Honors & Penalties Banner (ผู้ถือครองรางวัลและบทลงโทษปัจจุบัน) */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: "16px",
+              marginTop: "24px",
+            }}
+          >
+            {/* 1. รางวัลพิเศษ (+1 LP) */}
+            <div
+              onClick={() => onSelectContestant(currentAwardInfo.award.holderName)}
+              title="คลิกเพื่อดูสถิติผู้ถือครองรางวัล"
+              style={{
+                cursor: "pointer",
+                padding: "8px 18px",
+                borderRadius: "14px",
+                background: "linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(3, 105, 161, 0.35) 100%)",
+                border: "1.5px solid #00e5ff",
+                boxShadow: "0 0 20px rgba(0, 229, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.03)";
+                e.currentTarget.style.boxShadow = "0 0 25px rgba(0, 229, 255, 0.5)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 0 20px rgba(0, 229, 255, 0.3)";
+              }}
+            >
+              <div style={{ fontSize: "24px", filter: "drop-shadow(0 0 8px rgba(0,229,255,0.7))" }}>🎁</div>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: "11px", color: "rgba(224, 242, 254, 0.8)", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>รางวัลพิเศษประจำลีก (+1 LP)</span>
+                  <span style={{ fontSize: "9px", background: "rgba(0,229,255,0.25)", color: "#00e5ff", padding: "1px 5px", borderRadius: "4px" }}>ทำ 25 เต็ม</span>
+                </div>
+                <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
+                  <span style={{ color: "#38bdf8" }}>{currentAwardInfo.award.name}</span>{" "}
+                  <span style={{ fontSize: "13px", color: "#ffd700", fontWeight: "700" }}>
+                    • {currentAwardInfo.award.holderNickname || currentAwardInfo.award.holderName}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. บทลงโทษ (-1 LP) */}
+            <div
+              onClick={() => onSelectContestant(currentAwardInfo.penalty.holderName)}
+              title="คลิกเพื่อดูสถิติผู้โดนบทลงโทษ"
+              style={{
+                cursor: "pointer",
+                padding: "8px 18px",
+                borderRadius: "14px",
+                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.22) 0%, rgba(185, 28, 28, 0.35) 100%)",
+                border: "1.5px solid #ff4d4f",
+                boxShadow: "0 0 20px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.03)";
+                e.currentTarget.style.boxShadow = "0 0 25px rgba(239, 68, 68, 0.5)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.3)";
+              }}
+            >
+              <div style={{ fontSize: "24px", filter: "drop-shadow(0 0 8px rgba(239,68,68,0.7))" }}>⚠️</div>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: "11px", color: "rgba(254, 226, 226, 0.8)", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>บทลงโทษประจำลีก (-1 LP)</span>
+                  <span style={{ fontSize: "9px", background: "rgba(239,68,68,0.25)", color: "#fca5a5", padding: "1px 5px", borderRadius: "4px" }}>ได้ 0 อย่างน้อย 3 หมวด</span>
+                </div>
+                <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
+                  <span style={{ color: "#f87171" }}>{currentAwardInfo.penalty.name}</span>{" "}
+                  <span style={{ fontSize: "13px", color: "#ffd700", fontWeight: "700" }}>
+                    • {currentAwardInfo.penalty.holderNickname || currentAwardInfo.penalty.holderName}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

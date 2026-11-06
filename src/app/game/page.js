@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import GAME_CONFIG from "../config";
 import {
   SOUND_PATHS,
@@ -419,6 +419,7 @@ export default function Home() {
     "jigsaw": null,
     "attribute": null,
   });
+
   const [currentGame, setCurrentGame] = useState(null); // null, '3sec', 'qa', 'jigsaw', 'attribute'
   const [gameMode, setGameMode] = useState("single"); // single or battle
   const [playerNames, setPlayerNames] = useState({ player1: "ผู้เล่น 1", player2: "ผู้เล่น 2" });
@@ -442,6 +443,27 @@ export default function Home() {
   const [battleBigPoints, setBattleBigPoints] = useState({ player1: 0, player2: 0 });
   const [battleCompletedCategories, setBattleCompletedCategories] = useState([]);
   const [battleLockedState, setBattleLockedState] = useState(null);
+
+  const currentAccumulatedScore = useMemo(() => {
+    if (gameMode === "battle") {
+      const currentPlayer = battleOrder[battleRound - 1] || "player1";
+      const catScores = battleCategoryScores;
+      let total = 0;
+      ["3sec", "qa", "jigsaw", "attribute"].forEach((cat) => {
+        if (catScores[cat]?.[currentPlayer] !== null && catScores[cat]?.[currentPlayer] !== undefined) {
+          total += Number(catScores[cat][currentPlayer]) || 0;
+        }
+      });
+      return total;
+    }
+    let total = 0;
+    ["3sec", "qa", "jigsaw", "attribute"].forEach((cat) => {
+      if (scores[cat] !== null && scores[cat] !== undefined) {
+        total += Number(scores[cat]) || 0;
+      }
+    });
+    return total;
+  }, [gameMode, battleOrder, battleRound, battleCategoryScores, scores]);
 
   // ---- Leaderboard & Score Record State ----
   const [leaderboard, setLeaderboard] = useState([]);
@@ -2841,6 +2863,7 @@ export default function Home() {
                       qaConfig={battleLockedState?.config?.qa || GAME_CONFIG.qa}
                       judgeMode={true}
                       lockedState={battleLockedState}
+                      accumulatedScore={currentAccumulatedScore}
                       onComplete={(correct) => handleBattleJudge(correct)}
                       onResult={showResultPopup}
                       onDismissResult={dismissResultPopupWithFade}
@@ -2857,6 +2880,7 @@ export default function Home() {
                       jigsawQuestion={battleLockedState?.config?.jigsaw?.question || jigsawQuestion}
                       judgeMode={true}
                       lockedState={battleLockedState}
+                      accumulatedScore={currentAccumulatedScore}
                       onComplete={(correct) => handleBattleJudge(correct)}
                       onResult={showResultPopup}
                       onDismissResult={dismissResultPopupWithFade}
@@ -2869,6 +2893,7 @@ export default function Home() {
                       attributeConfig={battleLockedState?.config?.attribute || GAME_CONFIG.attribute}
                       judgeMode={true}
                       lockedState={battleLockedState}
+                      accumulatedScore={currentAccumulatedScore}
                       onComplete={(correct) => handleBattleJudge(correct)}
                       onResult={showResultPopup}
                       onDismissResult={dismissResultPopupWithFade}
@@ -2899,6 +2924,7 @@ export default function Home() {
                       threeSecSetHeaders={battlePlayerCfg?.threeSecondsHeaders || threeSecSetHeaders}
                       gameMode={gameMode}
                       activeScoreOverride={activeScoreOverride}
+                      accumulatedBaseScore={currentAccumulatedScore}
                       onComplete={(score) => {
                         if (gameMode === "battle") {
                           handleBattleComplete(score);
@@ -2918,6 +2944,7 @@ export default function Home() {
                       key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}-${configVersion}`}
                       qaConfig={battlePlayerCfg?.qa || GAME_CONFIG.qa}
                       battleLockMode={gameMode === "battle" && battleRound === 1 && battleCategory !== "3sec"}
+                      accumulatedScore={currentAccumulatedScore}
                       onLock={(score) => handleBattleLock(score)}
                       onComplete={(score) => {
                         if (gameMode === "battle") {
@@ -2940,6 +2967,7 @@ export default function Home() {
                       jigsawAnswer={battlePlayerCfg?.jigsaw?.answer || jigsawAnswer}
                       jigsawQuestion={battlePlayerCfg?.jigsaw?.question || jigsawQuestion}
                       battleLockMode={gameMode === "battle" && battleRound === 1 && battleCategory !== "3sec"}
+                      accumulatedScore={currentAccumulatedScore}
                       onLock={(score) => handleBattleLock(score)}
                       onComplete={(score) => {
                         if (gameMode === "battle") {
@@ -2958,6 +2986,7 @@ export default function Home() {
                       key={`${currentGame}-${battleRound}-${battlePlayerScores.player1}-${battlePlayerScores.player2}`}
                       attributeConfig={battlePlayerCfg?.attribute || GAME_CONFIG.attribute}
                       battleLockMode={gameMode === "battle" && battleRound === 1 && battleCategory !== "3sec"}
+                      accumulatedScore={currentAccumulatedScore}
                       onLock={(score) => handleBattleLock(score)}
                       onComplete={(score) => {
                         if (gameMode === "battle") {
@@ -3622,9 +3651,308 @@ export default function Home() {
 }
 
 // ==========================================
+// 📺 FANPANTAE BROADCAST TIMER BAR (3 วินาที)
+// ==========================================
+function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
+  const elapsed = Math.max(0, 3.0 - (timeLeft ?? 3.0));
+
+  let currentSecond = 1;
+  let fillPercent = 0;
+  const isWrong = isRoundCorrect === false;
+
+  if (isWrong) {
+    currentSecond = "X";
+    fillPercent = 100;
+  } else if (elapsed <= 0) {
+    currentSecond = 1;
+    fillPercent = 0;
+  } else if (elapsed < 1.0) {
+    currentSecond = 1;
+    fillPercent = Math.min(100, Math.max(0, elapsed * 100));
+  } else if (elapsed < 2.0) {
+    currentSecond = 2;
+    fillPercent = Math.min(100, Math.max(0, (elapsed - 1.0) * 100));
+  } else if (elapsed < 3.0) {
+    currentSecond = 3;
+    fillPercent = Math.min(100, Math.max(0, (elapsed - 2.0) * 100));
+  } else {
+    // ถึง 3 ให้ค้างไว้ที่ 3 และเต็มหลอด
+    currentSecond = 3;
+    fillPercent = 100;
+  }
+
+  return (
+    <div
+      className={`broadcast-timer-capsule ${isWrong ? "wrong" : ""}`}
+      style={{
+        transform: "skewX(-16deg)",
+        background: isWrong
+          ? "linear-gradient(135deg, #b91c1c 0%, #7f1d1d 50%, #450a0a 100%)"
+          : "linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%)",
+        border: isWrong ? "2.5px solid #ff1744" : "2.5px solid #38bdf8",
+        boxShadow: isWrong
+          ? "0 0 25px rgba(255, 23, 68, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+          : "0 0 20px rgba(14, 165, 233, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3)",
+        borderRadius: "8px",
+        padding: "4px 14px",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "12px",
+        height: "44px",
+        transition: "background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+      }}
+    >
+      {/* Number Display: 1 / 2 / 3 / X */}
+      <span
+        style={{
+          transform: "skewX(16deg)",
+          fontFamily: "'Orbitron', sans-serif",
+          fontStyle: "italic",
+          fontWeight: "900",
+          fontSize: "26px",
+          color: "#ffffff",
+          textShadow: isWrong ? "0 0 12px rgba(255, 255, 255, 0.9)" : "0 0 10px rgba(0, 229, 255, 0.8)",
+          minWidth: "24px",
+          textAlign: "center",
+          lineHeight: 1,
+        }}
+      >
+        {currentSecond}
+      </span>
+
+      {/* Progress Bar Track */}
+      <div
+        style={{
+          transform: "skewX(16deg)",
+          width: "130px",
+          height: "16px",
+          background: "rgba(0, 0, 0, 0.7)",
+          borderRadius: "4px",
+          border: "1.5px solid rgba(0, 0, 0, 0.5)",
+          padding: "1px",
+          overflow: "hidden",
+          position: "relative",
+          boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.9)",
+        }}
+      >
+        {/* Gradient Fill (Red to Yellow) */}
+        <div
+          style={{
+            width: `${fillPercent}%`,
+            height: "100%",
+            borderRadius: "2px",
+            background: "linear-gradient(90deg, #ff1744 0%, #ff5722 35%, #ff9800 70%, #ffd600 100%)",
+            boxShadow: "0 0 10px rgba(255, 152, 0, 0.85)",
+            transition: isWrong ? "none" : "width 0.05s linear",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// 📺 FANPANTAE BROADCAST QUESTION & SCORE BAR
+// ==========================================
+function BroadcastQuestionBar({
+  subHeader,
+  question,
+  accumulatedScore = 0,
+  topRightSlot,
+}) {
+  return (
+    <div className="broadcast-question-wrapper" style={{ width: "100%", maxWidth: "1120px", margin: "0 auto 20px" }}>
+      {/* Top Meta Row (Sub-header on left + Timer/Slot on right) */}
+      {(subHeader || topRightSlot) && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "8px",
+            padding: "0 6px",
+            gap: "12px",
+          }}
+        >
+          {subHeader ? (
+            <div
+              style={{
+                transform: "skewX(-16deg)",
+                background: "linear-gradient(135deg, rgba(8, 20, 44, 0.95) 0%, rgba(3, 8, 20, 0.98) 100%)",
+                border: "1.5px solid rgba(0, 229, 255, 0.45)",
+                borderRadius: "6px",
+                padding: "4px 18px",
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+              }}
+            >
+              <span
+                style={{
+                  transform: "skewX(16deg)",
+                  display: "inline-block",
+                  color: "#e0f2fe",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                {subHeader}
+              </span>
+            </div>
+          ) : <div />}
+
+          {topRightSlot && (
+            <div>{topRightSlot}</div>
+          )}
+        </div>
+      )}
+
+      {/* Main Broadcast Bar Row */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          width: "100%",
+        }}
+      >
+        {/* 1. FAN Logo Badge */}
+        <div
+          style={{
+            transform: "skewX(-16deg)",
+            height: "56px",
+            padding: "0 20px",
+            background: "linear-gradient(135deg, #07152e 0%, #020713 100%)",
+            border: "2px solid #00e5ff",
+            boxShadow: "0 0 16px rgba(0, 229, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              transform: "skewX(16deg)",
+              display: "flex",
+              alignItems: "center",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: "900",
+              fontSize: "24px",
+              letterSpacing: "1px",
+            }}
+          >
+            <span style={{ color: "#ffffff" }}>F</span>
+            <span style={{ color: "#00e5ff", textShadow: "0 0 10px rgba(0, 229, 255, 0.8)", margin: "0 1px" }}>A</span>
+            <span style={{ color: "#ffffff" }}>N</span>
+          </div>
+        </div>
+
+        {/* 2. Slanted Question Box */}
+        <div
+          style={{
+            transform: "skewX(-16deg)",
+            flex: 1,
+            minHeight: "56px",
+            background: "linear-gradient(90deg, #070e1c 0%, #0d1a33 50%, #050b17 100%)",
+            border: "2px solid rgba(0, 229, 255, 0.45)",
+            borderBottom: "3px solid #00e5ff",
+            borderLeft: "3.5px solid #00e5ff",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7), 0 0 18px rgba(0, 229, 255, 0.25)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            padding: "8px 24px",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              transform: "skewX(16deg)",
+              width: "100%",
+              color: "#ffffff",
+              fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+              fontSize: "clamp(16px, 1.8vw, 22px)",
+              fontWeight: "700",
+              lineHeight: "1.35",
+              textShadow: "0 2px 6px rgba(0, 0, 0, 0.9)",
+            }}
+          >
+            {question || "รอเปิดคำถาม..."}
+          </div>
+        </div>
+
+        {/* 3. Slanted Gold Score Capsule (คะแนนสะสม) */}
+        <div
+          style={{
+            transform: "skewX(-16deg)",
+            width: "135px",
+            minWidth: "125px",
+            height: "64px",
+            background: "linear-gradient(180deg, #b8860b 0%, #7d5700 50%, #4a3400 100%)",
+            border: "2.5px solid #ffd700",
+            boxShadow: "0 0 20px rgba(255, 215, 0, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4)",
+            borderRadius: "10px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            position: "relative",
+            marginRight: "4px",
+          }}
+        >
+          {/* Top Label */}
+          <div
+            style={{
+              transform: "skewX(16deg)",
+              background: "#000000",
+              border: "1px solid #ffd700",
+              borderRadius: "4px",
+              padding: "1px 8px",
+              marginTop: "-8px",
+              marginBottom: "2px",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: "800",
+                color: "#ffd700",
+                fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+                letterSpacing: "0.5px",
+              }}
+            >
+              คะแนนสะสม
+            </span>
+          </div>
+
+          {/* Orbitron Score Number */}
+          <div
+            style={{
+              transform: "skewX(16deg)",
+              fontFamily: "'Orbitron', sans-serif",
+              fontStyle: "italic",
+              fontWeight: "900",
+              fontSize: "36px",
+              color: "#ffffff",
+              textShadow: "0 0 14px rgba(255, 215, 0, 0.9), 0 2px 4px rgba(0, 0, 0, 0.9)",
+              lineHeight: 1,
+            }}
+          >
+            {accumulatedScore ?? 0}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
 // ⏱️ SUB-COMPONENT: GAME 1 (3 SECONDS) - PERFECT VIDEO PLAYBACK & MANUAL TIMER
 // ==========================================
-function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders = [], gameMode, activeScoreOverride, configVersion, onComplete, onResult, onBack }) {
+function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders = [], gameMode, activeScoreOverride, accumulatedBaseScore = 0, configVersion, onComplete, onResult, onBack }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [startQ, setStartQ] = useState(0);
   const [endQ, setEndQ] = useState(25);
@@ -3986,110 +4314,79 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
 
   return (
     <div className="three-sec-container">
-      {currentSetHeader && currentSetHeader.trim() !== "" && (
-        <div className="three-sec-set-header">{currentSetHeader}</div>
-      )}
-      <div className="three-sec-status">
-        <span className="three-sec-qnum">ข้อที่ {qNum} / {totalInSet}</span>
-        <div className="three-sec-score-badge">
-          <span className="three-sec-score-label">คะแนนสะสม:</span>
-          <span className="three-sec-score-val">{score}</span>
-        </div>
-      </div>
+      {/* 📺 Broadcast Question Bar with FAN Logo + Subheader + Question + Orbitron Accumulated Score + Top-Right Gradient Timer Bar */}
+      <BroadcastQuestionBar
+        subHeader={
+          currentSetHeader && currentSetHeader.trim() !== ""
+            ? `${qNum}. ${currentSetHeader}`
+            : `ข้อที่ ${qNum} / ${totalInSet}`
+        }
+        question={
+          roundActive
+            ? (q?.question || "ตอบคำถามภายใน 3 วินาที")
+            : (hasImage ? "คำถามพร้อมภาพ (กดเริ่มคำถามและจับเวลา)" : isVideo ? "คำถามพร้อมวิดีโอ (กดเล่นสื่อเพื่อเริ่ม)" : mediaSrc ? "คำถามพร้อมเสียง (กดเล่นสื่อเพื่อเริ่ม)" : "กดปุ่มด้านล่างเพื่อเริ่มคำถาม")
+        }
+        accumulatedScore={(accumulatedBaseScore || 0) + score}
+        topRightSlot={
+          !revealOnly ? (
+            <ThreeSecTimerBar
+              timeLeft={timeLeft}
+              isRoundCorrect={isRoundCorrect}
+            />
+          ) : null
+        }
+      />
 
       <div className="three-sec-main-area" style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
         {!roundActive ? (
-          <>
-            <div className="three-sec-question-box placeholder-box" style={{
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "260px", width: "100%", maxWidth: "640px", background: "rgba(255, 255, 255, 0.02)", border: "2px dashed rgba(255, 255, 255, 0.15)", borderRadius: "var(--radius)", padding: "40px"
-            }}>
-              <div style={{ fontSize: "50px", marginBottom: "16px", animation: "pulse-glow 2s infinite" }}>
-                {revealOnly ? (isVideo ? "🎬" : mediaSrc ? "🔊" : hasImage ? "🖼️" : "❓") : (isVideo ? "🎬" : mediaSrc ? "🔊" : hasImage ? "🖼️" : "⏱️")}
-              </div>
-              <div style={{ fontSize: "20px", fontWeight: "700", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
-              <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginTop: "8px" }}>
-                {revealOnly
-                  ? (mediaSrc ? "กดเล่นสื่อเพื่อเปิดคำถาม" : "กดปุ่มด้านล่างเพื่อเปิดคำถาม")
-                  : (mediaSrc ? "กดเล่นสื่อนั้นเพื่อเปิดคำถามและเตรียมจับเวลา" : hasImage ? "กดปุ่มด้านล่างเพื่อเริ่มคำถามและเริ่มจับเวลา 3 วิ" : "กดปุ่มด้านล่างเพื่อเริ่มคำถาม")}
-              </div>
+          <div className="three-sec-question-box placeholder-box" style={{
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "260px", width: "100%", maxWidth: "640px", background: "rgba(255, 255, 255, 0.02)", border: "2px dashed rgba(255, 255, 255, 0.15)", borderRadius: "var(--radius)", padding: "40px"
+          }}>
+            <div style={{ fontSize: "50px", marginBottom: "16px", animation: "pulse-glow 2s infinite" }}>
+              {revealOnly ? (isVideo ? "🎬" : mediaSrc ? "🔊" : hasImage ? "🖼️" : "❓") : (isVideo ? "🎬" : mediaSrc ? "🔊" : hasImage ? "🖼️" : "⏱️")}
             </div>
-            {!revealOnly && (
-              <div className={`three-sec-timer-ring ${timeLeft === 0 ? "time-up" : ""}`} id="timerRing" style={{ marginTop: "20px" }}>
-                <svg viewBox="0 0 120 120">
-                  <circle className="timer-bg" cx="60" cy="60" r="52" />
-                  <circle className="timer-progress" id="timerProgress" cx="60" cy="60" r="52" strokeDasharray={circumference} style={getTimerProgressStyle()} />
-                </svg>
-                <div className="timer-text" id="timerText" style={{ color: getTimerTextColor() }}>
-                  {timeLeft === 0 ? "0.0" : timeLeft.toFixed(1)}
-                </div>
-              </div>
-            )}
-          </>
+            <div style={{ fontSize: "20px", fontWeight: "700", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
+            <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginTop: "8px" }}>
+              {revealOnly
+                ? (mediaSrc ? "กดเล่นสื่อเพื่อเปิดคำถาม" : "กดปุ่มด้านล่างเพื่อเปิดคำถาม")
+                : (mediaSrc ? "กดเล่นสื่อนั้นเพื่อเปิดคำถามและเตรียมจับเวลา" : hasImage ? "กดปุ่มด้านล่างเพื่อเริ่มคำถามและเริ่มจับเวลา 3 วิ" : "กดปุ่มด้านล่างเพื่อเริ่มคำถาม")}
+            </div>
+          </div>
         ) : hasImage && !isVideo ? (
-          <div style={{ display: "flex", gap: "32px", width: "100%", alignItems: "center" }}>
-            <div style={{ flex: "1 1 55%", display: "flex", justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: "32px", width: "100%", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+            <div style={{ flex: "1 1 55%", display: "flex", justifyContent: "center", maxWidth: "680px" }}>
               <img
                 key={`${q.image}-${configVersion}`}
                 src={resolveImagePath(q.image, configVersion)}
                 alt="คำถาม"
-                style={{ width: "100%", maxHeight: "75vh", objectFit: "contain", borderRadius: "var(--radius)", border: "3px solid rgba(255,255,255,0.15)" }}
+                style={{ width: "100%", maxHeight: "65vh", objectFit: "contain", borderRadius: "var(--radius)", border: "3px solid rgba(255,255,255,0.15)" }}
               />
             </div>
-            <div style={{ flex: "1 1 45%", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
-              {!revealOnly && (
-                <div className={`three-sec-timer-ring ${timeLeft === 0 ? "time-up" : ""}`} id="timerRing">
-                  <svg viewBox="0 0 120 120">
-                    <circle className="timer-bg" cx="60" cy="60" r="52" />
-                    <circle className="timer-progress" id="timerProgress" cx="60" cy="60" r="52" strokeDasharray={circumference} style={getTimerProgressStyle()} />
-                  </svg>
-                  <div className="timer-text" id="timerText" style={{ color: getTimerTextColor() }}>
-                    {timeLeft === 0 ? "0.0" : timeLeft.toFixed(1)}
-                  </div>
-                </div>
-              )}
-              <div className="game-question-card three-sec-question-card" style={{ width: "100%", maxWidth: "480px", margin: "0 0 14px", padding: "16px 20px" }}>
-                <div className="three-sec-question-text" style={{ fontSize: "20px", textAlign: "center" }}>{q?.question}</div>
-              </div>
-              {answerRevealed && (
+            {answerRevealed && (
+              <div style={{ flex: "1 1 35%", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                  padding: "12px 20px", borderRadius: "var(--radius)", fontSize: "18px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+                  padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
                 }}>
                   <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="three-sec-question-box" style={{ width: "100%", maxWidth: "640px", textAlign: "center" }}>
-              {isVideo && mediaSrc && (
-                <div className="video-player-wrapper" style={{ width: "100%", overflow: "hidden", borderRadius: "12px", background: "#000", marginBottom: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
-                  <video ref={videoPlayerRef} playsInline controls style={{ width: "100%", maxHeight: "360px", display: "block" }} />
-                </div>
-              )}
-              <div className="game-question-card three-sec-question-card" style={{ width: "100%", maxWidth: "640px", margin: "14px auto" }}>
-                <div className="three-sec-question-text" style={{ fontSize: "22px", fontWeight: "700" }}>{q?.question}</div>
-              </div>
-              {answerRevealed && (
-                <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                  marginTop: "20px", padding: "16px 24px", borderRadius: "var(--radius)", fontSize: "20px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                }}>
-                  <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-                </div>
-              )}
-            </div>
-            {!revealOnly && (
-              <div className={`three-sec-timer-ring ${timeLeft === 0 ? "time-up" : ""}`} id="timerRing" style={{ marginTop: "20px" }}>
-                <svg viewBox="0 0 120 120">
-                  <circle className="timer-bg" cx="60" cy="60" r="52" />
-                  <circle className="timer-progress" id="timerProgress" cx="60" cy="60" r="52" strokeDasharray={circumference} style={getTimerProgressStyle()} />
-                </svg>
-                <div className="timer-text" id="timerText" style={{ color: getTimerTextColor() }}>
-                  {timeLeft === 0 ? "0.0" : timeLeft.toFixed(1)}
                 </div>
               </div>
             )}
-          </>
+          </div>
+        ) : (
+          <div style={{ width: "100%", maxWidth: "680px", textAlign: "center" }}>
+            {isVideo && mediaSrc && (
+              <div className="video-player-wrapper" style={{ width: "100%", overflow: "hidden", borderRadius: "12px", background: "#000", marginBottom: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+                <video ref={videoPlayerRef} playsInline controls style={{ width: "100%", maxHeight: "360px", display: "block" }} />
+              </div>
+            )}
+            {answerRevealed && (
+              <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
+                marginTop: "20px", padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+              }}>
+                <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -4260,7 +4557,7 @@ function getEliminateOrderIndices(cfg) {
   return resolvedIndices.length > 0 ? resolvedIndices : null;
 }
 
-function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, onLock, onComplete, onResult, onDismissResult, onBack }) {
+function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack }) {
   const [gameStarted, setGameStarted] = useState(judgeMode || false);
   const [currentPoints, setCurrentPoints] = useState(judgeMode && lockedState ? lockedState.score : 25);
   const [revealedCount, setRevealedCount] = useState(() => {
@@ -4462,18 +4759,18 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, onLock, onCo
 
   return (
     <div className="qa-container">
-      <div className="game-question-strip-bar">
-        <div className="question-strip-left">
-          <div className="qa-question-text">{cfg.question}</div>
-        </div>
-
-        <div className="question-strip-right">
-          <div className="game-score-card qa-score-card-compact">
-            <div className="game-score-badge-label">คะแนนที่จะได้</div>
-            <div className="qa-points-display" id="qaPointsDisplay">{currentPoints}</div>
+      {/* 📺 Broadcast Question Bar */}
+      <BroadcastQuestionBar
+        subHeader="หมวดคำถาม-คำตอบ (25 คะแนน)"
+        question={cfg.question || "เลือกคำตอบที่ถูกต้อง"}
+        accumulatedScore={accumulatedScore ?? 0}
+        topRightSlot={
+          <div className="game-score-card qa-score-card-compact" style={{ margin: 0, padding: "4px 18px", borderRadius: "10px", border: "1.5px solid rgba(255, 215, 0, 0.6)", background: "linear-gradient(135deg, rgba(26, 35, 126, 0.65) 0%, rgba(13, 20, 64, 0.9) 100%)" }}>
+            <div className="game-score-badge-label" style={{ fontSize: "11px", marginBottom: "1px", color: "rgba(255, 255, 255, 0.9)" }}>คะแนนที่จะได้</div>
+            <div className="qa-points-display" id="qaPointsDisplay" style={{ fontSize: "28px", fontFamily: "'Orbitron', var(--font-orbitron), sans-serif", fontStyle: "italic", fontWeight: "900", color: "#ffd700" }}>{currentPoints}</div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="qa-choices-grid" id="qaChoicesGrid">
         {cfg.choices.map((choice, i) => {
@@ -4552,7 +4849,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, onLock, onCo
 // ==========================================
 // 🧩 SUB-COMPONENT: GAME 3 (JIGSAW)
 // ==========================================
-function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, battleLockMode, judgeMode, lockedState, configVersion, onLock, onComplete, onResult, onDismissResult, onBack }) {
+function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, battleLockMode, judgeMode, lockedState, configVersion, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack }) {
   const [gameStarted, setGameStarted] = useState(judgeMode || false);
   const [currentPoints, setCurrentPoints] = useState(judgeMode && lockedState ? lockedState.score : 25);
   const [openedPieces, setOpenedPieces] = useState(judgeMode && lockedState ? lockedState.openedPieces : []);
@@ -4713,6 +5010,13 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
 
   return (
     <div className="jigsaw-container">
+      {/* 📺 Broadcast Question Bar */}
+      <BroadcastQuestionBar
+        subHeader="หมวดจิ๊กซอว์ (25 คะแนน)"
+        question={jigsawQuestion && jigsawQuestion.trim() !== "" ? jigsawQuestion : "นี่คือภาพของอะไร?"}
+        accumulatedScore={accumulatedScore ?? 0}
+      />
+
       <div className="jigsaw-main-area">
         {/* Left Column: Jigsaw Board (เหมือนฝั่งรูปภาพของ 3 วินาที) */}
         <div className="jigsaw-board-col">
@@ -4746,27 +5050,12 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
           </div>
         </div>
 
-        {/* Right Column: Score Card + Question Card + Answer Status (เหมือนฝั่งขวาของ 3 วินาที) */}
+        {/* Right Column: Score Card + Answer Status */}
         <div className="jigsaw-info-col">
           <div className="game-score-card jigsaw-score-card">
             <div className="game-score-badge-label">คะแนนที่จะได้</div>
-            <div className="jigsaw-points-display" id="jigsawPointsDisplay">{currentPoints}</div>
+            <div className="jigsaw-points-display" id="jigsawPointsDisplay" style={{ fontFamily: "'Orbitron', var(--font-orbitron), sans-serif", fontStyle: "italic", fontWeight: "900" }}>{currentPoints}</div>
           </div>
-
-          {jigsawQuestion && jigsawQuestion.trim() !== "" && (
-            <div className="game-question-card jigsaw-question-card" style={{ width: "100%", maxWidth: "460px", margin: 0 }}>
-              <div className="jigsaw-question-text" style={{
-                fontSize: "22px",
-                fontWeight: "700",
-                textAlign: "center",
-                color: "#ffffff",
-                margin: "0",
-                textShadow: "0 2px 10px rgba(0,0,0,0.5)"
-              }}>
-                {jigsawQuestion}
-              </div>
-            </div>
-          )}
 
           {answered && (
             <div style={{
@@ -4819,7 +5108,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
 // ==========================================
 // 🎯 SUB-COMPONENT: GAME 4 (ATTRIBUTE)
 // ==========================================
-function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState, onLock, onComplete, onResult, onDismissResult, onBack }) {
+function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack }) {
   const [gameStarted, setGameStarted] = useState(judgeMode || false);
   const [currentPoints, setCurrentPoints] = useState(judgeMode && lockedState ? lockedState.score : 25);
   const [clueSteps, setClueSteps] = useState(() => {
@@ -5060,18 +5349,18 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
 
   return (
     <div className="attr-container">
-      <div className="game-question-strip-bar">
-        <div className="question-strip-left">
-          <div className="attr-question-text">{cfg.question}</div>
-        </div>
-
-        <div className="question-strip-right">
-          <div className="game-score-card attr-score-card-compact">
-            <div className="game-score-badge-label">คะแนนที่จะได้</div>
-            <div className="attr-points-display" id="attrPointsDisplay">{currentPoints}</div>
+      {/* 📺 Broadcast Question Bar */}
+      <BroadcastQuestionBar
+        subHeader="หมวดคุณสมบัติ (25 คะแนน)"
+        question={cfg.question || "จากคุณสมบัติต่อไปนี้คือใคร หรืออะไร?"}
+        accumulatedScore={accumulatedScore ?? 0}
+        topRightSlot={
+          <div className="game-score-card attr-score-card-compact" style={{ margin: 0, padding: "4px 18px", borderRadius: "10px", border: "1.5px solid rgba(255, 215, 0, 0.6)", background: "linear-gradient(135deg, rgba(26, 35, 126, 0.65) 0%, rgba(13, 20, 64, 0.9) 100%)" }}>
+            <div className="game-score-badge-label" style={{ fontSize: "11px", marginBottom: "1px", color: "rgba(255, 255, 255, 0.9)" }}>คะแนนที่จะได้</div>
+            <div className="attr-points-display" id="attrPointsDisplay" style={{ fontSize: "28px", fontFamily: "'Orbitron', var(--font-orbitron), sans-serif", fontStyle: "italic", fontWeight: "900", color: "#ffd700" }}>{currentPoints}</div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="attr-clues-list" id="attrCluesList">
         {Array.from({ length: displayCluesCount }).map((_, i) => {

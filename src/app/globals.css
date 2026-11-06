@@ -45,7 +45,7 @@ button, input, select, textarea, optgroup {
     --radius: 12px;
     --radius-lg: 20px;
     --font-th: 'Sukhumvit Set', var(--font-prompt), 'Kanit', 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-num: 'Sukhumvit Set', var(--font-prompt), 'Kanit', 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-num: 'Orbitron', var(--font-orbitron), 'Kanit', 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 html, body {
@@ -3739,6 +3739,9 @@ main {
 .game-score-card .qa-points-display,
 .game-score-card .jigsaw-points-display,
 .game-score-card .attr-points-display {
+    font-family: 'Orbitron', var(--font-orbitron), sans-serif !important;
+    font-style: italic;
+    font-weight: 900;
     line-height: 1.05;
     margin: 0;
 }
