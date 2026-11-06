@@ -3112,28 +3112,6 @@ export default function Home() {
               >
                 ✏️ แก้คะแนน
               </button>
-              <button
-                type="button"
-                onClick={handleResetCurrentGameSession}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  background: "rgba(255, 255, 255, 0.08)",
-                  border: "1px solid rgba(255, 255, 255, 0.25)",
-                  borderRadius: "8px",
-                  padding: "6px 12px",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  fontWeight: "700",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s ease"
-                }}
-                title="เริ่มผู้เข้าแข่งขันคนใหม่ / ออกจากรอบปัจจุบัน"
-              >
-                🔄 เริ่มคนใหม่
-              </button>
             </div>
           </header>
 
@@ -4176,24 +4154,23 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
     currentSecond = "X";
     fillPercent = 100;
     badgeState = "red";
-  } else if (elapsed <= 0) {
-    currentSecond = "";
-    fillPercent = 0;
-    badgeState = "idle";
   } else if (elapsed < 1.0) {
-    currentSecond = "1";
+    // วินาทีแรก (0.0 - 0.99 วิ): เลขยังไม่ขึ้น เป็นสีเทา แถบสีกำลังวิ่งเติมเต็ม
+    currentSecond = "";
     fillPercent = Math.min(100, Math.max(0, elapsed * 100));
-    badgeState = "blue";
+    badgeState = "idle";
   } else if (elapsed < 2.0) {
-    currentSecond = "2";
+    // ผ่านไป 1 วิแล้ว (1.0 - 1.99 วิ): เลข 1 ขึ้นเป็นสีน้ำเงิน แถบสีวิ่งสำหรับวินาทีที่ 2
+    currentSecond = "1";
     fillPercent = Math.min(100, Math.max(0, (elapsed - 1.0) * 100));
     badgeState = "blue";
   } else if (elapsed < 3.0) {
-    currentSecond = "3";
+    // ผ่านไป 2 วิแล้ว (2.0 - 2.99 วิ): เลข 2 ขึ้นเป็นสีน้ำเงิน แถบสีวิ่งสำหรับวินาทีที่ 3
+    currentSecond = "2";
     fillPercent = Math.min(100, Math.max(0, (elapsed - 2.0) * 100));
-    badgeState = "red";
+    badgeState = "blue";
   } else {
-    // ถึง 3 ให้ค้างไว้ที่ 3 และเต็มหลอด (สีแดง)
+    // ผ่านไป 3 วิแล้ว (ครบ 3 วินาที / หมดเวลา): เลข 3 ขึ้นเป็นสีแดง และเต็มหลอดค้างไว้
     currentSecond = "3";
     fillPercent = 100;
     badgeState = "red";
