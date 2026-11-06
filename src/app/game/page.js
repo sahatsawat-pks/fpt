@@ -4166,97 +4166,141 @@ export default function Home() {
 // ==========================================
 function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
   const elapsed = Math.max(0, 3.0 - (timeLeft ?? 3.0));
-
-  let currentSecond = 1;
-  let fillPercent = 0;
   const isWrong = isRoundCorrect === false;
+
+  let currentSecond = "";
+  let fillPercent = 0;
+  let badgeState = "idle"; // "idle" | "blue" | "red"
 
   if (isWrong) {
     currentSecond = "X";
     fillPercent = 100;
+    badgeState = "red";
   } else if (elapsed <= 0) {
-    currentSecond = 1;
+    currentSecond = "";
     fillPercent = 0;
+    badgeState = "idle";
   } else if (elapsed < 1.0) {
-    currentSecond = 1;
+    currentSecond = "1";
     fillPercent = Math.min(100, Math.max(0, elapsed * 100));
+    badgeState = "blue";
   } else if (elapsed < 2.0) {
-    currentSecond = 2;
+    currentSecond = "2";
     fillPercent = Math.min(100, Math.max(0, (elapsed - 1.0) * 100));
+    badgeState = "blue";
   } else if (elapsed < 3.0) {
-    currentSecond = 3;
+    currentSecond = "3";
     fillPercent = Math.min(100, Math.max(0, (elapsed - 2.0) * 100));
+    badgeState = "red";
   } else {
-    // ถึง 3 ให้ค้างไว้ที่ 3 และเต็มหลอด
-    currentSecond = 3;
+    // ถึง 3 ให้ค้างไว้ที่ 3 และเต็มหลอด (สีแดง)
+    currentSecond = "3";
     fillPercent = 100;
+    badgeState = "red";
   }
+
+  const badgeBg =
+    badgeState === "red"
+      ? "linear-gradient(180deg, #e60000 0%, #8b0000 100%)"
+      : badgeState === "blue"
+      ? "linear-gradient(180deg, #025cc9 0%, #013485 100%)"
+      : "linear-gradient(180deg, #333333 0%, #161616 100%)";
+
+  const badgeGlow =
+    badgeState === "red"
+      ? "0 0 20px rgba(230, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4)"
+      : badgeState === "blue"
+      ? "0 0 18px rgba(0, 153, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)"
+      : "0 0 12px rgba(0, 153, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)";
 
   return (
     <div
-      className={`broadcast-timer-capsule ${isWrong ? "wrong" : ""}`}
+      className={`broadcast-timer-unit ${isWrong ? "wrong" : ""}`}
       style={{
-        transform: "skewX(-16deg)",
-        background: isWrong
-          ? "linear-gradient(135deg, #b91c1c 0%, #7f1d1d 50%, #450a0a 100%)"
-          : "linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%)",
-        border: isWrong ? "2.5px solid #ff1744" : "2.5px solid #38bdf8",
-        boxShadow: isWrong
-          ? "0 0 25px rgba(255, 23, 68, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
-          : "0 0 20px rgba(14, 165, 233, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3)",
-        borderRadius: "8px",
-        padding: "4px 14px",
         display: "inline-flex",
         alignItems: "center",
-        gap: "12px",
-        height: "44px",
-        transition: "background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+        filter: "drop-shadow(0 6px 16px rgba(0, 0, 0, 0.8))",
       }}
     >
-      {/* Number Display: 1 / 2 / 3 / X */}
-      <span
-        style={{
-          transform: "skewX(16deg)",
-          fontFamily: "'Orbitron', sans-serif",
-          fontStyle: "italic",
-          fontWeight: "900",
-          fontSize: "26px",
-          color: "#ffffff",
-          textShadow: isWrong ? "0 0 12px rgba(255, 255, 255, 0.9)" : "0 0 10px rgba(0, 229, 255, 0.8)",
-          minWidth: "24px",
-          textAlign: "center",
-          lineHeight: 1,
-        }}
-      >
-        {currentSecond}
-      </span>
-
-      {/* Progress Bar Track */}
+      {/* 1. Left Slanted Trapezoid Number Badge */}
       <div
         style={{
-          transform: "skewX(16deg)",
-          width: "130px",
-          height: "16px",
-          background: "rgba(0, 0, 0, 0.7)",
-          borderRadius: "4px",
-          border: "1.5px solid rgba(0, 0, 0, 0.5)",
-          padding: "1px",
-          overflow: "hidden",
+          transform: "skewX(-20deg)",
+          width: "66px",
+          height: "52px",
+          background: badgeBg,
+          border: "2.5px solid #00aaff",
+          boxShadow: badgeGlow,
+          borderRadius: "8px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           position: "relative",
-          boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.9)",
+          zIndex: 2,
+          transition: "background 0.15s ease, box-shadow 0.15s ease",
         }}
       >
-        {/* Gradient Fill (Red to Yellow) */}
+        <span
+          style={{
+            transform: "skewX(20deg)",
+            fontFamily: "'Orbitron', sans-serif",
+            fontStyle: "italic",
+            fontWeight: "900",
+            fontSize: "32px",
+            color: "#ffffff",
+            textShadow: "0 2px 6px rgba(0, 0, 0, 0.9)",
+            lineHeight: 1,
+            userSelect: "none",
+          }}
+        >
+          {currentSecond}
+        </span>
+      </div>
+
+      {/* 2. Right Slanted Blue Bezel with Recessed Slot */}
+      <div
+        style={{
+          transform: "skewX(-20deg)",
+          width: "240px",
+          height: "52px",
+          marginLeft: "-8px",
+          background: "linear-gradient(180deg, #0b67c2 0%, #06418d 50%, #042557 100%)",
+          border: "2.5px solid #00aaff",
+          boxShadow: "0 0 20px rgba(0, 170, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
+          borderRadius: "8px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 18px 0 22px",
+          zIndex: 1,
+        }}
+      >
+        {/* Recessed Black Track */}
         <div
           style={{
-            width: `${fillPercent}%`,
-            height: "100%",
-            borderRadius: "2px",
-            background: "linear-gradient(90deg, #ff1744 0%, #ff5722 35%, #ff9800 70%, #ffd600 100%)",
-            boxShadow: "0 0 10px rgba(255, 152, 0, 0.85)",
-            transition: isWrong ? "none" : "width 0.05s linear",
+            width: "100%",
+            height: "20px",
+            background: "#000000",
+            boxShadow: "inset 0 2px 6px rgba(0, 0, 0, 0.95)",
+            border: "1px solid rgba(0, 30, 80, 0.8)",
+            borderRadius: "3px",
+            overflow: "hidden",
+            position: "relative",
           }}
-        />
+        >
+          {/* Gradient Fill (Red -> Orange -> Yellow) */}
+          <div
+            style={{
+              width: `${fillPercent}%`,
+              height: "100%",
+              background: isWrong
+                ? "#ff1744"
+                : "linear-gradient(90deg, #ff1a00 0%, #ff5e00 28%, #ffa200 60%, #ffd200 100%)",
+              boxShadow: "0 0 14px rgba(255, 162, 0, 0.85)",
+              transition: isWrong ? "none" : "width 0.05s linear",
+            }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -4296,13 +4340,13 @@ function BroadcastQuestionBar({
           width: "100%",
         }}
       >
-        {/* 1. FAN Logo Badge */}
+        {/* 1. Official 3D FAN Logo Badge */}
         <div
           style={{
             transform: "skewX(-16deg)",
             height: "76px",
-            minWidth: "100px",
-            padding: "0 22px",
+            minWidth: "128px",
+            padding: "0 18px",
             background: "linear-gradient(135deg, #07152e 0%, #020713 100%)",
             border: "2.5px solid #00e5ff",
             boxShadow: "0 0 20px rgba(0, 229, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
@@ -4313,21 +4357,19 @@ function BroadcastQuestionBar({
             flexShrink: 0,
           }}
         >
-          <div
+          <img
+            src="/img/fan_broadcast_logo.png"
+            alt="FAN"
             style={{
               transform: "skewX(16deg)",
-              display: "flex",
-              alignItems: "center",
-              fontFamily: "'Orbitron', sans-serif",
-              fontWeight: "900",
-              fontSize: "28px",
-              letterSpacing: "1px",
+              height: "52px",
+              maxWidth: "110px",
+              width: "auto",
+              objectFit: "contain",
+              filter: "drop-shadow(0 0 10px rgba(0, 229, 255, 0.6))",
+              display: "block",
             }}
-          >
-            <span style={{ color: "#ffffff" }}>F</span>
-            <span style={{ color: "#00e5ff", textShadow: "0 0 12px rgba(0, 229, 255, 0.9)", margin: "0 1px" }}>A</span>
-            <span style={{ color: "#ffffff" }}>N</span>
-          </div>
+          />
         </div>
 
         {/* 2. Slanted Question Box */}
