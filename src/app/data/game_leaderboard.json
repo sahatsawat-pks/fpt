@@ -62,5 +62,117 @@
     "image": "",
     "createdAt": "2026-11-02T19:11:15.518Z",
     "updatedAt": "2026-11-02T20:21:22.598Z"
+  },
+  {
+    "id": "1793711715307",
+    "name": "อดิเทพ พฤกธารา",
+    "nickname": "โอเว่น",
+    "topic": "Cookie Run Classic",
+    "scores": {
+      "3sec": 17,
+      "qa": 0,
+      "jigsaw": 10,
+      "attribute": 0
+    },
+    "totalScore": 27,
+    "image": "",
+    "createdAt": "2026-11-03T13:15:15.355Z",
+    "updatedAt": "2026-11-03T14:06:08.493Z"
+  },
+  {
+    "id": "1793722628034",
+    "name": "ปฏิปัน อัศวภูไชย",
+    "nickname": "ปัน",
+    "topic": "48Group Thailand",
+    "scores": {
+      "3sec": 10,
+      "qa": 0,
+      "jigsaw": 20,
+      "attribute": 0
+    },
+    "totalScore": 30,
+    "image": "",
+    "createdAt": "2026-11-03T16:17:08.124Z",
+    "updatedAt": "2026-11-03T17:05:28.921Z"
+  },
+  {
+    "id": "1793805592722",
+    "name": "ณัฐวุฒิ โนรี",
+    "nickname": "แสตมป์​",
+    "topic": "The Cube UK",
+    "scores": {
+      "3sec": 9,
+      "qa": 15,
+      "jigsaw": 0,
+      "attribute": 5
+    },
+    "totalScore": 29,
+    "image": "",
+    "createdAt": "2026-11-04T15:19:52.835Z",
+    "updatedAt": "2026-11-04T16:28:04.455Z"
+  },
+  {
+    "id": "1793810712602",
+    "name": "ภควัต เลี้ยงอยู่",
+    "nickname": "ไผ่",
+    "topic": "Super Sentai",
+    "scores": {
+      "3sec": 9,
+      "qa": 25,
+      "jigsaw": 10,
+      "attribute": 15
+    },
+    "totalScore": 59,
+    "image": "",
+    "createdAt": "2026-11-04T16:45:12.661Z",
+    "updatedAt": "2026-11-04T17:43:53.663Z"
+  },
+  {
+    "id": "1793885532370",
+    "name": "ณัฐภัทร แก้วสินธ์ุ",
+    "nickname": "นที",
+    "topic": "Cookie Run Classic",
+    "scores": {
+      "3sec": 19,
+      "qa": 15,
+      "jigsaw": 25,
+      "attribute": 15
+    },
+    "totalScore": 74,
+    "image": "",
+    "createdAt": "2026-11-05T13:32:12.735Z",
+    "updatedAt": "2026-11-05T14:40:44.999Z"
+  },
+  {
+    "id": "1793894723168",
+    "name": "นิธิกร วิชัยวงศ์",
+    "nickname": "ก๊อปปี้",
+    "topic": "Disney",
+    "scores": {
+      "3sec": 21,
+      "qa": 5,
+      "jigsaw": 20,
+      "attribute": 20
+    },
+    "totalScore": 66,
+    "image": "",
+    "createdAt": "2026-11-05T16:05:23.388Z",
+    "updatedAt": "2026-11-05T17:14:22.840Z"
+  },
+  {
+    "id": "1793962440593",
+    "name": "นัทธสม บุญมา",
+    "nickname": "ซ่า",
+    "topic": "ประวัติศาสตร์ไทย",
+    "scores": {
+      "3sec": 0,
+      "qa": null,
+      "jigsaw": null,
+      "attribute": null
+    },
+    "totalScore": 0,
+    "image": "",
+    "createdAt": "2026-11-06T10:54:00.671Z",
+    "updatedAt": "2026-11-06T10:54:32.441Z"
   }
 ]

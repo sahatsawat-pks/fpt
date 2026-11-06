@@ -10,220 +10,220 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
-        "ไอดอลต่อไปนี้ประจำสังกัดใด?",
-        "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?"
+        "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
+        "ตัวละครต่อไปนี้มาจากการ์ตูน / ภาพยนตร์เรื่องใดในจักรวาล Disney?",
+        "ชื่อไทยของการ์ตูน / ภาพยนตร์ในจักรวาล Disney ต่อไปนี้มีชื่อภาษาอังกฤษว่าอะไร?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
-            "image": "public/img/01.png",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
+            "image": null,
             "audio": null,
-            "video": null,
-            "answer": "Takatsuki Yayoi"
+            "video": "public/video/01.mp4",
+            "answer": "Donald Duck"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "Kisaragi Chihaya"
+            "answer": "Judy Hopps"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "Futaba Anzu"
+            "answer": "Cinderella"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "Kanzaki Ranko"
+            "answer": "Tarzan"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "Kikuchi Makoto"
+            "answer": "Dr. Doofenshmirtz"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "Mizushima Saki"
+            "answer": "Star Butterfly"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "Pierre"
+            "answer": "Hector Rivera"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "Shinosawa Hiro"
+            "answer": "Luca"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "Higuchi Madoka"
+            "answer": "Oswald the Rabbit"
         },
         {
-            "question": "นี่คือภาพตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "Hoshimachi Suisei"
+            "answer": "Minnie Mouse"
         },
         {
-            "question": "Amami Haruka",
+            "question": "Bellweather",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "765 Production"
+            "answer": "Zootopia"
         },
         {
-            "question": "Honda Mio",
+            "question": "Perry the Platypus",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "CINDERELLA GIRLS"
+            "answer": "Phineas and Ferb"
         },
         {
-            "question": "Tokugawa Matsuri",
+            "question": "Jasmine",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "MILLION LIVE!"
+            "answer": "Aladdin"
         },
         {
-            "question": "Tsukimura Temari",
+            "question": "Bill Cipher",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Hatsuboshi Gakuen"
+            "answer": "Gravity Falls"
         },
         {
-            "question": "Ikaruga Luca",
+            "question": "Cruella Devil",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "283 Production"
+            "answer": "101 Dalmatians"
         },
         {
-            "question": "Himeno Kanon",
+            "question": "Kim Possible",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "315 Production"
+            "answer": "Kim Possible"
         },
         {
-            "question": "Shika",
+            "question": "Sprig Plantar",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "961 Produciton"
+            "answer": "Amphibia"
         },
         {
-            "question": "Akizuki Ryo",
+            "question": "Wander",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "876 / 315 Production"
+            "answer": "Wander Over Yonder"
         },
         {
-            "question": "Okuzora Mayumi",
+            "question": "Ennui",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "0936 Production"
+            "answer": "Inside Out 2"
         },
         {
-            "question": "Minase Iori",
+            "question": "Elsa",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "765 Production"
+            "answer": "Frozen"
         },
         {
-            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "บ้านมิคกี้แสนสนุก",
             "image": null,
-            "audio": "public/audio/21.mp3",
+            "audio": null,
             "video": null,
-            "answer": "GO MY WAY!!"
+            "answer": "Mickey Mouse Clubhouse"
         },
         {
-            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "โฉมงามกับเจ้าชายอสูร",
             "image": null,
-            "audio": "public/audio/22.mp3",
+            "audio": null,
             "video": null,
-            "answer": "Step!"
+            "answer": "Beauty and the Beast"
         },
         {
-            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "บริษัทรับจ้างหลอน (ไม่) จำกัด",
             "image": null,
-            "audio": "public/audio/23.mp3",
+            "audio": null,
             "video": null,
-            "answer": "Trinity Field"
+            "answer": "Monsters, Inc."
         },
         {
-            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "เจ้าหญิงซ่ากับปีศาจเจ้าปัญหา",
             "image": null,
-            "audio": "public/audio/24.mp3",
+            "audio": null,
             "video": null,
-            "answer": "vs.BELIEVERS"
+            "answer": "Star vs. the Forces of Evil"
         },
         {
-            "question": "นี่คือเสียงจากเพลง THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+            "question": "ผจญภัยแดนคำสาปราชินีหิมะ",
             "image": null,
-            "audio": "public/audio/25.mp3",
+            "audio": null,
             "video": null,
-            "answer": "READY!!"
+            "answer": "Frozen"
         }
     ],
     "qa": {
-        "question": "ยูนิต Virtual Idol เพียงหนึ่งเดียวที่ปรากฏใน THE iDOLM@STER มีชื่อว่าอะไร / อยู่ภายใต้สังกัดใด / สมาชิกประกอบไปด้วยใครบ้าง?",
-        "answer": "PROJECT vα-liv / 876 Production / Kamizuru Cosmo, Tomori Manaka, Letora",
+        "question": "คนไทยคนแรกและคนเดียวของโลกที่ได้ร่วมแสดง Disney On Ice คือใคร?",
+        "answer": "ร่มเกล้า โสภา",
         "choices": [
-            "PROJECT vα-liv / 961 Production / Kamizuru Uchuu, Tomori Manaka, Letoria",
-            "PROJECT vα-liv / 961 Production / Uesugi Uchuu, Akarisato Manaka, Letora",
-            "PROJECT vα-liv / 876 Production / Uesugi Cosmo, Tomori Aika, Letoria",
-            "PROJECT vα-liv / 876 Production / Kamizuru Cosmo, Tomori Manaka, Letora",
-            "PROJECT vα-liv / 876 Production / Kamizuru Cosmo, Akarisato Aika, Letoria"
+            "ไพพิศาล แหวนวงษ์",
+            "เทวินทร์ ชาติสุวรรณ",
+            "ร่มเกล้า โสภา",
+            "ชววิฐฌ์ เจียมหาทรัพย์",
+            "เชาว์วรรธน์ จันทร์สุข"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
-            3,
             2,
+            5,
             1
         ]
     },
     "jigsaw": {
-        "mode": "portrait",
+        "mode": "landscape",
         "image": "public/img/jigsaw.png",
-        "answer": "Hoshii Miki",
-        "question": "หลังจิ๊กซอว์นี้คือตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?"
+        "answer": "Stitch",
+        "question": "หลังจิ๊กซอว์นี้คือตัวละครในจักรวาล Disney ที่มีชื่อว่าอะไร?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของตัวละคร THE iDOLM@STER ที่มีชื่อว่าอะไร?",
+        "question": "นี่คือคุณสมบัติของตัวละครในจักรวาล Disney ที่มีชื่อว่าอะไร?",
         "clues": [
-            "ชื่อ-นามสกุลรวมกันมี 5 พยางค์",
-            "ตาสีแดง",
-            "เกิดเดือนเมษายน",
-            "อยู่ในภาค CINDERELLA GIRLS กลุ่ม Cool",
-            "ผมสีเทา"
+            "เป็น 1 ใน 3 แห่งเหล่า Calamity Trio ในเรื่อง Amphibia",
+            "เป็นมนุษย์เพศหญิงที่ไม่มีผมทอง ไม่มีตาฟ้า",
+            "ชื่อ-นามสกุลมี 3 พยางค์",
+            "ในเรื่องเคยใส่ชุดประจำชาติ",
+            "เป็นชาวเอเชียตะวันออกเฉียงใต้"
         ],
-        "answer": "Kanzaki Ranko"
+        "answer": "Anne Boonchuy (แอนน์ บุญช่วย)"
     },
     "battle": {
         "player1": {
