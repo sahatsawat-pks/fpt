@@ -5114,30 +5114,23 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                 alignItems: "center",
                 lineHeight: 0,
               }}>
-                <div style={{
-                  display: "inline-block",
-                  lineHeight: 0,
-                  borderRadius: "14px",
-                  overflow: "hidden",
-                  border: "3px solid rgba(0, 229, 255, 0.5)",
-                  boxShadow: "0 10px 36px rgba(0, 0, 0, 0.85), 0 0 24px rgba(0, 229, 255, 0.25)",
-                  background: "#020713",
-                  maxWidth: "100%",
-                }}>
-                  <img
-                    key={`${q.image}-${configVersion}`}
-                    src={resolveImagePath(q.image, configVersion)}
-                    alt="คำถาม"
-                    style={{
-                      display: "block",
-                      maxWidth: "min(640px, 100%)",
-                      maxHeight: "52vh",
-                      width: "auto",
-                      height: "auto",
-                      objectFit: "contain",
-                    }}
-                  />
-                </div>
+                <img
+                  key={`${q.image}-${configVersion}`}
+                  src={resolveImagePath(q.image, configVersion)}
+                  alt="คำถาม"
+                  style={{
+                    display: "block",
+                    maxWidth: "min(640px, 100%)",
+                    maxHeight: "52vh",
+                    width: "auto",
+                    height: "auto",
+                    borderRadius: "14px",
+                    border: "3px solid rgba(0, 229, 255, 0.5)",
+                    boxShadow: "0 10px 36px rgba(0, 0, 0, 0.85), 0 0 24px rgba(0, 229, 255, 0.25)",
+                    background: "#020713",
+                    boxSizing: "border-box",
+                  }}
+                />
               </div>
 
               {/* Right column: Timer & Revealed Answer */}
