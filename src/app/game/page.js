@@ -4854,7 +4854,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
               <div style={{ fontSize: "50px", marginBottom: "12px", animation: "pulse-glow 2s infinite" }}>
                 🖼️
               </div>
-              <div style={{ fontSize: "22px", fontWeight: "800", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum} / {totalInSet}</div>
+              <div style={{ fontSize: "22px", fontWeight: "800", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
             </div>
           ) : (
             <div style={{ display: "flex", gap: "36px", width: "100%", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
@@ -4904,21 +4904,81 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
           )
         ) : (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-            {/* Sub-bar for sub-question */}
-            {roundActive ? (
+            {/* Unified 2-part Sub-bar for sub-question */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "stretch",
+                justifyContent: "center",
+                gap: "10px",
+                maxWidth: "800px",
+                width: "90%",
+                marginBottom: "24px",
+              }}
+            >
+              {/* Question Number Badge (Cyan style) */}
               <div
                 style={{
                   transform: "skewX(-16deg)",
+                  background: "linear-gradient(135deg, rgba(8, 24, 52, 0.95) 0%, rgba(3, 10, 24, 0.98) 100%)",
+                  border: "2px solid #00e5ff",
+                  borderRadius: "8px",
+                  padding: "10px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  boxShadow: "0 0 16px rgba(0, 229, 255, 0.35), inset 0 0 10px rgba(0, 229, 255, 0.15)",
+                }}
+              >
+                <div
+                  style={{
+                    transform: "skewX(16deg)",
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: "6px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      color: "rgba(255, 255, 255, 0.85)",
+                    }}
+                  >
+                    ข้อ
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-orbitron), 'Orbitron', 'Kanit', sans-serif",
+                      fontSize: "26px",
+                      fontWeight: "900",
+                      color: "#00e5ff",
+                      textShadow: "0 0 12px rgba(0, 229, 255, 0.7)",
+                      letterSpacing: "1px",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {qNum}
+                  </span>
+                </div>
+              </div>
+
+              {/* Sub-Question Bar (displays question when roundActive, empty bar waiting for question) */}
+              <div
+                style={{
+                  transform: "skewX(-16deg)",
+                  flex: 1,
+                  minHeight: "56px",
                   background: "linear-gradient(135deg, rgba(12, 28, 58, 0.95) 0%, rgba(5, 12, 28, 0.98) 100%)",
                   border: "2px solid rgba(0, 229, 255, 0.45)",
-                  borderLeft: "4px solid #00e5ff",
                   borderRadius: "8px",
-                  padding: "12px 32px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 24px",
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.2)",
-                  marginBottom: "24px",
-                  maxWidth: "800px",
-                  width: "90%",
-                  textAlign: "center",
                 }}
               >
                 <div
@@ -4929,37 +4989,17 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                     fontWeight: "800",
                     color: "#ffffff",
                     textShadow: "0 2px 8px rgba(0, 0, 0, 0.8)",
+                    textAlign: "center",
+                    minHeight: "36px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  <span style={{ color: "#38bdf8", marginRight: "12px" }}>{qNum}.</span>
-                  <span>{q?.question || `ข้อที่ ${qNum}`}</span>
+                  {roundActive ? (q?.question ? q.question.replace(new RegExp(`^${qNum}[.)\\s\\-]+\\s*`), "") : "") : ""}
                 </div>
               </div>
-            ) : (
-              <div
-                style={{
-                  transform: "skewX(-16deg)",
-                  background: "linear-gradient(135deg, rgba(8, 20, 44, 0.9) 0%, rgba(3, 8, 20, 0.95) 100%)",
-                  border: "1.5px solid rgba(0, 229, 255, 0.35)",
-                  borderRadius: "8px",
-                  padding: "10px 28px",
-                  marginBottom: "24px",
-                  textAlign: "center",
-                }}
-              >
-                <div
-                  style={{
-                    transform: "skewX(16deg)",
-                    fontFamily: "var(--font-kanit), 'Kanit', sans-serif",
-                    fontSize: "20px",
-                    fontWeight: "700",
-                    color: "var(--gold-light)",
-                  }}
-                >
-                  ข้อที่ {qNum} / {totalInSet}
-                </div>
-              </div>
-            )}
+            </div>
 
             {isVideo && mediaSrc && (
               <div className="video-player-wrapper" style={{ width: "100%", maxWidth: "600px", overflow: "hidden", borderRadius: "12px", background: "#000", marginBottom: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
