@@ -3207,24 +3207,30 @@ export default function Home() {
               {gameMode === "single" && activePlayerEvaluation && (
                 <div className={`live-standing-card ${activePlayerEvaluation.statusClass}`}>
                   <div className="standing-card-top">
-                    <div className="standing-player-meta" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                      {(contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname)) && (
-                        <img
-                          src={getOptimizedImageUrl(contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname), 100)}
-                          alt={contestantName}
-                          referrerPolicy="no-referrer"
-                          style={{ width: "52px", height: "52px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--gold)", flexShrink: 0, boxShadow: "0 0 10px rgba(255,215,0,0.4)" }}
-                        />
-                      )}
-                      <div>
-                        <div className="standing-name-row">
-                          <span className="standing-name">{contestantName || "ผู้เข้าแข่งขัน"}</span>
-                          {contestantNickname && <span className="standing-nickname">({contestantNickname})</span>}
-                          <span className="standing-topic-pill">📌 {topic || "ไม่ระบุหัวข้อ"}</span>
-                        </div>
-                        <div className="standing-sub-text">
-                          เล่นแล้ว {4 - activePlayerEvaluation.unplayedCount} / 4 หมวด • คะแนนรวมปัจจุบัน <strong style={{ color: "var(--gold)" }}>{totalScore}</strong> / 100 คะแนน
-                        </div>
+                    <div className="standing-player-meta">
+                      <div className="standing-name-row" style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                        {(contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname)) && (
+                          <img
+                            src={getOptimizedImageUrl(contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname), 100)}
+                            alt={contestantName}
+                            referrerPolicy="no-referrer"
+                            style={{
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                              border: "2px solid var(--gold)",
+                              flexShrink: 0,
+                              boxShadow: "0 0 10px rgba(255,215,0,0.4)",
+                            }}
+                          />
+                        )}
+                        <span className="standing-name">{contestantName || "ผู้เข้าแข่งขัน"}</span>
+                        {contestantNickname && <span className="standing-nickname">({contestantNickname})</span>}
+                        <span className="standing-topic-pill">📌 {topic || "ไม่ระบุหัวข้อ"}</span>
+                      </div>
+                      <div className="standing-sub-text">
+                        เล่นแล้ว {4 - activePlayerEvaluation.unplayedCount} / 4 หมวด • คะแนนรวมปัจจุบัน <strong style={{ color: "var(--gold)" }}>{totalScore}</strong> / 100 คะแนน
                       </div>
                     </div>
                     <div className="standing-rank-group">
