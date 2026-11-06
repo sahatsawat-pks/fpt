@@ -5,6 +5,107 @@
   "standings": {
     "groupA": [
       {
+        "name": "วรงกร แจ่มปัญญา",
+        "nickname": "กร",
+        "photo": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
+        "group": "A",
+        "leaguePoints": 13,
+        "win": 3,
+        "lose": 0,
+        "draw": 1,
+        "categoriesWon": 13,
+        "categoriesLost": 5,
+        "totalScore": 238,
+        "topics": [
+          {
+            "topic": "Saturday Night Live",
+            "set1": {
+              "3sec": 19,
+              "qa": 25,
+              "jigsaw": 25,
+              "attribute": 15,
+              "sum": 84,
+              "played": true,
+              "matchId": "A20",
+              "matchday": "Matchday 4"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          },
+          {
+            "topic": "Marvel Cinematic Universe",
+            "set1": {
+              "3sec": 18,
+              "qa": 20,
+              "jigsaw": 0,
+              "attribute": 10,
+              "sum": 48,
+              "played": true,
+              "matchId": "A5",
+              "matchday": "Matchday 1"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          },
+          {
+            "topic": "James Bond 007",
+            "set1": {
+              "3sec": 6,
+              "qa": 25,
+              "jigsaw": 0,
+              "attribute": 25,
+              "sum": 56,
+              "played": true,
+              "matchId": "A9",
+              "matchday": "Matchday 2"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          },
+          {
+            "topic": "หนัง Hollywood",
+            "set1": {
+              "3sec": 10,
+              "qa": 0,
+              "jigsaw": 20,
+              "attribute": 20,
+              "sum": 50,
+              "played": true,
+              "matchId": "A18",
+              "matchday": "Matchday 3"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          }
+        ],
+        "rank": 1,
+        "scoreDiff": "+8"
+      },
+      {
         "name": "นัทธสม บุญมา",
         "nickname": "ซ่า",
         "photo": "https://lh3.googleusercontent.com/pw/AP1GczN9_pbMETa6aA9mNW9WZPhWmUi-ac42Zp2obSTLTtiztKA312V1RbqanK_eAAAUFmWL5En2oiFPUwLry3TkNYg5m4muafCBNnQ0crkIIPWrJGdpKYRcugDDt-2Ttm17_gSPGEdbdyrGw2-AG0N5q5-1=w1112-h1117-s-no-gm",
@@ -100,7 +201,7 @@
             }
           }
         ],
-        "rank": 1,
+        "rank": 2,
         "scoreDiff": "+10"
       },
       {
@@ -199,107 +300,8 @@
             }
           }
         ],
-        "rank": 2,
-        "scoreDiff": "+2"
-      },
-      {
-        "name": "วรงกร แจ่มปัญญา",
-        "nickname": "กร",
-        "photo": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
-        "group": "A",
-        "leaguePoints": 7,
-        "win": 2,
-        "lose": 0,
-        "draw": 1,
-        "categoriesWon": 8,
-        "categoriesLost": 5,
-        "totalScore": 154,
-        "topics": [
-          {
-            "topic": "Saturday Night Live",
-            "set1": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          },
-          {
-            "topic": "Marvel Cinematic Universe",
-            "set1": {
-              "3sec": 18,
-              "qa": 20,
-              "jigsaw": 0,
-              "attribute": 10,
-              "sum": 48,
-              "played": true,
-              "matchId": "A5",
-              "matchday": "Matchday 1"
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          },
-          {
-            "topic": "James Bond 007",
-            "set1": {
-              "3sec": 6,
-              "qa": 25,
-              "jigsaw": 0,
-              "attribute": 25,
-              "sum": 56,
-              "played": true,
-              "matchId": "A9",
-              "matchday": "Matchday 2"
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          },
-          {
-            "topic": "หนัง Hollywood",
-            "set1": {
-              "3sec": 10,
-              "qa": 0,
-              "jigsaw": 20,
-              "attribute": 20,
-              "sum": 50,
-              "played": true,
-              "matchId": "A18",
-              "matchday": "Matchday 3"
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          }
-        ],
         "rank": 3,
-        "scoreDiff": "+3"
+        "scoreDiff": "+2"
       },
       {
         "name": "เชาว์วรรธน์ จันทร์สุข",
@@ -500,49 +502,28 @@
         "scoreDiff": "+1"
       },
       {
-        "name": "ณฤกร วงศ์บูรณะ",
-        "nickname": "ตฤณ",
-        "photo": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
+        "name": "ณัฐวุฒิ โนรี",
+        "nickname": "แสตมป์",
+        "photo": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
         "group": "A",
         "leaguePoints": 5,
         "win": 1,
         "lose": 1,
-        "draw": 1,
+        "draw": 2,
         "categoriesWon": 8,
-        "categoriesLost": 8,
-        "totalScore": 154,
+        "categoriesLost": 11,
+        "totalScore": 144,
         "topics": [
           {
-            "topic": "Tattoo Colour",
+            "topic": "Thai BL Series",
             "set1": {
-              "3sec": 17,
-              "qa": 20,
-              "jigsaw": 25,
-              "attribute": 0,
-              "sum": 62,
-              "played": true,
-              "matchId": "A4",
-              "matchday": "Matchday 1"
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          },
-          {
-            "topic": "Marvel Cinematic Universe",
-            "set1": {
-              "3sec": 21,
+              "3sec": 6,
               "qa": 0,
               "jigsaw": 0,
-              "attribute": 15,
-              "sum": 36,
+              "attribute": 10,
+              "sum": 16,
               "played": true,
-              "matchId": "A16",
+              "matchId": "A14",
               "matchday": "Matchday 3"
             },
             "set2": {
@@ -555,16 +536,16 @@
             }
           },
           {
-            "topic": "Bodyslam",
+            "topic": "นักแสดง GMMTV",
             "set1": {
-              "3sec": 16,
-              "qa": 0,
-              "jigsaw": 25,
-              "attribute": 15,
-              "sum": 56,
+              "3sec": 10,
+              "qa": 20,
+              "jigsaw": 10,
+              "attribute": 0,
+              "sum": 40,
               "played": true,
-              "matchId": "A12",
-              "matchday": "Matchday 2"
+              "matchId": "A6",
+              "matchday": "Matchday 1"
             },
             "set2": {
               "3sec": null,
@@ -576,14 +557,37 @@
             }
           },
           {
-            "topic": "ETC",
+            "topic": "ห้างสรรพสินค้าไทย",
             "set1": {
+              "3sec": 2,
+              "qa": 20,
+              "jigsaw": 15,
+              "attribute": 0,
+              "sum": 37,
+              "played": true,
+              "matchId": "A19",
+              "matchday": "Matchday 4"
+            },
+            "set2": {
               "3sec": null,
               "qa": null,
               "jigsaw": null,
               "attribute": null,
               "sum": 0,
               "played": false
+            }
+          },
+          {
+            "topic": "เพลงสตริงไทยยุค 80s",
+            "set1": {
+              "3sec": 11,
+              "qa": 25,
+              "jigsaw": 0,
+              "attribute": 15,
+              "sum": 51,
+              "played": true,
+              "matchId": "A11",
+              "matchday": "Matchday 2"
             },
             "set2": {
               "3sec": null,
@@ -596,7 +600,108 @@
           }
         ],
         "rank": 6,
-        "scoreDiff": "0"
+        "scoreDiff": "-3"
+      },
+      {
+        "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+        "nickname": "แมน",
+        "photo": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+        "group": "A",
+        "leaguePoints": 4,
+        "win": 1,
+        "lose": 2,
+        "draw": 1,
+        "categoriesWon": 8,
+        "categoriesLost": 9,
+        "totalScore": 133,
+        "topics": [
+          {
+            "topic": "ตลกไทย",
+            "set1": {
+              "3sec": 16,
+              "qa": 0,
+              "jigsaw": 20,
+              "attribute": 10,
+              "sum": 46,
+              "played": true,
+              "matchId": "A1",
+              "matchday": "Matchday 1"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          },
+          {
+            "topic": "มอเตอร์ไซค์",
+            "set1": {
+              "3sec": 8,
+              "qa": 0,
+              "jigsaw": 20,
+              "attribute": 0,
+              "sum": 28,
+              "played": true,
+              "matchId": "A19",
+              "matchday": "Matchday 4"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          },
+          {
+            "topic": "ละคร Exact / ONE31",
+            "set1": {
+              "3sec": 9,
+              "qa": 0,
+              "jigsaw": 0,
+              "attribute": 0,
+              "sum": 9,
+              "played": true,
+              "matchId": "A7",
+              "matchday": "Matchday 2"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          },
+          {
+            "topic": "น้ำอัดลม",
+            "set1": {
+              "3sec": 20,
+              "qa": 0,
+              "jigsaw": 15,
+              "attribute": 15,
+              "sum": 50,
+              "played": true,
+              "matchId": "A18",
+              "matchday": "Matchday 3"
+            },
+            "set2": {
+              "3sec": null,
+              "qa": null,
+              "jigsaw": null,
+              "attribute": null,
+              "sum": 0,
+              "played": false
+            }
+          }
+        ],
+        "rank": 7,
+        "scoreDiff": "-1"
       },
       {
         "name": "พัทธ์ศีล ปุญศิริ",
@@ -694,7 +799,7 @@
             }
           }
         ],
-        "rank": 7,
+        "rank": 8,
         "scoreDiff": "-1"
       },
       {
@@ -793,53 +898,32 @@
             }
           }
         ],
-        "rank": 8,
+        "rank": 9,
         "scoreDiff": "-1"
       },
       {
-        "name": "ณัฐวุฒิ โนรี",
-        "nickname": "แสตมป์",
-        "photo": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
+        "name": "ณฤกร วงศ์บูรณะ",
+        "nickname": "ตฤณ",
+        "photo": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
         "group": "A",
         "leaguePoints": 4,
         "win": 1,
-        "lose": 1,
+        "lose": 2,
         "draw": 1,
-        "categoriesWon": 6,
-        "categoriesLost": 9,
-        "totalScore": 107,
+        "categoriesWon": 8,
+        "categoriesLost": 13,
+        "totalScore": 181,
         "topics": [
           {
-            "topic": "Thai BL Series",
+            "topic": "Tattoo Colour",
             "set1": {
-              "3sec": 6,
-              "qa": 0,
-              "jigsaw": 0,
-              "attribute": 10,
-              "sum": 16,
-              "played": true,
-              "matchId": "A14",
-              "matchday": "Matchday 3"
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          },
-          {
-            "topic": "นักแสดง GMMTV",
-            "set1": {
-              "3sec": 10,
+              "3sec": 17,
               "qa": 20,
-              "jigsaw": 10,
+              "jigsaw": 25,
               "attribute": 0,
-              "sum": 40,
+              "sum": 62,
               "played": true,
-              "matchId": "A6",
+              "matchId": "A4",
               "matchday": "Matchday 1"
             },
             "set2": {
@@ -852,14 +936,16 @@
             }
           },
           {
-            "topic": "ห้างสรรพสินค้าไทย",
+            "topic": "Marvel Cinematic Universe",
             "set1": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
+              "3sec": 21,
+              "qa": 0,
+              "jigsaw": 0,
+              "attribute": 15,
+              "sum": 36,
+              "played": true,
+              "matchId": "A16",
+              "matchday": "Matchday 3"
             },
             "set2": {
               "3sec": null,
@@ -871,93 +957,15 @@
             }
           },
           {
-            "topic": "เพลงสตริงไทยยุค 80s",
-            "set1": {
-              "3sec": 11,
-              "qa": 25,
-              "jigsaw": 0,
-              "attribute": 15,
-              "sum": 51,
-              "played": true,
-              "matchId": "A11",
-              "matchday": "Matchday 2"
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          }
-        ],
-        "rank": 9,
-        "scoreDiff": "-3"
-      },
-      {
-        "name": "ปกรณ์ สถิตอยู่คู่ไทย",
-        "nickname": "แมน",
-        "photo": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
-        "group": "A",
-        "leaguePoints": 3,
-        "win": 1,
-        "lose": 2,
-        "draw": 0,
-        "categoriesWon": 6,
-        "categoriesLost": 7,
-        "totalScore": 105,
-        "topics": [
-          {
-            "topic": "ตลกไทย",
+            "topic": "Bodyslam",
             "set1": {
               "3sec": 16,
               "qa": 0,
-              "jigsaw": 20,
-              "attribute": 10,
-              "sum": 46,
+              "jigsaw": 25,
+              "attribute": 15,
+              "sum": 56,
               "played": true,
-              "matchId": "A1",
-              "matchday": "Matchday 1"
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          },
-          {
-            "topic": "มอเตอร์ไซค์",
-            "set1": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            },
-            "set2": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null,
-              "sum": 0,
-              "played": false
-            }
-          },
-          {
-            "topic": "ละคร Exact / ONE31",
-            "set1": {
-              "3sec": 9,
-              "qa": 0,
-              "jigsaw": 0,
-              "attribute": 0,
-              "sum": 9,
-              "played": true,
-              "matchId": "A7",
+              "matchId": "A12",
               "matchday": "Matchday 2"
             },
             "set2": {
@@ -970,16 +978,16 @@
             }
           },
           {
-            "topic": "น้ำอัดลม",
+            "topic": "ETC",
             "set1": {
-              "3sec": 20,
+              "3sec": 17,
               "qa": 0,
-              "jigsaw": 15,
-              "attribute": 15,
-              "sum": 50,
+              "jigsaw": 0,
+              "attribute": 10,
+              "sum": 27,
               "played": true,
-              "matchId": "A18",
-              "matchday": "Matchday 3"
+              "matchId": "A20",
+              "matchday": "Matchday 4"
             },
             "set2": {
               "3sec": null,
@@ -992,7 +1000,7 @@
           }
         ],
         "rank": 10,
-        "scoreDiff": "-1"
+        "scoreDiff": "-5"
       },
       {
         "name": "ณชนน ยุงคุณ",
@@ -3747,74 +3755,114 @@
           "id": "A19",
           "matchNumber": 37,
           "group": "A",
-          "status": "scheduled",
-          "winner": null,
+          "status": "completed",
+          "winner": "draw",
           "player1": {
-            "name": "",
-            "nickname": "",
-            "topic": "",
-            "photo": "",
+            "name": "ณัฐวุฒิ โนรี",
+            "nickname": "แสตมป์",
+            "topic": "ห้างสรรพสินค้าไทย",
+            "set": "auto",
+            "photo": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
             "scores": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null
+              "3sec": 2,
+              "qa": 20,
+              "jigsaw": 15,
+              "attribute": 0
             },
-            "sum": 0,
-            "categoryPoints": 0,
-            "leaguePoint": null
+            "sum": 37,
+            "categoryPoints": 2,
+            "leaguePoint": 1
           },
           "player2": {
-            "name": "",
-            "nickname": "",
-            "topic": "",
-            "photo": "",
+            "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+            "nickname": "แมน",
+            "topic": "มอเตอร์ไซค์",
+            "set": "auto",
+            "photo": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
             "scores": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null
+              "3sec": 8,
+              "qa": 0,
+              "jigsaw": 20,
+              "attribute": 0
             },
-            "sum": 0,
-            "categoryPoints": 0,
-            "leaguePoint": null
+            "sum": 28,
+            "categoryPoints": 2,
+            "leaguePoint": 1
+          },
+          "completedCatsCount": 4,
+          "isAll4Completed": true,
+          "hasAnyScore": true,
+          "rawSumBonusWinner": "player1",
+          "categoryPointsBeforeBonus": {
+            "player1": 1,
+            "player2": 2
           }
         },
         {
           "id": "A20",
           "matchNumber": 38,
           "group": "A",
-          "status": "scheduled",
-          "winner": null,
+          "status": "completed",
+          "winner": "player2",
           "player1": {
-            "name": "",
-            "nickname": "",
-            "topic": "",
-            "photo": "",
+            "name": "ณฤกร วงศ์บูรณะ",
+            "nickname": "ตฤณ",
+            "topic": "ETC",
+            "set": "auto",
+            "photo": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
             "scores": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null
+              "3sec": 17,
+              "qa": 0,
+              "jigsaw": 0,
+              "attribute": 10
             },
-            "sum": 0,
+            "sum": 27,
             "categoryPoints": 0,
-            "leaguePoint": null
+            "leaguePoint": -1,
+            "award": null,
+            "penalty": null
           },
           "player2": {
-            "name": "",
-            "nickname": "",
-            "topic": "",
-            "photo": "",
+            "name": "วรงกร แจ่มปัญญา",
+            "nickname": "กร",
+            "topic": "Saturday Night Live",
+            "set": "auto",
+            "photo": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
             "scores": {
-              "3sec": null,
-              "qa": null,
-              "jigsaw": null,
-              "attribute": null
+              "3sec": 19,
+              "qa": 25,
+              "jigsaw": 25,
+              "attribute": 15
             },
-            "sum": 0,
-            "categoryPoints": 0,
-            "leaguePoint": null
+            "sum": 84,
+            "categoryPoints": 5,
+            "leaguePoint": 6,
+            "award": {
+              "name": "รางวัลกร",
+              "bonus": 1,
+              "reason": "ได้ 25 เต็ม 2 หมวดและชนะ 4 GP ก่อนรวมดิบ"
+            },
+            "penalty": null
+          },
+          "completedCatsCount": 4,
+          "isAll4Completed": true,
+          "hasAnyScore": true,
+          "rawSumBonusWinner": "player2",
+          "categoryPointsBeforeBonus": {
+            "player1": 0,
+            "player2": 4
+          },
+          "awards": {
+            "player1": null,
+            "player2": {
+              "name": "รางวัลกร",
+              "bonus": 1,
+              "reason": "ได้ 25 เต็ม 2 หมวดและชนะ 4 GP ก่อนรวมดิบ"
+            }
+          },
+          "penalties": {
+            "player1": null,
+            "player2": null
           }
         },
         {
@@ -5094,11 +5142,30 @@
   ],
   "topicRankings": [
     {
-      "name": "เชาว์วรรธน์ จันทร์สุข",
+      "contestantName": "วรงกร แจ่มปัญญา",
+      "nickname": "กร",
+      "photo": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
+      "group": "A",
+      "topic": "Saturday Night Live",
+      "setLabel": "ชุดที่ 1",
+      "scores": {
+        "3sec": 19,
+        "qa": 25,
+        "jigsaw": 25,
+        "attribute": 15
+      },
+      "sum": 84,
+      "matchId": "A20",
+      "matchday": "Matchday 4",
+      "rank": 1
+    },
+    {
+      "contestantName": "เชาว์วรรธน์ จันทร์สุข",
       "nickname": "ก๊อง",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO16Pbxv_LOcMn1OGJM6Ha7SWcpEXNeNhMwBNcJaaBSd0D_aWmjLO4S7123_qtY3GkXpgXLV9uWJ_hSyGzu1tK90zh_Q5i-jysqGqRXq7vLTVITDupLrn7Am5HOqWavHUJKvgh1qXD4ctiuDuUNNAY7=w1125-h1125-s-no-gm",
+      "group": "A",
       "topic": "รายการทีวีไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 17,
         "qa": 20,
@@ -5108,14 +5175,15 @@
       "sum": 82,
       "matchId": "A15",
       "matchday": "Matchday 3",
-      "rank": 1
+      "rank": 2
     },
     {
-      "name": "พีรภัทร หมื่นหาญ",
+      "contestantName": "พีรภัทร หมื่นหาญ",
       "nickname": "พีม",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczN4jEy-gRiP0MERBXqhkVTBrfQIsPXleD9Poc2xbKfFR7AxQeEthPl5HcqDWlNip6lmnvLifxL2f8HjYkZK8qyliukv2SVP1YIilK5Zy8DRHJEUMbpy324nqe-o1NzCJ2IZK3UbFMTeS2G7LUwIfAYk=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "กรุงเทพมหานคร",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 16,
         "qa": 25,
@@ -5125,14 +5193,15 @@
       "sum": 76,
       "matchId": "B12",
       "matchday": "Matchday 2",
-      "rank": 2
+      "rank": 3
     },
     {
-      "name": "ธนกร สุขปาน",
+      "contestantName": "ธนกร สุขปาน",
       "nickname": "ออม",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO-iIGwT9VP8Z5RO_tSXrDqx7gXF8vEFYRquqyBBzdoShAXQtUrlaYWuehjJUNMcRC0DsNP_tAm8yGCUByEBvNSz4vo1iymcdYYp-F4xmmYKzwlwDXdLPSP487u4riLxJpOh0RXJKjZoaJkbo0UaOpW=w1098-h1099-s-no-gm",
+      "group": "B",
       "topic": "ละครช่อง 3",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 21,
         "qa": 25,
@@ -5142,14 +5211,15 @@
       "sum": 76,
       "matchId": "B7",
       "matchday": "Matchday 2",
-      "rank": 2
+      "rank": 3
     },
     {
-      "name": "ฤทธิชัย ภูสิญามณี",
+      "contestantName": "ฤทธิชัย ภูสิญามณี",
       "nickname": "ริท",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPoobelYtJFgLBfwoO4JX5KwnjFgzPl1yDpAcnnTnYawU4qUdoQhegCiT8M_XxF3kUQXYujweANW183NPbe5PR9hK83WFmZgokhpiDlIHBXncUgIYwp6lEKutOIwbIqiEhtY2hc_OMRD4TyMnbIy1XM=w1114-h1110-s-no-gm",
+      "group": "B",
       "topic": "ขสมก.",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 20,
         "qa": 25,
@@ -5159,14 +5229,15 @@
       "sum": 75,
       "matchId": "B15",
       "matchday": "Matchday 3",
-      "rank": 4
+      "rank": 5
     },
     {
-      "name": "ธนกร สุขปาน",
+      "contestantName": "ธนกร สุขปาน",
       "nickname": "ออม",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO-iIGwT9VP8Z5RO_tSXrDqx7gXF8vEFYRquqyBBzdoShAXQtUrlaYWuehjJUNMcRC0DsNP_tAm8yGCUByEBvNSz4vo1iymcdYYp-F4xmmYKzwlwDXdLPSP487u4riLxJpOh0RXJKjZoaJkbo0UaOpW=w1098-h1099-s-no-gm",
+      "group": "B",
       "topic": "ศิริพร อำไพพงษ์",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 18,
         "qa": 20,
@@ -5176,14 +5247,15 @@
       "sum": 73,
       "matchId": "B1",
       "matchday": "Matchday 1",
-      "rank": 5
+      "rank": 6
     },
     {
-      "name": "รติพงษ์ กมลเกียรติพัฒน์",
+      "contestantName": "รติพงษ์ กมลเกียรติพัฒน์",
       "nickname": "นิว",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMYZtcBBAeBGcM50DIJ_hTvAne-blauzEryrQWkWweLAOOkqlwvrDmU0FRq_DEXmoE4HqHTiDB1zASFEKzok8vds2h6WvXSpI40ThimweGepynYIIvp4WspiPfVwDRnoFYL-gEOXIhkkZPXO9IKW-Oi=w1108-h1110-s-no-gm",
+      "group": "B",
       "topic": "My Hero Academia",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 15,
         "qa": 15,
@@ -5193,14 +5265,15 @@
       "sum": 70,
       "matchId": "B10",
       "matchday": "Matchday 2",
-      "rank": 6
+      "rank": 7
     },
     {
-      "name": "รัฐศาสตร์ สายโท",
+      "contestantName": "รัฐศาสตร์ สายโท",
       "nickname": "เติ๊ด",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPMpCgRhk7Nio2xpZN6badc9D3oFRnB_FRC0KjzJ125xoTqSKPdmwxgzdpchuOBOT2lHJWar8hmOdQf2t3WYha9jhlC5VA5qjAw2FPRfRL7bvTPlls61han8PVGK-jgbiXGsThwtFjeBID4sqnIdi-L=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "Hell's Kitchen Thailand",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 15,
         "qa": 25,
@@ -5210,14 +5283,15 @@
       "sum": 70,
       "matchId": "B6",
       "matchday": "Matchday 1",
-      "rank": 6
+      "rank": 7
     },
     {
-      "name": "พศวัต พุ่มเงิน",
+      "contestantName": "พศวัต พุ่มเงิน",
       "nickname": "ปาร์ค",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMwFPheesY-nKVcVpRYTHvCFm_Kvsf2djmqLhSfgE6btw62df02FN84YxvJnUHojPbRuOTYYcL-JEol0ZwrqvhwyENZWRk8KHGxLoZ4byFEbxKy7tYrZhY_9PSnMIxvau4O3_iyy_noIIO24OkcYhQJ=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "Uma Musume: Pretty Derby",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 20,
         "qa": 25,
@@ -5227,14 +5301,15 @@
       "sum": 70,
       "matchId": "B6",
       "matchday": "Matchday 1",
-      "rank": 6
+      "rank": 7
     },
     {
-      "name": "ศุภกร นิลสุวรรณ",
+      "contestantName": "ศุภกร นิลสุวรรณ",
       "nickname": "หมี",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMSx09lFNStjwGSoBCe1S6CVdaeZAlUgHXFBSRlDhVSsiCd7KFbeerK-dkmZpIsNAlsXBV8mFKlXy5YHrSzjN48auD8etOjURf8YSBq59PPrR52RSIGYdy73YEwuVC8iwrCOihhewJZ14RkWlpnPmfk=w1096-h1097-s-no-gm",
+      "group": "A",
       "topic": "GSH+",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 22,
         "qa": 0,
@@ -5244,14 +5319,15 @@
       "sum": 67,
       "matchId": "A9",
       "matchday": "Matchday 2",
-      "rank": 9
+      "rank": 10
     },
     {
-      "name": "ณชนน ยุงคุณ",
+      "contestantName": "ณชนน ยุงคุณ",
       "nickname": "เจสัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOSfRwKmGHwdQPemYmAyUztPOb_QZCsSc1rYwm9fWUESjcG42qQxj7cRgnPKMV_vZbmyPat7r_vGpKs0M9bgDXYyERBMJALw3cTMUNHRRJP-QF7hjCR_ZfgyFYWlTXEIq9nMBzf-Xxci2lMhlmH1DTq=w1110-h1113-s-no-gm",
+      "group": "A",
       "topic": "Spider-Man",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 12,
         "qa": 25,
@@ -5261,14 +5337,15 @@
       "sum": 67,
       "matchId": "A12",
       "matchday": "Matchday 2",
-      "rank": 9
+      "rank": 10
     },
     {
-      "name": "ธนกร สุขปาน",
+      "contestantName": "ธนกร สุขปาน",
       "nickname": "ออม",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO-iIGwT9VP8Z5RO_tSXrDqx7gXF8vEFYRquqyBBzdoShAXQtUrlaYWuehjJUNMcRC0DsNP_tAm8yGCUByEBvNSz4vo1iymcdYYp-F4xmmYKzwlwDXdLPSP487u4riLxJpOh0RXJKjZoaJkbo0UaOpW=w1098-h1099-s-no-gm",
+      "group": "B",
       "topic": "นวนิยายไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 16,
         "qa": 0,
@@ -5278,14 +5355,15 @@
       "sum": 66,
       "matchId": "B15",
       "matchday": "Matchday 3",
-      "rank": 11
+      "rank": 12
     },
     {
-      "name": "ณัฐดนัย วงศ์ปัญญา",
+      "contestantName": "ณัฐดนัย วงศ์ปัญญา",
       "nickname": "แฟรงค์",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMKFo_EG_3hY04pei5boOCaAm5MoLVG0354EE_uwQyjkDii9cy6oxbBsEOsOIXphC63oiOfSIdNET2A_-HxnpH636W1IiTOGYbNGg51lGhSsZ00i4u7X-zaUX2QhlfZSAksy6e4g970k_0jUO9VSIVl=w1093-h1092-s-no-gm",
+      "group": "B",
       "topic": "Honkai: Star Rail",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 24,
         "qa": 0,
@@ -5295,14 +5373,15 @@
       "sum": 64,
       "matchId": "B9",
       "matchday": "Matchday 2",
-      "rank": 12
+      "rank": 13
     },
     {
-      "name": "รติพงษ์ กมลเกียรติพัฒน์",
+      "contestantName": "รติพงษ์ กมลเกียรติพัฒน์",
       "nickname": "นิว",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMYZtcBBAeBGcM50DIJ_hTvAne-blauzEryrQWkWweLAOOkqlwvrDmU0FRq_DEXmoE4HqHTiDB1zASFEKzok8vds2h6WvXSpI40ThimweGepynYIIvp4WspiPfVwDRnoFYL-gEOXIhkkZPXO9IKW-Oi=w1108-h1110-s-no-gm",
+      "group": "B",
       "topic": "ไพ่ทาโร่ต์",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 24,
         "qa": 0,
@@ -5312,14 +5391,15 @@
       "sum": 64,
       "matchId": "B18",
       "matchday": "Matchday 3",
-      "rank": 12
+      "rank": 13
     },
     {
-      "name": "ณฤกร วงศ์บูรณะ",
+      "contestantName": "ณฤกร วงศ์บูรณะ",
       "nickname": "ตฤณ",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
+      "group": "A",
       "topic": "Tattoo Colour",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 17,
         "qa": 20,
@@ -5329,14 +5409,15 @@
       "sum": 62,
       "matchId": "A4",
       "matchday": "Matchday 1",
-      "rank": 14
+      "rank": 15
     },
     {
-      "name": "พศวัต พุ่มเงิน",
+      "contestantName": "พศวัต พุ่มเงิน",
       "nickname": "ปาร์ค",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMwFPheesY-nKVcVpRYTHvCFm_Kvsf2djmqLhSfgE6btw62df02FN84YxvJnUHojPbRuOTYYcL-JEol0ZwrqvhwyENZWRk8KHGxLoZ4byFEbxKy7tYrZhY_9PSnMIxvau4O3_iyy_noIIO24OkcYhQJ=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "Vocaloid",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 15,
         "qa": 20,
@@ -5346,14 +5427,15 @@
       "sum": 60,
       "matchId": "B11",
       "matchday": "Matchday 2",
-      "rank": 15
+      "rank": 16
     },
     {
-      "name": "ธีรวีร์ จรูญศรีโชติ",
+      "contestantName": "ธีรวีร์ จรูญศรีโชติ",
       "nickname": "ชีส",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPmtgYHGll5yAE5ULClZmSwDgwHnuzdvUl71F9IXMZNybTjWa1xwW7LNFh6h11HvomGdVBQnpf_YnZhzf68F-1muMGK8_MTSRaQJB2iQORgoblxzGj05Q2IOYH6UT5ZDV9jwL7dzTjhHifPQFZGiccR=w1096-h1103-s-no-gm",
+      "group": "B",
       "topic": "Cartoon Network",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 15,
         "qa": 25,
@@ -5363,14 +5445,15 @@
       "sum": 60,
       "matchId": "B18",
       "matchday": "Matchday 3",
-      "rank": 15
+      "rank": 16
     },
     {
-      "name": "ณัฐภัทร แก้วสินธุ์",
+      "contestantName": "ณัฐภัทร แก้วสินธุ์",
       "nickname": "นที",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOvDbHaUHp5S6iJubpPZzJCkpKXJVjJ7fnMn0YYSeRwWSS36FbDpX9w8eVt3my1wqKrg5utQbSFFVWG4s_hek_Yo8Zff6toTZCc_sp1_l16xArjwOcJHdBOTnjVXIKphWRfbOUlKwhvqYVNANRnnEy1=w1096-h1096-s-no-gm",
+      "group": "A",
       "topic": "Identity V",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 25,
         "qa": 15,
@@ -5380,14 +5463,15 @@
       "sum": 60,
       "matchId": "A17",
       "matchday": "Matchday 3",
-      "rank": 15
+      "rank": 16
     },
     {
-      "name": "สหัสวรรษ นิจพันธ์",
+      "contestantName": "สหัสวรรษ นิจพันธ์",
       "nickname": "พีท",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczNQ8B2o7fdgG-YweA57XLY-mnfrA-3X_lUjgIAeaCBTiegx-ZhBFRhp5zIBZItlakAmAC7a5sla7p5sTkup2h6dxqCOsFMwTPwHgE_OzJ2pK3w58LVT6wj_DHgbXSSh6osp4Jl1gIsMSzHFw48_tetS=w1095-h1098-s-no-gm",
+      "group": "A",
       "topic": "GSH+",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 18,
         "qa": 25,
@@ -5397,14 +5481,15 @@
       "sum": 58,
       "matchId": "A8",
       "matchday": "Matchday 2",
-      "rank": 18
+      "rank": 19
     },
     {
-      "name": "ศุภกร นิลสุวรรณ",
+      "contestantName": "ศุภกร นิลสุวรรณ",
       "nickname": "หมี",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMSx09lFNStjwGSoBCe1S6CVdaeZAlUgHXFBSRlDhVSsiCd7KFbeerK-dkmZpIsNAlsXBV8mFKlXy5YHrSzjN48auD8etOjURf8YSBq59PPrR52RSIGYdy73YEwuVC8iwrCOihhewJZ14RkWlpnPmfk=w1096-h1097-s-no-gm",
+      "group": "A",
       "topic": "Taskmaster UK",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 23,
         "qa": 25,
@@ -5414,14 +5499,15 @@
       "sum": 58,
       "matchId": "A16",
       "matchday": "Matchday 3",
-      "rank": 18
+      "rank": 19
     },
     {
-      "name": "นัทธสม บุญมา",
+      "contestantName": "นัทธสม บุญมา",
       "nickname": "ซ่า",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczN9_pbMETa6aA9mNW9WZPhWmUi-ac42Zp2obSTLTtiztKA312V1RbqanK_eAAAUFmWL5En2oiFPUwLry3TkNYg5m4muafCBNnQ0crkIIPWrJGdpKYRcugDDt-2Ttm17_gSPGEdbdyrGw2-AG0N5q5-1=w1112-h1117-s-no-gm",
+      "group": "A",
       "topic": "Cocktail",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 12,
         "qa": 0,
@@ -5431,14 +5517,15 @@
       "sum": 57,
       "matchId": "A7",
       "matchday": "Matchday 2",
-      "rank": 20
+      "rank": 21
     },
     {
-      "name": "รัฐศาสตร์ สายโท",
+      "contestantName": "รัฐศาสตร์ สายโท",
       "nickname": "เติ๊ด",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPMpCgRhk7Nio2xpZN6badc9D3oFRnB_FRC0KjzJ125xoTqSKPdmwxgzdpchuOBOT2lHJWar8hmOdQf2t3WYha9jhlC5VA5qjAw2FPRfRL7bvTPlls61han8PVGK-jgbiXGsThwtFjeBID4sqnIdi-L=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "Every Little Thing",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 2,
         "qa": 25,
@@ -5448,14 +5535,15 @@
       "sum": 57,
       "matchId": "B13",
       "matchday": "Matchday 3",
-      "rank": 20
+      "rank": 21
     },
     {
-      "name": "สิปโปทัย ศรีบุญเรือง",
+      "contestantName": "สิปโปทัย ศรีบุญเรือง",
       "nickname": "กัส",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczP4Zz5dzdpoyYZP25peANzW6uA30P3k08TJLk_NbipaYy_vR47l9V3En3DEQFU4JhAzM8z5f_-wtwBRp16-q0nhAjq9l1UzmZM3L7VYduoMsnWwekhiukE3Yg2A7qj0m0dQ2eCLREdzro1EIGTttYeO=w1089-h1092-s-no-gm",
+      "group": "B",
       "topic": "ภาพยนตร์ของหม่อมเจ้าชาตรีเฉลิม ยุคล",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 22,
         "qa": 20,
@@ -5465,14 +5553,15 @@
       "sum": 57,
       "matchId": "B12",
       "matchday": "Matchday 2",
-      "rank": 20
+      "rank": 21
     },
     {
-      "name": "นัทธสม บุญมา",
+      "contestantName": "นัทธสม บุญมา",
       "nickname": "ซ่า",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczN9_pbMETa6aA9mNW9WZPhWmUi-ac42Zp2obSTLTtiztKA312V1RbqanK_eAAAUFmWL5En2oiFPUwLry3TkNYg5m4muafCBNnQ0crkIIPWrJGdpKYRcugDDt-2Ttm17_gSPGEdbdyrGw2-AG0N5q5-1=w1112-h1117-s-no-gm",
+      "group": "A",
       "topic": "UEFA Club Competition",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 12,
         "qa": 20,
@@ -5482,14 +5571,15 @@
       "sum": 57,
       "matchId": "A14",
       "matchday": "Matchday 3",
-      "rank": 20
+      "rank": 21
     },
     {
-      "name": "วรงกร แจ่มปัญญา",
+      "contestantName": "วรงกร แจ่มปัญญา",
       "nickname": "กร",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
+      "group": "A",
       "topic": "James Bond 007",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 6,
         "qa": 25,
@@ -5499,14 +5589,15 @@
       "sum": 56,
       "matchId": "A9",
       "matchday": "Matchday 2",
-      "rank": 24
+      "rank": 25
     },
     {
-      "name": "ณฤกร วงศ์บูรณะ",
+      "contestantName": "ณฤกร วงศ์บูรณะ",
       "nickname": "ตฤณ",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
+      "group": "A",
       "topic": "Bodyslam",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 16,
         "qa": 0,
@@ -5516,14 +5607,15 @@
       "sum": 56,
       "matchId": "A12",
       "matchday": "Matchday 2",
-      "rank": 24
+      "rank": 25
     },
     {
-      "name": "ณชนน ยุงคุณ",
+      "contestantName": "ณชนน ยุงคุณ",
       "nickname": "เจสัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOSfRwKmGHwdQPemYmAyUztPOb_QZCsSc1rYwm9fWUESjcG42qQxj7cRgnPKMV_vZbmyPat7r_vGpKs0M9bgDXYyERBMJALw3cTMUNHRRJP-QF7hjCR_ZfgyFYWlTXEIq9nMBzf-Xxci2lMhlmH1DTq=w1110-h1113-s-no-gm",
+      "group": "A",
       "topic": "Inazuma Eleven",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 11,
         "qa": 25,
@@ -5533,14 +5625,15 @@
       "sum": 56,
       "matchId": "A15",
       "matchday": "Matchday 3",
-      "rank": 24
+      "rank": 25
     },
     {
-      "name": "สิปโปทัย ศรีบุญเรือง",
+      "contestantName": "สิปโปทัย ศรีบุญเรือง",
       "nickname": "กัส",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczP4Zz5dzdpoyYZP25peANzW6uA30P3k08TJLk_NbipaYy_vR47l9V3En3DEQFU4JhAzM8z5f_-wtwBRp16-q0nhAjq9l1UzmZM3L7VYduoMsnWwekhiukE3Yg2A7qj0m0dQ2eCLREdzro1EIGTttYeO=w1089-h1092-s-no-gm",
+      "group": "B",
       "topic": "ประวัติศาสตร์ไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 15,
         "qa": 0,
@@ -5550,14 +5643,15 @@
       "sum": 55,
       "matchId": "B5",
       "matchday": "Matchday 1",
-      "rank": 27
+      "rank": 28
     },
     {
-      "name": "กันตชาติ ศรีเพ็ชร",
+      "contestantName": "กันตชาติ ศรีเพ็ชร",
       "nickname": "กัปตัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczNMZIYoOYw84qTNgPcHiMxBSThspgdh3h8zYV6NlWgTGGT_6A-z3eokutDS0LIHwN5buC_i1B6ZP5tvCEgW8RSvT0v89_HnjdjvAMYwJfrgsKOoBX1_EYS2xt8Xnq_tke4dqtmmHn3Mh-O7F6AWeNWt=w1098-h1101-s-no-gm",
+      "group": "B",
       "topic": "Valorant E-Sports",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 20,
         "qa": 25,
@@ -5567,14 +5661,15 @@
       "sum": 55,
       "matchId": "B2",
       "matchday": "Matchday 1",
-      "rank": 27
+      "rank": 28
     },
     {
-      "name": "ภควัต เลี้ยงอยู่",
+      "contestantName": "ภควัต เลี้ยงอยู่",
       "nickname": "ไผ่",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOZEYRIxluoGWpWlpyhdIGofaZ6exlgo7OcBi8BJR9NeDFTFi-ImTwmaWI0FWrReH-5RisncZ-m7QBfYQtPWFWddOiNatRdCcYfAW-qylv3jhF8nbtX0A8I48zEgj5Dww6znjtkoikD9eViaSnxS3Ke=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "โฆษณาไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 14,
         "qa": 10,
@@ -5584,14 +5679,15 @@
       "sum": 54,
       "matchId": "B13",
       "matchday": "Matchday 3",
-      "rank": 29
+      "rank": 30
     },
     {
-      "name": "พัทธ์ศีล ปุญศิริ",
+      "contestantName": "พัทธ์ศีล ปุญศิริ",
       "nickname": "ศีล",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczM_hN8XWd9yv9EnS7_ELTNSVFz2dWD6SsNto-pFZE1nfJOUmxT0nfInpXfPLlx9Xe9zHA5zo07vNW09WM9_7l5zNudYVE_ZQoy2FMNm_qA1g0n19JpVLuZMgycHp61xigXt2S0s6ZJlfJJdpdF1DHuN=w1099-h1099-s-no-gm",
+      "group": "A",
       "topic": "K-ON!",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 3,
         "qa": 20,
@@ -5601,14 +5697,15 @@
       "sum": 53,
       "matchId": "A10",
       "matchday": "Matchday 2",
-      "rank": 30
+      "rank": 31
     },
     {
-      "name": "นัทธสม บุญมา",
+      "contestantName": "นัทธสม บุญมา",
       "nickname": "ซ่า",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczN9_pbMETa6aA9mNW9WZPhWmUi-ac42Zp2obSTLTtiztKA312V1RbqanK_eAAAUFmWL5En2oiFPUwLry3TkNYg5m4muafCBNnQ0crkIIPWrJGdpKYRcugDDt-2Ttm17_gSPGEdbdyrGw2-AG0N5q5-1=w1112-h1117-s-no-gm",
+      "group": "A",
       "topic": "โลกมวยปล้ำ",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 13,
         "qa": 25,
@@ -5618,14 +5715,15 @@
       "sum": 53,
       "matchId": "A3",
       "matchday": "Matchday 1",
-      "rank": 30
+      "rank": 31
     },
     {
-      "name": "รัฐศาสตร์ สายโท",
+      "contestantName": "รัฐศาสตร์ สายโท",
       "nickname": "เติ๊ด",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPMpCgRhk7Nio2xpZN6badc9D3oFRnB_FRC0KjzJ125xoTqSKPdmwxgzdpchuOBOT2lHJWar8hmOdQf2t3WYha9jhlC5VA5qjAw2FPRfRL7bvTPlls61han8PVGK-jgbiXGsThwtFjeBID4sqnIdi-L=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "Makihara Noriyuki",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 7,
         "qa": 20,
@@ -5635,14 +5733,15 @@
       "sum": 52,
       "matchId": "B10",
       "matchday": "Matchday 2",
-      "rank": 32
+      "rank": 33
     },
     {
-      "name": "สหัสวรรษ นิจพันธ์",
+      "contestantName": "สหัสวรรษ นิจพันธ์",
       "nickname": "พีท",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczNQ8B2o7fdgG-YweA57XLY-mnfrA-3X_lUjgIAeaCBTiegx-ZhBFRhp5zIBZItlakAmAC7a5sla7p5sTkup2h6dxqCOsFMwTPwHgE_OzJ2pK3w58LVT6wj_DHgbXSSh6osp4Jl1gIsMSzHFw48_tetS=w1095-h1098-s-no-gm",
+      "group": "A",
       "topic": "Rubsarb Production",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 6,
         "qa": 25,
@@ -5652,14 +5751,15 @@
       "sum": 51,
       "matchId": "A13",
       "matchday": "Matchday 3",
-      "rank": 33
+      "rank": 34
     },
     {
-      "name": "ณัฐวุฒิ โนรี",
+      "contestantName": "ณัฐวุฒิ โนรี",
       "nickname": "แสตมป์",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
+      "group": "A",
       "topic": "เพลงสตริงไทยยุค 80s",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 11,
         "qa": 25,
@@ -5669,14 +5769,15 @@
       "sum": 51,
       "matchId": "A11",
       "matchday": "Matchday 2",
-      "rank": 33
+      "rank": 34
     },
     {
-      "name": "วรงกร แจ่มปัญญา",
+      "contestantName": "วรงกร แจ่มปัญญา",
       "nickname": "กร",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
+      "group": "A",
       "topic": "หนัง Hollywood",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 10,
         "qa": 0,
@@ -5686,14 +5787,15 @@
       "sum": 50,
       "matchId": "A18",
       "matchday": "Matchday 3",
-      "rank": 35
+      "rank": 36
     },
     {
-      "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+      "contestantName": "ปกรณ์ สถิตอยู่คู่ไทย",
       "nickname": "แมน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+      "group": "A",
       "topic": "น้ำอัดลม",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 20,
         "qa": 0,
@@ -5703,14 +5805,15 @@
       "sum": 50,
       "matchId": "A18",
       "matchday": "Matchday 3",
-      "rank": 35
+      "rank": 36
     },
     {
-      "name": "พีรภัทร หมื่นหาญ",
+      "contestantName": "พีรภัทร หมื่นหาญ",
       "nickname": "พีม",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczN4jEy-gRiP0MERBXqhkVTBrfQIsPXleD9Poc2xbKfFR7AxQeEthPl5HcqDWlNip6lmnvLifxL2f8HjYkZK8qyliukv2SVP1YIilK5Zy8DRHJEUMbpy324nqe-o1NzCJ2IZK3UbFMTeS2G7LUwIfAYk=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "เลือกตั้งผู้ว่าฯ กทม.",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 14,
         "qa": 0,
@@ -5720,14 +5823,15 @@
       "sum": 49,
       "matchId": "B4",
       "matchday": "Matchday 1",
-      "rank": 37
+      "rank": 38
     },
     {
-      "name": "พีรภัทร หมื่นหาญ",
+      "contestantName": "พีรภัทร หมื่นหาญ",
       "nickname": "พีม",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczN4jEy-gRiP0MERBXqhkVTBrfQIsPXleD9Poc2xbKfFR7AxQeEthPl5HcqDWlNip6lmnvLifxL2f8HjYkZK8qyliukv2SVP1YIilK5Zy8DRHJEUMbpy324nqe-o1NzCJ2IZK3UbFMTeS2G7LUwIfAYk=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "อัสนี - วสันต์ โชติกุล",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 13,
         "qa": 0,
@@ -5737,14 +5841,15 @@
       "sum": 48,
       "matchId": "B17",
       "matchday": "Matchday 3",
-      "rank": 38
+      "rank": 39
     },
     {
-      "name": "วรงกร แจ่มปัญญา",
+      "contestantName": "วรงกร แจ่มปัญญา",
       "nickname": "กร",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
+      "group": "A",
       "topic": "Marvel Cinematic Universe",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 18,
         "qa": 20,
@@ -5754,14 +5859,15 @@
       "sum": 48,
       "matchId": "A5",
       "matchday": "Matchday 1",
-      "rank": 38
+      "rank": 39
     },
     {
-      "name": "สิปโปทัย ศรีบุญเรือง",
+      "contestantName": "สิปโปทัย ศรีบุญเรือง",
       "nickname": "กัส",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczP4Zz5dzdpoyYZP25peANzW6uA30P3k08TJLk_NbipaYy_vR47l9V3En3DEQFU4JhAzM8z5f_-wtwBRp16-q0nhAjq9l1UzmZM3L7VYduoMsnWwekhiukE3Yg2A7qj0m0dQ2eCLREdzro1EIGTttYeO=w1089-h1092-s-no-gm",
+      "group": "B",
       "topic": "น้าเน็ก เกตุเสพย์สวัสดิ์ฯ",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 2,
         "qa": 20,
@@ -5771,14 +5877,15 @@
       "sum": 47,
       "matchId": "B16",
       "matchday": "Matchday 3",
-      "rank": 40
+      "rank": 41
     },
     {
-      "name": "พัทธ์ศีล ปุญศิริ",
+      "contestantName": "พัทธ์ศีล ปุญศิริ",
       "nickname": "ศีล",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczM_hN8XWd9yv9EnS7_ELTNSVFz2dWD6SsNto-pFZE1nfJOUmxT0nfInpXfPLlx9Xe9zHA5zo07vNW09WM9_7l5zNudYVE_ZQoy2FMNm_qA1g0n19JpVLuZMgycHp61xigXt2S0s6ZJlfJJdpdF1DHuN=w1099-h1099-s-no-gm",
+      "group": "A",
       "topic": "Tetris",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 6,
         "qa": 25,
@@ -5788,14 +5895,15 @@
       "sum": 46,
       "matchId": "A13",
       "matchday": "Matchday 3",
-      "rank": 41
+      "rank": 42
     },
     {
-      "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+      "contestantName": "ปกรณ์ สถิตอยู่คู่ไทย",
       "nickname": "แมน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+      "group": "A",
       "topic": "ตลกไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 16,
         "qa": 0,
@@ -5805,14 +5913,15 @@
       "sum": 46,
       "matchId": "A1",
       "matchday": "Matchday 1",
-      "rank": 41
+      "rank": 42
     },
     {
-      "name": "กันตชาติ ศรีเพ็ชร",
+      "contestantName": "กันตชาติ ศรีเพ็ชร",
       "nickname": "กัปตัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczNMZIYoOYw84qTNgPcHiMxBSThspgdh3h8zYV6NlWgTGGT_6A-z3eokutDS0LIHwN5buC_i1B6ZP5tvCEgW8RSvT0v89_HnjdjvAMYwJfrgsKOoBX1_EYS2xt8Xnq_tke4dqtmmHn3Mh-O7F6AWeNWt=w1098-h1101-s-no-gm",
+      "group": "B",
       "topic": "Liverpool F.C.",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 11,
         "qa": 20,
@@ -5822,14 +5931,15 @@
       "sum": 46,
       "matchId": "B16",
       "matchday": "Matchday 3",
-      "rank": 41
+      "rank": 42
     },
     {
-      "name": "ภควัต เลี้ยงอยู่",
+      "contestantName": "ภควัต เลี้ยงอยู่",
       "nickname": "ไผ่",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOZEYRIxluoGWpWlpyhdIGofaZ6exlgo7OcBi8BJR9NeDFTFi-ImTwmaWI0FWrReH-5RisncZ-m7QBfYQtPWFWddOiNatRdCcYfAW-qylv3jhF8nbtX0A8I48zEgj5Dww6znjtkoikD9eViaSnxS3Ke=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "ขบวนการ 5 สี",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 19,
         "qa": 0,
@@ -5839,14 +5949,15 @@
       "sum": 44,
       "matchId": "B4",
       "matchday": "Matchday 1",
-      "rank": 44
+      "rank": 45
     },
     {
-      "name": "ปฏิปัน อัศวภูไชย",
+      "contestantName": "ปฏิปัน อัศวภูไชย",
       "nickname": "ปัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMYJs2gfkpivIlfFh_ogguJ850aCteu5kKVtkB2sKh-XFht5S6AzcTd42JOYXTFCi_-mpl16FpUV2fHvuZlY5J9ENOize1yH06NsdYgjLekboQ--KeSMVnuviGwjLkB5anel5ToX5KKP5d_g6NtvB9I=w1092-h1092-s-no-gm",
+      "group": "B",
       "topic": "สุนทราภรณ์",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 24,
         "qa": 0,
@@ -5856,14 +5967,15 @@
       "sum": 44,
       "matchId": "B3",
       "matchday": "Matchday 1",
-      "rank": 44
+      "rank": 45
     },
     {
-      "name": "เจษฎาพร ศรีมาตย์",
+      "contestantName": "เจษฎาพร ศรีมาตย์",
       "nickname": "ออมสิน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPm7XK3GBPrPoj5mitFuPhsIM-Ro5DWjk2l4zC8YydVisJjER1unaYVitNce0BUZa18n7hmXdnWbwa0DO5CkrWEHvBKBctORALIzEnkkPkRjlQlWlT12sVUEv2s2MySTZFoabz9xfc8nj2U9e-vmHL6=w1101-h1099-s-no-gm",
+      "group": "A",
       "topic": "Command and Conquer: Red Alert",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 2,
         "qa": 0,
@@ -5873,14 +5985,15 @@
       "sum": 42,
       "matchId": "A10",
       "matchday": "Matchday 2",
-      "rank": 46
+      "rank": 47
     },
     {
-      "name": "ณัฐดนัย วงศ์ปัญญา",
+      "contestantName": "ณัฐดนัย วงศ์ปัญญา",
       "nickname": "แฟรงค์",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMKFo_EG_3hY04pei5boOCaAm5MoLVG0354EE_uwQyjkDii9cy6oxbBsEOsOIXphC63oiOfSIdNET2A_-HxnpH636W1IiTOGYbNGg51lGhSsZ00i4u7X-zaUX2QhlfZSAksy6e4g970k_0jUO9VSIVl=w1093-h1092-s-no-gm",
+      "group": "B",
       "topic": "รถไฟไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 7,
         "qa": 20,
@@ -5890,14 +6003,15 @@
       "sum": 42,
       "matchId": "B1",
       "matchday": "Matchday 1",
-      "rank": 46
+      "rank": 47
     },
     {
-      "name": "พศวัต พุ่มเงิน",
+      "contestantName": "พศวัต พุ่มเงิน",
       "nickname": "ปาร์ค",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMwFPheesY-nKVcVpRYTHvCFm_Kvsf2djmqLhSfgE6btw62df02FN84YxvJnUHojPbRuOTYYcL-JEol0ZwrqvhwyENZWRk8KHGxLoZ4byFEbxKy7tYrZhY_9PSnMIxvau4O3_iyy_noIIO24OkcYhQJ=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "HARDCORE TANO*C",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 7,
         "qa": 20,
@@ -5907,14 +6021,15 @@
       "sum": 42,
       "matchId": "B14",
       "matchday": "Matchday 3",
-      "rank": 46
+      "rank": 47
     },
     {
-      "name": "ณชนน ยุงคุณ",
+      "contestantName": "ณชนน ยุงคุณ",
       "nickname": "เจสัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOSfRwKmGHwdQPemYmAyUztPOb_QZCsSc1rYwm9fWUESjcG42qQxj7cRgnPKMV_vZbmyPat7r_vGpKs0M9bgDXYyERBMJALw3cTMUNHRRJP-QF7hjCR_ZfgyFYWlTXEIq9nMBzf-Xxci2lMhlmH1DTq=w1110-h1113-s-no-gm",
-      "topic": "กัปตันสึบาสะ",
-      "set": 1,
+      "group": "A",
+      "topic": "กัปตันซึบาสะ",
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 16,
         "qa": 25,
@@ -5924,14 +6039,15 @@
       "sum": 41,
       "matchId": "A5",
       "matchday": "Matchday 1",
-      "rank": 49
+      "rank": 50
     },
     {
-      "name": "รติพงษ์ กมลเกียรติพัฒน์",
+      "contestantName": "รติพงษ์ กมลเกียรติพัฒน์",
       "nickname": "นิว",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMYZtcBBAeBGcM50DIJ_hTvAne-blauzEryrQWkWweLAOOkqlwvrDmU0FRq_DEXmoE4HqHTiDB1zASFEKzok8vds2h6WvXSpI40ThimweGepynYIIvp4WspiPfVwDRnoFYL-gEOXIhkkZPXO9IKW-Oi=w1108-h1110-s-no-gm",
+      "group": "B",
       "topic": "ตำนานเทพเจ้า",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 10,
         "qa": 0,
@@ -5941,14 +6057,15 @@
       "sum": 40,
       "matchId": "B2",
       "matchday": "Matchday 1",
-      "rank": 50
+      "rank": 51
     },
     {
-      "name": "ณัฐวุฒิ โนรี",
+      "contestantName": "ณัฐวุฒิ โนรี",
       "nickname": "แสตมป์",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
+      "group": "A",
       "topic": "นักแสดง GMMTV",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 10,
         "qa": 20,
@@ -5958,14 +6075,15 @@
       "sum": 40,
       "matchId": "A6",
       "matchday": "Matchday 1",
-      "rank": 50
+      "rank": 51
     },
     {
-      "name": "ฤทธิชัย ภูสิญามณี",
+      "contestantName": "ฤทธิชัย ภูสิญามณี",
       "nickname": "ริท",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPoobelYtJFgLBfwoO4JX5KwnjFgzPl1yDpAcnnTnYawU4qUdoQhegCiT8M_XxF3kUQXYujweANW183NPbe5PR9hK83WFmZgokhpiDlIHBXncUgIYwp6lEKutOIwbIqiEhtY2hc_OMRD4TyMnbIy1XM=w1114-h1110-s-no-gm",
+      "group": "B",
       "topic": "รายการทีวีไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 19,
         "qa": 20,
@@ -5975,14 +6093,15 @@
       "sum": 39,
       "matchId": "B5",
       "matchday": "Matchday 1",
-      "rank": 52
+      "rank": 53
     },
     {
-      "name": "ณัฐภัทร แก้วสินธุ์",
+      "contestantName": "ณัฐภัทร แก้วสินธุ์",
       "nickname": "นที",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOvDbHaUHp5S6iJubpPZzJCkpKXJVjJ7fnMn0YYSeRwWSS36FbDpX9w8eVt3my1wqKrg5utQbSFFVWG4s_hek_Yo8Zff6toTZCc_sp1_l16xArjwOcJHdBOTnjVXIKphWRfbOUlKwhvqYVNANRnnEy1=w1096-h1096-s-no-gm",
+      "group": "A",
       "topic": "Kakao Cookie Run",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 23,
         "qa": 0,
@@ -5992,14 +6111,33 @@
       "sum": 38,
       "matchId": "A11",
       "matchday": "Matchday 2",
-      "rank": 53
+      "rank": 54
     },
     {
-      "name": "ณฤกร วงศ์บูรณะ",
+      "contestantName": "ณัฐวุฒิ โนรี",
+      "nickname": "แสตมป์",
+      "photo": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
+      "group": "A",
+      "topic": "ห้างสรรพสินค้าไทย",
+      "setLabel": "ชุดที่ 1",
+      "scores": {
+        "3sec": 2,
+        "qa": 20,
+        "jigsaw": 15,
+        "attribute": 0
+      },
+      "sum": 37,
+      "matchId": "A19",
+      "matchday": "Matchday 4",
+      "rank": 55
+    },
+    {
+      "contestantName": "ณฤกร วงศ์บูรณะ",
       "nickname": "ตฤณ",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
+      "group": "A",
       "topic": "Marvel Cinematic Universe",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 21,
         "qa": 0,
@@ -6009,14 +6147,15 @@
       "sum": 36,
       "matchId": "A16",
       "matchday": "Matchday 3",
-      "rank": 54
+      "rank": 56
     },
     {
-      "name": "ธีรวีร์ จรูญศรีโชติ",
+      "contestantName": "ธีรวีร์ จรูญศรีโชติ",
       "nickname": "ชีส",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPmtgYHGll5yAE5ULClZmSwDgwHnuzdvUl71F9IXMZNybTjWa1xwW7LNFh6h11HvomGdVBQnpf_YnZhzf68F-1muMGK8_MTSRaQJB2iQORgoblxzGj05Q2IOYH6UT5ZDV9jwL7dzTjhHifPQFZGiccR=w1096-h1103-s-no-gm",
+      "group": "B",
       "topic": "Idolm@ster",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 10,
         "qa": 0,
@@ -6026,14 +6165,15 @@
       "sum": 35,
       "matchId": "B11",
       "matchday": "Matchday 2",
-      "rank": 55
+      "rank": 57
     },
     {
-      "name": "กันตชาติ ศรีเพ็ชร",
+      "contestantName": "กันตชาติ ศรีเพ็ชร",
       "nickname": "กัปตัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczNMZIYoOYw84qTNgPcHiMxBSThspgdh3h8zYV6NlWgTGGT_6A-z3eokutDS0LIHwN5buC_i1B6ZP5tvCEgW8RSvT0v89_HnjdjvAMYwJfrgsKOoBX1_EYS2xt8Xnq_tke4dqtmmHn3Mh-O7F6AWeNWt=w1098-h1101-s-no-gm",
+      "group": "B",
       "topic": "เกาะรัตนโกสินทร์",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 6,
         "qa": 0,
@@ -6043,14 +6183,15 @@
       "sum": 31,
       "matchId": "B8",
       "matchday": "Matchday 2",
-      "rank": 56
+      "rank": 58
     },
     {
-      "name": "สหัสวรรษ นิจพันธ์",
+      "contestantName": "สหัสวรรษ นิจพันธ์",
       "nickname": "พีท",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczNQ8B2o7fdgG-YweA57XLY-mnfrA-3X_lUjgIAeaCBTiegx-ZhBFRhp5zIBZItlakAmAC7a5sla7p5sTkup2h6dxqCOsFMwTPwHgE_OzJ2pK3w58LVT6wj_DHgbXSSh6osp4Jl1gIsMSzHFw48_tetS=w1095-h1098-s-no-gm",
-      "topic": "ประเทศญี่ปุ่น",
-      "set": 1,
+      "group": "A",
+      "topic": "ประเทศญี่ปุ่น",
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 11,
         "qa": 20,
@@ -6060,14 +6201,15 @@
       "sum": 31,
       "matchId": "A4",
       "matchday": "Matchday 1",
-      "rank": 56
+      "rank": 58
     },
     {
-      "name": "ธีรวีร์ จรูญศรีโชติ",
+      "contestantName": "ธีรวีร์ จรูญศรีโชติ",
       "nickname": "ชีส",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPmtgYHGll5yAE5ULClZmSwDgwHnuzdvUl71F9IXMZNybTjWa1xwW7LNFh6h11HvomGdVBQnpf_YnZhzf68F-1muMGK8_MTSRaQJB2iQORgoblxzGj05Q2IOYH6UT5ZDV9jwL7dzTjhHifPQFZGiccR=w1096-h1103-s-no-gm",
+      "group": "B",
       "topic": "Mario Party",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 3,
         "qa": 0,
@@ -6077,14 +6219,15 @@
       "sum": 28,
       "matchId": "B3",
       "matchday": "Matchday 1",
-      "rank": 58
+      "rank": 60
     },
     {
-      "name": "พัทธ์ศีล ปุญศิริ",
+      "contestantName": "พัทธ์ศีล ปุญศิริ",
       "nickname": "ศีล",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczM_hN8XWd9yv9EnS7_ELTNSVFz2dWD6SsNto-pFZE1nfJOUmxT0nfInpXfPLlx9Xe9zHA5zo07vNW09WM9_7l5zNudYVE_ZQoy2FMNm_qA1g0n19JpVLuZMgycHp61xigXt2S0s6ZJlfJJdpdF1DHuN=w1099-h1099-s-no-gm",
+      "group": "A",
       "topic": "เกมโชว์สหรัฐอเมริกา",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 13,
         "qa": 0,
@@ -6094,14 +6237,15 @@
       "sum": 28,
       "matchId": "A6",
       "matchday": "Matchday 1",
-      "rank": 58
+      "rank": 60
     },
     {
-      "name": "ปฏิปัน อัศวภูไชย",
+      "contestantName": "ปฏิปัน อัศวภูไชย",
       "nickname": "ปัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMYJs2gfkpivIlfFh_ogguJ850aCteu5kKVtkB2sKh-XFht5S6AzcTd42JOYXTFCi_-mpl16FpUV2fHvuZlY5J9ENOize1yH06NsdYgjLekboQ--KeSMVnuviGwjLkB5anel5ToX5KKP5d_g6NtvB9I=w1092-h1092-s-no-gm",
+      "group": "B",
       "topic": "ก๊อต จักรพรรณ์",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 13,
         "qa": 0,
@@ -6111,14 +6255,33 @@
       "sum": 28,
       "matchId": "B7",
       "matchday": "Matchday 2",
-      "rank": 58
+      "rank": 60
     },
     {
-      "name": "เชาว์วรรธน์ จันทร์สุข",
+      "contestantName": "ปกรณ์ สถิตอยู่คู่ไทย",
+      "nickname": "แมน",
+      "photo": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+      "group": "A",
+      "topic": "มอเตอร์ไซค์",
+      "setLabel": "ชุดที่ 1",
+      "scores": {
+        "3sec": 8,
+        "qa": 0,
+        "jigsaw": 20,
+        "attribute": 0
+      },
+      "sum": 28,
+      "matchId": "A19",
+      "matchday": "Matchday 4",
+      "rank": 60
+    },
+    {
+      "contestantName": "เชาว์วรรธน์ จันทร์สุข",
       "nickname": "ก๊อง",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO16Pbxv_LOcMn1OGJM6Ha7SWcpEXNeNhMwBNcJaaBSd0D_aWmjLO4S7123_qtY3GkXpgXLV9uWJ_hSyGzu1tK90zh_Q5i-jysqGqRXq7vLTVITDupLrn7Am5HOqWavHUJKvgh1qXD4ctiuDuUNNAY7=w1125-h1125-s-no-gm",
+      "group": "A",
       "topic": "Thai GL Series",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 12,
         "qa": 0,
@@ -6128,14 +6291,33 @@
       "sum": 27,
       "matchId": "A2",
       "matchday": "Matchday 1",
-      "rank": 61
+      "rank": 64
     },
     {
-      "name": "ณัฐดนัย วงศ์ปัญญา",
+      "contestantName": "ณฤกร วงศ์บูรณะ",
+      "nickname": "ตฤณ",
+      "photo": "https://lh3.googleusercontent.com/pw/AP1GczORCIOXiNRwT2Kw6_VzOiB3fVeyOn1YVxtXHbOMcsqRhnES7VNa6cAWZ6K8Sxdzm-Lx3IlpUrMmHBSYXU2FGrA-Gxo6fSl93ZSWlAf3jk6sBcrkUH_SOEjxHY60yptrfTYNVLT35OAO5Fnsd39FMR4M=w1092-h1091-s-no-gm",
+      "group": "A",
+      "topic": "ETC",
+      "setLabel": "ชุดที่ 1",
+      "scores": {
+        "3sec": 17,
+        "qa": 0,
+        "jigsaw": 0,
+        "attribute": 10
+      },
+      "sum": 27,
+      "matchId": "A20",
+      "matchday": "Matchday 4",
+      "rank": 64
+    },
+    {
+      "contestantName": "ณัฐดนัย วงศ์ปัญญา",
       "nickname": "แฟรงค์",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMKFo_EG_3hY04pei5boOCaAm5MoLVG0354EE_uwQyjkDii9cy6oxbBsEOsOIXphC63oiOfSIdNET2A_-HxnpH636W1IiTOGYbNGg51lGhSsZ00i4u7X-zaUX2QhlfZSAksy6e4g970k_0jUO9VSIVl=w1093-h1092-s-no-gm",
+      "group": "B",
       "topic": "มนต์แคน แก่นคูน",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 2,
         "qa": 25,
@@ -6145,14 +6327,15 @@
       "sum": 27,
       "matchId": "B17",
       "matchday": "Matchday 3",
-      "rank": 61
+      "rank": 64
     },
     {
-      "name": "เจษฎาพร ศรีมาตย์",
+      "contestantName": "เจษฎาพร ศรีมาตย์",
       "nickname": "ออมสิน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPm7XK3GBPrPoj5mitFuPhsIM-Ro5DWjk2l4zC8YydVisJjER1unaYVitNce0BUZa18n7hmXdnWbwa0DO5CkrWEHvBKBctORALIzEnkkPkRjlQlWlT12sVUEv2s2MySTZFoabz9xfc8nj2U9e-vmHL6=w1101-h1099-s-no-gm",
+      "group": "A",
       "topic": "BGN Squad",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 12,
         "qa": 15,
@@ -6162,14 +6345,15 @@
       "sum": 27,
       "matchId": "A17",
       "matchday": "Matchday 3",
-      "rank": 61
+      "rank": 64
     },
     {
-      "name": "ณัฐภัทร แก้วสินธุ์",
+      "contestantName": "ณัฐภัทร แก้วสินธุ์",
       "nickname": "นที",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOvDbHaUHp5S6iJubpPZzJCkpKXJVjJ7fnMn0YYSeRwWSS36FbDpX9w8eVt3my1wqKrg5utQbSFFVWG4s_hek_Yo8Zff6toTZCc_sp1_l16xArjwOcJHdBOTnjVXIKphWRfbOUlKwhvqYVNANRnnEy1=w1096-h1096-s-no-gm",
+      "group": "A",
       "topic": "Heliconia Cooking Show",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 20,
         "qa": 0,
@@ -6179,14 +6363,15 @@
       "sum": 20,
       "matchId": "A3",
       "matchday": "Matchday 1",
-      "rank": 64
+      "rank": 68
     },
     {
-      "name": "ณัฐวุฒิ โนรี",
+      "contestantName": "ณัฐวุฒิ โนรี",
       "nickname": "แสตมป์",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO3xt3J-x7bEn55ja3NOi9IivUrBZFuUesd4nx7eR8kUaOBb6fk1FJfl5RNm198DDnQtQomD1o63Y56OUy53SxxuD3VBplBzAIBdj7agOv6ZD_j_bsL4_aIKvKGwmUS_Vg0WVBBTDNjN8yDeRnjkx6V=w1113-h1117-s-no-gm",
+      "group": "A",
       "topic": "Thai BL Series",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 6,
         "qa": 0,
@@ -6196,14 +6381,15 @@
       "sum": 16,
       "matchId": "A14",
       "matchday": "Matchday 3",
-      "rank": 65
+      "rank": 69
     },
     {
-      "name": "ภควัต เลี้ยงอยู่",
+      "contestantName": "ภควัต เลี้ยงอยู่",
       "nickname": "ไผ่",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOZEYRIxluoGWpWlpyhdIGofaZ6exlgo7OcBi8BJR9NeDFTFi-ImTwmaWI0FWrReH-5RisncZ-m7QBfYQtPWFWddOiNatRdCcYfAW-qylv3jhF8nbtX0A8I48zEgj5Dww6znjtkoikD9eViaSnxS3Ke=w1125-h1125-s-no-gm",
+      "group": "B",
       "topic": "หนังไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 15,
         "qa": 0,
@@ -6213,14 +6399,15 @@
       "sum": 15,
       "matchId": "B8",
       "matchday": "Matchday 2",
-      "rank": 66
+      "rank": 70
     },
     {
-      "name": "ศุภกร นิลสุวรรณ",
+      "contestantName": "ศุภกร นิลสุวรรณ",
       "nickname": "หมี",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMSx09lFNStjwGSoBCe1S6CVdaeZAlUgHXFBSRlDhVSsiCd7KFbeerK-dkmZpIsNAlsXBV8mFKlXy5YHrSzjN48auD8etOjURf8YSBq59PPrR52RSIGYdy73YEwuVC8iwrCOihhewJZ14RkWlpnPmfk=w1096-h1097-s-no-gm",
+      "group": "A",
       "topic": "RoV E-Sports",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 9,
         "qa": 0,
@@ -6230,14 +6417,15 @@
       "sum": 14,
       "matchId": "A1",
       "matchday": "Matchday 1",
-      "rank": 67
+      "rank": 71
     },
     {
-      "name": "เชาว์วรรธน์ จันทร์สุข",
+      "contestantName": "เชาว์วรรธน์ จันทร์สุข",
       "nickname": "ก๊อง",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczO16Pbxv_LOcMn1OGJM6Ha7SWcpEXNeNhMwBNcJaaBSd0D_aWmjLO4S7123_qtY3GkXpgXLV9uWJ_hSyGzu1tK90zh_Q5i-jysqGqRXq7vLTVITDupLrn7Am5HOqWavHUJKvgh1qXD4ctiuDuUNNAY7=w1125-h1125-s-no-gm",
+      "group": "A",
       "topic": "48 Group Thailand",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 8,
         "qa": 0,
@@ -6247,14 +6435,15 @@
       "sum": 13,
       "matchId": "A8",
       "matchday": "Matchday 2",
-      "rank": 68
+      "rank": 72
     },
     {
-      "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+      "contestantName": "ปกรณ์ สถิตอยู่คู่ไทย",
       "nickname": "แมน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+      "group": "A",
       "topic": "ละคร Exact / ONE31",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 9,
         "qa": 0,
@@ -6264,14 +6453,15 @@
       "sum": 9,
       "matchId": "A7",
       "matchday": "Matchday 2",
-      "rank": 69
+      "rank": 73
     },
     {
-      "name": "เจษฎาพร ศรีมาตย์",
+      "contestantName": "เจษฎาพร ศรีมาตย์",
       "nickname": "ออมสิน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPm7XK3GBPrPoj5mitFuPhsIM-Ro5DWjk2l4zC8YydVisJjER1unaYVitNce0BUZa18n7hmXdnWbwa0DO5CkrWEHvBKBctORALIzEnkkPkRjlQlWlT12sVUEv2s2MySTZFoabz9xfc8nj2U9e-vmHL6=w1101-h1099-s-no-gm",
+      "group": "A",
       "topic": "Big Ass",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 6,
         "qa": 0,
@@ -6281,14 +6471,15 @@
       "sum": 6,
       "matchId": "A2",
       "matchday": "Matchday 1",
-      "rank": 70
+      "rank": 74
     },
     {
-      "name": "ฤทธิชัย ภูสิญามณี",
+      "contestantName": "ฤทธิชัย ภูสิญามณี",
       "nickname": "ริท",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczPoobelYtJFgLBfwoO4JX5KwnjFgzPl1yDpAcnnTnYawU4qUdoQhegCiT8M_XxF3kUQXYujweANW183NPbe5PR9hK83WFmZgokhpiDlIHBXncUgIYwp6lEKutOIwbIqiEhtY2hc_OMRD4TyMnbIy1XM=w1114-h1110-s-no-gm",
+      "group": "B",
       "topic": "กรุงเทพมหานคร",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 5,
         "qa": 0,
@@ -6298,14 +6489,15 @@
       "sum": 5,
       "matchId": "B9",
       "matchday": "Matchday 2",
-      "rank": 71
+      "rank": 75
     },
     {
-      "name": "ปฏิปัน อัศวภูไชย",
+      "contestantName": "ปฏิปัน อัศวภูไชย",
       "nickname": "ปัน",
       "photo": "https://lh3.googleusercontent.com/pw/AP1GczMYJs2gfkpivIlfFh_ogguJ850aCteu5kKVtkB2sKh-XFht5S6AzcTd42JOYXTFCi_-mpl16FpUV2fHvuZlY5J9ENOize1yH06NsdYgjLekboQ--KeSMVnuviGwjLkB5anel5ToX5KKP5d_g6NtvB9I=w1092-h1092-s-no-gm",
+      "group": "B",
       "topic": "หนังไทย",
-      "set": 1,
+      "setLabel": "ชุดที่ 1",
       "scores": {
         "3sec": 5,
         "qa": 0,
@@ -6315,7 +6507,7 @@
       "sum": 5,
       "matchId": "B14",
       "matchday": "Matchday 3",
-      "rank": 71
+      "rank": 75
     }
   ],
   "checklist": [
@@ -6789,7 +6981,7 @@
       "set2": false
     },
     {
-      "name": "ปฏิป��น อัศวภูไชย",
+      "name": "ปฏิปัน อัศวภูไชย",
       "nickname": "ปัน",
       "topic": "หนังไทย",
       "set1": true,
@@ -6950,7 +7142,7 @@
       "set2": false
     }
   ],
-  "updatedAt": "2026-10-23T20:20:57.928Z",
+  "updatedAt": "2026-11-06T10:13:23.560Z",
   "contestants": [
     {
       "id": "t1",
@@ -7043,7 +7235,7 @@
         }
       ],
       "stats": {
-        "rank": 8,
+        "rank": 9,
         "leaguePoints": 4,
         "win": 1,
         "lose": 1,
@@ -7051,7 +7243,8 @@
         "scoreDiff": "-1",
         "categoriesWon": 6,
         "categoriesLost": 7,
-        "totalScore": 139
+        "totalScore": 139,
+        "played": 3
       }
     },
     {
@@ -7153,7 +7346,8 @@
         "scoreDiff": "-8",
         "categoriesWon": 3,
         "categoriesLost": 11,
-        "totalScore": 75
+        "totalScore": 75,
+        "played": 3
       }
     },
     {
@@ -7247,7 +7441,7 @@
         }
       ],
       "stats": {
-        "rank": 1,
+        "rank": 2,
         "leaguePoints": 12,
         "win": 3,
         "lose": 0,
@@ -7255,7 +7449,8 @@
         "scoreDiff": "+10",
         "categoriesWon": 12,
         "categoriesLost": 2,
-        "totalScore": 167
+        "totalScore": 167,
+        "played": 3
       }
     },
     {
@@ -7331,12 +7526,14 @@
         {
           "topic": "ETC",
           "set1": {
-            "3sec": null,
-            "qa": null,
-            "jigsaw": null,
-            "attribute": null,
-            "sum": 0,
-            "played": false
+            "3sec": 17,
+            "qa": 0,
+            "jigsaw": 0,
+            "attribute": 10,
+            "sum": 27,
+            "played": true,
+            "matchId": "A20",
+            "matchday": "Matchday 4"
           },
           "set2": {
             "3sec": null,
@@ -7349,15 +7546,16 @@
         }
       ],
       "stats": {
-        "rank": 6,
-        "leaguePoints": 5,
+        "rank": 10,
+        "leaguePoints": 4,
         "win": 1,
-        "lose": 1,
+        "lose": 2,
         "draw": 1,
-        "scoreDiff": "0",
+        "scoreDiff": "-5",
         "categoriesWon": 8,
-        "categoriesLost": 8,
-        "totalScore": 154
+        "categoriesLost": 13,
+        "totalScore": 181,
+        "played": 4
       }
     },
     {
@@ -7370,12 +7568,14 @@
         {
           "topic": "Saturday Night Live",
           "set1": {
-            "3sec": null,
-            "qa": null,
-            "jigsaw": null,
-            "attribute": null,
-            "sum": 0,
-            "played": false
+            "3sec": 19,
+            "qa": 25,
+            "jigsaw": 25,
+            "attribute": 15,
+            "sum": 84,
+            "played": true,
+            "matchId": "A20",
+            "matchday": "Matchday 4"
           },
           "set2": {
             "3sec": null,
@@ -7451,15 +7651,16 @@
         }
       ],
       "stats": {
-        "rank": 3,
-        "leaguePoints": 7,
-        "win": 2,
+        "rank": 1,
+        "leaguePoints": 13,
+        "win": 3,
         "lose": 0,
         "draw": 1,
-        "scoreDiff": "+3",
-        "categoriesWon": 8,
+        "scoreDiff": "+8",
+        "categoriesWon": 13,
         "categoriesLost": 5,
-        "totalScore": 154
+        "totalScore": 238,
+        "played": 4
       }
     },
     {
@@ -7514,12 +7715,14 @@
         {
           "topic": "ห้างสรรพสินค้าไทย",
           "set1": {
-            "3sec": null,
-            "qa": null,
-            "jigsaw": null,
-            "attribute": null,
-            "sum": 0,
-            "played": false
+            "3sec": 2,
+            "qa": 20,
+            "jigsaw": 15,
+            "attribute": 0,
+            "sum": 37,
+            "played": true,
+            "matchId": "A19",
+            "matchday": "Matchday 4"
           },
           "set2": {
             "3sec": null,
@@ -7553,15 +7756,16 @@
         }
       ],
       "stats": {
-        "rank": 9,
-        "leaguePoints": 4,
+        "rank": 6,
+        "leaguePoints": 5,
         "win": 1,
         "lose": 1,
-        "draw": 1,
+        "draw": 2,
         "scoreDiff": "-3",
-        "categoriesWon": 6,
-        "categoriesLost": 9,
-        "totalScore": 107
+        "categoriesWon": 8,
+        "categoriesLost": 11,
+        "totalScore": 144,
+        "played": 4
       }
     },
     {
@@ -7595,12 +7799,14 @@
         {
           "topic": "มอเตอร์ไซค์",
           "set1": {
-            "3sec": null,
-            "qa": null,
-            "jigsaw": null,
-            "attribute": null,
-            "sum": 0,
-            "played": false
+            "3sec": 8,
+            "qa": 0,
+            "jigsaw": 20,
+            "attribute": 0,
+            "sum": 28,
+            "played": true,
+            "matchId": "A19",
+            "matchday": "Matchday 4"
           },
           "set2": {
             "3sec": null,
@@ -7655,15 +7861,16 @@
         }
       ],
       "stats": {
-        "rank": 10,
-        "leaguePoints": 3,
+        "rank": 7,
+        "leaguePoints": 4,
         "win": 1,
         "lose": 2,
-        "draw": 0,
+        "draw": 1,
         "scoreDiff": "-1",
-        "categoriesWon": 6,
-        "categoriesLost": 7,
-        "totalScore": 105
+        "categoriesWon": 8,
+        "categoriesLost": 9,
+        "totalScore": 133,
+        "played": 4
       }
     },
     {
@@ -7765,7 +7972,8 @@
         "scoreDiff": "+2",
         "categoriesWon": 8,
         "categoriesLost": 6,
-        "totalScore": 122
+        "totalScore": 122,
+        "played": 3
       }
     },
     {
@@ -7867,7 +8075,8 @@
         "scoreDiff": "+1",
         "categoriesWon": 7,
         "categoriesLost": 6,
-        "totalScore": 118
+        "totalScore": 118,
+        "played": 3
       }
     },
     {
@@ -7961,7 +8170,7 @@
         }
       ],
       "stats": {
-        "rank": 2,
+        "rank": 3,
         "leaguePoints": 8,
         "win": 2,
         "lose": 1,
@@ -7969,7 +8178,8 @@
         "scoreDiff": "+2",
         "categoriesWon": 9,
         "categoriesLost": 7,
-        "totalScore": 140
+        "totalScore": 140,
+        "played": 3
       }
     },
     {
@@ -8071,7 +8281,8 @@
         "scoreDiff": "-4",
         "categoriesWon": 6,
         "categoriesLost": 10,
-        "totalScore": 164
+        "totalScore": 164,
+        "played": 3
       }
     },
     {
@@ -8165,7 +8376,7 @@
         }
       ],
       "stats": {
-        "rank": 7,
+        "rank": 8,
         "leaguePoints": 4,
         "win": 1,
         "lose": 2,
@@ -8173,7 +8384,8 @@
         "scoreDiff": "-1",
         "categoriesWon": 8,
         "categoriesLost": 9,
-        "totalScore": 127
+        "totalScore": 127,
+        "played": 3
       }
     },
     {
@@ -8275,7 +8487,8 @@
         "scoreDiff": "-3",
         "categoriesWon": 6,
         "categoriesLost": 9,
-        "totalScore": 133
+        "totalScore": 133,
+        "played": 3
       }
     },
     {
@@ -8377,7 +8590,8 @@
         "scoreDiff": "+3",
         "categoriesWon": 10,
         "categoriesLost": 7,
-        "totalScore": 174
+        "totalScore": 174,
+        "played": 3
       }
     },
     {
@@ -8479,7 +8693,8 @@
         "scoreDiff": "-6",
         "categoriesWon": 4,
         "categoriesLost": 10,
-        "totalScore": 77
+        "totalScore": 77,
+        "played": 3
       }
     },
     {
@@ -8581,7 +8796,8 @@
         "scoreDiff": "+6",
         "categoriesWon": 11,
         "categoriesLost": 5,
-        "totalScore": 173
+        "totalScore": 173,
+        "played": 3
       }
     },
     {
@@ -8683,7 +8899,8 @@
         "scoreDiff": "-5",
         "categoriesWon": 4,
         "categoriesLost": 9,
-        "totalScore": 119
+        "totalScore": 119,
+        "played": 3
       }
     },
     {
@@ -8785,7 +9002,8 @@
         "scoreDiff": "+7",
         "categoriesWon": 11,
         "categoriesLost": 4,
-        "totalScore": 172
+        "totalScore": 172,
+        "played": 3
       }
     },
     {
@@ -8887,7 +9105,8 @@
         "scoreDiff": "+8",
         "categoriesWon": 12,
         "categoriesLost": 4,
-        "totalScore": 215
+        "totalScore": 215,
+        "played": 3
       }
     },
     {
@@ -8987,9 +9206,10 @@
         "lose": 0,
         "draw": 2,
         "scoreDiff": "+1",
-        "categoriesWon": 5,
-        "categoriesLost": 4,
-        "totalScore": 132
+        "categoriesWon": 6,
+        "categoriesLost": 5,
+        "totalScore": 132,
+        "played": 3
       }
     },
     {
@@ -9091,7 +9311,8 @@
         "scoreDiff": "-7",
         "categoriesWon": 4,
         "categoriesLost": 11,
-        "totalScore": 123
+        "totalScore": 123,
+        "played": 3
       }
     },
     {
@@ -9193,7 +9414,8 @@
         "scoreDiff": "-1",
         "categoriesWon": 5,
         "categoriesLost": 6,
-        "totalScore": 113
+        "totalScore": 113,
+        "played": 3
       }
     },
     {
@@ -9295,7 +9517,8 @@
         "scoreDiff": "-1",
         "categoriesWon": 7,
         "categoriesLost": 8,
-        "totalScore": 159
+        "totalScore": 159,
+        "played": 3
       }
     },
     {
@@ -9395,9 +9618,10 @@
         "lose": 1,
         "draw": 2,
         "scoreDiff": "-2",
-        "categoriesWon": 6,
-        "categoriesLost": 8,
-        "totalScore": 179
+        "categoriesWon": 7,
+        "categoriesLost": 9,
+        "totalScore": 179,
+        "played": 3
       }
     }
   ]

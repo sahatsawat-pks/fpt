@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { getKVData, saveKVData } from "@/lib/kv";
+import { getKVData, saveKVData } from "./kv.js";
 
 const DATA_FILE = path.join(process.cwd(), "src/app/data/tournament.json");
 
@@ -380,15 +380,47 @@ export function syncTournamentData(currentData) {
     });
   });
 
-  // 4. Mirror synced topics back into standings
+  // 4. Mirror synced topics & stats back into standings and contestants
+  const statsLookup = {};
   ["groupA", "groupB"].forEach((grp) => {
     (currentData.standings?.[grp] || []).forEach((c) => {
       const updated = contestantMap[c.name];
       if (updated) {
         c.topics = updated.topics;
       }
+      statsLookup[c.name] = {
+        played: (c.win || 0) + (c.lose || 0) + (c.draw || 0),
+        win: c.win,
+        lose: c.lose,
+        draw: c.draw,
+        categoriesWon: c.categoriesWon,
+        categoriesLost: c.categoriesLost,
+        scoreDiff: c.scoreDiff,
+        leaguePoints: c.leaguePoints,
+        totalScore: c.totalScore,
+        rank: c.rank,
+      };
+      if (c.nickname) {
+        statsLookup[c.nickname] = statsLookup[c.name];
+      }
     });
   });
+
+  if (Array.isArray(currentData.contestants)) {
+    currentData.contestants.forEach((c) => {
+      const updated = contestantMap[c.name] || (c.nickname && contestantMap[c.nickname]);
+      if (updated) {
+        c.topics = updated.topics;
+      }
+      const st = statsLookup[c.name] || (c.nickname && statsLookup[c.nickname]);
+      if (st) {
+        c.stats = {
+          ...(c.stats || {}),
+          ...st,
+        };
+      }
+    });
+  }
 
   // 5. Update topicRankings sorted by sum descending (tie-breakers: attribute, jigsaw, qa, 3sec)
   allTopicPerformances.sort((a, b) => {

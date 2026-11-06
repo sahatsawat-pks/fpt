@@ -56,7 +56,41 @@ export default function TournamentClient({ initialData }) {
   const matchdays = data?.matchdays || [];
   const topicRankings = data?.topicRankings || [];
   const checklist = data?.checklist || [];
-  const contestants = data?.contestants || [];
+
+  // Contestants list with live topics and stats merged from standings
+  const contestants = useMemo(() => {
+    const rawContestants = data?.contestants || [];
+    const standingsList = [...(data?.standings?.groupA || []), ...(data?.standings?.groupB || [])];
+    const standingsMap = new Map();
+    standingsList.forEach((s) => {
+      if (s.name) standingsMap.set(s.name, s);
+      if (s.nickname) standingsMap.set(s.nickname, s);
+    });
+
+    if (rawContestants.length === 0) return standingsList;
+
+    return rawContestants.map((c) => {
+      const st = standingsMap.get(c.name) || (c.nickname ? standingsMap.get(c.nickname) : null);
+      return {
+        ...c,
+        group: c.group || st?.group || "A",
+        stats: {
+          ...(c.stats || {}),
+          leaguePoints: st?.leaguePoints ?? c.stats?.leaguePoints ?? 0,
+          rank: st?.rank ?? c.stats?.rank ?? "-",
+          played: st ? (st.win || 0) + (st.lose || 0) + (st.draw || 0) : (c.stats?.played ?? 0),
+          win: st?.win ?? c.stats?.win ?? 0,
+          lose: st?.lose ?? c.stats?.lose ?? 0,
+          draw: st?.draw ?? c.stats?.draw ?? 0,
+          categoriesWon: st?.categoriesWon ?? c.stats?.categoriesWon ?? 0,
+          categoriesLost: st?.categoriesLost ?? c.stats?.categoriesLost ?? 0,
+          scoreDiff: st?.scoreDiff ?? c.stats?.scoreDiff ?? "0",
+          totalScore: st?.totalScore ?? c.stats?.totalScore ?? 0,
+        },
+        topics: st?.topics && st.topics.length > 0 ? st.topics : c.topics,
+      };
+    });
+  }, [data]);
 
   // Current active matchday object
   const currentMD = useMemo(() => {
