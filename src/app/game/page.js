@@ -286,6 +286,10 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23, act
   const worstCaseRank = 1 + maxPossibleDistinctAbove;
 
   // Elimination check:
+  // ในระบบ Dense Ranking ของเกม แฟนพันธุ์แท้ ยึด 5 อันดับแรก (Top 5 Ranks)
+  // ผู้เล่นที่เล่นครบ 4 หมวดแล้ว (isCompleted) จะตกรอบก็ต่อเมื่ออันดับคะแนนหลุดเกินอันดับ 5 (item.rank > 5) เท่านั้น
+  // ตราบใดที่ยังครองอันดับ 1-5 (เช่น อันดับ 5) จะยังไม่ตกรอบเด็ดขาด และยังคงสถานะ ⏳ รอผล
+  // ส่วนผู้เล่นที่ยังแข่งไม่จบ (!isCompleted) จะตกรอบเมื่อคะแนนสูงสุดที่เป็นไปได้ (maxPossibleScore) มีคะแนนที่การันตีสูงกว่าอย่างน้อย 5 อันดับคะแนน
   const scoreForElimCheck = isCompleted ? currentTotal : maxPossibleScore;
   const compDistinctScoresAboveForElim = Array.from(
     new Set(
@@ -305,15 +309,9 @@ function evaluatePlayerStatus(item, allRankedPlayers, totalContestants = 23, act
     }
   }
 
-  // Count total completed/guaranteed players strictly above scoreForElimCheck
-  const totalPlayersAbove =
-    otherCompletedPlayers.filter((p) => (Number(p.totalScore) || 0) > scoreForElimCheck).length +
-    (activePlayer && String(activePlayer.id) !== String(item.id) && activePlayer.totalScore > scoreForElimCheck ? 1 : 0);
-
-  const isGuaranteedEliminated =
-    guaranteedDistinctAbove >= 5 ||
-    totalPlayersAbove >= 5 ||
-    (isCompleted && item.rank > 5);
+  const isGuaranteedEliminated = isCompleted
+    ? item.rank > 5
+    : guaranteedDistinctAbove >= 5;
 
   let isEliminated = false;
   let isGuaranteedQualified = false;
