@@ -4707,8 +4707,17 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
     }, 20);
   };
 
-  const isVideoSource = (source) => {
-    return /\.(mp4|webm|ogg)$/i.test(source || "");
+  const isVideoSource = (source, question) => {
+    if (Boolean(question?.video && String(question.video).trim() !== "")) return true;
+    const s = String(source || question?.media || "");
+    return /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(s) || /video/i.test(s);
+  };
+
+  const isAudioSource = (source, question) => {
+    if (Boolean(question?.audio && String(question.audio).trim() !== "")) return true;
+    const s = String(source || question?.media || "");
+    if (isVideoSource(source, question)) return false;
+    return /\.(mp3|wav|ogg|m4a|aac|flac)(\?.*)?$/i.test(s) || /audio|sound/i.test(s) || Boolean(s);
   };
 
   const getMediaSource = (question) => {
@@ -4717,9 +4726,9 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
 
   const q = threeSecQuestions[currentQ];
   const mediaSrc = getMediaSource(q);
-  const isVideo = isVideoSource(mediaSrc);
-  const isAudio = Boolean(mediaSrc && !isVideo);
-  const hasImage = Boolean(q?.image && q.image.trim() !== "");
+  const isVideo = isVideoSource(mediaSrc, q);
+  const isAudio = isAudioSource(mediaSrc, q);
+  const hasImage = Boolean(q?.image && String(q.image).trim() !== "");
 
   const handleStartQuestion = () => {
     setRoundActive(true);
@@ -4742,7 +4751,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
     }
 
     const resolved = resolveImagePath(mediaSource, configVersion);
-    const isVideo = isVideoSource(mediaSource);
+    const isVideo = isVideoSource(mediaSource, q);
 
     // เปิดโหมดแสดงพื้นที่คำถามทันทีเพื่อให้ Tag สื่อปรากฏใน DOM ก่อนสั่ง .play()
     setRoundActive(true);
@@ -4983,8 +4992,54 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
       />
 
       <div className="three-sec-main-area" style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-        {hasImage && !isVideo ? (
-          /* เคส 1: คำถามรูปภาพ */
+        {isVideo ? (
+          /* เคส 1: คำถามวิดีโอ (ก่อนกดเริ่มเล่น ยังไม่ต้องขึ้นอะไร พอเริ่มเล่นแสดงวิดีโอ + นาฬิกา 3 วิทางขวา - ไม่มีแถบคำถามรอง) */
+          !roundActive ? (
+            <div style={{ minHeight: "140px", display: "flex", alignItems: "center", justifyContent: "center" }} />
+          ) : (
+            <div style={{ display: "flex", gap: "36px", width: "100%", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+              <div className="video-player-wrapper" style={{ width: "100%", maxWidth: "600px", overflow: "hidden", borderRadius: "12px", background: "#000", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+                <video ref={videoPlayerRef} playsInline controls style={{ width: "100%", maxHeight: "340px", display: "block" }} />
+              </div>
+
+              <div style={{ minWidth: "260px", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+                {!revealOnly && (
+                  <ThreeSecTimerBar
+                    timeLeft={timeLeft}
+                    isRoundCorrect={isRoundCorrect}
+                  />
+                )}
+
+                {answerRevealed && (
+                  <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
+                    margin: 0, padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+                  }}>
+                    <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        ) : isAudio ? (
+          /* เคส 2: คำถามเสียง -> โผล่นาฬิกา 3 วิอยู่ตรงกลางโดด ๆ ไม่มีแถบคำถามรอง */
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", minHeight: "180px", gap: "24px" }}>
+            {!revealOnly && (
+              <ThreeSecTimerBar
+                timeLeft={timeLeft}
+                isRoundCorrect={isRoundCorrect}
+              />
+            )}
+
+            {answerRevealed && (
+              <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
+                margin: 0, padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+              }}>
+                <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
+              </div>
+            )}
+          </div>
+        ) : hasImage ? (
+          /* เคส 3: คำถามรูปภาพ */
           !roundActive ? (
             <div className="three-sec-question-box placeholder-box" style={{
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "220px", width: "100%", maxWidth: "580px", background: "rgba(255, 255, 255, 0.02)", border: "2px dashed rgba(0, 229, 255, 0.25)", borderRadius: "16px", padding: "32px"
@@ -5040,59 +5095,6 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
               </div>
             </div>
           )
-        ) : isVideo ? (
-          /* เคส 2: คำถามวิดีโอ (ก่อนกดเริ่มเล่น ยังไม่ต้องขึ้นกล่องวิดีโอสีดำ) */
-          !roundActive ? (
-            <div className="three-sec-question-box placeholder-box" style={{
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "220px", width: "100%", maxWidth: "580px", background: "rgba(255, 255, 255, 0.02)", border: "2px dashed rgba(0, 229, 255, 0.25)", borderRadius: "16px", padding: "32px"
-            }}>
-              <div style={{ fontSize: "50px", marginBottom: "12px", animation: "pulse-glow 2s infinite" }}>
-                🎬
-              </div>
-              <div style={{ fontSize: "22px", fontWeight: "800", color: "var(--gold-light)" }}>คำถามข้อที่ {qNum}</div>
-            </div>
-          ) : (
-            <div style={{ display: "flex", gap: "36px", width: "100%", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
-              <div className="video-player-wrapper" style={{ width: "100%", maxWidth: "600px", overflow: "hidden", borderRadius: "12px", background: "#000", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
-                <video ref={videoPlayerRef} playsInline controls style={{ width: "100%", maxHeight: "340px", display: "block" }} />
-              </div>
-
-              <div style={{ minWidth: "260px", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
-                {!revealOnly && (
-                  <ThreeSecTimerBar
-                    timeLeft={timeLeft}
-                    isRoundCorrect={isRoundCorrect}
-                  />
-                )}
-
-                {answerRevealed && (
-                  <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                    margin: 0, padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                  }}>
-                    <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        ) : isAudio ? (
-          /* เคส 3: คำถามเสียง -> โผล่นาฬิกาตรงกลางโดด ๆ ไม่มีแถบคำถามรอง */
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", minHeight: "180px", gap: "24px" }}>
-            {!revealOnly && (
-              <ThreeSecTimerBar
-                timeLeft={timeLeft}
-                isRoundCorrect={isRoundCorrect}
-              />
-            )}
-
-            {answerRevealed && (
-              <div className={`host-answer-display-revealed ${isRoundCorrect === true ? "correct" : isRoundCorrect === false ? "wrong" : "skipped"}`} style={{
-                margin: 0, padding: "16px 28px", borderRadius: "var(--radius)", fontSize: "22px", fontWeight: "800", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-              }}>
-                <span className="answer-text" style={{ textDecoration: "underline", color: "var(--gold)" }}>{q?.answer}</span>
-              </div>
-            )}
-          </div>
         ) : (
           /* เคส 4: คำถามข้อความ -> แถบคำถามย่อยทางซ้าย + นาฬิกา 3 วิทางขวา */
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "24px", width: "100%", flexWrap: "wrap" }}>
