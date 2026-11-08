@@ -168,7 +168,9 @@ export default function TournamentClient({ initialData }) {
         if (!latestPenalty) {
           const zero1 = cats.filter((c) => p1?.scores?.[c] !== null && p1?.scores?.[c] !== undefined && Number(p1.scores[c]) === 0).length;
           const zero2 = cats.filter((c) => p2?.scores?.[c] !== null && p2?.scores?.[c] !== undefined && Number(p2.scores[c]) === 0).length;
-          if (m.penalties?.player2 || zero2 >= 3) {
+          const isPen2 = m.penalties?.player2 || (m.status === "completed" && zero2 >= 3 && Number(p2?.categoryPoints || 0) === 0);
+          const isPen1 = m.penalties?.player1 || (m.status === "completed" && zero1 >= 3 && Number(p1?.categoryPoints || 0) === 0);
+          if (isPen2) {
             latestPenalty = {
               name: m.penalties?.player2?.name || (p2.nickname ? `หักค่า${p2.nickname}` : "หักค่าปัน"),
               holderName: p2.name || "ปฏิปัน อัศวภูไชย",
@@ -177,7 +179,7 @@ export default function TournamentClient({ initialData }) {
               matchId: m.id,
               matchdayName: mds[i].name,
             };
-          } else if (m.penalties?.player1 || zero1 >= 3) {
+          } else if (isPen1) {
             latestPenalty = {
               name: m.penalties?.player1?.name || (p1.nickname ? `หักค่า${p1.nickname}` : "หักค่าปัน"),
               holderName: p1.name || "ปฏิปัน อัศวภูไชย",
@@ -956,7 +958,7 @@ export default function TournamentClient({ initialData }) {
               <div style={{ textAlign: "left" }}>
                 <div style={{ fontSize: "11px", color: "rgba(254, 226, 226, 0.8)", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
                   <span>บทลงโทษประจำลีก (-1 LP)</span>
-                  <span style={{ fontSize: "9px", background: "rgba(239,68,68,0.25)", color: "#fca5a5", padding: "1px 5px", borderRadius: "4px" }}>ได้ 0 อย่างน้อย 3 หมวด</span>
+                  <span style={{ fontSize: "9px", background: "rgba(239,68,68,0.25)", color: "#fca5a5", padding: "1px 5px", borderRadius: "4px" }}>ได้ 0 อย่างน้อย 3 หมวดและจบด้วย 0 GP</span>
                 </div>
                 <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
                   <span style={{ color: "#f87171" }}>{currentAwardInfo.penalty.name}</span>{" "}
@@ -2677,8 +2679,8 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
 
   const zero1 = isCompleted ? cats.filter((c) => p1.scores?.[c] !== null && p1.scores?.[c] !== undefined && Number(p1.scores[c]) === 0).length : 0;
   const zero2 = isCompleted ? cats.filter((c) => p2.scores?.[c] !== null && p2.scores?.[c] !== undefined && Number(p2.scores[c]) === 0).length : 0;
-  const hasPenalty1 = match.penalties?.player1 || (isCompleted && zero1 >= 3);
-  const hasPenalty2 = match.penalties?.player2 || (isCompleted && zero2 >= 3);
+  const hasPenalty1 = match.penalties?.player1 || (isCompleted && zero1 >= 3 && Number(p1.categoryPoints || 0) === 0);
+  const hasPenalty2 = match.penalties?.player2 || (isCompleted && zero2 >= 3 && Number(p2.categoryPoints || 0) === 0);
   const penaltyLabel = hasPenalty1
     ? (match.penalties?.player1?.name || (p1.nickname ? `หักค่า${p1.nickname}` : "หักค่าปัน"))
     : hasPenalty2

@@ -91,11 +91,11 @@ export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP 
   const isAward2 = (count25_2 >= 2 && cp2 === 4) || count25_2 >= 3;
 
   // Penalty conditions (หักค่าตามด้วยชื่อเล่น ตอนนี้เป็น "หักค่าปัน"):
-  // ได้คะแนน 0 อย่างน้อย 3 หมวด หัก 1 League Point
+  // ได้คะแนน 0 อย่างน้อย 3 หมวด และจบด้วย 0 Game Point หัก 1 League Point
   const zeroCount_1 = categories.filter((c) => p1Scores?.[c] !== null && p1Scores?.[c] !== undefined && Number(p1Scores[c]) === 0).length;
   const zeroCount_2 = categories.filter((c) => p2Scores?.[c] !== null && p2Scores?.[c] !== undefined && Number(p2Scores[c]) === 0).length;
-  const isPenalty1 = zeroCount_1 >= 3;
-  const isPenalty2 = zeroCount_2 >= 3;
+  const isPenalty1 = zeroCount_1 >= 3 && finalGp1 === 0;
+  const isPenalty2 = zeroCount_2 >= 3 && finalGp2 === 0;
 
   let winner = null;
   let autoLp1 = 0;
@@ -168,8 +168,8 @@ export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP 
       player2: isAward2 ? { name: award2Name, bonus: 1, reason: count25_2 >= 3 ? "ได้ 25 เต็ม 3 หมวด" : "ได้ 25 เต็ม 2 หมวดและชนะ 4 GP ก่อนรวมดิบ" } : null,
     },
     penalties: {
-      player1: isPenalty1 ? { name: penalty1Name, penalty: -1, reason: "ได้ 0 อย่างน้อย 3 หมวด" } : null,
-      player2: isPenalty2 ? { name: penalty2Name, penalty: -1, reason: "ได้ 0 อย่างน้อย 3 หมวด" } : null,
+      player1: isPenalty1 ? { name: penalty1Name, penalty: -1, reason: "ได้ 0 อย่างน้อย 3 หมวดและจบด้วย 0 GP" } : null,
+      player2: isPenalty2 ? { name: penalty2Name, penalty: -1, reason: "ได้ 0 อย่างน้อย 3 หมวดและจบด้วย 0 GP" } : null,
     },
     categoryResults,
   };

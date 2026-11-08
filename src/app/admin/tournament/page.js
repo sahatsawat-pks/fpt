@@ -962,12 +962,12 @@ export default function AdminTournamentPage() {
       }
 
       // 3. เงื่อนไขหักค่า (หักค่าตามด้วยชื่อเล่น ตอนนี้เป็น "หักค่าปัน")
-      // ได้คะแนน 0 อย่างน้อย 3 หมวด หัก 1 League Point
+      // ได้คะแนน 0 อย่างน้อย 3 หมวด และจบด้วย 0 Game Point หัก 1 League Point
       const zeroCount_1 = cats.filter((c) => s1[c] !== null && Number(s1[c]) === 0).length;
       const zeroCount_2 = cats.filter((c) => s2[c] !== null && Number(s2[c]) === 0).length;
 
-      const isPenalty1 = zeroCount_1 >= 3;
-      const isPenalty2 = zeroCount_2 >= 3;
+      const isPenalty1 = zeroCount_1 >= 3 && finalGp1 === 0;
+      const isPenalty2 = zeroCount_2 >= 3 && finalGp2 === 0;
 
       if (isPenalty1) {
         lp1 = (Number(lp1) || 0) - 1;
@@ -975,7 +975,7 @@ export default function AdminTournamentPage() {
         penalties.player1 = {
           name: penaltyName,
           penalty: -1,
-          reason: "ได้ 0 อย่างน้อย 3 หมวด",
+          reason: "ได้ 0 อย่างน้อย 3 หมวดและจบด้วย 0 GP",
         };
       }
 
@@ -985,7 +985,7 @@ export default function AdminTournamentPage() {
         penalties.player2 = {
           name: penaltyName,
           penalty: -1,
-          reason: "ได้ 0 อย่างน้อย 3 หมวด",
+          reason: "ได้ 0 อย่างน้อย 3 หมวดและจบด้วย 0 GP",
         };
       }
     } else if (hasAnyScore) {
