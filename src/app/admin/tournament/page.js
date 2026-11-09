@@ -902,16 +902,14 @@ export default function AdminTournamentPage() {
 
     if (isAll4Completed) {
       // กรอกครบทั้ง 4 หมวดแล้ว:
-      // ถ้าคะแนนหมวด (Game Point) ไม่เสมอ (cp1 !== cp2)
       // ผู้ที่มี "คะแนนรวมดิบ 4 หมวด" สูงกว่า จะได้เพิ่มอีก +1 Game Point!
-      if (cp1 !== cp2) {
-        if (sum1 > sum2) {
-          finalGp1 += 1;
-          rawSumBonusWinner = "player1";
-        } else if (sum2 > sum1) {
-          finalGp2 += 1;
-          rawSumBonusWinner = "player2";
-        }
+      // (ถ้าคะแนนรวมดิบเท่ากัน เช่น 70-70 ใน Matchday 1 คู่ B6 จะไม่มีใครได้ +1 GP รวมดิบ)
+      if (sum1 > sum2) {
+        finalGp1 += 1;
+        rawSumBonusWinner = "player1";
+      } else if (sum2 > sum1) {
+        finalGp2 += 1;
+        rawSumBonusWinner = "player2";
       }
 
       status = explicitStatus || "completed";

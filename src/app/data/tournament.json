@@ -2434,7 +2434,12 @@
             "sum": 46,
             "categoryPoints": 4,
             "leaguePoint": 5
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 0,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "A2",
@@ -2471,7 +2476,12 @@
             "sum": 27,
             "categoryPoints": 3,
             "leaguePoint": 3
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 0,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "A3",
@@ -2508,7 +2518,12 @@
             "sum": 20,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A4",
@@ -2545,7 +2560,12 @@
             "sum": 31,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A5",
@@ -2582,7 +2602,12 @@
             "sum": 41,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A6",
@@ -2619,7 +2644,12 @@
             "sum": 28,
             "categoryPoints": 2,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "B1",
@@ -2656,7 +2686,12 @@
             "sum": 73,
             "categoryPoints": 5,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 1,
+            "player2": 4
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B2",
@@ -2693,7 +2728,12 @@
             "sum": 55,
             "categoryPoints": 3,
             "leaguePoint": 3
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B3",
@@ -2730,7 +2770,12 @@
             "sum": 28,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "B4",
@@ -2767,7 +2812,12 @@
             "sum": 44,
             "categoryPoints": 2,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "B5",
@@ -2804,7 +2854,12 @@
             "sum": 55,
             "categoryPoints": 3,
             "leaguePoint": 3
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B6",
@@ -2841,7 +2896,12 @@
             "sum": 70,
             "categoryPoints": 3,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 3
+          },
+          "rawSumBonusWinner": null
         }
       ]
     },
@@ -2885,7 +2945,12 @@
             "sum": 9,
             "categoryPoints": 0,
             "leaguePoint": -2
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 0
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A8",
@@ -2922,7 +2987,12 @@
             "sum": 13,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A9",
@@ -2959,7 +3029,12 @@
             "sum": 67,
             "categoryPoints": 2,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "A10",
@@ -2996,7 +3071,12 @@
             "sum": 42,
             "categoryPoints": 2,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A11",
@@ -3033,7 +3113,12 @@
             "sum": 38,
             "categoryPoints": 2,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A12",
@@ -3070,7 +3155,12 @@
             "sum": 67,
             "categoryPoints": 3,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B7",
@@ -3107,7 +3197,12 @@
             "sum": 28,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 4,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "B8",
@@ -3144,7 +3239,12 @@
             "sum": 15,
             "categoryPoints": 1,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 1,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "B9",
@@ -3181,7 +3281,12 @@
             "sum": 64,
             "categoryPoints": 4,
             "leaguePoint": 5
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 0,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B10",
@@ -3218,7 +3323,12 @@
             "sum": 70,
             "categoryPoints": 4,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B11",
@@ -3255,7 +3365,12 @@
             "sum": 35,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "B12",
@@ -3292,7 +3407,12 @@
             "sum": 76,
             "categoryPoints": 4,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         }
       ]
     },
@@ -3336,7 +3456,12 @@
             "sum": 51,
             "categoryPoints": 4,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "A14",
@@ -3373,7 +3498,12 @@
             "sum": 57,
             "categoryPoints": 5,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 1,
+            "player2": 4
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "A15",
@@ -3410,7 +3540,12 @@
             "sum": 82,
             "categoryPoints": 4,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "A16",
@@ -3447,7 +3582,12 @@
             "sum": 58,
             "categoryPoints": 4,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 1,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "A17",
@@ -3484,7 +3624,12 @@
             "sum": 27,
             "categoryPoints": 1,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 1
+          },
+          "rawSumBonusWinner": "player1"
         },
         {
           "id": "A18",
@@ -3521,7 +3666,12 @@
             "sum": 50,
             "categoryPoints": 2,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 1
+          },
+          "rawSumBonusWinner": null
         },
         {
           "id": "B13",
@@ -3558,7 +3708,12 @@
             "sum": 57,
             "categoryPoints": 2,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B14",
@@ -3595,7 +3750,12 @@
             "sum": 42,
             "categoryPoints": 4,
             "leaguePoint": 5
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 0,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B15",
@@ -3632,7 +3792,12 @@
             "sum": 75,
             "categoryPoints": 2,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B16",
@@ -3669,7 +3834,12 @@
             "sum": 47,
             "categoryPoints": 2,
             "leaguePoint": 1
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 2,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B17",
@@ -3706,7 +3876,12 @@
             "sum": 48,
             "categoryPoints": 4,
             "leaguePoint": 4
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 1,
+            "player2": 3
+          },
+          "rawSumBonusWinner": "player2"
         },
         {
           "id": "B18",
@@ -3743,7 +3918,12 @@
             "sum": 60,
             "categoryPoints": 2,
             "leaguePoint": 0
-          }
+          },
+          "categoryPointsBeforeBonus": {
+            "player1": 3,
+            "player2": 2
+          },
+          "rawSumBonusWinner": "player1"
         }
       ]
     },

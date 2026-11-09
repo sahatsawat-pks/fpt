@@ -69,15 +69,14 @@ export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP 
   let finalGp2 = cp2;
   let rawSumBonusWinner = null;
 
-  // Raw sum bonus: If cp1 !== cp2, player with higher raw sum gets +1 GP
-  if (cp1 !== cp2) {
-    if (sum1 > sum2) {
-      finalGp1 += 1;
-      rawSumBonusWinner = "player1";
-    } else if (sum2 > sum1) {
-      finalGp2 += 1;
-      rawSumBonusWinner = "player2";
-    }
+  // Raw sum bonus: Whoever has higher raw sum gets +1 GP!
+  // Unless raw sums are equal (like 70 vs 70 in Matchday 1 B6)
+  if (sum1 > sum2) {
+    finalGp1 += 1;
+    rawSumBonusWinner = "player1";
+  } else if (sum2 > sum1) {
+    finalGp2 += 1;
+    rawSumBonusWinner = "player2";
   }
 
   // Count 25s
