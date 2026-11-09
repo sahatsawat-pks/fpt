@@ -29,7 +29,15 @@ export function writeTournamentData(data) {
 }
 
 // Calculate match category points & winner
-export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP = null, p1Nickname = "", p2Nickname = "") {
+export function evaluateMatch(
+  p1Scores,
+  p2Scores,
+  manualP1LP = null,
+  manualP2LP = null,
+  p1Nickname = "",
+  p2Nickname = "",
+  matchdayId = "md1"
+) {
   const categories = ["3sec", "qa", "jigsaw", "attribute"];
   let cp1 = 0;
   let cp2 = 0;
@@ -69,14 +77,34 @@ export function evaluateMatch(p1Scores, p2Scores, manualP1LP = null, manualP2LP 
   let finalGp2 = cp2;
   let rawSumBonusWinner = null;
 
-  // Raw sum bonus: Whoever has higher raw sum gets +1 GP!
-  // Unless raw sums are equal (like 70 vs 70 in Matchday 1 B6)
-  if (sum1 > sum2) {
-    finalGp1 += 1;
-    rawSumBonusWinner = "player1";
-  } else if (sum2 > sum1) {
-    finalGp2 += 1;
-    rawSumBonusWinner = "player2";
+  // กติกาแต้มดิบรวม (Raw Sum Bonus):
+  // 1. ใน Matchday 1: แม้แต้มหมวดเสมอกัน (cp1 === cp2) ก็ยังคิดแต้มดิบรวม (+1 GP ให้คนที่คะแนนรวมดิบมากกว่า)
+  //    (ยกเว้นคู่ B6 ที่คะแนนดิบรวมเท่ากัน 70-70 พอดี จึงไม่มีใครได้แต้มดิบ)
+  // 2. ตั้งแต่ Matchday 2 เป็นต้นไป:
+  //    - ถ้าแต้มหมวดเสมอกัน (cp1 === cp2) -> ตัดจบ ไม่คิดคะแนนรวมดิบ ถือว่าเสมอทันที (Draw 1 LP each)
+  //    - ถ้าแต้มหมวดไม่เสมอกัน (cp1 !== cp2) -> คนที่คะแนนรวมดิบมากกว่า จะได้ +1 GP จากคะแนนรวมดิบ
+  const mdStr = String(matchdayId || "").toLowerCase();
+  const isMatchday1 = mdStr === "md1" || mdStr === "1" || mdStr.includes("matchday 1");
+
+  if (isMatchday1) {
+    if (sum1 > sum2) {
+      finalGp1 += 1;
+      rawSumBonusWinner = "player1";
+    } else if (sum2 > sum1) {
+      finalGp2 += 1;
+      rawSumBonusWinner = "player2";
+    }
+  } else {
+    // Matchday 2+: ถ้า game point เสมอกัน ตัดจบ ไม่คิดคะแนนรวมเลย ถือว่าเสมอทันที
+    if (cp1 !== cp2) {
+      if (sum1 > sum2) {
+        finalGp1 += 1;
+        rawSumBonusWinner = "player1";
+      } else if (sum2 > sum1) {
+        finalGp2 += 1;
+        rawSumBonusWinner = "player2";
+      }
+    }
   }
 
   // Count 25s

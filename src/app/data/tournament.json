@@ -3034,7 +3034,7 @@
             "player1": 2,
             "player2": 2
           },
-          "rawSumBonusWinner": "player2"
+          "rawSumBonusWinner": null
         },
         {
           "id": "A10",
@@ -3118,7 +3118,7 @@
             "player1": 2,
             "player2": 2
           },
-          "rawSumBonusWinner": "player1"
+          "rawSumBonusWinner": null
         },
         {
           "id": "A12",
@@ -3244,7 +3244,7 @@
             "player1": 1,
             "player2": 1
           },
-          "rawSumBonusWinner": "player1"
+          "rawSumBonusWinner": null
         },
         {
           "id": "B9",
@@ -3713,7 +3713,7 @@
             "player1": 2,
             "player2": 2
           },
-          "rawSumBonusWinner": "player2"
+          "rawSumBonusWinner": null
         },
         {
           "id": "B14",
@@ -3797,7 +3797,7 @@
             "player1": 2,
             "player2": 2
           },
-          "rawSumBonusWinner": "player2"
+          "rawSumBonusWinner": null
         },
         {
           "id": "B16",
@@ -3839,7 +3839,7 @@
             "player1": 2,
             "player2": 2
           },
-          "rawSumBonusWinner": "player2"
+          "rawSumBonusWinner": null
         },
         {
           "id": "B17",

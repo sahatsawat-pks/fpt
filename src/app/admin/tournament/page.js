@@ -900,16 +900,35 @@ export default function AdminTournamentPage() {
     let awards = { player1: null, player2: null };
     let penalties = { player1: null, player2: null };
 
+    const mdStr = String(currentFormData?.matchdayId || selectedMatchday || "").toLowerCase();
+    const isMatchday1 = mdStr === "md1" || mdStr === "1" || mdStr.includes("matchday 1");
+
     if (isAll4Completed) {
       // กรอกครบทั้ง 4 หมวดแล้ว:
-      // ผู้ที่มี "คะแนนรวมดิบ 4 หมวด" สูงกว่า จะได้เพิ่มอีก +1 Game Point!
-      // (ถ้าคะแนนรวมดิบเท่ากัน เช่น 70-70 ใน Matchday 1 คู่ B6 จะไม่มีใครได้ +1 GP รวมดิบ)
-      if (sum1 > sum2) {
-        finalGp1 += 1;
-        rawSumBonusWinner = "player1";
-      } else if (sum2 > sum1) {
-        finalGp2 += 1;
-        rawSumBonusWinner = "player2";
+      // 1. เฉพาะใน Matchday 1: แม้แต้มหมวดเสมอกัน (cp1 === cp2) ก็ยังคิดแต้มดิบรวม (+1 GP แก่คนที่คะแนนรวมดิบมากกว่า)
+      //    (ยกเว้นคู่ B6 ที่คะแนนดิบรวมเท่ากัน 70-70 พอดี จึงไม่มีใครได้แต้มดิบ)
+      // 2. ตั้งแต่ Matchday 2 เป็นต้นไป:
+      //    - ถ้าแต้มหมวดเสมอกัน (cp1 === cp2) -> ตัดจบ ไม่คิดคะแนนรวมดิบ ถือว่าเสมอทันที
+      //    - ถ้าแต้มหมวดไม่เสมอกัน (cp1 !== cp2) -> คนที่คะแนนรวมดิบมากกว่า จะได้ +1 GP จากคะแนนรวมดิบ
+      if (isMatchday1) {
+        if (sum1 > sum2) {
+          finalGp1 += 1;
+          rawSumBonusWinner = "player1";
+        } else if (sum2 > sum1) {
+          finalGp2 += 1;
+          rawSumBonusWinner = "player2";
+        }
+      } else {
+        // Matchday 2+: ถ้า game point เสมอกัน ตัดจบ ไม่คิดคะแนนรวมเลย ถือว่าเสมอทันที
+        if (cp1 !== cp2) {
+          if (sum1 > sum2) {
+            finalGp1 += 1;
+            rawSumBonusWinner = "player1";
+          } else if (sum2 > sum1) {
+            finalGp2 += 1;
+            rawSumBonusWinner = "player2";
+          }
+        }
       }
 
       status = explicitStatus || "completed";
