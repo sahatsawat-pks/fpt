@@ -900,8 +900,13 @@ export default function AdminTournamentPage() {
     let awards = { player1: null, player2: null };
     let penalties = { player1: null, player2: null };
 
-    const mdStr = String(currentFormData?.matchdayId || selectedMatchday || "").toLowerCase();
-    const isMatchday1 = mdStr === "md1" || mdStr === "1" || mdStr.includes("matchday 1");
+    const extractMdNumber = (str) => {
+      const m = String(str || "").match(/(?:md|matchday\s*)(\d+)/i);
+      return m ? parseInt(m[1], 10) : 1;
+    };
+    const mdNum = extractMdNumber(currentFormData?.matchdayId || selectedMatchday || "md1");
+    const isMatchday1 = mdNum === 1;
+    const isMatchday4Plus = mdNum >= 4;
 
     if (isAll4Completed) {
       // กรอกครบทั้ง 4 หมวดแล้ว:
@@ -910,6 +915,9 @@ export default function AdminTournamentPage() {
       // 2. ตั้งแต่ Matchday 2 เป็นต้นไป:
       //    - ถ้าแต้มหมวดเสมอกัน (cp1 === cp2) -> ตัดจบ ไม่คิดคะแนนรวมดิบ ถือว่าเสมอทันที
       //    - ถ้าแต้มหมวดไม่เสมอกัน (cp1 !== cp2) -> คนที่คะแนนรวมดิบมากกว่า จะได้ +1 GP จากคะแนนรวมดิบ
+      // 3. แต้มฐานผู้แพ้ (-1 LP):
+      //    - Matchday 1-3: โดนแต้มฐาน -1 เมื่อแพ้ 4:0 หรือ 5:0
+      //    - Matchday 4 เป็นต้นไป: โดนแต้มฐาน -1 เมื่อแพ้ 5:0 เท่านั้น (ถ้าแพ้ 4:0 ได้ 0 LP)
       if (isMatchday1) {
         if (sum1 > sum2) {
           finalGp1 += 1;
@@ -936,14 +944,14 @@ export default function AdminTournamentPage() {
       // 1. Base League Points (LP)
       if (finalGp1 > finalGp2) {
         winner = "player1";
-        if (finalGp1 >= 4 && finalGp2 === 0) {
+        if (finalGp1 >= 5 && finalGp2 === 0) {
           lp1 = 5;
           lp2 = -1;
+        } else if (finalGp1 === 4 && finalGp2 === 0) {
+          lp1 = 4;
+          lp2 = isMatchday4Plus ? 0 : -1;
         } else if (finalGp1 >= 4) {
           lp1 = 4;
-          lp2 = 0;
-        } else if (finalGp1 === 3 && finalGp2 === 0) {
-          lp1 = 3;
           lp2 = 0;
         } else {
           lp1 = 3;
@@ -951,14 +959,14 @@ export default function AdminTournamentPage() {
         }
       } else if (finalGp2 > finalGp1) {
         winner = "player2";
-        if (finalGp2 >= 4 && finalGp1 === 0) {
+        if (finalGp2 >= 5 && finalGp1 === 0) {
           lp2 = 5;
           lp1 = -1;
+        } else if (finalGp2 === 4 && finalGp1 === 0) {
+          lp2 = 4;
+          lp1 = isMatchday4Plus ? 0 : -1;
         } else if (finalGp2 >= 4) {
           lp2 = 4;
-          lp1 = 0;
-        } else if (finalGp2 === 3 && finalGp1 === 0) {
-          lp2 = 3;
           lp1 = 0;
         } else {
           lp2 = 3;

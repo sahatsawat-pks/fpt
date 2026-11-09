@@ -77,14 +77,22 @@ export function evaluateMatch(
   let finalGp2 = cp2;
   let rawSumBonusWinner = null;
 
-  // กติกาแต้มดิบรวม (Raw Sum Bonus):
+  // กติกาแต้มดิบรวม (Raw Sum Bonus) และการตัดแต้ม:
   // 1. ใน Matchday 1: แม้แต้มหมวดเสมอกัน (cp1 === cp2) ก็ยังคิดแต้มดิบรวม (+1 GP ให้คนที่คะแนนรวมดิบมากกว่า)
   //    (ยกเว้นคู่ B6 ที่คะแนนดิบรวมเท่ากัน 70-70 พอดี จึงไม่มีใครได้แต้มดิบ)
   // 2. ตั้งแต่ Matchday 2 เป็นต้นไป:
   //    - ถ้าแต้มหมวดเสมอกัน (cp1 === cp2) -> ตัดจบ ไม่คิดคะแนนรวมดิบ ถือว่าเสมอทันที (Draw 1 LP each)
   //    - ถ้าแต้มหมวดไม่เสมอกัน (cp1 !== cp2) -> คนที่คะแนนรวมดิบมากกว่า จะได้ +1 GP จากคะแนนรวมดิบ
-  const mdStr = String(matchdayId || "").toLowerCase();
-  const isMatchday1 = mdStr === "md1" || mdStr === "1" || mdStr.includes("matchday 1");
+  // 3. แต้มฐานผู้แพ้ (-1 LP):
+  //    - Matchday 1-3: โดนแต้มฐาน -1 เมื่อแพ้ 4:0 หรือ 5:0
+  //    - Matchday 4 เป็นต้นไป: โดนแต้มฐาน -1 เมื่อแพ้ 5:0 เท่านั้น (ถ้าแพ้ 4:0 ได้ 0 LP)
+  const extractMdNumber = (str) => {
+    const m = String(str || "").match(/(?:md|matchday\s*)(\d+)/i);
+    return m ? parseInt(m[1], 10) : 1;
+  };
+  const mdNum = extractMdNumber(matchdayId || "md1");
+  const isMatchday1 = mdNum === 1;
+  const isMatchday4Plus = mdNum >= 4;
 
   if (isMatchday1) {
     if (sum1 > sum2) {
@@ -130,14 +138,14 @@ export function evaluateMatch(
 
   if (finalGp1 > finalGp2) {
     winner = "player1";
-    if (finalGp1 >= 4 && finalGp2 === 0) {
+    if (finalGp1 >= 5 && finalGp2 === 0) {
       autoLp1 = 5;
       autoLp2 = -1;
+    } else if (finalGp1 === 4 && finalGp2 === 0) {
+      autoLp1 = 4;
+      autoLp2 = isMatchday4Plus ? 0 : -1;
     } else if (finalGp1 >= 4) {
       autoLp1 = 4;
-      autoLp2 = 0;
-    } else if (finalGp1 === 3 && finalGp2 === 0) {
-      autoLp1 = 3;
       autoLp2 = 0;
     } else {
       autoLp1 = 3;
@@ -145,14 +153,14 @@ export function evaluateMatch(
     }
   } else if (finalGp2 > finalGp1) {
     winner = "player2";
-    if (finalGp2 >= 4 && finalGp1 === 0) {
+    if (finalGp2 >= 5 && finalGp1 === 0) {
       autoLp2 = 5;
       autoLp1 = -1;
+    } else if (finalGp2 === 4 && finalGp1 === 0) {
+      autoLp2 = 4;
+      autoLp1 = isMatchday4Plus ? 0 : -1;
     } else if (finalGp2 >= 4) {
       autoLp2 = 4;
-      autoLp1 = 0;
-    } else if (finalGp2 === 3 && finalGp1 === 0) {
-      autoLp2 = 3;
       autoLp1 = 0;
     } else {
       autoLp2 = 3;
