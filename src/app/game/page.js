@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, Fragment } from "react";
 import GAME_CONFIG from "../config";
 import contestantPhotos from "../data/contestant_photos.json";
 import {
@@ -5007,7 +5007,7 @@ function RankClimbAnimationModal({
               const isCutoffLine = idx > 0 && currentList[idx - 1].rank <= 5 && p.rank > 5;
 
               return (
-                <React.Fragment key={rowKey}>
+                <Fragment key={rowKey}>
                   {isCutoffLine && (
                     <div
                       style={{
@@ -5085,7 +5085,7 @@ function RankClimbAnimationModal({
                       <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>คะแนน</span>
                     </div>
                   </div>
-                </React.Fragment>
+                </Fragment>
               );
             })}
           </div>
