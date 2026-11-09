@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import defaultTournamentData from "@/app/data/tournament.json";
+import heroContestantsData from "@/app/data/heroContestants.json";
 
 function getOptimizedAvatarUrl(url, size = 120) {
   if (!url || typeof url !== "string") return "";
@@ -46,6 +47,10 @@ export default function TournamentClient({ initialData }) {
   const [replayMatchdayFilter, setReplayMatchdayFilter] = useState("all");
   const [replayGroupFilter, setReplayGroupFilter] = useState("all");
   const [replaySearch, setReplaySearch] = useState("");
+
+  // Live Match States
+  const [selectedLiveIndex, setSelectedLiveIndex] = useState(0);
+  const [showLiveBanner, setShowLiveBanner] = useState(true);
 
   // Fetch latest data from API if initialData was not provided
   useEffect(() => {
@@ -110,6 +115,56 @@ export default function TournamentClient({ initialData }) {
   const currentMD = useMemo(() => {
     return matchdays.find((m) => m.id === selectedMatchday) || matchdays[0];
   }, [matchdays, selectedMatchday]);
+
+  // All In-Progress (Live) Matches across all matchdays
+  const liveMatches = useMemo(() => {
+    const list = [];
+    (data?.matchdays || []).forEach((md) => {
+      (md.matches || []).forEach((m) => {
+        if (m.status === "in_progress") {
+          list.push({
+            ...m,
+            matchdayId: md.id,
+            matchdayName: md.name,
+          });
+        }
+      });
+    });
+    return list;
+  }, [data?.matchdays]);
+
+  const currentLiveMatch = liveMatches.length > 0 ? (liveMatches[selectedLiveIndex] || liveMatches[0]) : null;
+
+  // Resolve Player Photo (player.photo -> contestants photo/image -> heroContestants.json Google Photo)
+  const getPlayerPhoto = (player) => {
+    if (!player) return "";
+    if (player.photo && String(player.photo).trim()) {
+      return player.photo;
+    }
+    const cleanName = (player.name || "").trim().toLowerCase();
+    const cleanNick = (player.nickname || "").trim().toLowerCase();
+
+    // 1. Check in contestants list
+    const found = contestants.find((c) => {
+      const cName = (c.name || "").trim().toLowerCase();
+      const cNick = (c.nickname || "").trim().toLowerCase();
+      return (cleanName && (cName === cleanName || cName.includes(cleanName) || cleanName.includes(cName))) ||
+             (cleanNick && (cNick === cleanNick || cNick.includes(cleanNick)));
+    });
+    if (found?.photo && String(found.photo).trim()) return found.photo;
+    if (found?.image && String(found.image).trim()) return found.image;
+
+    // 2. Check in heroContestantsData (official Google Photos ชูนิ้ว)
+    const heroFound = (heroContestantsData || []).find((h) => {
+      const hName = (h.name || "").trim().toLowerCase();
+      const hNick = (h.nickname || "").trim().toLowerCase();
+      return (cleanName && (hName === cleanName || hName.includes(cleanName) || cleanName.includes(hName))) ||
+             (cleanNick && (hNick === cleanNick || hNick.includes(cleanNick)));
+    });
+    if (heroFound?.image && String(heroFound.image).trim()) return heroFound.image;
+
+    return "";
+  };
 
   // 6 columns of contestant photos for the hero background wall (matching main page)
   const heroColumns = useMemo(() => {
@@ -861,189 +916,727 @@ export default function TournamentClient({ initialData }) {
           }}
         />
 
-        <div style={{ position: "relative", zIndex: 10, maxWidth: "1100px", width: "100%", textAlign: "center" }}>
-          {/* Official Tournament Logo Emblem */}
-          <div style={{ maxWidth: "420px", width: "85%", margin: "0 auto 18px" }}>
-            <img
-              src="/img/tournament_logo_cropped.png"
-              alt="FANPANTAE TOURNAMENT 2026/27"
+        {currentLiveMatch && showLiveBanner ? (
+          /* ========================================================
+             1. LIVE MATCH BANNER (Active when a match is in_progress)
+             ======================================================== */
+          <div style={{ position: "relative", zIndex: 10, maxWidth: "1120px", width: "100%", margin: "0 auto" }}>
+            {/* Multi-live Matches Switcher Pills (If more than 1 match is live) */}
+            {liveMatches.length > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
+                {liveMatches.map((lm, idx) => (
+                  <button
+                    key={lm.id}
+                    type="button"
+                    onClick={() => setSelectedLiveIndex(idx)}
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: "20px",
+                      background: selectedLiveIndex === idx ? "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)" : "rgba(255,255,255,0.08)",
+                      border: selectedLiveIndex === idx ? "1.5px solid #ff4d4f" : "1px solid rgba(255,255,255,0.15)",
+                      color: "#ffffff",
+                      fontSize: "12px",
+                      fontWeight: "800",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: selectedLiveIndex === idx ? "0 0 15px rgba(239, 68, 68, 0.5)" : "none",
+                    }}
+                  >
+                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444", display: "inline-block", animation: "heroGlowPulse 1.2s infinite" }} />
+                    <span>{lm.matchdayName || "Matchday"} • คู่ที่ {lm.id} ({lm.group})</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Main Live Card HUD */}
+            <div
               style={{
+                position: "relative",
                 width: "100%",
-                height: "auto",
-                objectFit: "contain",
-                filter: "drop-shadow(0 0 25px rgba(0, 229, 255, 0.75)) drop-shadow(0 0 50px rgba(0, 119, 182, 0.4))",
+                padding: "clamp(20px, 3vw, 32px) clamp(16px, 2.5vw, 28px)",
+                borderRadius: "24px",
+                background: "linear-gradient(150deg, rgba(8, 22, 50, 0.94) 0%, rgba(3, 10, 24, 0.98) 100%)",
+                border: "2px solid rgba(0, 229, 255, 0.55)",
+                boxShadow: "0 0 45px rgba(0, 229, 255, 0.22), 0 20px 60px rgba(0, 0, 0, 0.85)",
+                backdropFilter: "blur(14px)",
+                boxSizing: "border-box",
+                overflow: "hidden",
+              }}
+            >
+              {/* Top Accent Light Bar */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: "420px",
+                  maxWidth: "90%",
+                  height: "3px",
+                  background: "linear-gradient(90deg, transparent, #ef4444 20%, #00e5ff 80%, transparent)",
+                }}
+              />
+
+              {/* Match Header Bar: LIVE Indicator + Matchday + Match Code */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                  marginBottom: "24px",
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                  paddingBottom: "14px",
+                }}
+              >
+                {/* Left: LIVE Pulse Pill */}
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "5px 14px",
+                    borderRadius: "20px",
+                    background: "rgba(239, 68, 68, 0.18)",
+                    border: "1.5px solid #ef4444",
+                    color: "#ffffff",
+                    fontSize: "12px",
+                    fontWeight: "900",
+                    letterSpacing: "0.5px",
+                    boxShadow: "0 0 16px rgba(239, 68, 68, 0.4)",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: "#ef4444",
+                      boxShadow: "0 0 8px #ef4444",
+                      animation: "heroGlowPulse 1.2s infinite",
+                    }}
+                  />
+                  <span>LIVE MATCH • กำลังแข่งขันสด</span>
+                </div>
+
+                {/* Center / Right: Matchday & Match ID */}
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      padding: "4px 12px",
+                      borderRadius: "6px",
+                      background: "rgba(0, 229, 255, 0.15)",
+                      border: "1px solid rgba(0, 229, 255, 0.35)",
+                      color: "#00e5ff",
+                      fontSize: "12px",
+                      fontWeight: "800",
+                    }}
+                  >
+                    📅 {currentLiveMatch.matchdayName || "MATCHDAY"}
+                  </span>
+                  <span
+                    style={{
+                      padding: "4px 12px",
+                      borderRadius: "6px",
+                      background: currentLiveMatch.group === "A" ? "#00e5ff" : "#ffd700",
+                      color: "#030814",
+                      fontSize: "12px",
+                      fontWeight: "900",
+                    }}
+                  >
+                    คู่ที่ {currentLiveMatch.id} (กลุ่ม {currentLiveMatch.group})
+                  </span>
+                </div>
+              </div>
+
+              {/* 3-Part Arena Layout: Player 1 | Logo & VS & Score | Player 2 */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                  alignItems: "center",
+                  gap: "24px",
+                }}
+              >
+                {/* PLAYER 1 CARD */}
+                <div
+                  onClick={() => onSelectContestant(currentLiveMatch.player1?.name)}
+                  title="คลิกเพื่อดูโปรไฟล์ผู้เข้าแข่งขัน"
+                  style={{
+                    cursor: "pointer",
+                    padding: "20px 18px",
+                    borderRadius: "18px",
+                    background: "linear-gradient(135deg, rgba(0, 119, 182, 0.18) 0%, rgba(6, 16, 36, 0.85) 100%)",
+                    border: "1.5px solid rgba(0, 229, 255, 0.45)",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 12px 30px rgba(0, 229, 255, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.4)";
+                  }}
+                >
+                  {/* Avatar */}
+                  <div
+                    style={{
+                      width: "116px",
+                      height: "116px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      border: "3px solid #00e5ff",
+                      boxShadow: "0 0 24px rgba(0, 229, 255, 0.5)",
+                      marginBottom: "12px",
+                      background: "#030a18",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <img
+                      src={getOptimizedAvatarUrl(getPlayerPhoto(currentLiveMatch.player1), 240)}
+                      alt={currentLiveMatch.player1?.name}
+                      referrerPolicy="no-referrer"
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                  </div>
+
+                  {/* Name & Nickname */}
+                  <div style={{ fontSize: "19px", fontWeight: "900", color: "#ffffff", lineHeight: "1.3" }}>
+                    {currentLiveMatch.player1?.nickname ? (
+                      <>
+                        <span style={{ color: "#00e5ff" }}>({currentLiveMatch.player1.nickname})</span>{" "}
+                        {currentLiveMatch.player1.name}
+                      </>
+                    ) : (
+                      currentLiveMatch.player1?.name
+                    )}
+                  </div>
+
+                  {/* Topic Pill */}
+                  <div
+                    style={{
+                      marginTop: "10px",
+                      padding: "6px 14px",
+                      borderRadius: "20px",
+                      background: "rgba(0, 229, 255, 0.15)",
+                      border: "1px solid rgba(0, 229, 255, 0.4)",
+                      color: "#e0f2fe",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      maxWidth: "100%",
+                    }}
+                  >
+                    <span>🎯</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {currentLiveMatch.player1?.topic || "ไม่ระบุหัวข้อ"}
+                    </span>
+                  </div>
+
+                  {/* Score Info */}
+                  <div style={{ marginTop: "12px", display: "flex", gap: "12px", alignItems: "center", fontSize: "12px" }}>
+                    <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                      คะแนนหมวด: <strong style={{ color: "#00e5ff", fontSize: "15px" }}>{currentLiveMatch.player1?.categoryPoints ?? 0} GP</strong>
+                    </span>
+                    <span style={{ color: "rgba(255,255,255,0.3)" }}>|</span>
+                    <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                      ดิบ: <strong style={{ color: "#ffffff", fontSize: "14px" }}>{currentLiveMatch.player1?.sum ?? 0}</strong>
+                    </span>
+                  </div>
+                </div>
+
+                {/* CENTER CLASH: Logo + VS + Game Points */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    gap: "10px",
+                    padding: "8px 0",
+                  }}
+                >
+                  {/* Tournament Logo */}
+                  <div style={{ maxWidth: "240px", width: "80%", marginBottom: "4px" }}>
+                    <img
+                      src="/img/tournament_logo_cropped.png"
+                      alt="FANPANTAE TOURNAMENT"
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        objectFit: "contain",
+                        filter: "drop-shadow(0 0 20px rgba(0, 229, 255, 0.6))",
+                      }}
+                    />
+                  </div>
+
+                  {/* Big Metallic VS */}
+                  <div
+                    style={{
+                      fontSize: "clamp(38px, 6vw, 56px)",
+                      fontWeight: "900",
+                      letterSpacing: "2px",
+                      background: "linear-gradient(180deg, #ffffff 0%, #ffd700 50%, #f59e0b 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      filter: "drop-shadow(0 0 20px rgba(255, 215, 0, 0.6)) drop-shadow(0 4px 10px rgba(0,0,0,0.8))",
+                      fontFamily: "var(--font-num, sans-serif)",
+                      lineHeight: "1",
+                    }}
+                  >
+                    VS
+                  </div>
+
+                  {/* Live Game Points Comparison Badge */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "14px",
+                      padding: "8px 20px",
+                      borderRadius: "14px",
+                      background: "rgba(3, 10, 24, 0.85)",
+                      border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                    }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>GP</div>
+                      <div style={{ fontSize: "22px", fontWeight: "900", color: "#00e5ff", fontFamily: "var(--font-num)" }}>
+                        {currentLiveMatch.player1?.categoryPoints ?? 0}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "16px", color: "rgba(255,255,255,0.4)", fontWeight: "900" }}>:</span>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>GP</div>
+                      <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>
+                        {currentLiveMatch.player2?.categoryPoints ?? 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center", marginTop: "4px" }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab("matches");
+                        if (currentLiveMatch.matchdayId) {
+                          setSelectedMatchday(currentLiveMatch.matchdayId);
+                        }
+                        if (currentLiveMatch.group) {
+                          setSelectedGroup(currentLiveMatch.group);
+                        }
+                        setTimeout(() => {
+                          const el = document.getElementById(`match-${currentLiveMatch.id}`);
+                          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }, 150);
+                      }}
+                      style={{
+                        padding: "8px 18px",
+                        borderRadius: "20px",
+                        background: "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)",
+                        border: "none",
+                        color: "#030a18",
+                        fontSize: "12px",
+                        fontWeight: "900",
+                        cursor: "pointer",
+                        boxShadow: "0 0 16px rgba(0, 229, 255, 0.4)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        transition: "transform 0.15s ease",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                    >
+                      <span>⚔️ ดูผลคะแนนสดคู่นี้ ↓</span>
+                    </button>
+
+                    {currentLiveMatch.youtubeUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveVideoModal({
+                            url: currentLiveMatch.youtubeUrl,
+                            youtubeId: getYouTubeId(currentLiveMatch.youtubeUrl),
+                            title: `คู่ที่ ${currentLiveMatch.id}: ${currentLiveMatch.player1?.name} vs ${currentLiveMatch.player2?.name}`,
+                            description: `${currentLiveMatch.player1?.topic || ""} vs ${currentLiveMatch.player2?.topic || ""}`,
+                            matchdayName: currentLiveMatch.matchdayName,
+                            group: currentLiveMatch.group,
+                          });
+                        }}
+                        style={{
+                          padding: "8px 16px",
+                          borderRadius: "20px",
+                          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.35) 0%, rgba(185, 28, 28, 0.5) 100%)",
+                          border: "1.5px solid #ef4444",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "800",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          boxShadow: "0 0 14px rgba(239, 68, 68, 0.4)",
+                        }}
+                      >
+                        <span>▶️ รับชมสด</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* PLAYER 2 CARD */}
+                <div
+                  onClick={() => onSelectContestant(currentLiveMatch.player2?.name)}
+                  title="คลิกเพื่อดูโปรไฟล์ผู้เข้าแข่งขัน"
+                  style={{
+                    cursor: "pointer",
+                    padding: "20px 18px",
+                    borderRadius: "18px",
+                    background: "linear-gradient(135deg, rgba(217, 119, 6, 0.18) 0%, rgba(6, 16, 36, 0.85) 100%)",
+                    border: "1.5px solid rgba(255, 215, 0, 0.45)",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 12px 30px rgba(255, 215, 0, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.4)";
+                  }}
+                >
+                  {/* Avatar */}
+                  <div
+                    style={{
+                      width: "116px",
+                      height: "116px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      border: "3px solid #ffd700",
+                      boxShadow: "0 0 24px rgba(255, 215, 0, 0.5)",
+                      marginBottom: "12px",
+                      background: "#030a18",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <img
+                      src={getOptimizedAvatarUrl(getPlayerPhoto(currentLiveMatch.player2), 240)}
+                      alt={currentLiveMatch.player2?.name}
+                      referrerPolicy="no-referrer"
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                  </div>
+
+                  {/* Name & Nickname */}
+                  <div style={{ fontSize: "19px", fontWeight: "900", color: "#ffffff", lineHeight: "1.3" }}>
+                    {currentLiveMatch.player2?.nickname ? (
+                      <>
+                        <span style={{ color: "#ffd700" }}>({currentLiveMatch.player2.nickname})</span>{" "}
+                        {currentLiveMatch.player2.name}
+                      </>
+                    ) : (
+                      currentLiveMatch.player2?.name
+                    )}
+                  </div>
+
+                  {/* Topic Pill */}
+                  <div
+                    style={{
+                      marginTop: "10px",
+                      padding: "6px 14px",
+                      borderRadius: "20px",
+                      background: "rgba(255, 215, 0, 0.15)",
+                      border: "1px solid rgba(255, 215, 0, 0.4)",
+                      color: "#fef08a",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      maxWidth: "100%",
+                    }}
+                  >
+                    <span>🎯</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {currentLiveMatch.player2?.topic || "ไม่ระบุหัวข้อ"}
+                    </span>
+                  </div>
+
+                  {/* Score Info */}
+                  <div style={{ marginTop: "12px", display: "flex", gap: "12px", alignItems: "center", fontSize: "12px" }}>
+                    <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                      คะแนนหมวด: <strong style={{ color: "#ffd700", fontSize: "15px" }}>{currentLiveMatch.player2?.categoryPoints ?? 0} GP</strong>
+                    </span>
+                    <span style={{ color: "rgba(255,255,255,0.3)" }}>|</span>
+                    <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                      ดิบ: <strong style={{ color: "#ffffff", fontSize: "14px" }}>{currentLiveMatch.player2?.sum ?? 0}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Toggle Pill: Switch between Live Banner and League Overview */}
+              <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "14px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowLiveBanner(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "rgba(255,255,255,0.55)",
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    transition: "color 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#00e5ff")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.55)")}
+                >
+                  <span>📊 สลับดูข้อมูลภาพรวม League Phase</span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* ========================================================
+             2. DEFAULT HERO BANNER (League Phase Overview & Stats)
+             ======================================================== */
+          <div style={{ position: "relative", zIndex: 10, maxWidth: "1100px", width: "100%", textAlign: "center" }}>
+            {/* If there is a live match hidden, offer a toggle back */}
+            {currentLiveMatch && (
+              <div style={{ marginBottom: "14px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowLiveBanner(true)}
+                  style={{
+                    padding: "6px 16px",
+                    borderRadius: "20px",
+                    background: "rgba(239, 68, 68, 0.2)",
+                    border: "1.5px solid #ef4444",
+                    color: "#ffffff",
+                    fontSize: "12px",
+                    fontWeight: "900",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    boxShadow: "0 0 15px rgba(239, 68, 68, 0.5)",
+                  }}
+                >
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444", animation: "heroGlowPulse 1.2s infinite" }} />
+                  <span>⚡ สลับกลับไปดูคู่แข่งขันสด (LIVE BANNER)</span>
+                </button>
+              </div>
+            )}
+
+            {/* Official Tournament Logo Emblem */}
+            <div style={{ maxWidth: "420px", width: "85%", margin: "0 auto 18px" }}>
+              <img
+                src="/img/tournament_logo_cropped.png"
+                alt="FANPANTAE TOURNAMENT 2026/27"
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 0 25px rgba(0, 229, 255, 0.75)) drop-shadow(0 0 50px rgba(0, 119, 182, 0.4))",
+                  animation: "heroGlowPulse 4s ease-in-out infinite",
+                }}
+              />
+            </div>
+
+            {/* Title */}
+            <h1
+              style={{
+                fontSize: "clamp(28px, 5.5vw, 48px)",
+                fontWeight: "900",
+                background: "linear-gradient(180deg, #ffffff 0%, #ffd700 70%, #f59e0b 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                margin: "0 0 12px 0",
+                letterSpacing: "-0.5px",
+                filter: "drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8))",
                 animation: "heroGlowPulse 4s ease-in-out infinite",
               }}
-            />
-          </div>
+            >
+              การแข่งขันระบบ League Phase
+            </h1>
 
-          {/* Title */}
-          <h1
-            style={{
-              fontSize: "clamp(28px, 5.5vw, 48px)",
-              fontWeight: "900",
-              background: "linear-gradient(180deg, #ffffff 0%, #ffd700 70%, #f59e0b 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              margin: "0 0 12px 0",
-              letterSpacing: "-0.5px",
-              filter: "drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8))",
-              animation: "heroGlowPulse 4s ease-in-out infinite",
-            }}
-          >
-            การแข่งขันระบบ League Phase
-          </h1>
-
-          <p
-            style={{
-              color: "rgba(224, 242, 254, 0.85)",
-              fontSize: "clamp(14px, 2vw, 17px)",
-              maxWidth: "760px",
-              margin: "0 auto 28px",
-              lineHeight: "1.6",
-              textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)",
-            }}
-          >
-            การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ)<br></br>2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป
-          </p>
-
-          {/* Stat Badges Row */}
-          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "12px" }}>
-            <div
+            <p
               style={{
-                padding: "10px 20px",
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
-                border: "1.5px solid rgba(0, 229, 255, 0.4)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                minWidth: "150px",
+                color: "rgba(224, 242, 254, 0.85)",
+                fontSize: "clamp(14px, 2vw, 17px)",
+                maxWidth: "760px",
+                margin: "0 auto 28px",
+                lineHeight: "1.6",
+                textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)",
               }}
             >
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>ผู้เข้าแข่งขัน</div>
-              <div style={{ fontSize: "22px", fontWeight: "900", color: "#00e5ff", fontFamily: "var(--font-num)" }}>24 คน</div>
-              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>กลุ่มละ 12 คน</div>
-            </div>
+              การประลองความรู้แฟนพันธุ์แท้ตัวจริงแบบตัวต่อตัว (3 วินาที, ถาม-ตอบ, จิ๊กซอว์, คุณสมบัติ)<br></br>2 กลุ่ม รวม 24 ยอดฝีมือ ชิง 4 อันดับแรกเพื่อผ่านเข้ารอบถัดไป
+            </p>
 
-            <div
-              style={{
-                padding: "10px 20px",
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
-                border: "1.5px solid rgba(255, 215, 0, 0.4)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                minWidth: "150px",
-              }}
-            >
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>รอบการแข่งขัน</div>
-              <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>6 Matchdays</div>
-              <div style={{ fontSize: "10px", color: "#86efac", fontWeight: "700" }}>แข่งแล้ว 3 แมตช์เดย์</div>
-            </div>
-
-            <div
-              style={{
-                padding: "10px 20px",
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
-                border: "1.5px solid rgba(244, 63, 94, 0.4)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                minWidth: "170px",
-              }}
-            >
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>จ่าฝูงกลุ่มปัจจุบัน</div>
-              <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff", marginTop: "4px" }}>
-                A: <strong style={{ color: "#00e5ff" }}>ซ่า (12 LP)</strong>
+            {/* Stat Badges Row */}
+            <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "12px" }}>
+              <div
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                  border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                  minWidth: "150px",
+                }}
+              >
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>ผู้เข้าแข่งขัน</div>
+                <div style={{ fontSize: "22px", fontWeight: "900", color: "#00e5ff", fontFamily: "var(--font-num)" }}>24 คน</div>
+                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>กลุ่มละ 12 คน</div>
               </div>
-              <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff" }}>
-                B: <strong style={{ color: "#ffd700" }}>พีม (11 LP)</strong>
+
+              <div
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                  border: "1.5px solid rgba(255, 215, 0, 0.4)",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                  minWidth: "150px",
+                }}
+              >
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>รอบการแข่งขัน</div>
+                <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>6 Matchdays</div>
+                <div style={{ fontSize: "10px", color: "#86efac", fontWeight: "700" }}>แข่งแล้ว 3 แมตช์เดย์</div>
+              </div>
+
+              <div
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(6, 16, 36, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                  border: "1.5px solid rgba(244, 63, 94, 0.4)",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                  minWidth: "170px",
+                }}
+              >
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>จ่าฝูงกลุ่มปัจจุบัน</div>
+                <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff", marginTop: "4px" }}>
+                  A: <strong style={{ color: "#00e5ff" }}>ซ่า (12 LP)</strong>
+                </div>
+                <div style={{ fontSize: "14px", fontWeight: "900", color: "#ffffff" }}>
+                  B: <strong style={{ color: "#ffd700" }}>พีม (11 LP)</strong>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Tournament Honors & Penalties Banner (ผู้ถือครองรางวัลและบทลงโทษปัจจุบัน) */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              flexWrap: "wrap",
-              gap: "16px",
-              marginTop: "24px",
-            }}
-          >
-            {/* 1. รางวัลพิเศษ (+1 LP) */}
+            {/* Tournament Honors & Penalties Banner (ผู้ถือครองรางวัลและบทลงโทษปัจจุบัน) */}
             <div
-              onClick={() => onSelectContestant(currentAwardInfo.award.holderName)}
-              title="คลิกเพื่อดูสถิติผู้ถือครองรางวัล"
               style={{
-                cursor: "pointer",
-                padding: "8px 18px",
-                borderRadius: "14px",
-                background: "linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(3, 105, 161, 0.35) 100%)",
-                border: "1.5px solid #00e5ff",
-                boxShadow: "0 0 20px rgba(0, 229, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
                 display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                transition: "transform 0.15s ease, box-shadow 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.03)";
-                e.currentTarget.style.boxShadow = "0 0 25px rgba(0, 229, 255, 0.5)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 0 20px rgba(0, 229, 255, 0.3)";
+                justifyContent: "center",
+                flexWrap: "wrap",
+                gap: "16px",
+                marginTop: "24px",
               }}
             >
-              <div style={{ fontSize: "24px", filter: "drop-shadow(0 0 8px rgba(0,229,255,0.7))" }}>🎁</div>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: "11px", color: "rgba(224, 242, 254, 0.8)", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span>รางวัลพิเศษประจำลีก (+1 LP)</span>
-                  <span style={{ fontSize: "9px", background: "rgba(0,229,255,0.25)", color: "#00e5ff", padding: "1px 5px", borderRadius: "4px" }}>ทำ 25 เต็ม</span>
-                </div>
-                <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
-                  <span style={{ color: "#38bdf8" }}>{currentAwardInfo.award.name}</span>{" "}
+              {/* 1. รางวัลพิเศษ (+1 LP) */}
+              <div
+                onClick={() => onSelectContestant(currentAwardInfo.award.holderName)}
+                title="คลิกเพื่อดูสถิติผู้ถือครองรางวัล"
+                style={{
+                  cursor: "pointer",
+                  padding: "8px 18px",
+                  borderRadius: "14px",
+                  background: "linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(3, 105, 161, 0.35) 100%)",
+                  border: "1.5px solid #00e5ff",
+                  boxShadow: "0 0 20px rgba(0, 229, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.03)";
+                  e.currentTarget.style.boxShadow = "0 0 25px rgba(0, 229, 255, 0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "0 0 20px rgba(0, 229, 255, 0.3)";
+                }}
+              >
+                <div style={{ fontSize: "24px", filter: "drop-shadow(0 0 8px rgba(0,229,255,0.7))" }}>🎁</div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", color: "rgba(224, 242, 254, 0.8)", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>รางวัลพิเศษประจำลีก (+1 LP)</span>
+                    <span style={{ fontSize: "9px", background: "rgba(0,229,255,0.25)", color: "#00e5ff", padding: "1px 5px", borderRadius: "4px" }}>ทำ 25 เต็ม</span>
+                  </div>
+                  <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
+                    <span style={{ color: "#38bdf8" }}>{currentAwardInfo.award.name}</span>{" "}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 2. บทลงโทษ (-1 LP) */}
-            <div
-              onClick={() => onSelectContestant(currentAwardInfo.penalty.holderName)}
-              title="คลิกเพื่อดูสถิติผู้โดนบทลงโทษ"
-              style={{
-                cursor: "pointer",
-                padding: "8px 18px",
-                borderRadius: "14px",
-                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.22) 0%, rgba(185, 28, 28, 0.35) 100%)",
-                border: "1.5px solid #ff4d4f",
-                boxShadow: "0 0 20px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                transition: "transform 0.15s ease, box-shadow 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.03)";
-                e.currentTarget.style.boxShadow = "0 0 25px rgba(239, 68, 68, 0.5)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.3)";
-              }}
-            >
-              <div style={{ fontSize: "24px", filter: "drop-shadow(0 0 8px rgba(239,68,68,0.7))" }}>⚠️</div>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: "11px", color: "rgba(254, 226, 226, 0.8)", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span>บทลงโทษประจำลีก (-1 LP)</span>
-                  <span style={{ fontSize: "9px", background: "rgba(239,68,68,0.25)", color: "#fca5a5", padding: "1px 5px", borderRadius: "4px" }}>ได้ 0 อย่างน้อย 3 หมวดและจบด้วย 0 GP</span>
-                </div>
-                <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
-                  <span style={{ color: "#f87171" }}>{currentAwardInfo.penalty.name}</span>{" "}
+              {/* 2. บทลงโทษ (-1 LP) */}
+              <div
+                onClick={() => onSelectContestant(currentAwardInfo.penalty.holderName)}
+                title="คลิกเพื่อดูสถิติผู้โดนบทลงโทษ"
+                style={{
+                  cursor: "pointer",
+                  padding: "8px 18px",
+                  borderRadius: "14px",
+                  background: "linear-gradient(135deg, rgba(239, 68, 68, 0.22) 0%, rgba(185, 28, 28, 0.35) 100%)",
+                  border: "1.5px solid #ff4d4f",
+                  boxShadow: "0 0 20px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.03)";
+                  e.currentTarget.style.boxShadow = "0 0 25px rgba(239, 68, 68, 0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.3)";
+                }}
+              >
+                <div style={{ fontSize: "24px", filter: "drop-shadow(0 0 8px rgba(239,68,68,0.7))" }}>⚠️</div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", color: "rgba(254, 226, 226, 0.8)", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>บทลงโทษประจำลีก (-1 LP)</span>
+                    <span style={{ fontSize: "9px", background: "rgba(239,68,68,0.25)", color: "#fca5a5", padding: "1px 5px", borderRadius: "4px" }}>ได้ 0 อย่างน้อย 3 หมวดและจบด้วย 0 GP</span>
+                  </div>
+                  <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
+                    <span style={{ color: "#f87171" }}>{currentAwardInfo.penalty.name}</span>{" "}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* ========================================================
@@ -3416,6 +4009,7 @@ function FanpantaeMatchCard({ match, onSelectContestant, onPlayVideo }) {
 
   return (
     <div
+      id={`match-${match.id}`}
       className="tournament-card-entrance"
       style={{
         background: "linear-gradient(150deg, rgba(16, 32, 60, 0.92) 0%, rgba(6, 14, 30, 0.98) 100%)",
