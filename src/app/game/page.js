@@ -900,6 +900,13 @@ export default function Home() {
     totalScore: 0,
   });
 
+  // ---- Real-time 3-Second live score & Session recovery & Rank animation state ----
+  const [liveThreeSecScore, setLiveThreeSecScore] = useState(null);
+  const [restoredNotice, setRestoredNotice] = useState(null);
+  const [rankTransitionInfo, setRankTransitionInfo] = useState(null);
+  const [showRankClimbModal, setShowRankClimbModal] = useState(false);
+  const categoryStartSnapshot = useRef(null);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -936,6 +943,31 @@ export default function Home() {
       const local = localStorage.getItem("fpt_game_leaderboard");
       if (local) {
         setLeaderboard(JSON.parse(local));
+      }
+    } catch (e) {}
+
+    // Check active game session to restore if game was refreshed / reloaded midway
+    try {
+      const savedSession = localStorage.getItem("fpt_active_game_session");
+      if (savedSession) {
+        const s = JSON.parse(savedSession);
+        if (s && (s.contestantName || s.playerNames?.player1)) {
+          if (s.gameMode) setGameMode(s.gameMode);
+          if (s.contestantName) setContestantName(s.contestantName);
+          if (s.contestantNickname) setContestantNickname(s.contestantNickname);
+          if (s.topic) setTopic(s.topic);
+          if (s.contestantPhoto) setContestantPhoto(s.contestantPhoto);
+          if (s.activePlayerRecordId) setActivePlayerRecordId(s.activePlayerRecordId);
+          if (s.scores) setScores(s.scores);
+          if (s.playerNames) setPlayerNames(s.playerNames);
+          if (s.playerNicknames) setPlayerNicknames(s.playerNicknames);
+          if (s.playerTopics) setPlayerTopics(s.playerTopics);
+          if (s.playerPhotos) setPlayerPhotos(s.playerPhotos);
+          if (s.activeBattleRecordIds) setActiveBattleRecordIds(s.activeBattleRecordIds);
+          if (s.battleCategoryScores) setBattleCategoryScores(s.battleCategoryScores);
+          if (s.battleBigPoints) setBattleBigPoints(s.battleBigPoints);
+          if (s.currentPanel === "game") setCurrentPanel("game");
+        }
       }
     } catch (e) {}
 
@@ -1014,6 +1046,89 @@ export default function Home() {
       stopAudio(introAudioRef);
     };
   }, []);
+
+  // Sync active game session to localStorage so that if game reloads midway, it can be resumed
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (currentPanel === "game" && (contestantName || playerNames.player1)) {
+      const sessionData = {
+        currentPanel,
+        gameMode,
+        contestantName,
+        contestantNickname,
+        topic,
+        contestantPhoto,
+        activePlayerRecordId,
+        scores,
+        playerNames,
+        playerNicknames,
+        playerTopics,
+        playerPhotos,
+        activeBattleRecordIds,
+        battleCategoryScores,
+        battleBigPoints,
+      };
+      try {
+        localStorage.setItem("fpt_active_game_session", JSON.stringify(sessionData));
+      } catch (e) {}
+    }
+  }, [
+    currentPanel,
+    gameMode,
+    contestantName,
+    contestantNickname,
+    topic,
+    contestantPhoto,
+    activePlayerRecordId,
+    scores,
+    playerNames,
+    playerNicknames,
+    playerTopics,
+    playerPhotos,
+    activeBattleRecordIds,
+    battleCategoryScores,
+    battleBigPoints,
+  ]);
+
+  // Helper to check and pull latest saved scores from leaderboard when selecting or typing a player
+  const checkAndRestorePlayerScores = (name, nickname = "", chosenTopic = "", chosenPhoto = "") => {
+    if (!name || !name.trim()) {
+      setRestoredNotice(null);
+      return;
+    }
+    const cleanName = name.trim().toLowerCase();
+    const cleanNick = (nickname || "").trim().toLowerCase();
+
+    const matched = leaderboard.find((item) => {
+      const iName = (item.name || "").trim().toLowerCase();
+      const iNick = (item.nickname || "").trim().toLowerCase();
+      if (iName === cleanName) return true;
+      if (cleanNick && iNick && cleanNick === iNick) return true;
+      return false;
+    });
+
+    if (matched) {
+      setActivePlayerRecordId(matched.id);
+      if (matched.scores) {
+        setScores(matched.scores);
+      }
+      if (matched.topic && !chosenTopic) {
+        setTopic(matched.topic);
+      }
+      const played = ["3sec", "qa", "jigsaw", "attribute"].filter(
+        (k) => matched.scores?.[k] !== null && matched.scores?.[k] !== undefined
+      );
+      setRestoredNotice({
+        id: matched.id,
+        name: matched.name,
+        totalScore: matched.totalScore || 0,
+        scores: matched.scores || {},
+        playedCount: played.length,
+      });
+    } else {
+      setRestoredNotice(null);
+    }
+  };
 
   // ---- Config Panel State ----
   const [configMode, setConfigMode] = useState("single"); // "single" | "player1" | "player2"
@@ -1460,17 +1575,28 @@ export default function Home() {
         alert("กรุณากรอกหัวข้อการแข่งขัน");
         return;
       }
-      const newId = Date.now().toString();
-      setActivePlayerRecordId(newId);
-      const initialScores = {
-        "3sec": null,
-        qa: null,
-        jigsaw: null,
-        attribute: null,
-      };
-      setScores(initialScores);
-      syncScoreToLeaderboard(initialScores, "single", {
-        id: newId,
+
+      // Check if this player already has an existing record or scores in leaderboard
+      const existing = leaderboard.find(
+        (item) => item.name?.trim() === contestantName.trim() || String(item.id) === String(activePlayerRecordId)
+      );
+
+      const targetId = existing?.id || activePlayerRecordId || Date.now().toString();
+      setActivePlayerRecordId(targetId);
+
+      // If existing player had saved scores, preserve them! Otherwise initialize to null
+      const targetScores = existing?.scores || (
+        Object.values(scores).some((v) => v !== null) ? scores : {
+          "3sec": null,
+          qa: null,
+          jigsaw: null,
+          attribute: null,
+        }
+      );
+      setScores(targetScores);
+
+      syncScoreToLeaderboard(targetScores, "single", {
+        id: targetId,
         name: contestantName.trim(),
         nickname: contestantNickname.trim(),
         topic: topic.trim(),
@@ -1482,6 +1608,28 @@ export default function Home() {
   };
 
   const setGameScore = (gameKey, score) => {
+    const fromRank = categoryStartSnapshot.current?.fromRank || activePlayerRank || provisionalRank;
+    const fromScore = categoryStartSnapshot.current?.fromScore ?? totalScore;
+    const added = typeof score === "number" ? score : 0;
+    const toScore = fromScore + added;
+
+    const otherDistinctScores = new Set(
+      denseRankedLeaderboard
+        .filter((item) => String(item.id) !== String(activePlayerRecordId))
+        .filter((item) => (Number(item.totalScore) || 0) > toScore)
+        .map((item) => Number(item.totalScore) || 0)
+    ).size;
+    const toRank = otherDistinctScores + 1;
+
+    setRankTransitionInfo({
+      category: gameKey,
+      fromRank,
+      toRank,
+      fromScore,
+      toScore,
+      pointsAdded: added,
+    });
+
     setScores((prev) => {
       const nextScores = { ...prev, [gameKey]: score };
       syncScoreToLeaderboard(nextScores, "single");
@@ -1512,6 +1660,14 @@ export default function Home() {
   };
 
   const handleSelectCategory = (gameKey) => {
+    categoryStartSnapshot.current = {
+      gameKey,
+      fromRank: activePlayerRank || provisionalRank,
+      fromScore: totalScore,
+    };
+    if (gameKey === "3sec") {
+      setLiveThreeSecScore(scores["3sec"] !== null ? scores["3sec"] : 0);
+    }
     if (gameMode === "battle") {
       setBattleCategory(gameKey);
       setBattleStage("chooseOrder");
@@ -1915,6 +2071,9 @@ export default function Home() {
 
   const handleResetCurrentGameSession = () => {
     if (confirm("ต้องการเริ่มผู้เข้าแข่งขันคนใหม่ / ออกจากรอบการแข่งขันปัจจุบันใช่หรือไม่?\n(คะแนนที่บันทึกไปแล้วจะยังคงอยู่ในตารางคะแนน)")) {
+      try {
+        localStorage.removeItem("fpt_active_game_session");
+      } catch (e) {}
       setScores({ "3sec": null, qa: null, jigsaw: null, attribute: null });
       setCurrentGame(null);
       resetBattleState();
@@ -1923,6 +2082,9 @@ export default function Home() {
       setContestantName("");
       setContestantNickname("");
       setTopic("");
+      setRestoredNotice(null);
+      setRankTransitionInfo(null);
+      setLiveThreeSecScore(null);
       setCurrentPanel("setup");
     }
   };
@@ -2253,9 +2415,64 @@ export default function Home() {
                       setContestantName(c.name || "");
                       setContestantNickname(c.nickname || "");
                       setTopic(c.topic || "");
-                      setContestantPhoto(c.photo || resolveContestantPhoto(c.name, c.nickname) || "");
+                      const photoUrl = c.photo || resolveContestantPhoto(c.name, c.nickname) || "";
+                      setContestantPhoto(photoUrl);
+                      checkAndRestorePlayerScores(c.name, c.nickname, c.topic, photoUrl);
                     }}
                   />
+
+                  {restoredNotice && (
+                    <div
+                      style={{
+                        background: "linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(6, 78, 59, 0.28) 100%)",
+                        border: "1.5px solid #10b981",
+                        boxShadow: "0 4px 16px rgba(16, 185, 129, 0.25)",
+                        borderRadius: "12px",
+                        padding: "12px 16px",
+                        marginBottom: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <div style={{ color: "#6ee7b7", fontWeight: "800", fontSize: "14px", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span>💡</span> พบข้อมูลการแข่งขันล่าสุดของ {restoredNotice.name} (ดึงคะแนนมาให้เรียบร้อยแล้ว)
+                        </div>
+                        <div style={{ color: "rgba(255,255,255,0.85)", fontSize: "12px", marginTop: "4px" }}>
+                          คะแนนรวม: <strong style={{ color: "var(--gold)" }}>{restoredNotice.totalScore}</strong> คะแนน •
+                          {" "}3วิ: <strong>{restoredNotice.scores?.["3sec"] !== null && restoredNotice.scores?.["3sec"] !== undefined ? restoredNotice.scores["3sec"] : "-"}</strong> |
+                          {" "}ถาม: <strong>{restoredNotice.scores?.["qa"] !== null && restoredNotice.scores?.["qa"] !== undefined ? restoredNotice.scores["qa"] : "-"}</strong> |
+                          {" "}จิ๊ก: <strong>{restoredNotice.scores?.["jigsaw"] !== null && restoredNotice.scores?.["jigsaw"] !== undefined ? restoredNotice.scores["jigsaw"] : "-"}</strong> |
+                          {" "}คุณ: <strong>{restoredNotice.scores?.["attribute"] !== null && restoredNotice.scores?.["attribute"] !== undefined ? restoredNotice.scores["attribute"] : "-"}</strong>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setScores({ "3sec": null, qa: null, jigsaw: null, attribute: null });
+                          setActivePlayerRecordId(Date.now().toString());
+                          setRestoredNotice(null);
+                        }}
+                        style={{
+                          background: "rgba(255, 255, 255, 0.12)",
+                          border: "1px solid rgba(255,255,255,0.3)",
+                          color: "#fff",
+                          borderRadius: "6px",
+                          padding: "6px 14px",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          cursor: "pointer",
+                        }}
+                        title="ล้างคะแนนเดิมเพื่อเริ่มเล่นใหม่ทั้งหมด"
+                      >
+                        🔄 เริ่มใหม่ (ล้างคะแนน)
+                      </button>
+                    </div>
+                  )}
+
                   <div className="form-group">
                     <label htmlFor="contestantName">
                       <span className="label-icon">👤</span> ชื่อจริง-นามสกุล
@@ -2266,6 +2483,7 @@ export default function Home() {
                       placeholder="เช่น นัทธภพ ธนวัฒนาเจริญ"
                       value={contestantName}
                       onChange={(e) => setContestantName(e.target.value)}
+                      onBlur={(e) => checkAndRestorePlayerScores(e.target.value, contestantNickname, topic, contestantPhoto)}
                     />
                   </div>
                   <div className="form-group">
@@ -3062,12 +3280,20 @@ export default function Home() {
                   <>
                     <div className="total-score-box">
                       <span className="total-label">Total</span>
-                      <span className="total-value" id="totalScoreDisplay">{totalScore}</span>
+                      <span className="total-value" id="totalScoreDisplay">
+                        {currentGame === "3sec" && liveThreeSecScore !== null
+                          ? ((scores["qa"] || 0) + (scores["jigsaw"] || 0) + (scores["attribute"] || 0) + liveThreeSecScore)
+                          : totalScore}
+                      </span>
                     </div>
                     <div className="category-scores">
                       <div className="cat-score" id="catScore1" title="3 วินาที">
                         <span className="cat-label">3วิ</span>
-                        <span className="cat-value">{scores["3sec"] !== null ? scores["3sec"] : "-"}</span>
+                        <span className="cat-value">
+                          {currentGame === "3sec" && liveThreeSecScore !== null
+                            ? liveThreeSecScore
+                            : (scores["3sec"] !== null ? scores["3sec"] : "-")}
+                        </span>
                       </div>
                       <div className="cat-score" id="catScore2" title="ถาม-ตอบ">
                         <span className="cat-label">ถาม</span>
@@ -3239,13 +3465,31 @@ export default function Home() {
                         activePlayerEvaluation.reason
                       )}
                     </div>
-                    <button
-                      type="button"
-                      className="btn-standing-leaderboard"
-                      onClick={() => setShowLeaderboardModal(true)}
-                    >
-                      🏆 ตารางคะแนน Real-Time
-                    </button>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                      {rankTransitionInfo && (
+                        <button
+                          type="button"
+                          className="btn-standing-leaderboard"
+                          style={{
+                            background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+                            color: "#0a0d18",
+                            fontWeight: "800",
+                            border: "none",
+                            boxShadow: "0 0 16px rgba(255, 215, 0, 0.45)",
+                          }}
+                          onClick={() => setShowRankClimbModal(true)}
+                        >
+                          🎬 ดูการเลื่อนอันดับ ({rankTransitionInfo.fromRank} ➔ {rankTransitionInfo.toRank})
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="btn-standing-leaderboard"
+                        onClick={() => setShowLeaderboardModal(true)}
+                      >
+                        🏆 ตารางคะแนน Real-Time
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -3456,7 +3700,12 @@ export default function Home() {
                       gameMode={gameMode}
                       activeScoreOverride={activeScoreOverride}
                       accumulatedBaseScore={currentAccumulatedScore}
+                      onScoreChange={(liveSc) => {
+                        setLiveThreeSecScore(liveSc);
+                      }}
+                      onOpenRankClimb={() => setShowRankClimbModal(true)}
                       onComplete={(score) => {
+                        setLiveThreeSecScore(null);
                         if (gameMode === "battle") {
                           handleBattleComplete(score);
                         } else {
@@ -3465,6 +3714,7 @@ export default function Home() {
                       }}
                       onResult={showResultPopup}
                       onBack={() => {
+                        setLiveThreeSecScore(null);
                         setActiveScoreOverride(null);
                         setCurrentGame(null);
                       }}
@@ -4201,7 +4451,339 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* 🎬 Rank Climb Animation Modal */}
+      <RankClimbAnimationModal
+        isOpen={showRankClimbModal}
+        onClose={() => setShowRankClimbModal(false)}
+        transitionInfo={rankTransitionInfo}
+        denseRankedLeaderboard={denseRankedLeaderboard}
+        currentContestant={{
+          id: activePlayerRecordId,
+          name: contestantName || "ผู้เข้าแข่งขัน",
+          nickname: contestantNickname,
+          topic: topic,
+          photo: contestantPhoto || resolveContestantPhoto(contestantName, contestantNickname),
+        }}
+      />
     </main>
+  );
+}
+
+// ==========================================
+// 🎬 RANK CLIMB ANIMATION MODAL (TV BROADCAST STYLE)
+// ==========================================
+function RankClimbAnimationModal({
+  isOpen,
+  onClose,
+  transitionInfo,
+  denseRankedLeaderboard,
+  currentContestant,
+}) {
+  const [animStep, setAnimStep] = useState(0); // 0 = start at fromRank, 1 = animated to toRank
+  const sfxRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setAnimStep(0);
+      const timer = setTimeout(() => {
+        stopAudio(sfxRef);
+        sfxRef.current = playAudio(SOUND_PATHS.shuffle);
+        setAnimStep(1);
+      }, 700);
+      return () => {
+        clearTimeout(timer);
+        stopAudio(sfxRef);
+      };
+    }
+  }, [isOpen]);
+
+  if (!isOpen || !transitionInfo) return null;
+
+  const { category, fromRank, toRank, fromScore, toScore, pointsAdded } = transitionInfo;
+  const currentRank = animStep === 0 ? fromRank : toRank;
+  const currentScore = animStep === 0 ? fromScore : toScore;
+  const rankClimbed = fromRank - toRank;
+  const isImproved = rankClimbed > 0;
+  const isRank5 = toRank <= 5;
+
+  const categoryLabel =
+    category === "3sec"
+      ? "3 วินาที"
+      : category === "qa"
+      ? "ถาม-ตอบ"
+      : category === "jigsaw"
+      ? "จิ๊กซอว์"
+      : category === "attribute"
+      ? "คุณสมบัติ"
+      : "หมวด";
+
+  // Top positions preview (1 to 8)
+  const previewList = denseRankedLeaderboard.slice(0, 8);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 99999,
+        background: "rgba(3, 7, 18, 0.88)",
+        backdropFilter: "blur(12px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "640px",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          background: "linear-gradient(135deg, #091326 0%, #030712 100%)",
+          border: "2.5px solid #00e5ff",
+          boxShadow: "0 0 45px rgba(0, 229, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+          borderRadius: "16px",
+          padding: "28px",
+          color: "#fff",
+          position: "relative",
+          animation: "revealPop 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <div>
+            <div style={{ fontSize: "12px", color: "var(--accent)", fontWeight: "800", letterSpacing: "1px", textTransform: "uppercase" }}>
+              RANK TRANSITION UPDATE
+            </div>
+            <h2 style={{ fontSize: "22px", fontWeight: "900", margin: "4px 0 0", color: "#fff", display: "flex", alignItems: "center", gap: "8px" }}>
+              <span>🏆</span> เลื่อนอันดับหลังจบหมวด{categoryLabel}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              color: "#fff",
+              width: "36px",
+              height: "36px",
+              borderRadius: "50%",
+              cursor: "pointer",
+              fontSize: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.2s",
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Hero Card */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(14, 28, 54, 0.9) 0%, rgba(6, 14, 30, 0.95) 100%)",
+            border: animStep === 1 && isImproved ? "2px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.4)",
+            boxShadow: animStep === 1 && isImproved ? "0 0 25px rgba(255, 215, 0, 0.45)" : "none",
+            borderRadius: "14px",
+            padding: "20px",
+            marginBottom: "20px",
+            transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+            {currentContestant?.photo && (
+              <img
+                src={getOptimizedImageUrl(currentContestant.photo, 100)}
+                alt={currentContestant.name}
+                style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--gold)" }}
+              />
+            )}
+            <div>
+              <div style={{ fontSize: "18px", fontWeight: "800", color: "#fff" }}>
+                {currentContestant?.name} {currentContestant?.nickname && `(${currentContestant.nickname})`}
+              </div>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                📌 {currentContestant?.topic || "แฟนพันธุ์แท้"}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: "12px", alignItems: "center", textAlign: "center" }}>
+            {/* Before */}
+            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "12px" }}>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", fontWeight: "700" }}>ก่อนเริ่มหมวดนี้</div>
+              <div style={{ fontSize: "26px", fontWeight: "900", color: "rgba(255,255,255,0.7)", margin: "4px 0" }}>
+                #{fromRank}
+              </div>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>{fromScore} คะแนน</div>
+            </div>
+
+            {/* Transition Badge */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+              <span style={{ fontSize: "22px", color: "var(--accent)" }}>➔</span>
+              <span
+                style={{
+                  background: pointsAdded > 0 ? "rgba(76, 175, 80, 0.2)" : "rgba(255,255,255,0.1)",
+                  color: pointsAdded > 0 ? "#81c784" : "#fff",
+                  border: pointsAdded > 0 ? "1px solid #4caf50" : "1px solid rgba(255,255,255,0.2)",
+                  borderRadius: "12px",
+                  padding: "2px 8px",
+                  fontSize: "11px",
+                  fontWeight: "800",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                +{pointsAdded} คะแนน
+              </span>
+            </div>
+
+            {/* After (Animated) */}
+            <div
+              style={{
+                background: animStep === 1
+                  ? (isRank5 ? "linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 145, 0, 0.25) 100%)" : "rgba(0, 229, 255, 0.12)")
+                  : "rgba(255,255,255,0.04)",
+                border: animStep === 1 ? (isRank5 ? "1.5px solid #ffd700" : "1.5px solid #00e5ff") : "1px solid transparent",
+                borderRadius: "10px",
+                padding: "12px",
+                transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: animStep === 1 ? "scale(1.04)" : "scale(1)",
+              }}
+            >
+              <div style={{ fontSize: "11px", color: animStep === 1 ? "#ffd700" : "rgba(255,255,255,0.5)", fontWeight: "700" }}>
+                หลังจบหมวดนี้
+              </div>
+              <div
+                style={{
+                  fontSize: "30px",
+                  fontWeight: "900",
+                  color: animStep === 1 ? (isRank5 ? "#ffd700" : "#00e5ff") : "rgba(255,255,255,0.7)",
+                  margin: "4px 0",
+                  textShadow: animStep === 1 ? "0 0 16px rgba(255, 215, 0, 0.6)" : "none",
+                }}
+              >
+                #{currentRank}
+              </div>
+              <div style={{ fontSize: "13px", color: "#fff", fontWeight: "700" }}>{currentScore} คะแนน</div>
+            </div>
+          </div>
+
+          {/* Banner inside hero */}
+          <div style={{ marginTop: "16px", textAlign: "center" }}>
+            {isImproved ? (
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "6px 18px",
+                  borderRadius: "20px",
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  color: "#fff",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                  boxShadow: "0 4px 14px rgba(16, 185, 129, 0.45)",
+                }}
+              >
+                🚀 เลื่อนขึ้น +{rankClimbed} อันดับ! {isRank5 && "🔥 ติด TOP 5 เข้ารอบแล้ว!"}
+              </span>
+            ) : (
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "6px 16px",
+                  borderRadius: "20px",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.8)",
+                  fontWeight: "700",
+                  fontSize: "13px",
+                }}
+              >
+                🤝 อันดับคงที่ (อันดับ {toRank})
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Mini Standing Preview */}
+        <div style={{ marginBottom: "20px" }}>
+          <div style={{ fontSize: "13px", fontWeight: "800", color: "rgba(255,255,255,0.7)", marginBottom: "8px" }}>
+            📊 ตารางอันดับปัจจุบัน (TOP 8):
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "240px", overflowY: "auto" }}>
+            {previewList.map((p, idx) => {
+              const isCurrent = String(p.id) === String(currentContestant?.id) || p.name === currentContestant?.name;
+              const isTop5 = p.rank <= 5;
+              return (
+                <div
+                  key={p.id || idx}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    background: isCurrent
+                      ? "linear-gradient(90deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 145, 0, 0.15) 100%)"
+                      : "rgba(255,255,255,0.03)",
+                    border: isCurrent
+                      ? "1.5px solid #ffd700"
+                      : isTop5
+                      ? "1px solid rgba(0, 229, 255, 0.2)"
+                      : "1px solid rgba(255,255,255,0.06)",
+                    boxShadow: isCurrent ? "0 0 12px rgba(255, 215, 0, 0.3)" : "none",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span
+                      style={{
+                        fontWeight: "900",
+                        fontSize: "14px",
+                        width: "36px",
+                        color: p.rank === 1 ? "#ffd700" : p.rank === 2 ? "#e0e0e0" : p.rank === 3 ? "#cd7f32" : isTop5 ? "#00e5ff" : "rgba(255,255,255,0.5)",
+                      }}
+                    >
+                      {p.rank === 1 ? "🥇 1" : p.rank === 2 ? "🥈 2" : p.rank === 3 ? "🥉 3" : `#${p.rank}`}
+                    </span>
+                    <span style={{ fontWeight: isCurrent ? "800" : "600", fontSize: "14px", color: isCurrent ? "#ffd700" : "#fff" }}>
+                      {p.name} {p.nickname && `(${p.nickname})`}
+                    </span>
+                    {isCurrent && (
+                      <span style={{ fontSize: "10px", background: "#ffd700", color: "#000", fontWeight: "900", padding: "1px 6px", borderRadius: "4px" }}>
+                        คุณ
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontWeight: "800", fontSize: "15px", color: isCurrent ? "#ffd700" : "#fff" }}>
+                      {p.totalScore}
+                    </span>
+                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>คะแนน</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <button
+            type="button"
+            className="btn-game btn-start-round"
+            onClick={onClose}
+            style={{ width: "100%", padding: "12px 24px", fontSize: "16px" }}
+          >
+            ✓ ดำเนินการต่อ
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -4665,7 +5247,7 @@ function BroadcastQuestionBar({
 // ==========================================
 // ⏱️ SUB-COMPONENT: GAME 1 (3 SECONDS) - PERFECT VIDEO PLAYBACK & MANUAL TIMER
 // ==========================================
-function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders = [], gameMode, activeScoreOverride, accumulatedBaseScore = 0, configVersion, onComplete, onResult, onBack }) {
+function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders = [], gameMode, activeScoreOverride, accumulatedBaseScore = 0, configVersion, onComplete, onResult, onBack, onScoreChange, onOpenRankClimb }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [startQ, setStartQ] = useState(0);
   const [endQ, setEndQ] = useState(25);
@@ -4710,6 +5292,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
   useEffect(() => {
     if (activeScoreOverride !== null && activeScoreOverride !== undefined) {
       setScore(activeScoreOverride);
+      if (onScoreChange) onScoreChange(activeScoreOverride);
     }
   }, [activeScoreOverride]);
 
@@ -4721,6 +5304,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
     setTotalInSet(end - start);
     setCurrentQ(start);
     setScore(0);
+    if (onScoreChange) onScoreChange(0);
     setTimeLeft(3.0);
     setIsRunning(false);
     setRoundActive(false);
@@ -4731,6 +5315,72 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
     setGameStarted(true);
     setIsMediaPlaying(false);
     setRevealOnly(false);
+    setTimerStarted(false);
+  };
+
+  // ย้อนกลับไปสถานะก่อนเริ่มคำถามข้อปัจจุบัน (กรณีผู้เล่นมีปัญหา เช่น เน็ตหลุด ไม่ได้ยินเสียง ฯลฯ)
+  const handleResetCurrentQuestion = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (audioRef.current) {
+      unregisterMediaElement(audioRef.current);
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (videoPlayerRef.current) {
+      unregisterMediaElement(videoPlayerRef.current);
+      videoPlayerRef.current.pause();
+    }
+    stopAudio(excitedAudioRef);
+    stopAudio(sfxAudioRef);
+
+    // หากข้อนี้กดถูกไปแล้วและย้อนกลับ ให้หักคะแนนคืน
+    if (isRoundCorrect === true) {
+      setScore((prev) => {
+        const next = Math.max(0, prev - 1);
+        if (onScoreChange) onScoreChange(next);
+        return next;
+      });
+    }
+
+    setIsRunning(false);
+    setTimeLeft(3.0);
+    setRoundActive(false);
+    setTimerStarted(false);
+    setAnswerRevealed(false);
+    setIsRoundCorrect(null);
+    setIsRoundSkipped(false);
+    setIsMediaPlaying(false);
+  };
+
+  // ย้อนกลับไปข้อก่อนหน้า (กรณีพิธีกรกดผ่านเร็วเกินไป)
+  const handlePreviousQ = () => {
+    if (currentQ <= startQ) return;
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (audioRef.current) {
+      unregisterMediaElement(audioRef.current);
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (videoPlayerRef.current) {
+      unregisterMediaElement(videoPlayerRef.current);
+      videoPlayerRef.current.pause();
+    }
+    stopAudio(excitedAudioRef);
+    stopAudio(sfxAudioRef);
+
+    setCurrentQ((prev) => prev - 1);
+    setTimeLeft(3.0);
+    setRoundActive(false);
+    setAnswerRevealed(false);
+    setIsRoundCorrect(null);
+    setIsRoundSkipped(false);
+    setIsMediaPlaying(false);
     setTimerStarted(false);
   };
 
@@ -4875,7 +5525,11 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
     stopAudio(excitedAudioRef);
 
     if (correct) {
-      setScore(prev => prev + 1);
+      setScore((prev) => {
+        const next = prev + 1;
+        if (onScoreChange) onScoreChange(next);
+        return next;
+      });
       setIsRoundCorrect(true);
       setAnswerRevealed(true);
 
@@ -5016,7 +5670,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
 
   if (isGameOver) {
     return (
-      <div className="three-sec-container">
+      <div className="three-sec-container" style={{ textAlign: "center", padding: "40px 20px" }}>
         <div className="game-ended-banner success">
           🎉 สรุปผลคะแนนการแข่งขันรอบ 3 วินาที
         </div>
@@ -5025,7 +5679,31 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
           <span className="three-sec-score-val" style={{ fontSize: "64px" }}>{score}</span>
           <span className="three-sec-score-label"> / {totalInSet}</span>
         </div>
-        <button className="btn-game btn-start-round" onClick={onBack} style={{ marginTop: "24px" }}>กลับหน้าหลัก</button>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "24px", flexWrap: "wrap" }}>
+          {onOpenRankClimb && (
+            <button
+              type="button"
+              className="btn-game"
+              onClick={onOpenRankClimb}
+              style={{
+                background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+                color: "#0a0d18",
+                fontWeight: "900",
+                fontSize: "16px",
+                border: "none",
+                padding: "12px 24px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+              }}
+            >
+              🎬 ดูอนิเมชั่นเลื่อนอันดับ
+            </button>
+          )}
+          <button className="btn-game btn-start-round" onClick={onBack}>
+            กลับหน้าหลัก
+          </button>
+        </div>
       </div>
     );
   }
@@ -5309,12 +5987,28 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
         )}
       </div>
 
-      <div className="three-sec-controls" id="threeSecControls" style={{ marginTop: "16px", display: "flex", justifyContent: "center", gap: "12px", width: "100%" }}>
+      <div className="three-sec-controls" id="threeSecControls" style={{ marginTop: "16px", display: "flex", justifyContent: "center", gap: "12px", width: "100%", flexWrap: "wrap" }}>
         {!roundActive ? (
-          <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "480px", justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "520px", justifyContent: "center", flexWrap: "wrap" }}>
+            {currentQ > startQ && (
+              <button
+                type="button"
+                className="btn-game btn-back"
+                onClick={handlePreviousQ}
+                style={{
+                  background: "rgba(255, 255, 255, 0.08)",
+                  border: "1px solid rgba(255, 255, 255, 0.25)",
+                  color: "rgba(255, 255, 255, 0.8)",
+                  padding: "10px 18px",
+                }}
+                title="ย้อนกลับไปข้อก่อนหน้า"
+              >
+                ⏮️ ข้อก่อนหน้า
+              </button>
+            )}
             <button
               className="btn-game btn-action"
-              style={{ flex: 1 }}
+              style={{ flex: 1, minWidth: "200px" }}
               onClick={mediaSrc ? () => playQuestionMedia(true) : handleStartQuestion}
             >
               {mediaSrc
@@ -5332,8 +6026,23 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             // เคส A: เฉลยแสดงขึ้นมาแล้ว
             if (answerRevealed) {
               return (
-                <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "480px", justifyContent: "center" }}>
-                  <button className="btn-game btn-correct" onClick={handleNextQ} style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "520px", justifyContent: "center", flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    className="btn-game btn-back"
+                    onClick={handleResetCurrentQuestion}
+                    style={{
+                      background: "rgba(255, 171, 0, 0.16)",
+                      border: "1.5px solid #ffab00",
+                      color: "#ffab00",
+                      fontWeight: "700",
+                      padding: "10px 18px",
+                    }}
+                    title="ย้อนกลับไปสถานะก่อนเริ่มคำถามข้อนี้ เผื่อกรณีผู้เล่นติดปัญหา"
+                  >
+                    ↺ ก่อนเริ่มคำถาม
+                  </button>
+                  <button className="btn-game btn-correct" onClick={handleNextQ} style={{ flex: 1, minWidth: "160px" }}>
                     ข้อถัดไป →
                   </button>
                   {revealOnly && (
@@ -5348,8 +6057,23 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             // เคส B: ตอบผิด (isRoundCorrect === false) หรือ กดข้าม (isRoundSkipped) และยังไม่ได้กดยืนยันดูเฉลย
             if ((isRoundCorrect === false || isRoundSkipped) && !answerRevealed) {
               return (
-                <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "480px", justifyContent: "center" }}>
-                  <button className="btn-game btn-reveal" onClick={() => setAnswerRevealed(true)} style={{ flex: 1, background: "var(--accent)" }}>
+                <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "520px", justifyContent: "center", flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    className="btn-game btn-back"
+                    onClick={handleResetCurrentQuestion}
+                    style={{
+                      background: "rgba(255, 171, 0, 0.16)",
+                      border: "1.5px solid #ffab00",
+                      color: "#ffab00",
+                      fontWeight: "700",
+                      padding: "10px 18px",
+                    }}
+                    title="ย้อนกลับไปสถานะก่อนเริ่มคำถามข้อนี้ เผื่อกรณีผู้เล่นติดปัญหา"
+                  >
+                    ↺ ก่อนเริ่มคำถาม
+                  </button>
+                  <button className="btn-game btn-reveal" onClick={() => setAnswerRevealed(true)} style={{ flex: 1, minWidth: "160px", background: "var(--accent)" }}>
                     👁️ เฉลยคำตอบ
                   </button>
                   {revealOnly && (
@@ -5364,7 +6088,22 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             // เคส B2: โหมด revealOnly (กดผิดไปแล้วข้อก่อนหน้า) — แสดงแค่ปุ่มเฉลย
             if (revealOnly && !answerRevealed) {
               return (
-                <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "480px", justifyContent: "center" }}>
+                <div style={{ display: "flex", gap: "12px", width: "100%", maxWidth: "520px", justifyContent: "center", flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    className="btn-game btn-back"
+                    onClick={handleResetCurrentQuestion}
+                    style={{
+                      background: "rgba(255, 171, 0, 0.16)",
+                      border: "1.5px solid #ffab00",
+                      color: "#ffab00",
+                      fontWeight: "700",
+                      padding: "10px 18px",
+                    }}
+                    title="ย้อนกลับไปสถานะก่อนเริ่มคำถามข้อนี้ เผื่อกรณีผู้เล่นติดปัญหา"
+                  >
+                    ↺ ก่อนเริ่มคำถาม
+                  </button>
                   {mediaSrc && (
                     <button
                       className={`btn-game btn-reveal ${isMediaPlaying ? "playing" : ""}`}
@@ -5377,7 +6116,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
                       {isMediaPlaying ? "⌛ กำลังเล่น..." : isVideo ? "▶️ รีรันวิดีโอ" : "🔊 รีรันเสียง"}
                     </button>
                   )}
-                  <button className="btn-game btn-reveal" onClick={handleRevealOnly} style={{ flex: 1, background: "var(--accent)" }}>
+                  <button className="btn-game btn-reveal" onClick={handleRevealOnly} style={{ flex: 1, minWidth: "120px", background: "var(--accent)" }}>
                     👁️ เฉลย
                   </button>
                   <button className="btn-game btn-back" onClick={handleBack}>
@@ -5390,6 +6129,22 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
             // เคส C: สถานะปกติในขณะที่เวลากำลังเดิน หรือ เวลาหยุดอยู่ที่ 0.0 วินาที หรือ รอเริ่มจับเวลา
             return (
               <>
+                <button
+                  type="button"
+                  className="btn-game btn-back"
+                  onClick={handleResetCurrentQuestion}
+                  style={{
+                    background: "rgba(255, 171, 0, 0.16)",
+                    border: "1.5px solid #ffab00",
+                    color: "#ffab00",
+                    fontWeight: "700",
+                    padding: "10px 18px",
+                  }}
+                  title="ย้อนกลับไปสถานะก่อนเริ่มคำถามข้อนี้ เผื่อกรณีผู้เล่นติดปัญหา"
+                >
+                  ↺ ก่อนเริ่มคำถาม
+                </button>
+
                 {mediaSrc && (
                   <button
                     className={`btn-game btn-reveal ${isMediaPlaying ? "playing" : ""}`}
@@ -6290,23 +7045,19 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
                 judgeMode
                   ? ""
                   : isBonus
-                  ? (!isFullyRevealed ? "คลิกเพื่อเปิดคำตอบ" : "")
+                  ? (!isFullyRevealed ? "เปิดคำตอบ" : "")
                   : isFullyRevealed
                   ? "เปิดเต็มแล้ว"
                   : step === 1
-                  ? "คลิกเพื่อแง้มต่อ (2/4)"
+                  ? "แง้มต่อ (2/4)"
                   : step === 2
-                  ? "คลิกเพื่อเปิดเต็ม"
-                  : `คลิกเพื่อเริ่มแง้มข้อที่ ${i + 1} (1/4)`
+                  ? "เปิดเต็ม"
+                  : `ข้อที่ ${i + 1}`
               }
             >
               <div className="attr-clue-number">{isBonus ? "?" : (i + 1)}</div>
               <div className="attr-clue-content">
-                {!isRevealed ? (
-                  <span style={{ fontSize: "14px", opacity: 0.6, color: isBonus ? "rgba(255, 23, 68, 0.8)" : "var(--gold-light)", textAlign: "center", width: "100%" }}>
-                    🔒 คลิกเพื่อเปิด{isBonus ? "คำตอบ" : `ข้อมูลคุณสมบัติข้อที่ ${i + 1}`}
-                  </span>
-                ) : (
+                {!isRevealed ? null : (
                   <>
                     <div className="attr-clue-text">{clue}</div>
                     {!isBonus && isPeeked && (
