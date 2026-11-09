@@ -922,9 +922,6 @@ export default function TournamentClient({ initialData }) {
                 </div>
                 <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
                   <span style={{ color: "#38bdf8" }}>{currentAwardInfo.award.name}</span>{" "}
-                  <span style={{ fontSize: "13px", color: "#ffd700", fontWeight: "700" }}>
-                    • {currentAwardInfo.award.holderNickname || currentAwardInfo.award.holderName}
-                  </span>
                 </div>
               </div>
             </div>
@@ -962,9 +959,6 @@ export default function TournamentClient({ initialData }) {
                 </div>
                 <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", marginTop: "1px" }}>
                   <span style={{ color: "#f87171" }}>{currentAwardInfo.penalty.name}</span>{" "}
-                  <span style={{ fontSize: "13px", color: "#ffd700", fontWeight: "700" }}>
-                    • {currentAwardInfo.penalty.holderNickname || currentAwardInfo.penalty.holderName}
-                  </span>
                 </div>
               </div>
             </div>

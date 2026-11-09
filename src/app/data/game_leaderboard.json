@@ -160,18 +160,163 @@
     "updatedAt": "2026-11-05T17:14:22.840Z"
   },
   {
-    "id": "1793964292755",
+    "id": "1793976261212",
     "name": "นัทธสม บุญมา",
     "nickname": "ซ่า",
     "topic": "ประวัติศาสตร์ไทย",
     "scores": {
-      "3sec": null,
-      "qa": null,
-      "jigsaw": null,
-      "attribute": null
+      "3sec": 5,
+      "qa": 20,
+      "jigsaw": 0,
+      "attribute": 15
     },
-    "totalScore": 0,
+    "totalScore": 40,
     "image": "",
-    "createdAt": "2026-11-06T11:24:52.826Z"
+    "createdAt": "2026-11-06T14:44:21.298Z",
+    "updatedAt": "2026-11-06T15:20:28.943Z"
+  },
+  {
+    "id": "1793979045555",
+    "name": "ธนกร สุขปาน",
+    "nickname": "ออม",
+    "topic": "แกรมมี่โกลด์",
+    "scores": {
+      "3sec": 19,
+      "qa": 0,
+      "jigsaw": 0,
+      "attribute": 0
+    },
+    "totalScore": 19,
+    "image": "",
+    "createdAt": "2026-11-06T15:30:45.629Z",
+    "updatedAt": "2026-11-06T17:06:47.147Z"
+  },
+  {
+    "id": "1793986246361",
+    "name": "ณฤกร วงศ์บูรณะ",
+    "nickname": "ตฤณ",
+    "topic": "Marvel Cinematic Universe",
+    "scores": {
+      "3sec": 20,
+      "qa": 20,
+      "jigsaw": 0,
+      "attribute": 10
+    },
+    "totalScore": 50,
+    "image": "",
+    "createdAt": "2026-11-06T17:30:46.432Z",
+    "updatedAt": "2026-11-06T18:36:58.108Z"
+  },
+  {
+    "id": "1794062521103",
+    "name": "สิปโปทัย ศรีบุญเรือง",
+    "nickname": "กัส",
+    "topic": "คาราบาว",
+    "scores": {
+      "3sec": 14,
+      "qa": 25,
+      "jigsaw": 25,
+      "attribute": 0
+    },
+    "totalScore": 64,
+    "image": "",
+    "createdAt": "2026-11-07T14:42:01.226Z",
+    "updatedAt": "2026-11-07T14:42:57.448Z"
+  },
+  {
+    "id": "1794065707552",
+    "name": "วินทกร คำภีระ",
+    "nickname": "อุลตร้า",
+    "topic": "ดูนกไทย",
+    "scores": {
+      "3sec": 11,
+      "qa": 0,
+      "jigsaw": 15,
+      "attribute": 0
+    },
+    "totalScore": 26,
+    "image": "",
+    "createdAt": "2026-11-07T15:35:07.622Z",
+    "updatedAt": "2026-11-07T15:56:27.460Z"
+  },
+  {
+    "id": "1794069288292",
+    "name": "ปกรณ์ สถิตอยู่คู่ไทย",
+    "nickname": "แมน",
+    "topic": "บะหมี่กึ่งสำเร็จรูปไทย",
+    "scores": {
+      "3sec": 11,
+      "qa": 0,
+      "jigsaw": 20,
+      "attribute": 0
+    },
+    "totalScore": 31,
+    "image": "",
+    "createdAt": "2026-11-07T16:34:48.564Z",
+    "updatedAt": "2026-11-07T17:22:12.312Z"
+  },
+  {
+    "id": "1794129881230",
+    "name": "เชาว์วรรธน์ จันทร์สุข",
+    "nickname": "ก๊อง",
+    "topic": "Workpoint",
+    "scores": {
+      "3sec": 16,
+      "qa": 20,
+      "jigsaw": 5,
+      "attribute": 20
+    },
+    "totalScore": 61,
+    "image": "",
+    "createdAt": "2026-11-08T09:24:41.315Z",
+    "updatedAt": "2026-11-08T10:19:26.416Z"
+  },
+  {
+    "id": "1794145123738",
+    "name": "รติพงษ์ กมลเกียรติพัฒน์",
+    "nickname": "นิว",
+    "topic": "My Hero Academia",
+    "scores": {
+      "3sec": 14,
+      "qa": 0,
+      "jigsaw": 25,
+      "attribute": 15
+    },
+    "totalScore": 54,
+    "image": "",
+    "createdAt": "2026-11-08T13:38:44.058Z",
+    "updatedAt": "2026-11-08T14:49:18.608Z"
+  },
+  {
+    "id": "1794153561835",
+    "name": "พีรภัทร หมื่นหาญ",
+    "nickname": "พีม",
+    "topic": "อัสนี วสันต์",
+    "scores": {
+      "3sec": 19,
+      "qa": 20,
+      "jigsaw": 25,
+      "attribute": 10
+    },
+    "totalScore": 74,
+    "image": "",
+    "createdAt": "2026-11-08T15:59:21.918Z",
+    "updatedAt": "2026-11-08T16:51:15.809Z"
+  },
+  {
+    "id": "1794157725870",
+    "name": "ภควัต ศรศุกลรัตน์",
+    "nickname": "อาร์ม",
+    "topic": "รายการโทรทัศน์ไทย 90's-2010's",
+    "scores": {
+      "3sec": 19,
+      "qa": 0,
+      "jigsaw": 0,
+      "attribute": 20
+    },
+    "totalScore": 39,
+    "image": "",
+    "createdAt": "2026-11-08T17:08:45.948Z",
+    "updatedAt": "2026-11-08T17:54:22.609Z"
   }
 ]

@@ -10,196 +10,196 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-        "ตัวละครต่อไปนี้มาจากการ์ตูน / ภาพยนตร์เรื่องใดในจักรวาล Disney?",
-        "ชื่อไทยของการ์ตูน / ภาพยนตร์ในจักรวาล Disney ต่อไปนี้มีชื่อภาษาอังกฤษว่าอะไร?"
+        "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
+        "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+        "รายการที่คุณกำลังจะได้ยินต่อไปนี้ มีพิธีกรชื่อว่าอะไรบ้าง"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
-            "video": "public/video/01.mp4",
-            "answer": "Donald Duck"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/02.png",
-            "audio": null,
+            "audio": "public/audio/01.mp3",
             "video": null,
-            "answer": "Judy Hopps"
+            "answer": "สะเก็ดข่าว"
         },
         {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/03.png",
-            "audio": null,
-            "video": null,
-            "answer": "Cinderella"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/04.png",
-            "audio": null,
-            "video": null,
-            "answer": "Tarzan"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/05.png",
-            "audio": null,
-            "video": null,
-            "answer": "Dr. Doofenshmirtz"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/06.png",
-            "audio": null,
-            "video": null,
-            "answer": "Star Butterfly"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/07.png",
-            "audio": null,
-            "video": null,
-            "answer": "Hector Rivera"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/08.png",
-            "audio": null,
-            "video": null,
-            "answer": "Luca"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/09.png",
-            "audio": null,
-            "video": null,
-            "answer": "Oswald the Rabbit"
-        },
-        {
-            "question": "นี่คือภาพตัวละครจักรวาล Disney ที่มีชื่อว่าอะไร?",
-            "image": "public/img/10.png",
-            "audio": null,
-            "video": null,
-            "answer": "Minnie Mouse"
-        },
-        {
-            "question": "Bellweather",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/02.mp3",
             "video": null,
-            "answer": "Zootopia"
+            "answer": "ข่าว 3 มิติ"
         },
         {
-            "question": "Perry the Platypus",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/03.mp3",
             "video": null,
-            "answer": "Phineas and Ferb"
+            "answer": "จ้อจี้"
         },
         {
-            "question": "Jasmine",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/04.mp3",
             "video": null,
-            "answer": "Aladdin"
+            "answer": "กบนอกกะลา"
         },
         {
-            "question": "Bill Cipher",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/05.mp3",
             "video": null,
-            "answer": "Gravity Falls"
+            "answer": "สอนศิลป์"
         },
         {
-            "question": "Cruella Devil",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/06.mp3",
             "video": null,
-            "answer": "101 Dalmatians"
+            "answer": "ยกโขยง 6 โมงเช้า"
         },
         {
-            "question": "Kim Possible",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/07.mp3",
             "video": null,
-            "answer": "Kim Possible"
+            "answer": "English Breakfast"
         },
         {
-            "question": "Sprig Plantar",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/08.mp3",
             "video": null,
-            "answer": "Amphibia"
+            "answer": "ชิมไปบ่นไป"
         },
         {
-            "question": "Wander",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/09.mp3",
             "video": null,
-            "answer": "Wander Over Yonder"
+            "answer": "ขบวนการไร้พุง"
         },
         {
-            "question": "Ennui",
+            "question": "นี่คือเสียงจากรายการที่มีชื่อว่าอะไร",
             "image": null,
-            "audio": null,
+            "audio": "public/audio/10.mp3",
             "video": null,
-            "answer": "Inside Out 2"
+            "answer": "บุปผาสวรรค์ ชุมชนคนลูกทุ่ง"
         },
         {
-            "question": "Elsa",
-            "image": null,
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/11.png",
             "audio": null,
             "video": null,
-            "answer": "Frozen"
+            "answer": "หว่อง พิสิทธิ์ กีรติการกุล"
         },
         {
-            "question": "บ้านมิคกี้แสนสนุก",
-            "image": null,
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/12.png",
             "audio": null,
             "video": null,
-            "answer": "Mickey Mouse Clubhouse"
+            "answer": "สรยุทธ สุทัศนะจินดา"
         },
         {
-            "question": "โฉมงามกับเจ้าชายอสูร",
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/13.png",
+            "audio": null,
+            "video": null,
+            "answer": "น้าเน็ก เกตุเสพย์สวัสดิ์ ปาลกะวงศ์ ณ อยุธยา"
+        },
+        {
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/14.png",
+            "audio": null,
+            "video": null,
+            "answer": "ธีมะ กาญจนไพริน"
+        },
+        {
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/15.png",
+            "audio": null,
+            "video": null,
+            "answer": "วิทวัจน์ สุนทรวิเนตร์"
+        },
+        {
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/16.png",
+            "audio": null,
+            "video": null,
+            "answer": "ชัยณรงค์ มนเทียรวิเชียรฉาย"
+        },
+        {
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/17.png",
+            "audio": null,
+            "video": null,
+            "answer": "โน๊ต เชิญยิ้ม"
+        },
+        {
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/18.png",
+            "audio": null,
+            "video": null,
+            "answer": "เสนาลิง สมเกียรติ จันทร์พราหมณ์"
+        },
+        {
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/19.png",
+            "audio": null,
+            "video": null,
+            "answer": "กษิติ กมลนาวิน"
+        },
+        {
+            "question": "นี่คือภาพบุคคลที่เกี่ยวข้องกับรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
+            "image": "public/img/20.png",
+            "audio": null,
+            "video": null,
+            "answer": "ไตรภพ ลิมปพัทธ์"
+        },
+        {
+            "question": "อัจฉริยะข้ามคืน",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Beauty and the Beast"
+            "answer": "แทนคุณ จิตต์อิสระ"
         },
         {
-            "question": "บริษัทรับจ้างหลอน (ไม่) จำกัด",
+            "question": "ดูให้รู้",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Monsters, Inc."
+            "answer": "ฟูจิ ฟูจิซากิ"
         },
         {
-            "question": "เจ้าหญิงซ่ากับปีศาจเจ้าปัญหา",
+            "question": "ขำกลิ้งลิงกับหมา",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Star vs. the Forces of Evil"
+            "answer": "เอก ฮิมสกุล / ตุ๊ยตุ่ย พุทธชาด พงศ์สุชาติ"
         },
         {
-            "question": "ผจญภัยแดนคำสาปราชินีหิมะ",
+            "question": "มาสเตอร์คีย์ 10 ปีทอง",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Frozen"
+            "answer": "นีโน่ เมทนี / จ๋า ญาสุมินทร์ / เทพ โพธิ์งาม / ถนอม สามโทน"
+        },
+        {
+            "question": "คดีเด็ด",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "หว่อง พิสิทธิ์ กีรติการกุล"
         }
     ],
     "qa": {
-        "question": "คนไทยคนแรกและคนเดียวของโลกที่ได้ร่วมแสดง Disney On Ice คือใคร?",
-        "answer": "ร่มเกล้า โสภา",
+        "question": "ในรายการ รีวิวบันเทิง บุคคลแรกที่ไตรภพ ลิมปพัทธ์ ได้สัมภาษณ์สดในสตูดิโอคือใคร",
+        "answer": "เจมส์ จิรายุ ตั้งศรีสุข",
         "choices": [
-            "ไพพิศาล แหวนวงษ์",
-            "เทวินทร์ ชาติสุวรรณ",
-            "ร่มเกล้า โสภา",
-            "ชววิฐฌ์ เจียมหาทรัพย์",
-            "เชาว์วรรธน์ จันทร์สุข"
+            "เกรท วรินทร",
+            "โป๊ป ธนวรรธน์",
+            "เจมส์ จิรายุ ตั้งศรีสุข",
+            "บอม ธนิน",
+            "เจมส์ มาร์"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
@@ -211,19 +211,19 @@ const GAME_CONFIG = {
     "jigsaw": {
         "mode": "landscape",
         "image": "public/img/jigsaw.png",
-        "answer": "Stitch",
-        "question": "หลังจิ๊กซอว์นี้คือตัวละครในจักรวาล Disney ที่มีชื่อว่าอะไร?"
+        "answer": "เฉียด",
+        "question": "หลังจิ๊กซอว์นี้ นี่คือรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของตัวละครในจักรวาล Disney ที่มีชื่อว่าอะไร?",
+        "question": "นี่คือคุณสมบัติของรายการโทรทัศน์ไทยยุค 90's-2010's ที่มีชื่อว่าอะไร",
         "clues": [
-            "เป็น 1 ใน 3 แห่งเหล่า Calamity Trio ในเรื่อง Amphibia",
-            "เป็นมนุษย์เพศหญิงที่ไม่มีผมทอง ไม่มีตาฟ้า",
-            "ชื่อ-นามสกุลมี 3 พยางค์",
-            "ในเรื่องเคยใส่ชุดประจำชาติ",
-            "เป็นชาวเอเชียตะวันออกเฉียงใต้"
+            "ไม่ใช่รายการเกมโชว์",
+            "ในช่วงปี พ.ศ. 2539 รายการนี้ยังออกอากาศอยู่",
+            "มีไตรภพ ลิมปพัทธ์ เป็นพิธีกร",
+            "ออกอากาศทางช่อง 3",
+            "ชื่อรายการมี 1 พยางค์"
         ],
-        "answer": "Anne Boonchuy (แอนน์ บุญช่วย)"
+        "answer": "เฉียด"
     },
     "battle": {
         "player1": {
