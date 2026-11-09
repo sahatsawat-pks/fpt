@@ -21,10 +21,18 @@ function getOptimizedAvatarUrl(url, size = 120) {
   return clean;
 }
 
+export function getYouTubeId(url) {
+  if (!url || typeof url !== "string") return null;
+  const clean = url.trim();
+  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|live|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = clean.match(regExp);
+  return match && match[1] ? match[1] : null;
+}
+
 export default function TournamentClient({ initialData }) {
   const [data, setData] = useState(initialData || defaultTournamentData);
   const [loading, setLoading] = useState(!initialData);
-  const [activeTab, setActiveTab] = useState("standings"); // 'standings' | 'matches' | 'topics' | 'checklist'
+  const [activeTab, setActiveTab] = useState("standings"); // 'standings' | 'matches' | 'replays' | 'topics' | 'checklist'
   const [selectedGroup, setSelectedGroup] = useState("all"); // 'all' | 'A' | 'B'
   const [selectedMatchday, setSelectedMatchday] = useState("md1");
   const [matchSearch, setMatchSearch] = useState("");
@@ -32,6 +40,12 @@ export default function TournamentClient({ initialData }) {
   const [topicSortBy, setTopicSortBy] = useState("sum"); // 'sum' | '3sec' | 'qa' | 'jigsaw' | 'attribute'
   const [selectedContestant, setSelectedContestant] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // YouTube Replay States
+  const [activeVideoModal, setActiveVideoModal] = useState(null);
+  const [replayMatchdayFilter, setReplayMatchdayFilter] = useState("all");
+  const [replayGroupFilter, setReplayGroupFilter] = useState("all");
+  const [replaySearch, setReplaySearch] = useState("");
 
   // Fetch latest data from API if initialData was not provided
   useEffect(() => {
@@ -237,6 +251,72 @@ export default function TournamentClient({ initialData }) {
 
     return list;
   }, [topicRankings, topicSearch, topicSortBy]);
+
+  // Derived replays list (from data.replays and any match with youtubeUrl)
+  const replays = useMemo(() => {
+    const explicitReplays = Array.isArray(data?.replays) ? data.replays : [];
+
+    // Also automatically gather any match with youtubeUrl that isn't already in explicitReplays
+    const matchReplays = [];
+    (data?.matchdays || []).forEach((md) => {
+      (md.matches || []).forEach((m) => {
+        if (m.youtubeUrl && String(m.youtubeUrl).trim()) {
+          const alreadyExists = explicitReplays.some((r) => r.matchId === m.id || r.url === m.youtubeUrl);
+          if (!alreadyExists) {
+            const p1Name = m.player1?.nickname ? `${m.player1.nickname} (${m.player1.name})` : (m.player1?.name || "Player 1");
+            const p2Name = m.player2?.nickname ? `${m.player2.nickname} (${m.player2.name})` : (m.player2?.name || "Player 2");
+            matchReplays.push({
+              id: `match-rep-${m.id}`,
+              title: `คู่ที่ ${m.matchNumber || m.id} (กลุ่ม ${m.group}): ${p1Name} vs ${p2Name}`,
+              url: m.youtubeUrl,
+              youtubeId: getYouTubeId(m.youtubeUrl),
+              matchId: m.id,
+              matchdayId: md.id,
+              matchdayName: md.name,
+              group: m.group,
+              player1: m.player1,
+              player2: m.player2,
+              winner: m.winner,
+              status: m.status,
+              description: `${m.player1?.topic || ""} vs ${m.player2?.topic || ""}`,
+            });
+          }
+        }
+      });
+    });
+
+    return [...explicitReplays, ...matchReplays].map((rep) => ({
+      ...rep,
+      youtubeId: rep.youtubeId || getYouTubeId(rep.url),
+    }));
+  }, [data?.replays, data?.matchdays]);
+
+  // Filtered replays based on filter pills and search query
+  const filteredReplays = useMemo(() => {
+    return replays.filter((rep) => {
+      if (replayMatchdayFilter !== "all" && rep.matchdayId && rep.matchdayId !== replayMatchdayFilter) {
+        return false;
+      }
+      if (replayGroupFilter !== "all" && rep.group && rep.group !== replayGroupFilter) {
+        return false;
+      }
+      if (replaySearch.trim()) {
+        const q = replaySearch.trim().toLowerCase();
+        const tMatch = (rep.title || "").toLowerCase().includes(q);
+        const dMatch = (rep.description || "").toLowerCase().includes(q);
+        const p1Match =
+          (rep.player1?.name || "").toLowerCase().includes(q) ||
+          (rep.player1?.nickname || "").toLowerCase().includes(q) ||
+          (rep.player1?.topic || "").toLowerCase().includes(q);
+        const p2Match =
+          (rep.player2?.name || "").toLowerCase().includes(q) ||
+          (rep.player2?.nickname || "").toLowerCase().includes(q) ||
+          (rep.player2?.topic || "").toLowerCase().includes(q);
+        if (!tMatch && !dMatch && !p1Match && !p2Match) return false;
+      }
+      return true;
+    });
+  }, [replays, replayMatchdayFilter, replayGroupFilter, replaySearch]);
 
   // Calculate match history for selected contestant
   const contestantMatches = useMemo(() => {
@@ -983,6 +1063,7 @@ export default function TournamentClient({ initialData }) {
           {[
             { id: "standings", label: "📊 ตารางคะแนน (Standings)" },
             { id: "matches", label: "⚔️ ตารางการแข่งขัน (Matches & Fixtures)" },
+            { id: "replays", label: `📺 รับชมย้อนหลัง (${replays.length})` },
             { id: "topics", label: "🏅 สถิติคะแนนรายหัวข้อ (Top Records)" },
             { id: "checklist", label: "📋 ผังหัวข้อที่ลงทะเบียน (Topics Checklist)" },
           ].map((tab) => (
@@ -1220,8 +1301,477 @@ export default function TournamentClient({ initialData }) {
                       const c = contestants.find((x) => x.name === name);
                       if (c) setSelectedContestant(c);
                     }}
+                    onPlayVideo={(url, m) => {
+                      const yId = getYouTubeId(url);
+                      if (yId) {
+                        const p1Name = m?.player1?.nickname ? `${m.player1.nickname} (${m.player1.name})` : (m?.player1?.name || "");
+                        const p2Name = m?.player2?.nickname ? `${m.player2.nickname} (${m.player2.name})` : (m?.player2?.name || "");
+                        setActiveVideoModal({
+                          url,
+                          youtubeId: yId,
+                          title: `คู่ที่ ${m?.matchNumber || m?.id} (กลุ่ม ${m?.group}): ${p1Name} vs ${p2Name}`,
+                          matchdayName: currentMD?.name,
+                          group: m?.group,
+                          description: `${m?.player1?.topic || ""} vs ${m?.player2?.topic || ""}`,
+                        });
+                      } else {
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }
+                    }}
                   />
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB: YOUTUBE REPLAYS & HIGHLIGHTS
+           ======================================================== */}
+        {activeTab === "replays" && (
+          <div className="tournament-tab-content">
+            {/* Header & Description */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "16px",
+                marginBottom: "24px",
+              }}
+            >
+              <div>
+                <h2
+                  style={{
+                    fontSize: "24px",
+                    fontWeight: "900",
+                    color: "#ffffff",
+                    margin: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <span style={{ color: "#ef4444" }}>📺</span>
+                  <span>รับชมการแข่งขันย้อนหลัง (Replays & Highlights)</span>
+                </h2>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
+                  เทปบันทึกการแข่งขัน FANPANTAE TOURNAMENT ทุกแมตช์ รับชมผ่าน YouTube ได้ทั้งในเว็บหรือเปิดผ่านแอป
+                </div>
+              </div>
+
+              {/* Search input */}
+              <div style={{ position: "relative", minWidth: "260px" }}>
+                <input
+                  type="text"
+                  placeholder="ค้นหาชื่อผู้แข่ง, หัวข้อ, หรือคู่แข่ง..."
+                  value={replaySearch}
+                  onChange={(e) => setReplaySearch(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "9px 14px 9px 36px",
+                    borderRadius: "20px",
+                    background: "rgba(10, 25, 47, 0.8)",
+                    border: "1px solid rgba(0, 229, 255, 0.3)",
+                    color: "#ffffff",
+                    fontSize: "13px",
+                    outline: "none",
+                  }}
+                />
+                <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
+                  🔍
+                </span>
+              </div>
+            </div>
+
+            {/* Filter Bar: Matchday Pills & Group Pills */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                background: "rgba(6, 16, 36, 0.7)",
+                padding: "12px 18px",
+                borderRadius: "14px",
+                border: "1px solid rgba(0, 229, 255, 0.15)",
+                marginBottom: "28px",
+              }}
+            >
+              {/* Matchday Filters */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "12px", fontWeight: "700", color: "rgba(255,255,255,0.5)", marginRight: "4px" }}>
+                  รอบการแข่ง:
+                </span>
+                <button
+                  onClick={() => setReplayMatchdayFilter("all")}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "16px",
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    border: replayMatchdayFilter === "all" ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                    background: replayMatchdayFilter === "all" ? "rgba(0, 229, 255, 0.25)" : "transparent",
+                    color: replayMatchdayFilter === "all" ? "#00e5ff" : "rgba(255,255,255,0.7)",
+                  }}
+                >
+                  ทุกรอบ ({replays.length})
+                </button>
+                {matchdays.map((md) => {
+                  const count = replays.filter((r) => r.matchdayId === md.id).length;
+                  return (
+                    <button
+                      key={md.id}
+                      onClick={() => setReplayMatchdayFilter(md.id)}
+                      style={{
+                        padding: "5px 12px",
+                        borderRadius: "16px",
+                        fontSize: "12px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        border: replayMatchdayFilter === md.id ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                        background: replayMatchdayFilter === md.id ? "rgba(0, 229, 255, 0.25)" : "transparent",
+                        color: replayMatchdayFilter === md.id ? "#00e5ff" : "rgba(255,255,255,0.7)",
+                      }}
+                    >
+                      {md.name} {count > 0 ? `(${count})` : ""}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Group Filters */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ fontSize: "12px", fontWeight: "700", color: "rgba(255,255,255,0.5)", marginRight: "4px" }}>
+                  กลุ่ม:
+                </span>
+                {[
+                  { id: "all", label: "ทั้งหมด" },
+                  { id: "A", label: "กลุ่ม A" },
+                  { id: "B", label: "กลุ่ม B" },
+                ].map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => setReplayGroupFilter(g.id)}
+                    style={{
+                      padding: "5px 12px",
+                      borderRadius: "16px",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      border: replayGroupFilter === g.id ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                      background: replayGroupFilter === g.id ? "rgba(0, 229, 255, 0.25)" : "transparent",
+                      color: replayGroupFilter === g.id ? "#00e5ff" : "rgba(255,255,255,0.7)",
+                    }}
+                  >
+                    {g.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Replay Videos Grid */}
+            {filteredReplays.length === 0 ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "70px 20px",
+                  color: "rgba(255,255,255,0.6)",
+                  background: "rgba(10, 25, 47, 0.5)",
+                  borderRadius: "16px",
+                  border: "1px dashed rgba(239, 68, 68, 0.35)",
+                }}
+              >
+                <div style={{ fontSize: "44px", marginBottom: "14px" }}>📺</div>
+                <div style={{ fontSize: "18px", fontWeight: "800", color: "#ffffff", marginBottom: "6px" }}>
+                  {replays.length === 0
+                    ? "ยังไม่มีคลิปย้อนหลังในขณะนี้"
+                    : "ไม่พบคลิปย้อนหลังที่ตรงกับตัวกรอง"}
+                </div>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", maxWidth: "460px", margin: "0 auto" }}>
+                  {replays.length === 0
+                    ? "เทปบันทึกการแข่งขันจะถูกอัปเดตอย่างต่อเนื่องหลังจากการแข่งขันแต่ละสัปดาห์สิ้นสุดลง"
+                    : "ลองเปลี่ยนตัวกรองรอบการแข่ง กลุ่ม หรือคำค้นหาใหม่อีกครั้ง"}
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                  gap: "22px",
+                }}
+              >
+                {filteredReplays.map((rep) => {
+                  const yId = rep.youtubeId || getYouTubeId(rep.url);
+                  const thumbUrl = yId
+                    ? `https://img.youtube.com/vi/${yId}/hqdefault.jpg`
+                    : "/img/fan_broadcast_logo.png";
+
+                  return (
+                    <div
+                      key={rep.id}
+                      style={{
+                        background: "linear-gradient(150deg, rgba(16, 32, 60, 0.95) 0%, rgba(6, 14, 30, 0.98) 100%)",
+                        borderRadius: "16px",
+                        border: "1.5px solid rgba(239, 68, 68, 0.35)",
+                        overflow: "hidden",
+                        display: "flex",
+                        flexDirection: "column",
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.55)",
+                        transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.boxShadow = "0 14px 35px rgba(239, 68, 68, 0.35), 0 0 20px rgba(239, 68, 68, 0.2)";
+                        e.currentTarget.style.borderColor = "#ef4444";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.55)";
+                        e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.35)";
+                      }}
+                    >
+                      {/* Thumbnail Container */}
+                      <div
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                          paddingTop: "56.25%",
+                          background: "#050b14",
+                          cursor: "pointer",
+                          overflow: "hidden",
+                        }}
+                        onClick={() => {
+                          if (yId) {
+                            setActiveVideoModal({
+                              ...rep,
+                              youtubeId: yId,
+                            });
+                          } else if (rep.url) {
+                            window.open(rep.url, "_blank", "noopener,noreferrer");
+                          }
+                        }}
+                      >
+                        <img
+                          src={thumbUrl}
+                          alt={rep.title}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+
+                        {/* Dark Gradient Overlay */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%)",
+                          }}
+                        />
+
+                        {/* YouTube Play Icon Button */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            width: "56px",
+                            height: "40px",
+                            background: "rgba(239, 68, 68, 0.95)",
+                            borderRadius: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 0 25px rgba(239, 68, 68, 0.8)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 0,
+                              height: 0,
+                              borderTop: "8px solid transparent",
+                              borderBottom: "8px solid transparent",
+                              borderLeft: "14px solid #ffffff",
+                              marginLeft: "3px",
+                            }}
+                          />
+                        </div>
+
+                        {/* Matchday Badge on top right */}
+                        {rep.matchdayName && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "10px",
+                              right: "10px",
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              background: "rgba(3, 10, 24, 0.85)",
+                              border: "1px solid rgba(0, 229, 255, 0.4)",
+                              color: "#00e5ff",
+                              fontSize: "11px",
+                              fontWeight: "800",
+                              backdropFilter: "blur(4px)",
+                            }}
+                          >
+                            {rep.matchdayName}
+                          </div>
+                        )}
+
+                        {/* Group Badge on top left */}
+                        {rep.group && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "10px",
+                              left: "10px",
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              background: rep.group === "A" ? "#00e5ff" : "#ffd700",
+                              color: "#030814",
+                              fontSize: "11px",
+                              fontWeight: "900",
+                            }}
+                          >
+                            กลุ่ม {rep.group}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card Content Body */}
+                      <div style={{ padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column" }}>
+                        <h3
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "800",
+                            color: "#ffffff",
+                            margin: "0 0 10px 0",
+                            lineHeight: "1.4",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            if (yId) {
+                              setActiveVideoModal({ ...rep, youtubeId: yId });
+                            } else if (rep.url) {
+                              window.open(rep.url, "_blank", "noopener,noreferrer");
+                            }
+                          }}
+                        >
+                          {rep.title}
+                        </h3>
+
+                        {/* Matchup preview if available */}
+                        {rep.player1 && rep.player2 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: "8px",
+                              padding: "8px 10px",
+                              borderRadius: "10px",
+                              background: "rgba(6, 16, 36, 0.6)",
+                              border: "1px solid rgba(255, 255, 255, 0.08)",
+                              marginBottom: "12px",
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1 }}>
+                              {rep.player1.photo && (
+                                <img
+                                  src={getOptimizedAvatarUrl(rep.player1.photo, 60)}
+                                  alt={rep.player1.name}
+                                  style={{ width: "24px", height: "24px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                                />
+                              )}
+                              <span style={{ fontSize: "12px", color: "#ffffff", fontWeight: "700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {rep.player1.nickname || rep.player1.name}
+                              </span>
+                            </div>
+                            <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", fontWeight: "900" }}>VS</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1, justifyContent: "flex-end" }}>
+                              <span style={{ fontSize: "12px", color: "#ffffff", fontWeight: "700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {rep.player2.nickname || rep.player2.name}
+                              </span>
+                              {rep.player2.photo && (
+                                <img
+                                  src={getOptimizedAvatarUrl(rep.player2.photo, 60)}
+                                  alt={rep.player2.name}
+                                  style={{ width: "24px", height: "24px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {rep.description && (
+                          <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginBottom: "14px", flex: 1 }}>
+                            {rep.description}
+                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "auto" }}>
+                          {yId && (
+                            <button
+                              type="button"
+                              onClick={() => setActiveVideoModal({ ...rep, youtubeId: yId })}
+                              style={{
+                                flex: 1,
+                                padding: "8px 14px",
+                                borderRadius: "8px",
+                                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(185, 28, 28, 0.5) 100%)",
+                                border: "1.5px solid #ef4444",
+                                color: "#fecaca",
+                                fontSize: "12px",
+                                fontWeight: "800",
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "6px",
+                                boxShadow: "0 0 10px rgba(239, 68, 68, 0.3)",
+                              }}
+                            >
+                              <span>▶️</span>
+                              <span>รับชมในเว็บ</span>
+                            </button>
+                          )}
+                          <a
+                            href={rep.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              padding: "8px 14px",
+                              borderRadius: "8px",
+                              background: "rgba(255, 255, 255, 0.08)",
+                              border: "1px solid rgba(255, 255, 255, 0.2)",
+                              color: "#ffffff",
+                              fontSize: "12px",
+                              fontWeight: "700",
+                              textDecoration: "none",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "4px",
+                            }}
+                          >
+                            <span>🔗 YouTube</span>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1907,6 +2457,142 @@ export default function TournamentClient({ initialData }) {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          YOUTUBE VIDEO PLAYER MODAL
+         ======================================================== */}
+      {activeVideoModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 2100,
+            background: "rgba(2, 6, 18, 0.92)",
+            backdropFilter: "blur(14px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+          onClick={() => setActiveVideoModal(null)}
+        >
+          <div
+            className="tournament-modal-zoom"
+            style={{
+              background: "linear-gradient(150deg, rgba(16, 32, 60, 0.98) 0%, rgba(8, 16, 32, 0.99) 100%)",
+              borderRadius: "20px",
+              border: "2px solid #ef4444",
+              boxShadow: "0 0 40px rgba(239, 68, 68, 0.4), 0 20px 60px rgba(0, 0, 0, 0.8)",
+              width: "100%",
+              maxWidth: "880px",
+              overflow: "hidden",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: "16px 20px",
+                background: "linear-gradient(90deg, rgba(185, 28, 28, 0.3) 0%, rgba(10, 25, 47, 0.6) 100%)",
+                borderBottom: "1.5px solid rgba(239, 68, 68, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                <span style={{ fontSize: "20px" }}>📺</span>
+                <div style={{ minWidth: 0 }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#ffffff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {activeVideoModal.title || "รับชมการแข่งขันย้อนหลัง"}
+                  </h3>
+                  {activeVideoModal.matchdayName && (
+                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "2px" }}>
+                      {activeVideoModal.matchdayName} {activeVideoModal.group ? `• กลุ่ม ${activeVideoModal.group}` : ""}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveVideoModal(null)}
+                style={{
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  color: "#ffffff",
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Video Iframe 16:9 */}
+            <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", background: "#000" }}>
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${activeVideoModal.youtubeId}?autoplay=1`}
+                title={activeVideoModal.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: "none",
+                }}
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: "14px 20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "12px",
+                background: "rgba(6, 14, 30, 0.8)",
+              }}
+            >
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)" }}>
+                {activeVideoModal.description || "เทปบันทึกการแข่งขัน FANPANTAE TOURNAMENT"}
+              </div>
+              <a
+                href={activeVideoModal.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: "20px",
+                  background: "#ef4444",
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  fontWeight: "800",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  boxShadow: "0 0 15px rgba(239, 68, 68, 0.5)",
+                }}
+              >
+                <span>🔗 เปิดดูบน YouTube</span>
+              </a>
             </div>
           </div>
         </div>
@@ -2605,7 +3291,7 @@ function FanpantaeStandingsTable({ groupName, badgeColor, list, onSelectContesta
 // ========================================================
 // SUB-COMPONENT: FANPANTAE MATCH CARD (Broadcast Esports Arena + Excel View)
 // ========================================================
-function FanpantaeMatchCard({ match, onSelectContestant }) {
+function FanpantaeMatchCard({ match, onSelectContestant, onPlayVideo }) {
   const [showSpreadsheet, setShowSpreadsheet] = useState(false);
   const isCompleted = match.status === "completed";
   const isInProgress = match.status === "in_progress";
@@ -2871,6 +3557,38 @@ function FanpantaeMatchCard({ match, onSelectContestant }) {
             </div>
           ) : (
             <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>รอการแข่งขันตามกำหนดการ</div>
+          )}
+
+          {/* YouTube Replay Button */}
+          {match.youtubeUrl && (
+            <button
+              type="button"
+              onClick={() => {
+                if (onPlayVideo) {
+                  onPlayVideo(match.youtubeUrl, match);
+                } else {
+                  window.open(match.youtubeUrl, "_blank", "noopener,noreferrer");
+                }
+              }}
+              style={{
+                padding: "4px 12px",
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(185, 28, 28, 0.45) 100%)",
+                border: "1.5px solid #ef4444",
+                color: "#ffffff",
+                fontSize: "11px",
+                fontWeight: "800",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                boxShadow: "0 0 12px rgba(239, 68, 68, 0.4)",
+                transition: "all 0.15s ease",
+              }}
+              title="รับชมเทปการแข่งขันย้อนหลังผ่าน YouTube"
+            >
+              <span>▶️ ดูย้อนหลัง</span>
+            </button>
           )}
 
           {/* View Mode Toggle Pill Button */}

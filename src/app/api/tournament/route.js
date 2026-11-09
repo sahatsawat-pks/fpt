@@ -81,6 +81,40 @@ export async function POST(request) {
 
       currentData.matchdays[mdIndex].matches[matchIndex] = updatedMatch;
 
+      // Auto-sync replay if matchData has youtubeUrl
+      if (matchData.youtubeUrl !== undefined) {
+        if (!Array.isArray(currentData.replays)) {
+          currentData.replays = [];
+        }
+        const cleanUrl = String(matchData.youtubeUrl || "").trim();
+        const repIdx = currentData.replays.findIndex((r) => r.matchId === matchId);
+        if (cleanUrl) {
+          const p1Name = updatedMatch.player1?.nickname ? `${updatedMatch.player1.nickname} (${updatedMatch.player1.name})` : (updatedMatch.player1?.name || "Player 1");
+          const p2Name = updatedMatch.player2?.nickname ? `${updatedMatch.player2.nickname} (${updatedMatch.player2.name})` : (updatedMatch.player2?.name || "Player 2");
+          const repTitle = `คู่ที่ ${updatedMatch.matchNumber || updatedMatch.id} (กลุ่ม ${updatedMatch.group}): ${p1Name} vs ${p2Name}`;
+
+          if (repIdx !== -1) {
+            currentData.replays[repIdx].url = cleanUrl;
+            currentData.replays[repIdx].updatedAt = new Date().toISOString();
+          } else {
+            currentData.replays.unshift({
+              id: `rep-${matchId}-${Date.now()}`,
+              title: repTitle,
+              url: cleanUrl,
+              matchId: matchId,
+              matchdayId: matchdayId,
+              matchdayName: currentData.matchdays[mdIndex].name,
+              group: updatedMatch.group,
+              description: `${updatedMatch.player1?.topic || ""} vs ${updatedMatch.player2?.topic || ""}`,
+              createdAt: new Date().toISOString(),
+            });
+          }
+        } else if (repIdx !== -1) {
+          // If url cleared, remove that match's auto-replay
+          currentData.replays.splice(repIdx, 1);
+        }
+      }
+
       // Recalculate standings, contestant topic sets (set 1 & 2), and topic rankings
       currentData = syncTournamentData(currentData);
       currentData.updatedAt = new Date().toISOString();
@@ -257,6 +291,69 @@ export async function POST(request) {
       });
 
       currentData = syncTournamentData(currentData);
+      currentData.updatedAt = new Date().toISOString();
+      await saveKVData("fpt_tournament", currentData, writeData);
+      return NextResponse.json({ success: true, data: currentData });
+    }
+
+    // Save or update entire replays list
+    if (action === "save_replays" && Array.isArray(body.replays)) {
+      currentData.replays = body.replays;
+      currentData.updatedAt = new Date().toISOString();
+      await saveKVData("fpt_tournament", currentData, writeData);
+      return NextResponse.json({ success: true, data: currentData });
+    }
+
+    // Add or update single replay
+    if (action === "save_replay" && body.replay) {
+      if (!Array.isArray(currentData.replays)) {
+        currentData.replays = [];
+      }
+      const incoming = body.replay;
+      const replayId = incoming.id || `rep-${Date.now()}`;
+      const existingIdx = currentData.replays.findIndex((r) => r.id === replayId);
+      const replayItem = {
+        ...incoming,
+        id: replayId,
+        updatedAt: new Date().toISOString(),
+      };
+      if (existingIdx !== -1) {
+        currentData.replays[existingIdx] = replayItem;
+      } else {
+        currentData.replays.unshift(replayItem);
+      }
+
+      // If replay links to a match, also sync youtubeUrl to that match
+      if (incoming.matchId && incoming.matchdayId) {
+        const md = (currentData.matchdays || []).find((m) => m.id === incoming.matchdayId);
+        if (md) {
+          const match = (md.matches || []).find((m) => m.id === incoming.matchId);
+          if (match) {
+            match.youtubeUrl = incoming.url || incoming.youtubeUrl || "";
+          }
+        }
+      }
+
+      currentData.updatedAt = new Date().toISOString();
+      await saveKVData("fpt_tournament", currentData, writeData);
+      return NextResponse.json({ success: true, data: currentData, replay: replayItem });
+    }
+
+    // Delete single replay
+    if (action === "delete_replay" && body.id) {
+      if (Array.isArray(currentData.replays)) {
+        const toDelete = currentData.replays.find((r) => r.id === body.id);
+        currentData.replays = currentData.replays.filter((r) => r.id !== body.id);
+        if (toDelete?.matchId && toDelete?.matchdayId) {
+          const md = (currentData.matchdays || []).find((m) => m.id === toDelete.matchdayId);
+          if (md) {
+            const match = (md.matches || []).find((m) => m.id === toDelete.matchId);
+            if (match && match.youtubeUrl === toDelete.url) {
+              delete match.youtubeUrl;
+            }
+          }
+        }
+      }
       currentData.updatedAt = new Date().toISOString();
       await saveKVData("fpt_tournament", currentData, writeData);
       return NextResponse.json({ success: true, data: currentData });

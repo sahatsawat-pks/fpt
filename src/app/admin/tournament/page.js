@@ -4,6 +4,14 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import defaultTournamentData from "@/app/data/tournament.json";
 
+export function getYouTubeId(url) {
+  if (!url || typeof url !== "string") return null;
+  const clean = url.trim();
+  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|live|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = clean.match(regExp);
+  return match && match[1] ? match[1] : null;
+}
+
 // ========================================================
 // CUSTOM CONTESTANT DROPDOWN (Matches /admin dropdown design)
 // ========================================================
@@ -606,6 +614,19 @@ export default function AdminTournamentPage() {
   const [contestantPhotos, setContestantPhotos] = useState({});
   const [savingContestantName, setSavingContestantName] = useState(null);
 
+  // YouTube Replays State
+  const [editingReplay, setEditingReplay] = useState(null);
+  const [replayFormData, setReplayFormData] = useState({
+    id: "",
+    title: "",
+    url: "",
+    matchdayId: "",
+    matchId: "",
+    description: "",
+  });
+  const [savingReplay, setSavingReplay] = useState(false);
+  const [replayFilterSearch, setReplayFilterSearch] = useState("");
+
   const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
@@ -775,6 +796,7 @@ export default function AdminTournamentPage() {
       group: match.group,
       status: initialStatus,
       winner: match.winner || null,
+      youtubeUrl: match.youtubeUrl || "",
       player1: {
         name: match.player1?.name || "",
         nickname: match.player1?.nickname || "",
@@ -1321,6 +1343,126 @@ export default function AdminTournamentPage() {
     }
   };
 
+  // Handle Save Replay
+  const handleSaveReplay = async (e) => {
+    if (e) e.preventDefault();
+    if (!replayFormData.url.trim()) {
+      showToast("กรุณากรอก URL วิดีโอ YouTube", "error");
+      return;
+    }
+    const yId = getYouTubeId(replayFormData.url);
+    if (!yId) {
+      showToast("รูปแบบลิงก์ YouTube ไม่ถูกต้อง กรุณาตรวจสอบลิงก์", "error");
+      return;
+    }
+
+    setSavingReplay(true);
+    try {
+      const payload = {
+        action: "save_replay",
+        replay: {
+          id: replayFormData.id || `rep-${Date.now()}`,
+          title: replayFormData.title.trim() || `คลิปบันทึกการแข่งขัน YouTube`,
+          url: replayFormData.url.trim(),
+          youtubeId: yId,
+          matchdayId: replayFormData.matchdayId || null,
+          matchId: replayFormData.matchId || null,
+          description: replayFormData.description.trim() || "",
+        },
+      };
+
+      const res = await fetch("/api/tournament", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        setData(result.data);
+        showToast("บันทึกคลิป YouTube ย้อนหลังสำเร็จ!");
+        setEditingReplay(null);
+        setReplayFormData({
+          id: "",
+          title: "",
+          url: "",
+          matchdayId: "",
+          matchId: "",
+          description: "",
+        });
+      } else {
+        showToast(result.error || "เกิดข้อผิดพลาดในการบันทึก", "error");
+      }
+    } catch (err) {
+      console.error("Save replay error:", err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย", "error");
+    } finally {
+      setSavingReplay(false);
+    }
+  };
+
+  const handleEditReplay = (rep) => {
+    setEditingReplay(rep);
+    setReplayFormData({
+      id: rep.id || "",
+      title: rep.title || "",
+      url: rep.url || "",
+      matchdayId: rep.matchdayId || "",
+      matchId: rep.matchId || "",
+      description: rep.description || "",
+    });
+    const el = document.getElementById("replay-form-section");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleDeleteReplay = async (replayId) => {
+    if (!confirm("คุณต้องการลบคลิปย้อนหลังนี้ใช่หรือไม่?")) return;
+    try {
+      const res = await fetch("/api/tournament", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_replay", id: replayId }),
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        setData(result.data);
+        showToast("ลบคลิป YouTube เรียบร้อยแล้ว");
+      } else {
+        showToast(result.error || "ลบไม่สำเร็จ", "error");
+      }
+    } catch (err) {
+      showToast("เกิดข้อผิดพลาดในการลบ", "error");
+    }
+  };
+
+  const handleSelectMatchForReplay = (matchUniqueKey) => {
+    if (!matchUniqueKey) {
+      setReplayFormData((prev) => ({
+        ...prev,
+        matchdayId: "",
+        matchId: "",
+      }));
+      return;
+    }
+    const [mdId, mId] = matchUniqueKey.split("::");
+    const targetMd = (data?.matchdays || []).find((m) => m.id === mdId);
+    const targetMatch = targetMd?.matches?.find((m) => m.id === mId);
+    if (targetMatch) {
+      const p1Name = targetMatch.player1?.nickname ? `${targetMatch.player1.nickname} (${targetMatch.player1.name})` : (targetMatch.player1?.name || "Player 1");
+      const p2Name = targetMatch.player2?.nickname ? `${targetMatch.player2.nickname} (${targetMatch.player2.name})` : (targetMatch.player2?.name || "Player 2");
+      const autoTitle = `คู่ที่ ${targetMatch.matchNumber || targetMatch.id} (กลุ่ม ${targetMatch.group}): ${p1Name} vs ${p2Name}`;
+      const autoDesc = `${targetMatch.player1?.topic || ""} vs ${targetMatch.player2?.topic || ""}`;
+
+      setReplayFormData((prev) => ({
+        ...prev,
+        matchdayId: mdId,
+        matchId: mId,
+        title: prev.title ? prev.title : autoTitle,
+        description: prev.description ? prev.description : autoDesc,
+        url: targetMatch.youtubeUrl ? targetMatch.youtubeUrl : prev.url,
+      }));
+    }
+  };
+
   // Auth Gate
   if (authChecking) {
     return (
@@ -1664,6 +1806,7 @@ export default function AdminTournamentPage() {
             { id: "matches", label: "🎯 บันทึกผลการแข่งขัน (Match Scoring)" },
             { id: "contestants", label: `👥 รายชื่อผู้เข้าแข่งขัน & ผูกรูปภาพ (${contestants.length})` },
             { id: "standings", label: "📊 ตรวจสอบตารางคะแนน (Standings & Sync)" },
+            { id: "replays", label: `📺 จัดการคลิปย้อนหลัง YouTube (${(data?.replays || []).length})` },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -2265,6 +2408,463 @@ export default function AdminTournamentPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 4: YOUTUBE REPLAYS MANAGEMENT
+           ======================================================== */}
+        {activeTab === "replays" && (
+          <div className="admin-tab-content">
+            {/* Header Card */}
+            <div
+              style={{
+                marginBottom: "24px",
+                padding: "20px 24px",
+                borderRadius: "16px",
+                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)",
+                border: "1.5px solid rgba(239, 68, 68, 0.35)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "16px",
+              }}
+            >
+              <div>
+                <h2 style={{ fontSize: "20px", fontWeight: "900", color: "#fca5a5", display: "flex", alignItems: "center", gap: "10px", margin: 0 }}>
+                  <span>📺</span> จัดการคลิปวิดีโอรับชมย้อนหลัง (YouTube Match Replays)
+                </h2>
+                <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "6px 0 0" }}>
+                  เพิ่มหรือแก้ไขลิงก์เทปบันทึกการแข่งขัน YouTube เพื่อให้แสดงผลในหน้า /tournament ทั้งแบบรับชมบนเว็บ (Embed Modal) และลิงก์ไปยัง YouTube
+                </p>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: "20px",
+                    background: "rgba(239, 68, 68, 0.2)",
+                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                    color: "#fca5a5",
+                    fontSize: "13px",
+                    fontWeight: "800",
+                  }}
+                >
+                  ทั้งหมด {(data?.replays || []).length} คลิป
+                </span>
+              </div>
+            </div>
+
+            {/* Replay Form (Add / Edit) */}
+            <div
+              id="replay-form-section"
+              style={{
+                marginBottom: "32px",
+                padding: "24px",
+                borderRadius: "16px",
+                background: "rgba(10, 22, 40, 0.85)",
+                border: editingReplay ? "2px solid #ef4444" : "1px solid rgba(239, 68, 68, 0.3)",
+                boxShadow: editingReplay ? "0 0 30px rgba(239, 68, 68, 0.25)" : "0 8px 32px rgba(0,0,0,0.4)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+                <h3 style={{ fontSize: "17px", fontWeight: "900", color: "#ffffff", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span>{editingReplay ? "✏️ แก้ไขคลิปย้อนหลัง" : "➕ เพิ่มคลิปบันทึกการแข่งขันใหม่"}</span>
+                </h3>
+                {editingReplay && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingReplay(null);
+                      setReplayFormData({
+                        id: "",
+                        title: "",
+                        url: "",
+                        matchdayId: "",
+                        matchId: "",
+                        description: "",
+                      });
+                    }}
+                    style={{
+                      padding: "5px 12px",
+                      borderRadius: "6px",
+                      background: "rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      color: "#ffffff",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ✕ ยกเลิกการแก้ไข (สร้างใหม่)
+                  </button>
+                )}
+              </div>
+
+              <form onSubmit={handleSaveReplay}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+                  {/* Select Match Shortcut */}
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#93c5fd", marginBottom: "6px" }}>
+                      🎯 ผูกกับคู่แข่งขัน (Auto-fill ข้อมูล)
+                    </label>
+                    <select
+                      value={replayFormData.matchdayId && replayFormData.matchId ? `${replayFormData.matchdayId}::${replayFormData.matchId}` : ""}
+                      onChange={(e) => handleSelectMatchForReplay(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: "8px",
+                        background: "#070c18",
+                        border: "1px solid rgba(0, 229, 255, 0.3)",
+                        color: "#ffffff",
+                        fontSize: "13px",
+                        outline: "none",
+                      }}
+                    >
+                      <option value="">-- ไม่ระบุคู่แข่งขัน (คลิปทั่วไป/ไฮไลท์) --</option>
+                      {(data?.matchdays || []).map((md) => (
+                        <optgroup key={md.id} label={md.name}>
+                          {(md.matches || []).map((m) => {
+                            const p1 = m.player1?.nickname ? `${m.player1.nickname} (${m.player1.name})` : (m.player1?.name || "P1");
+                            const p2 = m.player2?.nickname ? `${m.player2.nickname} (${m.player2.name})` : (m.player2?.name || "P2");
+                            return (
+                              <option key={m.id} value={`${md.id}::${m.id}`}>
+                                คู่ที่ {m.matchNumber || m.id} (กลุ่ม {m.group}): {p1} vs {p2} {m.youtubeUrl ? "✓ มีคลิปแล้ว" : ""}
+                              </option>
+                            );
+                          })}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* YouTube URL */}
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#fca5a5", marginBottom: "6px" }}>
+                      🔗 ลิงก์ YouTube (URL) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="https://www.youtube.com/watch?v=... หรือ youtu.be/..."
+                      value={replayFormData.url}
+                      onChange={(e) => setReplayFormData({ ...replayFormData, url: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: "8px",
+                        background: "#070c18",
+                        border: "1px solid rgba(239, 68, 68, 0.4)",
+                        color: "#ffffff",
+                        fontSize: "13px",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+                  {/* Title */}
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#e2e8f0", marginBottom: "6px" }}>
+                      📝 ชื่อคลิป / หัวข้อการแข่งขัน *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="เช่น คู่ที่ 1 (กลุ่ม A): กัปตัน vs ไผ่"
+                      value={replayFormData.title}
+                      onChange={(e) => setReplayFormData({ ...replayFormData, title: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: "8px",
+                        background: "#070c18",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        color: "#ffffff",
+                        fontSize: "13px",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+
+                  {/* Description / Subtitle */}
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#e2e8f0", marginBottom: "6px" }}>
+                      ℹ️ รายละเอียดเพิ่มเติม / หัวข้อคำถาม
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="เช่น เกาะรัตนโกสินทร์ vs หนังไทย"
+                      value={replayFormData.description}
+                      onChange={(e) => setReplayFormData({ ...replayFormData, description: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: "8px",
+                        background: "#070c18",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        color: "#ffffff",
+                        fontSize: "13px",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Live YouTube Preview if URL valid */}
+                {replayFormData.url && getYouTubeId(replayFormData.url) && (
+                  <div
+                    style={{
+                      marginBottom: "18px",
+                      padding: "12px 16px",
+                      borderRadius: "10px",
+                      background: "rgba(239, 68, 68, 0.1)",
+                      border: "1px dashed rgba(239, 68, 68, 0.4)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "16px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <img
+                      src={`https://img.youtube.com/vi/${getYouTubeId(replayFormData.url)}/hqdefault.jpg`}
+                      alt="Preview"
+                      style={{ width: "130px", height: "74px", objectFit: "cover", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.5)" }}
+                    />
+                    <div style={{ flex: 1, minWidth: "200px" }}>
+                      <div style={{ fontSize: "12px", color: "#86efac", fontWeight: "800", marginBottom: "4px" }}>
+                        ✓ รูปแบบ URL ถูกต้อง (YouTube ID: {getYouTubeId(replayFormData.url)})
+                      </div>
+                      <div style={{ fontSize: "13px", color: "#ffffff", fontWeight: "700" }}>
+                        {replayFormData.title || "ตัวอย่างชื่อคลิป"}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                        {replayFormData.description || "เทปบันทึกการแข่งขัน FANPANTAE TOURNAMENT"}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                  <button
+                    type="submit"
+                    disabled={savingReplay}
+                    style={{
+                      padding: "10px 24px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
+                      border: "none",
+                      color: "#ffffff",
+                      fontSize: "14px",
+                      fontWeight: "800",
+                      cursor: savingReplay ? "not-allowed" : "pointer",
+                      boxShadow: "0 0 16px rgba(239, 68, 68, 0.4)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <span>{savingReplay ? "กำลังบันทึก..." : (editingReplay ? "💾 อัปเดตคลิปย้อนหลัง" : "➕ บันทึกคลิปใหม่")}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* List of Existing Replays */}
+            <div
+              style={{
+                padding: "20px 24px",
+                borderRadius: "16px",
+                background: "rgba(10, 22, 40, 0.75)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              }}
+            >
+              {/* Filter / Search Bar */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "14px", marginBottom: "20px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ffffff", margin: 0 }}>
+                  📋 รายการคลิปย้อนหลังทั้งหมด ({Array.isArray(data?.replays) ? data.replays.length : 0})
+                </h3>
+                <div style={{ position: "relative", minWidth: "240px" }}>
+                  <input
+                    type="text"
+                    placeholder="🔍 ค้นหาคลิป, ชื่อคู่แข่ง, หรือหัวข้อ..."
+                    value={replayFilterSearch}
+                    onChange={(e) => setReplayFilterSearch(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: "8px",
+                      background: "#070c18",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      color: "#ffffff",
+                      fontSize: "12px",
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Replays Table or Grid */}
+              {(() => {
+                const list = (data?.replays || []).filter((r) => {
+                  if (!replayFilterSearch.trim()) return true;
+                  const q = replayFilterSearch.trim().toLowerCase();
+                  return (
+                    (r.title || "").toLowerCase().includes(q) ||
+                    (r.description || "").toLowerCase().includes(q) ||
+                    (r.url || "").toLowerCase().includes(q)
+                  );
+                });
+
+                if (list.length === 0) {
+                  return (
+                    <div style={{ textAlign: "center", padding: "40px 20px", color: "rgba(255,255,255,0.4)" }}>
+                      <div style={{ fontSize: "36px", marginBottom: "8px" }}>📺</div>
+                      <div>ยังไม่มีรายการคลิปย้อนหลัง หรือไม่พบผลการค้นหา</div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {list.map((rep) => {
+                      const yId = rep.youtubeId || getYouTubeId(rep.url);
+                      return (
+                        <div
+                          key={rep.id}
+                          style={{
+                            padding: "14px 18px",
+                            borderRadius: "12px",
+                            background: "rgba(6, 14, 30, 0.8)",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            flexWrap: "wrap",
+                            gap: "14px",
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "14px", minWidth: 0, flex: 1 }}>
+                            {yId ? (
+                              <img
+                                src={`https://img.youtube.com/vi/${yId}/hqdefault.jpg`}
+                                alt={rep.title}
+                                style={{ width: "90px", height: "52px", objectFit: "cover", borderRadius: "6px", flexShrink: 0, border: "1px solid rgba(239,68,68,0.4)" }}
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  width: "90px",
+                                  height: "52px",
+                                  background: "#1e293b",
+                                  borderRadius: "6px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  color: "#ffffff",
+                                  fontSize: "20px",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                📺
+                              </div>
+                            )}
+
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                <span style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>{rep.title}</span>
+                                {rep.group && (
+                                  <span
+                                    style={{
+                                      fontSize: "10px",
+                                      fontWeight: "800",
+                                      padding: "1px 6px",
+                                      borderRadius: "4px",
+                                      background: rep.group === "A" ? "#00e5ff" : "#ffd700",
+                                      color: "#000",
+                                    }}
+                                  >
+                                    กลุ่ม {rep.group}
+                                  </span>
+                                )}
+                              </div>
+                              {rep.description && (
+                                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "2px" }}>
+                                  {rep.description}
+                                </div>
+                              )}
+                              <div style={{ fontSize: "11px", color: "#fca5a5", marginTop: "3px", wordBreak: "break-all" }}>
+                                {rep.url}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                            <a
+                              href={rep.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                padding: "6px 12px",
+                                borderRadius: "6px",
+                                background: "rgba(239, 68, 68, 0.15)",
+                                border: "1px solid rgba(239, 68, 68, 0.3)",
+                                color: "#fca5a5",
+                                fontSize: "12px",
+                                fontWeight: "700",
+                                textDecoration: "none",
+                              }}
+                            >
+                              ▶️ เปิดดู
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => handleEditReplay(rep)}
+                              style={{
+                                padding: "6px 12px",
+                                borderRadius: "6px",
+                                background: "rgba(0, 229, 255, 0.15)",
+                                border: "1px solid rgba(0, 229, 255, 0.3)",
+                                color: "#00e5ff",
+                                fontSize: "12px",
+                                fontWeight: "700",
+                                cursor: "pointer",
+                              }}
+                            >
+                              ✏️ แก้ไข
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteReplay(rep.id)}
+                              style={{
+                                padding: "6px 12px",
+                                borderRadius: "6px",
+                                background: "rgba(239, 68, 68, 0.2)",
+                                border: "1px solid rgba(239, 68, 68, 0.5)",
+                                color: "#ef4444",
+                                fontSize: "12px",
+                                fontWeight: "700",
+                                cursor: "pointer",
+                              }}
+                            >
+                              🗑️ ลบ
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
@@ -2959,6 +3559,74 @@ export default function AdminTournamentPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* YouTube Replay URL Input */}
+            <div
+              style={{
+                marginTop: "16px",
+                marginBottom: "20px",
+                padding: "14px 16px",
+                borderRadius: "10px",
+                background: "rgba(239, 68, 68, 0.08)",
+                border: "1px solid rgba(239, 68, 68, 0.3)",
+              }}
+            >
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: "13px",
+                  fontWeight: "800",
+                  color: "#fca5a5",
+                  marginBottom: "8px",
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>📺</span> ลิงก์ YouTube สำหรับรับชมย้อนหลัง (Replay URL)
+                </span>
+                {matchFormData.youtubeUrl && getYouTubeId(matchFormData.youtubeUrl) && (
+                  <span style={{ fontSize: "11px", color: "#86efac", fontWeight: "700" }}>✓ ตรวจพบ Video ID</span>
+                )}
+              </label>
+              <input
+                type="text"
+                value={matchFormData.youtubeUrl || ""}
+                onChange={(e) => setMatchFormData({ ...matchFormData, youtubeUrl: e.target.value })}
+                placeholder="https://www.youtube.com/watch?v=... หรือ https://youtu.be/..."
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  background: "#070c18",
+                  border: "1px solid rgba(239, 68, 68, 0.4)",
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+              {matchFormData.youtubeUrl && getYouTubeId(matchFormData.youtubeUrl) && (
+                <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                  <img
+                    src={`https://img.youtube.com/vi/${getYouTubeId(matchFormData.youtubeUrl)}/hqdefault.jpg`}
+                    alt="YouTube Preview"
+                    style={{ width: "120px", height: "68px", objectFit: "cover", borderRadius: "6px", border: "1px solid rgba(239,68,68,0.5)" }}
+                  />
+                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)" }}>
+                    <div>วิดีโอจะปรากฏปุ่ม <strong>▶️ ดูย้อนหลัง</strong> ในการ์ดคู่นี้ทันทีหลังบันทึก</div>
+                    <a
+                      href={matchFormData.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#ef4444", textDecoration: "underline", marginTop: "4px", display: "inline-block" }}
+                    >
+                      ทดสอบเปิดลิงก์ ↗
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Modal Actions */}
