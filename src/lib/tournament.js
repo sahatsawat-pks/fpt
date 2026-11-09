@@ -138,7 +138,7 @@ export function evaluateMatch(
       autoLp2 = 0;
     } else if (finalGp1 === 3 && finalGp2 === 0) {
       autoLp1 = 3;
-      autoLp2 = -1;
+      autoLp2 = 0;
     } else {
       autoLp1 = 3;
       autoLp2 = 0;
@@ -153,7 +153,7 @@ export function evaluateMatch(
       autoLp1 = 0;
     } else if (finalGp2 === 3 && finalGp1 === 0) {
       autoLp2 = 3;
-      autoLp1 = -1;
+      autoLp1 = 0;
     } else {
       autoLp2 = 3;
       autoLp1 = 0;

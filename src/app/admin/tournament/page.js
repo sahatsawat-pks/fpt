@@ -944,7 +944,7 @@ export default function AdminTournamentPage() {
           lp2 = 0;
         } else if (finalGp1 === 3 && finalGp2 === 0) {
           lp1 = 3;
-          lp2 = -1;
+          lp2 = 0;
         } else {
           lp1 = 3;
           lp2 = 0;
@@ -959,7 +959,7 @@ export default function AdminTournamentPage() {
           lp1 = 0;
         } else if (finalGp2 === 3 && finalGp1 === 0) {
           lp2 = 3;
-          lp1 = -1;
+          lp1 = 0;
         } else {
           lp2 = 3;
           lp1 = 0;
