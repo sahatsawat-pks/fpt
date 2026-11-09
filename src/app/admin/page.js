@@ -2230,9 +2230,11 @@ export default function AdminPage() {
                                             onClick={() => {
                                               setSelectedFinalsPlayerOrder(String(p.order));
                                               setIsFinalsDropdownOpen(false);
-                                              const catKeys = ["3sec", "qa", "jigsaw", "attribute"];
+                                              const catKeys = selectedHistoryYear === "2023"
+                                                ? ["3sec", "actionGame", "qa", "jigsaw", "attribute"]
+                                                : ["3sec", "qa", "jigsaw", "attribute"];
                                               for (const k of catKeys) {
-                                                const v = p.scores?.[k];
+                                                const v = p.scores?.[k] ?? (k === "actionGame" ? p.scores?.action : null);
                                                 if (v !== null && v !== undefined && v !== "X") {
                                                   setSelectedFinalsCategory(k);
                                                   setFinalsInputScore(String(v));
@@ -2290,13 +2292,22 @@ export default function AdminPage() {
                               <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.7)", marginBottom: "6px", fontWeight: "700" }}>
                                 2. เลือกหมวดการแข่งขัน (เลือกได้ 1 หมวด):
                               </label>
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                {[
-                                  { key: "3sec", label: "⏱️ 3 วินาที" },
-                                  { key: "qa", label: "❓ ถาม-ตอบ" },
-                                  { key: "jigsaw", label: "🧩 จิ๊กซอว์" },
-                                  { key: "attribute", label: "🔍 คุณสมบัติ" },
-                                ].map((cat) => {
+                              <div style={{ display: "grid", gridTemplateColumns: selectedHistoryYear === "2023" ? "repeat(auto-fit, minmax(130px, 1fr))" : "1fr 1fr", gap: "6px" }}>
+                                {(selectedHistoryYear === "2023"
+                                  ? [
+                                      { key: "3sec", label: "⏱️ 3 วินาที" },
+                                      { key: "actionGame", label: "🎮 แอ็คชั่นเกม" },
+                                      { key: "qa", label: "❓ ถาม-ตอบ" },
+                                      { key: "jigsaw", label: "🧩 จิ๊กซอว์" },
+                                      { key: "attribute", label: "🔍 คุณสมบัติ" },
+                                    ]
+                                  : [
+                                      { key: "3sec", label: "⏱️ 3 วินาที" },
+                                      { key: "qa", label: "❓ ถาม-ตอบ" },
+                                      { key: "jigsaw", label: "🧩 จิ๊กซอว์" },
+                                      { key: "attribute", label: "🔍 คุณสมบัติ" },
+                                    ]
+                                ).map((cat) => {
                                   const locked = isCatLocked(cat.key);
                                   const isSelected = selectedFinalsCategory === cat.key;
                                   return (
@@ -2426,6 +2437,9 @@ export default function AdminPage() {
                               <div style={{ width: "50px", textAlign: "center" }}>Order</div>
                               <div style={{ flex: 1, paddingLeft: "10px" }}>ผู้เข้าแข่งขัน</div>
                               <div style={{ width: "60px", textAlign: "center" }}>3 วินาที</div>
+                              {selectedHistoryYear === "2023" && (
+                                <div style={{ width: "60px", textAlign: "center" }}>แอ็คชั่น</div>
+                              )}
                               <div style={{ width: "60px", textAlign: "center" }}>ถาม-ตอบ</div>
                               <div style={{ width: "60px", textAlign: "center" }}>จิ๊กซอว์</div>
                               <div style={{ width: "60px", textAlign: "center" }}>คุณสมบัติ</div>
@@ -2485,8 +2499,11 @@ export default function AdminPage() {
                                     </div>
                                   </div>
 
-                                  {["3sec", "qa", "jigsaw", "attribute"].map((k) => {
-                                    const val = p.scores?.[k];
+                                  {(selectedHistoryYear === "2023"
+                                    ? ["3sec", "actionGame", "qa", "jigsaw", "attribute"]
+                                    : ["3sec", "qa", "jigsaw", "attribute"]
+                                  ).map((k) => {
+                                    const val = p.scores?.[k] ?? (k === "actionGame" ? p.scores?.action : null);
                                     const locked = val === "X";
                                     const sc = typeof val === "number";
                                     return (
@@ -2545,9 +2562,11 @@ export default function AdminPage() {
                                       type="button"
                                       onClick={() => {
                                         setSelectedFinalsPlayerOrder(String(p.order));
-                                        const catKeys = ["3sec", "qa", "jigsaw", "attribute"];
+                                        const catKeys = selectedHistoryYear === "2023"
+                                          ? ["3sec", "actionGame", "qa", "jigsaw", "attribute"]
+                                          : ["3sec", "qa", "jigsaw", "attribute"];
                                         for (const k of catKeys) {
-                                          const v = p.scores?.[k];
+                                          const v = p.scores?.[k] ?? (k === "actionGame" ? p.scores?.action : null);
                                           if (v !== null && v !== undefined && v !== "X") {
                                             setSelectedFinalsCategory(k);
                                             setFinalsInputScore(String(v));

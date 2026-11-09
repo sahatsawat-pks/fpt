@@ -3641,8 +3641,8 @@ export default function HistoryPage() {
                             </div>
 
                             {/* Category Scores in Finals */}
-                            {["3sec", "qa", "jigsaw", "attribute"].map((cat) => {
-                              const sc = item.scores?.[cat];
+                            {["3sec", "actionGame", "qa", "jigsaw", "attribute"].map((cat) => {
+                              const sc = item.scores?.[cat] ?? (cat === "actionGame" ? item.scores?.action : null);
                               if (sc === undefined || sc === null) return null;
                               const is25 = sc !== "X" && Number(sc) === 25;
                               const is0 = sc !== "X" && Number(sc) === 0;
@@ -3668,7 +3668,15 @@ export default function HistoryPage() {
                                 >
                                   <div style={{ transform: "skewX(16deg)", textAlign: "center" }}>
                                     <div style={{ fontSize: "8px", color: is25 ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.5)" }}>
-                                      {cat === "3sec" ? "3 วินาที" : cat === "qa" ? "ถาม-ตอบ" : cat === "jigsaw" ? "จิ๊กซอว์" : "คุณสมบัติ"}
+                                      {cat === "3sec"
+                                        ? "3 วินาที"
+                                        : (cat === "actionGame" || cat === "action")
+                                        ? "แอ็คชั่นเกม"
+                                        : cat === "qa"
+                                        ? "ถาม-ตอบ"
+                                        : cat === "jigsaw"
+                                        ? "จิ๊กซอว์"
+                                        : "คุณสมบัติ"}
                                     </div>
                                     <div style={{
                                       fontSize: "15px",
