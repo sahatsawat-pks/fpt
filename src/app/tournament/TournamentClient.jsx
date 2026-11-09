@@ -2817,7 +2817,7 @@ export default function TournamentClient({ initialData }) {
               <div
                 style={{
                   background: "rgba(6, 16, 36, 0.9)",
-                  padding: "12px 8px",
+                  padding: "12px 6px",
                   borderRadius: "12px",
                   border: "1px solid rgba(255,255,255,0.08)",
                   display: "flex",
@@ -2838,18 +2838,21 @@ export default function TournamentClient({ initialData }) {
                     justifyContent: "center",
                     textAlign: "center",
                     lineHeight: 1.2,
+                    whiteSpace: "nowrap",
                   }}
                 >
                   W - D - L (ช-ส-พ)
                 </div>
                 <div
                   style={{
-                    fontSize: "18px",
+                    fontSize: "13px",
                     fontWeight: "900",
                     color: "#86efac",
                     fontFamily: "var(--font-num)",
                     lineHeight: 1,
                     marginTop: "6px",
+                    whiteSpace: "nowrap",
+                    letterSpacing: "-0.2px",
                   }}
                 >
                   {selectedContestant.stats?.win ?? selectedContestant.win}W - {selectedContestant.stats?.draw ?? selectedContestant.draw}D - {selectedContestant.stats?.lose ?? selectedContestant.lose}L
@@ -2860,7 +2863,7 @@ export default function TournamentClient({ initialData }) {
               <div
                 style={{
                   background: "rgba(6, 16, 36, 0.9)",
-                  padding: "12px 8px",
+                  padding: "12px 6px",
                   borderRadius: "12px",
                   border: "1px solid rgba(255,255,255,0.08)",
                   display: "flex",
@@ -2881,6 +2884,7 @@ export default function TournamentClient({ initialData }) {
                     justifyContent: "center",
                     textAlign: "center",
                     lineHeight: 1.2,
+                    whiteSpace: "nowrap",
                   }}
                 >
                   ผลต่าง GP (+/-)
@@ -2893,6 +2897,7 @@ export default function TournamentClient({ initialData }) {
                     fontFamily: "var(--font-num)",
                     lineHeight: 1,
                     marginTop: "6px",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {selectedContestant.stats?.scoreDiff ?? selectedContestant.scoreDiff}
@@ -2903,7 +2908,7 @@ export default function TournamentClient({ initialData }) {
               <div
                 style={{
                   background: "rgba(6, 16, 36, 0.9)",
-                  padding: "12px 8px",
+                  padding: "12px 6px",
                   borderRadius: "12px",
                   border: "1px solid rgba(255,255,255,0.08)",
                   display: "flex",
@@ -2924,18 +2929,20 @@ export default function TournamentClient({ initialData }) {
                     justifyContent: "center",
                     textAlign: "center",
                     lineHeight: 1.2,
+                    whiteSpace: "nowrap",
                   }}
                 >
                   ชนะ / แพ้ GP
                 </div>
                 <div
                   style={{
-                    fontSize: "18px",
+                    fontSize: "15px",
                     fontWeight: "900",
                     color: "#ffd700",
                     fontFamily: "var(--font-num)",
                     lineHeight: 1,
                     marginTop: "6px",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   +{selectedContestant.stats?.categoriesWon ?? selectedContestant.categoriesWon} / -{selectedContestant.stats?.categoriesLost ?? selectedContestant.categoriesLost}
@@ -2946,7 +2953,7 @@ export default function TournamentClient({ initialData }) {
               <div
                 style={{
                   background: "rgba(6, 16, 36, 0.9)",
-                  padding: "12px 8px",
+                  padding: "12px 6px",
                   borderRadius: "12px",
                   border: "1px solid rgba(255,255,255,0.08)",
                   display: "flex",
@@ -2967,6 +2974,7 @@ export default function TournamentClient({ initialData }) {
                     justifyContent: "center",
                     textAlign: "center",
                     lineHeight: 1.2,
+                    whiteSpace: "nowrap",
                   }}
                 >
                   คะแนนดิบรวม
@@ -2979,6 +2987,7 @@ export default function TournamentClient({ initialData }) {
                     fontFamily: "var(--font-num)",
                     lineHeight: 1,
                     marginTop: "6px",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {selectedContestant.stats?.totalScore ?? selectedContestant.totalScore}
