@@ -116,6 +116,23 @@ export default function TournamentClient({ initialData }) {
     return matchdays.find((m) => m.id === selectedMatchday) || matchdays[0];
   }, [matchdays, selectedMatchday]);
 
+  // Handler to select contestant by name or object
+  const handleSelectContestant = (nameOrObj) => {
+    if (!nameOrObj) return;
+    if (typeof nameOrObj === "object") {
+      setSelectedContestant(nameOrObj);
+      return;
+    }
+    const clean = String(nameOrObj).trim().toLowerCase();
+    const found = contestants.find((x) => {
+      const cName = (x.name || "").trim().toLowerCase();
+      const cNick = (x.nickname || "").trim().toLowerCase();
+      return cName === clean || cNick === clean || cName.includes(clean) || clean.includes(cName);
+    });
+    if (found) setSelectedContestant(found);
+  };
+  const onSelectContestant = handleSelectContestant;
+
   // All In-Progress (Live) Matches across all matchdays
   const liveMatches = useMemo(() => {
     const list = [];
