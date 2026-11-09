@@ -4497,29 +4497,183 @@ function RankClimbAnimationModal({
   denseRankedLeaderboard,
   currentContestant,
 }) {
-  const [animStep, setAnimStep] = useState(0); // 0 = start at fromRank, 1 = animated to toRank
-  const sfxRef = useRef(null);
+  const [animStep, setAnimStep] = useState(0); // 0 = start at fromRank, 1 = climbing, 2 = finished
+  const [displayRank, setDisplayRank] = useState(transitionInfo?.fromRank ?? 1);
+  const [displayScore, setDisplayScore] = useState(transitionInfo?.fromScore ?? 0);
+  const [replayKey, setReplayKey] = useState(0);
 
-  useEffect(() => {
-    if (isOpen) {
-      setAnimStep(0);
-      const timer = setTimeout(() => {
-        stopAudio(sfxRef);
-        sfxRef.current = playAudio(SOUND_PATHS.shuffle);
-        setAnimStep(1);
-      }, 700);
-      return () => {
-        clearTimeout(timer);
-        stopAudio(sfxRef);
-      };
+  const sfxRef = useRef(null);
+  const listContainerRef = useRef(null);
+  const rowElsRef = useRef(new Map());
+  const prevTopsRef = useRef(new Map());
+
+  const isCurrentPlayer = (p) => {
+    if (!currentContestant || !p) return false;
+    if (currentContestant.id && String(p.id) === String(currentContestant.id)) return true;
+    if (currentContestant.name && p.name && p.name.trim() === currentContestant.name.trim()) return true;
+    return false;
+  };
+
+  // Build beforeList and afterList
+  const { beforeList, afterList } = useMemo(() => {
+    if (!transitionInfo) return { beforeList: [], afterList: [] };
+
+    let baseItems = (denseRankedLeaderboard || []).map((item) => ({ ...item }));
+    if (!baseItems.some(isCurrentPlayer)) {
+      baseItems.push({
+        id: currentContestant?.id || "temp-current-contestant",
+        name: currentContestant?.name || "ผู้เข้าแข่งขัน",
+        nickname: currentContestant?.nickname,
+        topic: currentContestant?.topic,
+        photo: currentContestant?.photo,
+        totalScore: transitionInfo.toScore,
+      });
     }
-  }, [isOpen]);
+
+    const beforeRanked = calculateDenseRanks(
+      baseItems.map((item) => {
+        if (isCurrentPlayer(item)) {
+          return { ...item, totalScore: transitionInfo.fromScore };
+        }
+        return item;
+      })
+    );
+
+    const afterRanked = calculateDenseRanks(
+      baseItems.map((item) => {
+        if (isCurrentPlayer(item)) {
+          return { ...item, totalScore: transitionInfo.toScore };
+        }
+        return item;
+      })
+    );
+
+    return { beforeList: beforeRanked, afterList: afterRanked };
+  }, [denseRankedLeaderboard, currentContestant, transitionInfo]);
+
+  const [currentList, setCurrentList] = useState(beforeList);
+
+  // Reset or run climb animation
+  useEffect(() => {
+    if (!isOpen || !transitionInfo) return;
+
+    setDisplayRank(transitionInfo.fromRank);
+    setDisplayScore(transitionInfo.fromScore);
+    setAnimStep(0);
+    setCurrentList(beforeList);
+
+    // Initial scroll to current contestant's starting position
+    const initTimer = setTimeout(() => {
+      const contestantKey = String(currentContestant?.id || currentContestant?.name);
+      const el = rowElsRef.current.get(contestantKey);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 120);
+
+    // After pause, start the climb animation!
+    const climbTimer = setTimeout(() => {
+      stopAudio(sfxRef);
+      sfxRef.current = playAudio(SOUND_PATHS.shuffle);
+      setAnimStep(1);
+
+      const totalClimb = transitionInfo.fromRank - transitionInfo.toRank;
+      const scoreDiff = transitionInfo.toScore - transitionInfo.fromScore;
+      const climbDuration = totalClimb > 0 ? Math.min(1300, Math.max(700, totalClimb * 120)) : 600;
+      const startTime = performance.now();
+
+      const countInterval = setInterval(() => {
+        const now = performance.now();
+        const progress = Math.min(1, (now - startTime) / climbDuration);
+        const ease = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+
+        const curR = Math.round(transitionInfo.fromRank - ease * totalClimb);
+        const curS = Math.round(transitionInfo.fromScore + ease * scoreDiff);
+        setDisplayRank(curR);
+        setDisplayScore(curS);
+
+        if (progress >= 1) {
+          clearInterval(countInterval);
+          setDisplayRank(transitionInfo.toRank);
+          setDisplayScore(transitionInfo.toScore);
+          setAnimStep(2);
+          stopAudio(sfxRef);
+
+          if (transitionInfo.toRank <= 5) {
+            sfxRef.current = playAudio(SOUND_PATHS.cheer);
+          } else if (totalClimb > 0) {
+            sfxRef.current = playAudio(SOUND_PATHS.correct);
+          } else {
+            sfxRef.current = playAudio(SOUND_PATHS.textIn);
+          }
+        }
+      }, 30);
+
+      return () => clearInterval(countInterval);
+    }, 700);
+
+    return () => {
+      clearTimeout(initTimer);
+      clearTimeout(climbTimer);
+      stopAudio(sfxRef);
+    };
+  }, [isOpen, transitionInfo, replayKey, beforeList]);
+
+  // When step changes to 1, capture FIRST layout tops before re-rendering afterList
+  useEffect(() => {
+    if (animStep === 1) {
+      const firstTops = new Map();
+      rowElsRef.current.forEach((el, key) => {
+        if (el) {
+          firstTops.set(key, el.getBoundingClientRect().top);
+        }
+      });
+      prevTopsRef.current = firstTops;
+      setCurrentList(afterList);
+    } else if (animStep === 0) {
+      setCurrentList(beforeList);
+    }
+  }, [animStep, beforeList, afterList]);
+
+  // FLIP animation: animate rows moving to new positions
+  useEffect(() => {
+    if (animStep >= 1 && prevTopsRef.current.size > 0) {
+      const firstTops = prevTopsRef.current;
+      prevTopsRef.current = new Map();
+
+      rowElsRef.current.forEach((el, key) => {
+        if (!el) return;
+        const firstTop = firstTops.get(key);
+        if (firstTop !== undefined) {
+          const lastTop = el.getBoundingClientRect().top;
+          const deltaY = firstTop - lastTop;
+          if (deltaY !== 0) {
+            el.style.transform = `translateY(${deltaY}px)`;
+            el.style.transition = "transform 0s";
+            el.style.zIndex = el.dataset.isCurrent === "true" ? "20" : "1";
+
+            requestAnimationFrame(() => {
+              el.style.transition = "transform 0.9s cubic-bezier(0.2, 0.85, 0.3, 1)";
+              el.style.transform = "translateY(0)";
+            });
+          }
+        }
+      });
+
+      // Follow current contestant with auto-scroll as they climb
+      const contestantKey = String(currentContestant?.id || currentContestant?.name);
+      const contestantEl = rowElsRef.current.get(contestantKey);
+      if (contestantEl) {
+        setTimeout(() => {
+          contestantEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 150);
+      }
+    }
+  }, [currentList, animStep, currentContestant]);
 
   if (!isOpen || !transitionInfo) return null;
 
   const { category, fromRank, toRank, fromScore, toScore, pointsAdded } = transitionInfo;
-  const currentRank = animStep === 0 ? fromRank : toRank;
-  const currentScore = animStep === 0 ? fromScore : toScore;
   const rankClimbed = fromRank - toRank;
   const isImproved = rankClimbed > 0;
   const isRank5 = toRank <= 5;
@@ -4534,9 +4688,6 @@ function RankClimbAnimationModal({
       : category === "attribute"
       ? "คุณสมบัติ"
       : "หมวด";
-
-  // Top positions preview (1 to 8)
-  const previewList = denseRankedLeaderboard.slice(0, 8);
 
   return (
     <div
@@ -4553,17 +4704,36 @@ function RankClimbAnimationModal({
       }}
       onClick={onClose}
     >
+      <style>{`
+        @keyframes rankSlotRollUp {
+          0% { transform: translateY(14px); opacity: 0.3; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes arrowBounceUp {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes goldGlowPulse {
+          0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.45); }
+          50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.85); }
+        }
+        @keyframes celebrationPop {
+          0% { transform: scale(0.92); opacity: 0; }
+          60% { transform: scale(1.04); opacity: 1; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
       <div
         style={{
           width: "100%",
-          maxWidth: "640px",
-          maxHeight: "90vh",
+          maxWidth: "660px",
+          maxHeight: "92vh",
           overflowY: "auto",
           background: "linear-gradient(135deg, #091326 0%, #030712 100%)",
           border: "2.5px solid #00e5ff",
           boxShadow: "0 0 45px rgba(0, 229, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
           borderRadius: "16px",
-          padding: "28px",
+          padding: "24px 28px",
           color: "#fff",
           position: "relative",
           animation: "revealPop 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -4571,7 +4741,7 @@ function RankClimbAnimationModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
           <div>
             <div style={{ fontSize: "12px", color: "var(--accent)", fontWeight: "800", letterSpacing: "1px", textTransform: "uppercase" }}>
               RANK TRANSITION UPDATE
@@ -4580,41 +4750,65 @@ function RankClimbAnimationModal({
               <span>🏆</span> เลื่อนอันดับหลังจบหมวด{categoryLabel}
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              color: "#fff",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              cursor: "pointer",
-              fontSize: "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s",
-            }}
-          >
-            ✕
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <button
+              type="button"
+              onClick={() => setReplayKey((k) => k + 1)}
+              title="ดูอนิเมชั่นเลื่อนอันดับอีกครั้ง"
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "#ffd700",
+                height: "36px",
+                padding: "0 12px",
+                borderRadius: "18px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: "800",
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+                transition: "all 0.2s",
+              }}
+            >
+              🔄 ดูอีกครั้ง
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "#fff",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                cursor: "pointer",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+              }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Hero Card */}
         <div
           style={{
             background: "linear-gradient(135deg, rgba(14, 28, 54, 0.9) 0%, rgba(6, 14, 30, 0.95) 100%)",
-            border: animStep === 1 && isImproved ? "2px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.4)",
-            boxShadow: animStep === 1 && isImproved ? "0 0 25px rgba(255, 215, 0, 0.45)" : "none",
+            border: animStep >= 1 && isImproved ? "2px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.4)",
+            boxShadow: animStep === 2 && isImproved ? "0 0 28px rgba(255, 215, 0, 0.55)" : "none",
             borderRadius: "14px",
-            padding: "20px",
-            marginBottom: "20px",
+            padding: "18px 20px",
+            marginBottom: "18px",
             transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
             {currentContestant?.photo && (
               <img
                 src={getOptimizedImageUrl(currentContestant.photo, 100)}
@@ -4651,7 +4845,7 @@ function RankClimbAnimationModal({
                   color: pointsAdded > 0 ? "#81c784" : "#fff",
                   border: pointsAdded > 0 ? "1px solid #4caf50" : "1px solid rgba(255,255,255,0.2)",
                   borderRadius: "12px",
-                  padding: "2px 8px",
+                  padding: "3px 9px",
                   fontSize: "11px",
                   fontWeight: "800",
                   whiteSpace: "nowrap",
@@ -4659,42 +4853,97 @@ function RankClimbAnimationModal({
               >
                 +{pointsAdded} คะแนน
               </span>
+              {animStep >= 1 && rankClimbed > 0 && (
+                <span
+                  style={{
+                    background: "rgba(255, 215, 0, 0.18)",
+                    color: "#ffd700",
+                    border: "1px solid rgba(255, 215, 0, 0.6)",
+                    borderRadius: "10px",
+                    padding: "2px 7px",
+                    fontSize: "10px",
+                    fontWeight: "900",
+                    animation: "arrowBounceUp 0.6s infinite ease-in-out",
+                  }}
+                >
+                  ▲ +{rankClimbed}
+                </span>
+              )}
             </div>
 
-            {/* After (Animated) */}
+            {/* After (Animated upward rolling) */}
             <div
               style={{
-                background: animStep === 1
-                  ? (isRank5 ? "linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 145, 0, 0.25) 100%)" : "rgba(0, 229, 255, 0.12)")
+                background: animStep >= 1
+                  ? (isRank5 ? "linear-gradient(135deg, rgba(255, 215, 0, 0.18) 0%, rgba(255, 145, 0, 0.28) 100%)" : "rgba(0, 229, 255, 0.14)")
                   : "rgba(255,255,255,0.04)",
-                border: animStep === 1 ? (isRank5 ? "1.5px solid #ffd700" : "1.5px solid #00e5ff") : "1px solid transparent",
+                border: animStep >= 1 ? (isRank5 ? "1.8px solid #ffd700" : "1.8px solid #00e5ff") : "1px solid transparent",
                 borderRadius: "10px",
                 padding: "12px",
-                transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                transform: animStep === 1 ? "scale(1.04)" : "scale(1)",
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: animStep === 2 ? "scale(1.03)" : "scale(1)",
+                overflow: "hidden",
+                position: "relative",
               }}
             >
-              <div style={{ fontSize: "11px", color: animStep === 1 ? "#ffd700" : "rgba(255,255,255,0.5)", fontWeight: "700" }}>
+              <div style={{ fontSize: "11px", color: animStep >= 1 ? (isRank5 ? "#ffd700" : "#00e5ff") : "rgba(255,255,255,0.5)", fontWeight: "700" }}>
                 หลังจบหมวดนี้
               </div>
               <div
                 style={{
-                  fontSize: "30px",
-                  fontWeight: "900",
-                  color: animStep === 1 ? (isRank5 ? "#ffd700" : "#00e5ff") : "rgba(255,255,255,0.7)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
                   margin: "4px 0",
-                  textShadow: animStep === 1 ? "0 0 16px rgba(255, 215, 0, 0.6)" : "none",
                 }}
               >
-                #{currentRank}
+                {animStep >= 1 && rankClimbed > 0 && (
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      color: "#10b981",
+                      animation: "arrowBounceUp 0.6s infinite ease-in-out",
+                    }}
+                  >
+                    ▲
+                  </span>
+                )}
+                <span
+                  key={displayRank}
+                  style={{
+                    fontSize: "30px",
+                    fontWeight: "900",
+                    color: animStep >= 1 ? (isRank5 ? "#ffd700" : "#00e5ff") : "rgba(255,255,255,0.7)",
+                    textShadow: animStep >= 1 ? "0 0 16px rgba(255, 215, 0, 0.6)" : "none",
+                    animation: animStep === 1 ? "rankSlotRollUp 0.16s ease-out" : "none",
+                  }}
+                >
+                  #{displayRank}
+                </span>
               </div>
-              <div style={{ fontSize: "13px", color: "#fff", fontWeight: "700" }}>{currentScore} คะแนน</div>
+              <div style={{ fontSize: "13px", color: "#fff", fontWeight: "700" }}>{displayScore} คะแนน</div>
             </div>
           </div>
 
           {/* Banner inside hero */}
-          <div style={{ marginTop: "16px", textAlign: "center" }}>
-            {isImproved ? (
+          <div style={{ marginTop: "14px", textAlign: "center" }}>
+            {animStep === 1 && rankClimbed > 0 ? (
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "6px 18px",
+                  borderRadius: "20px",
+                  background: "linear-gradient(135deg, #0284c7 0%, #00e5ff 100%)",
+                  color: "#0a0d18",
+                  fontWeight: "900",
+                  fontSize: "13px",
+                  boxShadow: "0 4px 14px rgba(0, 229, 255, 0.45)",
+                }}
+              >
+                ⚡ กำลังเลื่อนอันดับขึ้น... (#{displayRank})
+              </span>
+            ) : isImproved ? (
               <span
                 style={{
                   display: "inline-block",
@@ -4705,6 +4954,7 @@ function RankClimbAnimationModal({
                   fontWeight: "800",
                   fontSize: "14px",
                   boxShadow: "0 4px 14px rgba(16, 185, 129, 0.45)",
+                  animation: "celebrationPop 0.4s ease-out",
                 }}
               >
                 🚀 เลื่อนขึ้น +{rankClimbed} อันดับ! {isRank5 && "🔥 ติด TOP 5 เข้ารอบแล้ว!"}
@@ -4727,62 +4977,115 @@ function RankClimbAnimationModal({
           </div>
         </div>
 
-        {/* Mini Standing Preview */}
-        <div style={{ marginBottom: "20px" }}>
-          <div style={{ fontSize: "13px", fontWeight: "800", color: "rgba(255,255,255,0.7)", marginBottom: "8px" }}>
-            📊 ตารางอันดับปัจจุบัน (TOP 8):
+        {/* Mini Standing Preview with FLIP Row Slide-Up Animation */}
+        <div style={{ marginBottom: "18px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <div style={{ fontSize: "13px", fontWeight: "800", color: "rgba(255,255,255,0.7)" }}>
+              📊 การเลื่อนอันดับในตารางคะแนน:
+            </div>
+            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", fontWeight: "600" }}>
+              ผู้เข้าแข่งขัน {currentList.length} คน
+            </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "240px", overflowY: "auto" }}>
-            {previewList.map((p, idx) => {
-              const isCurrent = String(p.id) === String(currentContestant?.id) || p.name === currentContestant?.name;
+
+          <div
+            ref={listContainerRef}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px",
+              maxHeight: "260px",
+              overflowY: "auto",
+              paddingRight: "4px",
+              position: "relative",
+            }}
+          >
+            {currentList.map((p, idx) => {
+              const isCurrent = isCurrentPlayer(p);
               const isTop5 = p.rank <= 5;
+              const rowKey = String(p.id || p.name || idx);
+              const isCutoffLine = idx > 0 && currentList[idx - 1].rank <= 5 && p.rank > 5;
+
               return (
-                <div
-                  key={p.id || idx}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
-                    background: isCurrent
-                      ? "linear-gradient(90deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 145, 0, 0.15) 100%)"
-                      : "rgba(255,255,255,0.03)",
-                    border: isCurrent
-                      ? "1.5px solid #ffd700"
-                      : isTop5
-                      ? "1px solid rgba(0, 229, 255, 0.2)"
-                      : "1px solid rgba(255,255,255,0.06)",
-                    boxShadow: isCurrent ? "0 0 12px rgba(255, 215, 0, 0.3)" : "none",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span
+                <React.Fragment key={rowKey}>
+                  {isCutoffLine && (
+                    <div
                       style={{
-                        fontWeight: "900",
-                        fontSize: "14px",
-                        width: "36px",
-                        color: p.rank === 1 ? "#ffd700" : p.rank === 2 ? "#e0e0e0" : p.rank === 3 ? "#cd7f32" : isTop5 ? "#00e5ff" : "rgba(255,255,255,0.5)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        margin: "4px 0",
+                        color: "#ffd700",
+                        fontSize: "11px",
+                        fontWeight: "800",
+                        letterSpacing: "0.5px",
                       }}
                     >
-                      {p.rank === 1 ? "🥇 1" : p.rank === 2 ? "🥈 2" : p.rank === 3 ? "🥉 3" : `#${p.rank}`}
-                    </span>
-                    <span style={{ fontWeight: isCurrent ? "800" : "600", fontSize: "14px", color: isCurrent ? "#ffd700" : "#fff" }}>
-                      {p.name} {p.nickname && `(${p.nickname})`}
-                    </span>
-                    {isCurrent && (
-                      <span style={{ fontSize: "10px", background: "#ffd700", color: "#000", fontWeight: "900", padding: "1px 6px", borderRadius: "4px" }}>
-                        คุณ
+                      <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.5))" }} />
+                      <span>🏁 เส้นแบ่ง TOP 5 เข้ารอบชิง</span>
+                      <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(255, 215, 0, 0.5), transparent)" }} />
+                    </div>
+                  )}
+
+                  <div
+                    ref={(el) => {
+                      if (el) {
+                        rowElsRef.current.set(rowKey, el);
+                      } else {
+                        rowElsRef.current.delete(rowKey);
+                      }
+                    }}
+                    data-is-current={isCurrent ? "true" : "false"}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "8px 12px",
+                      borderRadius: "8px",
+                      background: isCurrent
+                        ? "linear-gradient(90deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 145, 0, 0.18) 100%)"
+                        : "rgba(255,255,255,0.03)",
+                      border: isCurrent
+                        ? "2px solid #ffd700"
+                        : isTop5
+                        ? "1px solid rgba(0, 229, 255, 0.2)"
+                        : "1px solid rgba(255,255,255,0.06)",
+                      boxShadow: isCurrent ? "0 0 16px rgba(255, 215, 0, 0.45)" : "none",
+                      position: "relative",
+                      willChange: "transform",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span
+                        style={{
+                          fontWeight: "900",
+                          fontSize: "14px",
+                          width: "42px",
+                          color: p.rank === 1 ? "#ffd700" : p.rank === 2 ? "#e0e0e0" : p.rank === 3 ? "#cd7f32" : isTop5 ? "#00e5ff" : "rgba(255,255,255,0.5)",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "3px",
+                        }}
+                      >
+                        {p.rank === 1 ? "🥇 1" : p.rank === 2 ? "🥈 2" : p.rank === 3 ? "🥉 3" : `#${p.rank}`}
                       </span>
-                    )}
+                      <span style={{ fontWeight: isCurrent ? "800" : "600", fontSize: "14px", color: isCurrent ? "#ffd700" : "#fff" }}>
+                        {p.name} {p.nickname && `(${p.nickname})`}
+                      </span>
+                      {isCurrent && (
+                        <span style={{ fontSize: "10px", background: "#ffd700", color: "#000", fontWeight: "900", padding: "1px 6px", borderRadius: "4px" }}>
+                          คุณ {animStep >= 1 && rankClimbed > 0 && "▲"}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontWeight: "800", fontSize: "15px", color: isCurrent ? "#ffd700" : "#fff" }}>
+                        {p.totalScore}
+                      </span>
+                      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>คะแนน</span>
+                    </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontWeight: "800", fontSize: "15px", color: isCurrent ? "#ffd700" : "#fff" }}>
-                      {p.totalScore}
-                    </span>
-                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>คะแนน</span>
-                  </div>
-                </div>
+                </React.Fragment>
               );
             })}
           </div>
