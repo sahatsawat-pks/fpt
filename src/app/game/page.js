@@ -1133,8 +1133,15 @@ export default function Home() {
   // ---- Config Panel State ----
   const [configMode, setConfigMode] = useState("single"); // "single" | "player1" | "player2"
   const [threeSecMode, setThreeSecMode] = useState(() => {
+    if (GAME_CONFIG.threeSecMode) return GAME_CONFIG.threeSecMode;
     if (typeof window !== "undefined") {
-      return localStorage.getItem("fpt_threeSecMode") || "1set";
+      const stored = localStorage.getItem("fpt_threeSecMode");
+      if (stored) return stored;
+    }
+    if (Array.isArray(GAME_CONFIG.threeSecondsHeaders)) {
+      if (GAME_CONFIG.threeSecondsHeaders.length === 2) return "2sets";
+      if (GAME_CONFIG.threeSecondsHeaders.length === 3) return "3sets";
+      if (GAME_CONFIG.threeSecondsHeaders.length === 5) return "5sets";
     }
     return "1set";
   });
@@ -1241,6 +1248,14 @@ export default function Home() {
     if (Array.isArray(cfg.threeSecondsHeaders)) {
       setThreeSecSetHeaders(cfg.threeSecondsHeaders);
     }
+    if (cfg.threeSecMode) {
+      setThreeSecMode(cfg.threeSecMode);
+    } else if (Array.isArray(cfg.threeSecondsHeaders)) {
+      if (cfg.threeSecondsHeaders.length === 2) setThreeSecMode("2sets");
+      else if (cfg.threeSecondsHeaders.length === 3) setThreeSecMode("3sets");
+      else if (cfg.threeSecondsHeaders.length === 5) setThreeSecMode("5sets");
+      else setThreeSecMode("1set");
+    }
     if (cfg.battle?.player1) {
       const p1 = cfg.battle.player1;
       if (p1.threeSecMode) setBattleP1ThreeSecMode(p1.threeSecMode);
@@ -1318,6 +1333,8 @@ export default function Home() {
     GAME_CONFIG.jigsaw.image = jigsawImage;
     GAME_CONFIG.jigsaw.question = jigsawQuestion;
     GAME_CONFIG.jigsaw.answer = jigsawAnswer;
+    GAME_CONFIG.threeSecMode = threeSecMode;
+    GAME_CONFIG.jigsawMode = jigsawMode;
     GAME_CONFIG.threeSeconds = threeSecQuestions;
     GAME_CONFIG.threeSecondsHeaders = threeSecSetHeaders;
 
@@ -5292,9 +5309,15 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
   useEffect(() => {
     if (activeScoreOverride !== null && activeScoreOverride !== undefined) {
       setScore(activeScoreOverride);
-      if (onScoreChange) onScoreChange(activeScoreOverride);
     }
   }, [activeScoreOverride]);
+
+  // Sync live score to parent safely via useEffect to prevent setState-in-render warning
+  useEffect(() => {
+    if (onScoreChange) {
+      onScoreChange(score);
+    }
+  }, [score, onScoreChange]);
 
   const startRoundWithSet = (start, end, idx) => {
     stopAudio(excitedAudioRef);
@@ -5304,7 +5327,6 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
     setTotalInSet(end - start);
     setCurrentQ(start);
     setScore(0);
-    if (onScoreChange) onScoreChange(0);
     setTimeLeft(3.0);
     setIsRunning(false);
     setRoundActive(false);
@@ -5338,11 +5360,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
 
     // หากข้อนี้กดถูกไปแล้วและย้อนกลับ ให้หักคะแนนคืน
     if (isRoundCorrect === true) {
-      setScore((prev) => {
-        const next = Math.max(0, prev - 1);
-        if (onScoreChange) onScoreChange(next);
-        return next;
-      });
+      setScore((prev) => Math.max(0, prev - 1));
     }
 
     setIsRunning(false);
@@ -5525,11 +5543,7 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
     stopAudio(excitedAudioRef);
 
     if (correct) {
-      setScore((prev) => {
-        const next = prev + 1;
-        if (onScoreChange) onScoreChange(next);
-        return next;
-      });
+      setScore((prev) => prev + 1);
       setIsRoundCorrect(true);
       setAnswerRevealed(true);
 
@@ -5644,10 +5658,18 @@ function ThreeSecondsGame({ threeSecQuestions, threeSecMode, threeSecSetHeaders 
   };
 
   const getSetIndexForQuestion = (qIndex, mode) => {
-    if (mode === "1set") return 0;
-    if (mode === "2sets") return qIndex < 15 ? 0 : 1;
-    if (mode === "3sets") return qIndex < 10 ? 0 : qIndex < 20 ? 1 : 2;
-    if (mode === "5sets") return qIndex < 5 ? 0 : qIndex < 10 ? 1 : qIndex < 15 ? 2 : qIndex < 20 ? 3 : 4;
+    let effectiveMode = mode;
+    // Auto-detect mode if not explicitly set or set to "1set", but multiple set headers exist
+    const validHeaders = Array.isArray(threeSecSetHeaders) ? threeSecSetHeaders.filter((h) => h && String(h).trim() !== "") : [];
+    if ((!effectiveMode || effectiveMode === "1set") && validHeaders.length > 1) {
+      if (threeSecSetHeaders.length === 2 || validHeaders.length === 2) effectiveMode = "2sets";
+      else if (threeSecSetHeaders.length === 3 || validHeaders.length === 3) effectiveMode = "3sets";
+      else if (threeSecSetHeaders.length >= 5 || validHeaders.length >= 5) effectiveMode = "5sets";
+    }
+
+    if (effectiveMode === "2sets") return qIndex < 15 ? 0 : 1;
+    if (effectiveMode === "3sets") return qIndex < 10 ? 0 : qIndex < 20 ? 1 : 2;
+    if (effectiveMode === "5sets") return qIndex < 5 ? 0 : qIndex < 10 ? 1 : qIndex < 15 ? 2 : qIndex < 20 ? 3 : 4;
     return 0;
   };
 
