@@ -3751,6 +3751,7 @@ export default function Home() {
                           setGameScore("qa", score);
                         }
                       }}
+                      onOpenRankClimb={gameMode !== "battle" ? () => setShowRankClimbModal(true) : null}
                       onResult={showResultPopup}
                       onDismissResult={dismissResultPopupWithFade}
                       onBack={() => setCurrentGame(null)}
@@ -3774,6 +3775,7 @@ export default function Home() {
                           setGameScore("jigsaw", score);
                         }
                       }}
+                      onOpenRankClimb={gameMode !== "battle" ? () => setShowRankClimbModal(true) : null}
                       onResult={showResultPopup}
                       onDismissResult={dismissResultPopupWithFade}
                       onBack={() => setCurrentGame(null)}
@@ -3793,6 +3795,7 @@ export default function Home() {
                           setGameScore("attribute", score);
                         }
                       }}
+                      onOpenRankClimb={gameMode !== "battle" ? () => setShowRankClimbModal(true) : null}
                       onResult={showResultPopup}
                       onDismissResult={dismissResultPopupWithFade}
                       onBack={() => setCurrentGame(null)}
@@ -3824,6 +3827,31 @@ export default function Home() {
             <div className="result-score" id="resultScore">
               {resultOverlay.score !== null ? (resultOverlay.isCorrect ? `${resultOverlay.score} คะแนน` : `0 คะแนน`) : ""}
             </div>
+            {resultOverlay.isCorrect && gameMode !== "battle" && (
+              <button
+                type="button"
+                className="btn-game"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dismissResultPopupWithFade();
+                  setShowRankClimbModal(true);
+                }}
+                style={{
+                  marginTop: "16px",
+                  background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+                  color: "#0a0d18",
+                  fontWeight: "900",
+                  fontSize: "16px",
+                  border: "none",
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.4)",
+                }}
+              >
+                🎬 ดูอนิเมชั่นเลื่อนอันดับ
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -6556,7 +6584,7 @@ function getEliminateOrderIndices(cfg) {
   return resolvedIndices.length > 0 ? resolvedIndices : null;
 }
 
-function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack }) {
+function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack, onOpenRankClimb }) {
   const [gameStarted, setGameStarted] = useState(judgeMode || false);
   const [currentPoints, setCurrentPoints] = useState(judgeMode && lockedState ? lockedState.score : 25);
   const [revealedCount, setRevealedCount] = useState(() => {
@@ -6568,6 +6596,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
   });
   const [eliminatedIndices, setEliminatedIndices] = useState(judgeMode && lockedState ? lockedState.eliminatedIndices : []);
   const [answered, setAnswered] = useState(false);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [introSoundStep, setIntroSoundStep] = useState(0); // 0 = none, 1 = BGFAN2012, 2 = ทึ้ม
   const [suspenseStep, setSuspenseStep] = useState(0); // 0 = none, 1 = suspense1, 2 = suspense2
 
@@ -6678,6 +6707,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
   const handleAnswer = (correct) => {
     if (answered) return;
     setAnswered(true);
+    setIsCorrectAnswer(Boolean(correct));
 
     stopAudio(bgmRef);
     stopAudio(suspenseRef);
@@ -6795,9 +6825,33 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
           animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
           marginBottom: "16px",
           width: "100%",
-          maxWidth: "700px"
+          maxWidth: "700px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "12px"
         }}>
-          บันทึกผลการแข่งขันแล้ว
+          <div>บันทึกผลการแข่งขันแล้ว {isCorrectAnswer ? `(+${currentPoints} คะแนน)` : "(0 คะแนน)"}</div>
+          {isCorrectAnswer && onOpenRankClimb && (
+            <button
+              type="button"
+              className="btn-game"
+              onClick={onOpenRankClimb}
+              style={{
+                background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+                color: "#0a0d18",
+                fontWeight: "900",
+                fontSize: "16px",
+                border: "none",
+                padding: "10px 24px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+              }}
+            >
+              🎬 ดูอนิเมชั่นเลื่อนอันดับ
+            </button>
+          )}
         </div>
       )}
 
@@ -6833,6 +6887,27 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
           </button>
         )}
 
+        {answered && isCorrectAnswer && onOpenRankClimb && (
+          <button
+            type="button"
+            className="btn-game"
+            onClick={onOpenRankClimb}
+            style={{
+              background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+              color: "#0a0d18",
+              fontWeight: "900",
+              fontSize: "16px",
+              border: "none",
+              padding: "10px 22px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+            }}
+          >
+            🎬 ดูอนิเมชั่นเลื่อนอันดับ
+          </button>
+        )}
+
         <button className="btn-game btn-back" onClick={handleBack}>กลับ</button>
       </div>
     </div>
@@ -6842,11 +6917,12 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
 // ==========================================
 // 🧩 SUB-COMPONENT: GAME 3 (JIGSAW)
 // ==========================================
-function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, battleLockMode, judgeMode, lockedState, configVersion, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack }) {
+function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, battleLockMode, judgeMode, lockedState, configVersion, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack, onOpenRankClimb }) {
   const [gameStarted, setGameStarted] = useState(judgeMode || false);
   const [currentPoints, setCurrentPoints] = useState(judgeMode && lockedState ? lockedState.score : 25);
   const [openedPieces, setOpenedPieces] = useState(judgeMode && lockedState ? lockedState.openedPieces : []);
   const [answered, setAnswered] = useState(false);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [firstOpen, setFirstOpen] = useState(judgeMode && lockedState ? lockedState.firstOpen : true);
   const [introSoundStep, setIntroSoundStep] = useState(0); // 0 = none, 1 = BGFAN2012, 2 = ทึ้ม
   const [suspenseStep, setSuspenseStep] = useState(0); // 0 = none, 1 = suspense1, 2 = suspense2
@@ -6934,6 +7010,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
   const handleAnswer = (correct) => {
     if (answered) return;
     setAnswered(true);
+    setIsCorrectAnswer(Boolean(correct));
 
     stopAudio(bgmRef);
     stopAudio(sfxRef);
@@ -7056,13 +7133,37 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
           color: "var(--gold-light)",
           animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
           width: "100%",
-          maxWidth: "460px"
+          maxWidth: "460px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "12px",
         }}>
-          บันทึกผลการแข่งขันแล้ว
+          <div>บันทึกผลการแข่งขันแล้ว {isCorrectAnswer ? `(+${currentPoints} คะแนน)` : "(0 คะแนน)"}</div>
+          {isCorrectAnswer && onOpenRankClimb && (
+            <button
+              type="button"
+              className="btn-game"
+              onClick={onOpenRankClimb}
+              style={{
+                background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+                color: "#0a0d18",
+                fontWeight: "900",
+                fontSize: "16px",
+                border: "none",
+                padding: "10px 24px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+              }}
+            >
+              🎬 ดูอนิเมชั่นเลื่อนอันดับ
+            </button>
+          )}
         </div>
       )}
 
-      <div className="jigsaw-controls" id="jigsawControls" style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "12px", width: "100%" }}>
+      <div className="jigsaw-controls" id="jigsawControls" style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "12px", width: "100%", flexWrap: "wrap" }}>
         {!answered ? (
           <>
             {battleLockMode ? (
@@ -7084,6 +7185,27 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
           </button>
         )}
 
+        {answered && isCorrectAnswer && onOpenRankClimb && (
+          <button
+            type="button"
+            className="btn-game"
+            onClick={onOpenRankClimb}
+            style={{
+              background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+              color: "#0a0d18",
+              fontWeight: "900",
+              fontSize: "16px",
+              border: "none",
+              padding: "10px 22px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+            }}
+          >
+            🎬 ดูอนิเมชั่นเลื่อนอันดับ
+          </button>
+        )}
+
         <button className="btn-game btn-back" onClick={handleBack}>กลับ</button>
       </div>
     </div>
@@ -7093,7 +7215,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
 // ==========================================
 // 🎯 SUB-COMPONENT: GAME 4 (ATTRIBUTE)
 // ==========================================
-function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack }) {
+function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState, accumulatedScore = 0, onLock, onComplete, onResult, onDismissResult, onBack, onOpenRankClimb }) {
   const [gameStarted, setGameStarted] = useState(judgeMode || false);
   const [currentPoints, setCurrentPoints] = useState(judgeMode && lockedState ? lockedState.score : 25);
   const [clueSteps, setClueSteps] = useState(() => {
@@ -7110,6 +7232,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
     return [0, 0, 0, 0, 0, 0];
   });
   const [answered, setAnswered] = useState(false);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [introSoundStep, setIntroSoundStep] = useState(0); // 0 = none, 1 = BGFAN2012, 2 = ทึ้ม
   const [suspenseStep, setSuspenseStep] = useState(0); // 0 = none, 1 = suspense1, 2 = suspense2
 
@@ -7264,6 +7387,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
   const handleAnswer = (correct) => {
     if (answered) return;
     setAnswered(true);
+    setIsCorrectAnswer(Boolean(correct));
 
     stopAudio(bgmRef);
     stopAudio(sfxRef);
@@ -7419,13 +7543,37 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
           animation: "revealPop 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
           marginBottom: "16px",
           width: "100%",
-          maxWidth: "700px"
+          maxWidth: "700px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "12px",
         }}>
-          บันทึกผลการแข่งขันแล้ว
+          <div>บันทึกผลการแข่งขันแล้ว {isCorrectAnswer ? `(+${currentPoints} คะแนน)` : "(0 คะแนน)"}</div>
+          {isCorrectAnswer && onOpenRankClimb && (
+            <button
+              type="button"
+              className="btn-game"
+              onClick={onOpenRankClimb}
+              style={{
+                background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+                color: "#0a0d18",
+                fontWeight: "900",
+                fontSize: "16px",
+                border: "none",
+                padding: "10px 24px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+              }}
+            >
+              🎬 ดูอนิเมชั่นเลื่อนอันดับ
+            </button>
+          )}
         </div>
       )}
 
-      <div className="attr-controls" id="attrControls">
+      <div className="attr-controls" id="attrControls" style={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
         {!answered ? (
           <>
             {battleLockMode ? (
@@ -7444,6 +7592,27 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
         {!answered && !judgeMode && (
           <button className="btn-game btn-action" onClick={handleSuspenseClick} style={{ background: suspenseStep > 0 ? "var(--accent)" : "" }}>
             {suspenseStep === 0 ? "🎵 เสียงลุ้น" : suspenseStep === 1 ? "🎵 เสียงเฉลยจบ" : "🎵 เล่นเสียงเฉลยจบ (ซ้ำ)"}
+          </button>
+        )}
+
+        {answered && isCorrectAnswer && onOpenRankClimb && (
+          <button
+            type="button"
+            className="btn-game"
+            onClick={onOpenRankClimb}
+            style={{
+              background: "linear-gradient(135deg, #ffd700 0%, #ff9100 100%)",
+              color: "#0a0d18",
+              fontWeight: "900",
+              fontSize: "16px",
+              border: "none",
+              padding: "10px 22px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+            }}
+          >
+            🎬 ดูอนิเมชั่นเลื่อนอันดับ
           </button>
         )}
 
