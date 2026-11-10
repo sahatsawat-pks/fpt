@@ -25,6 +25,7 @@ const DEFAULT_SETTINGS = {
   trialVotingOpen: true,
   showWarmupTable: true,
   showPollTable: true,
+  showTrialPollTable: true,
 };
 
 function readSettings() {
@@ -83,6 +84,7 @@ export async function GET(request) {
       trialVotingOpen: settings.trialVotingOpen !== false,
       showWarmupTable: settings.showWarmupTable !== false,
       showPollTable: settings.showPollTable !== false,
+      showTrialPollTable: settings.showTrialPollTable !== false,
     });
   }
 
@@ -102,6 +104,7 @@ export async function GET(request) {
     trialVotingOpen: settings.trialVotingOpen !== false,
     showWarmupTable: settings.showWarmupTable !== false,
     showPollTable: settings.showPollTable !== false,
+    showTrialPollTable: settings.showTrialPollTable !== false,
   });
 }
 
@@ -235,6 +238,9 @@ export async function POST(request) {
       if (body.showPollTable !== undefined) {
         newSettings.showPollTable = Boolean(body.showPollTable);
       }
+      if (body.showTrialPollTable !== undefined) {
+        newSettings.showTrialPollTable = Boolean(body.showTrialPollTable);
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -260,11 +266,12 @@ export async function POST(request) {
           trialVotingOpen: newSettings.trialVotingOpen !== false,
           showWarmupTable: newSettings.showWarmupTable !== false,
           showPollTable: newSettings.showPollTable !== false,
+          showTrialPollTable: newSettings.showTrialPollTable !== false,
         },
       });
     }
 
-    // Toggle poll table visibility action
+    // Toggle poll table visibility action (Main homepage /)
     if (body.action === "toggle_poll_table") {
       const newStatus =
         body.showPollTable !== undefined
@@ -278,6 +285,24 @@ export async function POST(request) {
         success: true,
         showPollTable: newStatus,
         message: newStatus ? "เปิดแสดงตารางโพลล์แล้ว" : "ปิดแสดงตารางโพลล์แล้ว",
+      });
+    }
+
+    // Toggle Trial FOTY poll table visibility action (/trial-foty)
+    if (body.action === "toggle_trial_poll_table") {
+      const currentVal = current.showTrialPollTable !== undefined ? current.showTrialPollTable !== false : true;
+      const newStatus =
+        body.showTrialPollTable !== undefined
+          ? Boolean(body.showTrialPollTable)
+          : body.showPollTable !== undefined
+          ? Boolean(body.showPollTable)
+          : !currentVal;
+      const newSettings = { ...current, showTrialPollTable: newStatus };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        showTrialPollTable: newStatus,
+        message: newStatus ? "เปิดแสดงตารางโพลล์ Trial FOTY แล้ว" : "ปิดซ่อนตารางโพลล์ Trial FOTY แล้ว",
       });
     }
 

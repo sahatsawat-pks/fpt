@@ -250,6 +250,7 @@ export default function TrialFOTYPage() {
   // View & Filter States
   const [activeTableTab, setActiveTableTab] = useState("standings"); // 'standings' | 'warmup' | 'poll'
   const [showWarmupTable, setShowWarmupTable] = useState(true);
+  const [showPollTable, setShowPollTable] = useState(true);
   const [sortBy, setSortBy] = useState("rank"); // 'rank' | 'order'
   const [searchQuery, setSearchQuery] = useState("");
   const [pollSearchQuery, setPollSearchQuery] = useState("");
@@ -283,6 +284,13 @@ export default function TrialFOTYPage() {
         }
         if (jsonPoll.showWarmupTable !== undefined) {
           setShowWarmupTable(Boolean(jsonPoll.showWarmupTable));
+        }
+        if (jsonPoll.showPollTable !== undefined || jsonPoll.showTrialPollTable !== undefined) {
+          const isPollVis = Boolean(jsonPoll.showTrialPollTable !== undefined ? jsonPoll.showTrialPollTable : jsonPoll.showPollTable);
+          setShowPollTable(isPollVis);
+          if (!isPollVis) {
+            setActiveTableTab((prev) => (prev === "poll" ? "standings" : prev));
+          }
         }
       }
     } catch (e) {
@@ -730,30 +738,32 @@ export default function TrialFOTYPage() {
               🏆 ตารางคะแนนแข่งขัน
             </a>
 
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTableTab("poll");
-                const el = document.getElementById("leaderboard");
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "14px 28px",
-                borderRadius: "30px",
-                background: "rgba(16, 32, 60, 0.7)",
-                border: "2px solid #ffd700",
-                color: "#ffd700",
-                fontSize: "16px",
-                fontWeight: "800",
-                cursor: "pointer",
-                boxShadow: "0 0 15px rgba(255, 215, 0, 0.3)",
-              }}
-            >
-              📊 ดูตารางอันดับโพลล์
-            </button>
+            {showPollTable && (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTableTab("poll");
+                  const el = document.getElementById("leaderboard");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "30px",
+                  background: "rgba(16, 32, 60, 0.7)",
+                  border: "2px solid #ffd700",
+                  color: "#ffd700",
+                  fontSize: "16px",
+                  fontWeight: "800",
+                  cursor: "pointer",
+                  boxShadow: "0 0 15px rgba(255, 215, 0, 0.3)",
+                }}
+              >
+                📊 ดูตารางอันดับโพลล์
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -796,14 +806,14 @@ export default function TrialFOTYPage() {
               margin: "0 0 8px 0",
             }}
           >
-            {activeTableTab === "standings"
+            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
               ? "ตารางคะแนนการแข่งขัน งุ่นง่าน Of The Year 2026"
               : activeTableTab === "warmup"
                 ? "ตารางคะแนนรอบอุ่นเครื่อง (Warm-up / What If? Standings)"
                 : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
           </h2>
           <p style={{ fontSize: "15px", color: "rgba(255, 255, 255, 0.65)", margin: 0 }}>
-            {activeTableTab === "standings"
+            {activeTableTab === "standings" || (!showPollTable && activeTableTab === "poll")
               ? "คะแนนสดอัปเดตแบบเรียลไทม์ 4 หมวดการแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 อันดับแรก"
               : activeTableTab === "warmup"
                 ? "คะแนนจากการลงสนามแข่งในห้องเกม (/game) เต็ม 100 คะแนน คิดเป็นสัดส่วน 30% ของตารางโพลล์มหาชน"
@@ -873,30 +883,32 @@ export default function TrialFOTYPage() {
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={() => setActiveTableTab("poll")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "12px 28px",
-              borderRadius: "14px",
-              background:
-                activeTableTab === "poll"
-                  ? "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)"
-                  : "rgba(16, 32, 60, 0.65)",
-              color: activeTableTab === "poll" ? "#030812" : "#ffd700",
-              border: activeTableTab === "poll" ? "1px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.25)",
-              fontSize: "16px",
-              fontWeight: "800",
-              cursor: "pointer",
-              boxShadow: activeTableTab === "poll" ? "0 0 25px rgba(255, 215, 0, 0.5)" : "none",
-              transition: "all 0.2s ease",
-            }}
-          >
-            📊 ตารางอันดับโพลล์ (Poll)
-          </button>
+          {showPollTable && (
+            <button
+              type="button"
+              onClick={() => setActiveTableTab("poll")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "12px 28px",
+                borderRadius: "14px",
+                background:
+                  activeTableTab === "poll"
+                    ? "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)"
+                    : "rgba(16, 32, 60, 0.65)",
+                color: activeTableTab === "poll" ? "#030812" : "#ffd700",
+                border: activeTableTab === "poll" ? "1px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.25)",
+                fontSize: "16px",
+                fontWeight: "800",
+                cursor: "pointer",
+                boxShadow: activeTableTab === "poll" ? "0 0 25px rgba(255, 215, 0, 0.5)" : "none",
+                transition: "all 0.2s ease",
+              }}
+            >
+              📊 ตารางอันดับโพลล์ (Poll)
+            </button>
+          )}
         </div>
 
         {/* BROADCAST LIVE PULSE HUD TICKER */}
@@ -1141,25 +1153,27 @@ export default function TrialFOTYPage() {
                   >
                     🎮 ไปที่หน้ากรอกคะแนน Admin
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTableTab("poll")}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "12px 24px",
-                      borderRadius: "24px",
-                      background: "rgba(255, 215, 0, 0.15)",
-                      border: "1px solid #ffd700",
-                      color: "#ffd700",
-                      fontWeight: "700",
-                      fontSize: "15px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    📊 ดูผลโพลล์มหาชน
-                  </button>
+                  {showPollTable && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTableTab("poll")}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "12px 24px",
+                        borderRadius: "24px",
+                        background: "rgba(255, 215, 0, 0.15)",
+                        border: "1px solid #ffd700",
+                        color: "#ffd700",
+                        fontWeight: "700",
+                        fontSize: "15px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      📊 ดูผลโพลล์มหาชน
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
@@ -2192,25 +2206,27 @@ export default function TrialFOTYPage() {
                   >
                     🎮 ไปที่หน้าเกม (เล่นเพื่อบันทึกคะแนน)
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTableTab("poll")}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "12px 24px",
-                      borderRadius: "24px",
-                      background: "rgba(255, 136, 0, 0.15)",
-                      border: "1px solid #ff8800",
-                      color: "#ffa940",
-                      fontWeight: "700",
-                      fontSize: "15px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    📊 ดูผลโพลล์มหาชน
-                  </button>
+                  {showPollTable && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTableTab("poll")}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "12px 24px",
+                        borderRadius: "24px",
+                        background: "rgba(255, 136, 0, 0.15)",
+                        border: "1px solid #ff8800",
+                        color: "#ffa940",
+                        fontWeight: "700",
+                        fontSize: "15px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      📊 ดูผลโพลล์มหาชน
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
@@ -3026,7 +3042,7 @@ export default function TrialFOTYPage() {
         {/* ========================================================
             TAB 2: FAN POLL RANKINGS (Authentic 1:1 Matching page.js)
            ======================================================== */}
-        {activeTableTab === "poll" && (
+        {activeTableTab === "poll" && showPollTable && (
           <div key="poll-tab-view" className="table-slide-down">
             {/* Vote CTA Banner */}
             <div

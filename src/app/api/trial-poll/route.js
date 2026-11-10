@@ -135,6 +135,10 @@ export async function GET() {
   ]);
   const votingOpen = rawSettings ? rawSettings.trialVotingOpen !== false : true;
   const showWarmupTable = rawSettings ? rawSettings.showWarmupTable !== false : true;
+  const showTrialPollTable = rawSettings
+    ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : rawSettings.showPollTable !== false)
+    : true;
+  const showPollTable = showTrialPollTable;
 
   const pollList = Array.isArray(data) && data.length > 0 ? data : getDefaultPoll();
   const contestants = Array.isArray(trialContestants) ? trialContestants : [];
@@ -170,6 +174,8 @@ export async function GET() {
     data: enrichedPoll,
     votingOpen,
     showWarmupTable,
+    showPollTable,
+    showTrialPollTable,
   });
 }
 
@@ -208,6 +214,34 @@ export async function POST(request) {
         success: true,
         showWarmupTable: newStatus,
         message: newStatus ? "🟢 เปิดแสดงตารางรอบอุ่นเครื่องในหน้าแรกแล้ว" : "🔴 ซ่อนตารางรอบอุ่นเครื่องในหน้าแรกแล้ว",
+      });
+    }
+
+    // Toggle poll table visibility on trial front page
+    if (body.action === "toggle_poll_table" || body.action === "set_poll_table" || body.action === "toggle_trial_poll_table") {
+      const rawSettings = await getKVData("fpt_settings", readSettings);
+      const currentStatus = rawSettings
+        ? (rawSettings.showTrialPollTable !== undefined ? rawSettings.showTrialPollTable !== false : rawSettings.showPollTable !== false)
+        : true;
+      const newStatus =
+        body.showTrialPollTable !== undefined
+          ? Boolean(body.showTrialPollTable)
+          : body.showPollTable !== undefined
+          ? Boolean(body.showPollTable)
+          : !currentStatus;
+      const updatedSettings = {
+        ...(rawSettings || {}),
+        showTrialPollTable: newStatus,
+      };
+
+      writeSettings(updatedSettings);
+      await saveKVData("fpt_settings", updatedSettings, writeSettings);
+
+      return NextResponse.json({
+        success: true,
+        showPollTable: newStatus,
+        showTrialPollTable: newStatus,
+        message: newStatus ? "🟢 เปิดแสดงตารางโพลล์ในหน้าแรกแล้ว" : "🔴 ซ่อนตารางโพลล์ในหน้าแรกแล้ว",
       });
     }
 

@@ -112,6 +112,10 @@ export default function TrialAdminPage() {
   const [togglingVoting, setTogglingVoting] = useState(false);
   const [showWarmupTable, setShowWarmupTable] = useState(true);
   const [togglingWarmupTable, setTogglingWarmupTable] = useState(false);
+  const [showPollTable, setShowPollTable] = useState(true);
+  const [togglingPollTable, setTogglingPollTable] = useState(false);
+  const [showMainPollTable, setShowMainPollTable] = useState(true);
+  const [togglingMainPollTable, setTogglingMainPollTable] = useState(false);
   const [syncingGameScores, setSyncingGameScores] = useState(false);
 
   // ── Trial Info & Staff Q&A States ─────────────────────────────────────────
@@ -208,6 +212,14 @@ export default function TrialAdminPage() {
         }
         if (jsonPoll.votingOpen !== undefined) {
           setVotingOpen(Boolean(jsonPoll.votingOpen));
+        }
+        if (jsonPoll.showWarmupTable !== undefined) {
+          setShowWarmupTable(Boolean(jsonPoll.showWarmupTable));
+        }
+        if (jsonPoll.showTrialPollTable !== undefined) {
+          setShowPollTable(Boolean(jsonPoll.showTrialPollTable));
+        } else if (jsonPoll.showPollTable !== undefined) {
+          setShowPollTable(Boolean(jsonPoll.showPollTable));
         }
       }
       if (resInfo.ok) {
@@ -694,6 +706,14 @@ export default function TrialAdminPage() {
         if (data.showWarmupTable !== undefined) {
           setShowWarmupTable(Boolean(data.showWarmupTable));
         }
+        if (data.showTrialPollTable !== undefined) {
+          setShowPollTable(Boolean(data.showTrialPollTable));
+        } else if (data.showPollTable !== undefined) {
+          setShowPollTable(Boolean(data.showPollTable));
+        }
+        if (data.showPollTable !== undefined) {
+          setShowMainPollTable(Boolean(data.showPollTable));
+        }
       }
     } catch (e) {
       console.error(e);
@@ -745,6 +765,54 @@ export default function TrialAdminPage() {
       showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
     } finally {
       setTogglingWarmupTable(false);
+    }
+  };
+
+  const handleToggleTrialPollTable = async (newStatus) => {
+    const targetStatus = typeof newStatus === "boolean" ? newStatus : !showPollTable;
+    setTogglingPollTable(true);
+    try {
+      const res = await fetch("/api/trial-poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_trial_poll_table", showTrialPollTable: targetStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowPollTable(targetStatus);
+        showToast(targetStatus ? "🟢 เปิดแสดงตารางโพลล์ในหน้า Trial FOTY แล้ว" : "🔴 ปิดซ่อนตารางโพลล์ในหน้า Trial FOTY แล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการเปลี่ยนการแสดงตารางโพลล์", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setTogglingPollTable(false);
+    }
+  };
+
+  const handleToggleMainPollTable = async (newStatus) => {
+    const targetStatus = typeof newStatus === "boolean" ? newStatus : !showMainPollTable;
+    setTogglingMainPollTable(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_poll_table", showPollTable: targetStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowMainPollTable(targetStatus);
+        showToast(targetStatus ? "🟢 เปิดแสดงตารางโพลล์ในหน้าแรกหลัก (/) แล้ว" : "🔴 ปิดซ่อนตารางโพลล์ในหน้าแรกหลัก (/) แล้ว", "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการเปลี่ยนการแสดงตารางโพลล์หน้าแรก", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setTogglingMainPollTable(false);
     }
   };
 
@@ -3125,6 +3193,107 @@ export default function TrialAdminPage() {
                 </div>
               </div>
 
+              {/* Poll Table on Trial Front Page Toggle Control Box */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "16px 20px",
+                  borderRadius: "14px",
+                  background: showPollTable
+                    ? "linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(60, 40, 6, 0.25) 100%)"
+                    : "linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(127, 29, 29, 0.25) 100%)",
+                  border: showPollTable ? "1.5px solid rgba(255, 215, 0, 0.45)" : "1.5px solid rgba(239, 68, 68, 0.45)",
+                  boxShadow: showPollTable ? "0 0 16px rgba(255, 215, 0, 0.15)" : "0 0 16px rgba(239, 68, 68, 0.15)",
+                  marginBottom: "16px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingPollTable ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showPollTable}
+                    disabled={togglingPollTable}
+                    onChange={(e) => handleToggleTrialPollTable(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingPollTable ? "not-allowed" : "pointer",
+                      accentColor: "#ffd700",
+                    }}
+                  />
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <span
+                        style={{
+                          fontSize: "15px",
+                          fontWeight: "900",
+                          color: showPollTable ? "#ffd700" : "#f87171",
+                        }}
+                      >
+                        {showPollTable ? "📊 เปิดแสดงตารางโพลล์ในหน้า Trial FOTY (Poll Table Active)" : "🔴 ปิดซ่อนตารางโพลล์ในหน้า Trial FOTY (Poll Table Hidden)"}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: "800",
+                          padding: "2px 8px",
+                          borderRadius: "20px",
+                          background: showPollTable ? "rgba(255, 215, 0, 0.2)" : "rgba(248, 113, 113, 0.2)",
+                          color: showPollTable ? "#fde047" : "#fca5a5",
+                          border: showPollTable ? "1px solid rgba(255, 215, 0, 0.4)" : "1px solid rgba(248, 113, 113, 0.4)",
+                        }}
+                      >
+                        {showPollTable ? "แสดงในหน้า /trial-foty" : "ซ่อนจากหน้า /trial-foty"}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {showPollTable
+                        ? "ผู้ชมสามารถกดดูแท็บ '📊 ตารางอันดับโพลล์ (Poll)' ที่หน้า /trial-foty ได้ตามปกติ"
+                        : "ซ่อนแท็บและตารางอันดับโพลล์จากหน้า /trial-foty ผู้ชมทั่วไปจะไม่เห็นตารางนี้"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingPollTable}
+                    onClick={() => handleToggleTrialPollTable(!showPollTable)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: showPollTable ? "rgba(239, 68, 68, 0.2)" : "rgba(255, 215, 0, 0.2)",
+                      border: showPollTable ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(255, 215, 0, 0.5)",
+                      color: showPollTable ? "#fca5a5" : "#ffd700",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingPollTable ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {togglingPollTable
+                      ? "⏳ กำลังบันทึก..."
+                      : showPollTable
+                      ? "🔒 คลิกเพื่อปิดซ่อน"
+                      : "🔓 คลิกเพื่อเปิดแสดง"}
+                  </button>
+                </div>
+              </div>
+
               {/* Warm-up Table on Front Page Toggle Control Box */}
               <div
                 style={{
@@ -4328,6 +4497,202 @@ export default function TrialAdminPage() {
                     {togglingWarmupTable
                       ? "⏳ กำลังบันทึก..."
                       : showWarmupTable
+                      ? "🔒 คลิกเพื่อปิดซ่อน"
+                      : "🔓 คลิกเพื่อเปิดแสดง"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Trial Poll Table Open / Close Settings Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: showPollTable ? "1.5px solid rgba(255, 215, 0, 0.4)" : "1.5px solid rgba(239, 68, 68, 0.4)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+                boxShadow: showPollTable ? "0 0 20px rgba(255, 215, 0, 0.12)" : "0 0 20px rgba(239, 68, 68, 0.12)",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>📊</span> แสดง-ซ่อนตารางอันดับโพลล์ในหน้า Trial FoTY (/trial-foty)
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                ควบคุมการเปิดหรือปิดแท็บ <strong>"📊 ตารางอันดับโพลล์ (Poll)"</strong> ในหน้าแรก <code>/trial-foty</code> ซึ่งแสดงอันดับและผลคะแนนโหวตมหาชน
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  background: showPollTable ? "rgba(255, 215, 0, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                  border: showPollTable ? "1px solid rgba(255, 215, 0, 0.35)" : "1px solid rgba(239, 68, 68, 0.35)",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingPollTable ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showPollTable}
+                    disabled={togglingPollTable}
+                    onChange={(e) => handleToggleTrialPollTable(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingPollTable ? "not-allowed" : "pointer",
+                      accentColor: "#ffd700",
+                    }}
+                  />
+                  <div>
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "900",
+                        color: showPollTable ? "#ffd700" : "#f87171",
+                      }}
+                    >
+                      {showPollTable ? "📊 เปิดแสดงตารางโพลล์ในหน้า Trial FOTY" : "🔴 ปิดซ่อนตารางโพลล์ในหน้า Trial FOTY"}
+                    </span>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {showPollTable
+                        ? "ผู้ชมสามารถกดดูแท็บ '📊 ตารางอันดับโพลล์ (Poll)' บนหน้า /trial-foty ได้ตามปกติ"
+                        : "ซ่อนแท็บและตารางอันดับโพลล์จากหน้า /trial-foty"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingPollTable}
+                    onClick={() => handleToggleTrialPollTable(!showPollTable)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: showPollTable ? "rgba(239, 68, 68, 0.2)" : "rgba(255, 215, 0, 0.2)",
+                      border: showPollTable ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(255, 215, 0, 0.5)",
+                      color: showPollTable ? "#fca5a5" : "#ffd700",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingPollTable ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    {togglingPollTable
+                      ? "⏳ กำลังบันทึก..."
+                      : showPollTable
+                      ? "🔒 คลิกเพื่อปิดซ่อน"
+                      : "🔓 คลิกเพื่อเปิดแสดง"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Homepage Poll Table Open / Close Settings Box */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: showMainPollTable ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1.5px solid rgba(239, 68, 68, 0.4)",
+                borderRadius: "16px",
+                padding: "20px",
+                marginBottom: "20px",
+                boxShadow: showMainPollTable ? "0 0 20px rgba(0, 229, 255, 0.12)" : "0 0 20px rgba(239, 68, 68, 0.12)",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#00e5ff", margin: "0 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>🏠</span> แสดง-ซ่อนตารางอันดับโพลล์ในหน้าแรกหลัก (/)
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", margin: "0 0 16px", lineHeight: "1.6" }}>
+                ควบคุมการเปิดหรือปิดแท็บ <strong>"📊 ตารางอันดับโพลล์ (Poll)"</strong> ในหน้าแรกของเว็บไซต์หลัก <code>/</code>
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "14px",
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  background: showMainPollTable ? "rgba(0, 229, 255, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                  border: showMainPollTable ? "1px solid rgba(0, 229, 255, 0.35)" : "1px solid rgba(239, 68, 68, 0.35)",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    cursor: togglingMainPollTable ? "not-allowed" : "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showMainPollTable}
+                    disabled={togglingMainPollTable}
+                    onChange={(e) => handleToggleMainPollTable(e.target.checked)}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      cursor: togglingMainPollTable ? "not-allowed" : "pointer",
+                      accentColor: "#00e5ff",
+                    }}
+                  />
+                  <div>
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "900",
+                        color: showMainPollTable ? "#00e5ff" : "#f87171",
+                      }}
+                    >
+                      {showMainPollTable ? "🏠 เปิดแสดงตารางโพลล์ในหน้าแรกหลัก (/)" : "🔴 ปิดซ่อนตารางโพลล์ในหน้าแรกหลัก (/)"}
+                    </span>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.7)", margin: "3px 0 0" }}>
+                      {showMainPollTable
+                        ? "ผู้ชมสามารถกดดูแท็บ '📊 ตารางอันดับโพลล์ (Poll)' บนหน้าแรกหลัก (/) ได้ตามปกติ"
+                        : "ซ่อนแท็บและตารางอันดับโพลล์จากหน้าแรกหลัก (/)"}
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <button
+                    type="button"
+                    disabled={togglingMainPollTable}
+                    onClick={() => handleToggleMainPollTable(!showMainPollTable)}
+                    style={{
+                      padding: "8px 18px",
+                      borderRadius: "8px",
+                      background: showMainPollTable ? "rgba(239, 68, 68, 0.2)" : "rgba(0, 229, 255, 0.2)",
+                      border: showMainPollTable ? "1px solid rgba(239, 68, 68, 0.5)" : "1px solid rgba(0, 229, 255, 0.5)",
+                      color: showMainPollTable ? "#fca5a5" : "#67e8f9",
+                      fontSize: "13px",
+                      fontWeight: "800",
+                      cursor: togglingMainPollTable ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    {togglingMainPollTable
+                      ? "⏳ กำลังบันทึก..."
+                      : showMainPollTable
                       ? "🔒 คลิกเพื่อปิดซ่อน"
                       : "🔓 คลิกเพื่อเปิดแสดง"}
                   </button>

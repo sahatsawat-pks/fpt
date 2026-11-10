@@ -53,6 +53,7 @@ export default function AdminPage() {
   const [protectRestrict, setProtectRestrict] = useState(false);
   const [restrictPassword, setRestrictPassword] = useState("");
   const [showPollTable, setShowPollTable] = useState(true);
+  const [showTrialPollTable, setShowTrialPollTable] = useState(true);
   const [settingsNotice, setSettingsNotice] = useState("");
 
   // Archive & Tournament Phase States
@@ -474,6 +475,9 @@ export default function AdminPage() {
         if (data.showPollTable !== undefined) {
           setShowPollTable(Boolean(data.showPollTable));
         }
+        if (data.showTrialPollTable !== undefined) {
+          setShowTrialPollTable(Boolean(data.showTrialPollTable));
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -697,6 +701,7 @@ export default function AdminPage() {
           protectRestrict,
           restrictPassword,
           showPollTable,
+          showTrialPollTable,
         }),
       });
       const data = await res.json();
@@ -729,6 +734,27 @@ export default function AdminPage() {
           setPollNotice("");
           setSettingsNotice("");
         }, 3500);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
+  // Toggle Trial FOTY Poll Table Visibility (/trial-foty)
+  const handleToggleTrialPollTable = async (newVal) => {
+    setShowTrialPollTable(newVal);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_trial_poll_table", showTrialPollTable: newVal }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const msg = newVal ? "🟢 เปิดแสดงตารางโพลล์ Trial FOTY แล้ว" : "🔴 ปิดซ่อนตารางโพลล์ Trial FOTY แล้ว";
+        setSettingsNotice(msg);
+        setTimeout(() => setSettingsNotice(""), 3500);
       }
     } catch (err) {
       console.error(err);
@@ -4752,19 +4778,20 @@ export default function AdminPage() {
                 )}
               </div>
 
-              {/* Homepage Display Settings */}
+              {/* Homepage & Trial FOTY Display Settings */}
               <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", margin: "24px 0" }}></div>
 
               <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#ffd700", marginBottom: "14px" }}>
-                📊 การแสดงผลบนหน้าแรก (/)
+                📊 การแสดงผลตารางโพลล์บนหน้าต่าง ๆ
               </h3>
 
+              {/* Main Homepage Poll */}
               <div style={{
                 background: "rgba(0, 15, 30, 0.6)",
                 border: showPollTable ? "1.5px solid rgba(255, 215, 0, 0.4)" : "1px solid rgba(255, 255, 255, 0.15)",
                 borderRadius: "10px",
                 padding: "16px",
-                marginBottom: "22px"
+                marginBottom: "16px"
               }}>
                 <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: showPollTable ? "#ffd700" : "rgba(255,255,255,0.7)" }}>
                   <input
@@ -4773,10 +4800,32 @@ export default function AdminPage() {
                     onChange={(e) => handleTogglePollTable(e.target.checked)}
                     style={{ width: "18px", height: "18px", accentColor: "#ffd700", cursor: "pointer" }}
                   />
-                  <span>📊 เปิดแสดงตารางอันดับโพลล์ (Poll) ในหน้าแรก (/)</span>
+                  <span>🏠 เปิดแสดงตารางอันดับโพลล์ (Poll) ในหน้าแรกหลัก (/)</span>
                 </label>
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
                   หากปิดใช้งาน หน้าแรกจะซ่อนแท็บสลับและตารางอันดับโพลล์ทั้งหมด เหลือแสดงเฉพาะตารางคะแนนแข่งขันเท่านั้น
+                </p>
+              </div>
+
+              {/* Trial FOTY Poll */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: showTrialPollTable ? "1.5px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "22px"
+              }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: showTrialPollTable ? "#00e5ff" : "rgba(255,255,255,0.7)" }}>
+                  <input
+                    type="checkbox"
+                    checked={showTrialPollTable}
+                    onChange={(e) => handleToggleTrialPollTable(e.target.checked)}
+                    style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
+                  />
+                  <span>🏁 เปิดแสดงตารางอันดับโพลล์ (Poll) ในหน้า Trial FOTY (/trial-foty)</span>
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
+                  หากปิดใช้งาน หน้า <code>/trial-foty</code> จะซ่อนแท็บสลับและตารางอันดับโพลล์มหาชน
                 </p>
               </div>
 
