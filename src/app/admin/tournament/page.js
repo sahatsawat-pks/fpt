@@ -947,13 +947,16 @@ export default function AdminTournamentPage() {
         if (finalGp1 >= 5 && finalGp2 === 0) {
           lp1 = 5;
           lp2 = -1;
-        } else if (finalGp1 === 4 && finalGp2 === 0) {
-          lp1 = 4;
-          lp2 = isMatchday4Plus ? 0 : -1;
-        } else if (finalGp1 >= 4) {
+        } else if (finalGp1 >= 5) {
+          // 5-x (เช่น 5:1, 5:2) ชนะได้ 4 แพ้ได้ 0
           lp1 = 4;
           lp2 = 0;
+        } else if (finalGp1 === 4 && finalGp2 === 0) {
+          // 4-0 ชนะได้ 4 แพ้ได้ 0 (ใน MD1-3 แพ้โดน -1, ใน MD4+ แพ้ได้ 0)
+          lp1 = 4;
+          lp2 = isMatchday4Plus ? 0 : -1;
         } else {
+          // เคสอื่น ๆ ทั้งหมด (เช่น 4:1, 4:2, 3:0, 3:1, 3:2) ชนะได้ 3 แพ้ได้ 0
           lp1 = 3;
           lp2 = 0;
         }
@@ -962,13 +965,16 @@ export default function AdminTournamentPage() {
         if (finalGp2 >= 5 && finalGp1 === 0) {
           lp2 = 5;
           lp1 = -1;
-        } else if (finalGp2 === 4 && finalGp1 === 0) {
-          lp2 = 4;
-          lp1 = isMatchday4Plus ? 0 : -1;
-        } else if (finalGp2 >= 4) {
+        } else if (finalGp2 >= 5) {
+          // 5-x (เช่น 5:1, 5:2) ชนะได้ 4 แพ้ได้ 0
           lp2 = 4;
           lp1 = 0;
+        } else if (finalGp2 === 4 && finalGp1 === 0) {
+          // 4-0 ชนะได้ 4 แพ้ได้ 0 (ใน MD1-3 แพ้โดน -1, ใน MD4+ แพ้ได้ 0)
+          lp2 = 4;
+          lp1 = isMatchday4Plus ? 0 : -1;
         } else {
+          // เคสอื่น ๆ ทั้งหมด (เช่น 4:1, 4:2, 3:0, 3:1, 3:2) ชนะได้ 3 แพ้ได้ 0
           lp2 = 3;
           lp1 = 0;
         }
