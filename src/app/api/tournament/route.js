@@ -55,15 +55,6 @@ export async function POST(request) {
       return NextResponse.json({ success: true, data: currentData });
     }
 
-    // Set showPollTable toggle
-    if (action === "set_poll_table") {
-      const showPollTable = Boolean(body.showPollTable);
-      currentData.showPollTable = showPollTable;
-      currentData.updatedAt = new Date().toISOString();
-      await saveKVData("fpt_tournament", currentData, writeData);
-      return NextResponse.json({ success: true, showPollTable, data: currentData });
-    }
-
     // Update individual match
     if (action === "save_match") {
       const { matchdayId, matchId, matchData } = body;

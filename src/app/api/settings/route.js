@@ -24,6 +24,7 @@ const DEFAULT_SETTINGS = {
   qualifyingLocked: false,
   trialVotingOpen: true,
   showWarmupTable: true,
+  showPollTable: true,
 };
 
 function readSettings() {
@@ -81,6 +82,7 @@ export async function GET(request) {
       qualifyingLocked: Boolean(settings.qualifyingLocked),
       trialVotingOpen: settings.trialVotingOpen !== false,
       showWarmupTable: settings.showWarmupTable !== false,
+      showPollTable: settings.showPollTable !== false,
     });
   }
 
@@ -99,6 +101,7 @@ export async function GET(request) {
     qualifyingLocked: Boolean(settings.qualifyingLocked),
     trialVotingOpen: settings.trialVotingOpen !== false,
     showWarmupTable: settings.showWarmupTable !== false,
+    showPollTable: settings.showPollTable !== false,
   });
 }
 
@@ -229,6 +232,9 @@ export async function POST(request) {
       if (body.showWarmupTable !== undefined) {
         newSettings.showWarmupTable = Boolean(body.showWarmupTable);
       }
+      if (body.showPollTable !== undefined) {
+        newSettings.showPollTable = Boolean(body.showPollTable);
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -253,7 +259,25 @@ export async function POST(request) {
           qualifyingLocked: newSettings.qualifyingLocked,
           trialVotingOpen: newSettings.trialVotingOpen !== false,
           showWarmupTable: newSettings.showWarmupTable !== false,
+          showPollTable: newSettings.showPollTable !== false,
         },
+      });
+    }
+
+    // Toggle poll table visibility action
+    if (body.action === "toggle_poll_table") {
+      const newStatus =
+        body.showPollTable !== undefined
+          ? Boolean(body.showPollTable)
+          : current.showPollTable === false
+          ? true
+          : false;
+      const newSettings = { ...current, showPollTable: newStatus };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        showPollTable: newStatus,
+        message: newStatus ? "เปิดแสดงตารางโพลล์แล้ว" : "ปิดแสดงตารางโพลล์แล้ว",
       });
     }
 

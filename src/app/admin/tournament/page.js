@@ -1374,25 +1374,6 @@ export default function AdminTournamentPage() {
     }
   };
 
-  // Handle Toggle Poll Table for /tournament
-  const handleTogglePollTable = async (newVal) => {
-    try {
-      const res = await fetch("/api/tournament", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "set_poll_table", showPollTable: newVal }),
-      });
-      const result = await res.json();
-      if (result.success) {
-        setData((prev) => ({ ...prev, showPollTable: newVal }));
-        showToast(newVal ? "เปิดแสดงตารางโพลล์ในหน้าทัวร์นาเมนต์แล้ว" : "ปิดซ่อนตารางโพลล์ในหน้าทัวร์นาเมนต์แล้ว");
-      }
-    } catch (err) {
-      console.error(err);
-      showToast("เกิดข้อผิดพลาดในการบันทึก", "error");
-    }
-  };
-
   // Handle Save Replay
   const handleSaveReplay = async (e) => {
     if (e) e.preventDefault();
@@ -1812,31 +1793,6 @@ export default function AdminTournamentPage() {
           >
             📸 จัดการรูปถ่ายผู้เข้าแข่งขัน
           </Link>
-          <label
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "6px 14px",
-              borderRadius: "8px",
-              background: data?.showPollTable !== false ? "rgba(255, 215, 0, 0.18)" : "rgba(255, 255, 255, 0.05)",
-              color: data?.showPollTable !== false ? "#ffd700" : "rgba(255,255,255,0.6)",
-              fontSize: "13px",
-              border: data?.showPollTable !== false ? "1.5px solid rgba(255, 215, 0, 0.5)" : "1px solid rgba(255, 255, 255, 0.2)",
-              fontWeight: "800",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
-            title="ติ๊กเพื่อเปิดหรือปิดแสดงตารางโพลล์ในหน้าทัวร์นาเมนต์ (/tournament)"
-          >
-            <input
-              type="checkbox"
-              checked={data?.showPollTable !== false}
-              onChange={(e) => handleTogglePollTable(e.target.checked)}
-              style={{ accentColor: "#ffd700", width: "16px", height: "16px", cursor: "pointer" }}
-            />
-            <span>📊 ตารางโพลล์: {data?.showPollTable !== false ? "เปิดแสดง (ON)" : "ปิดซ่อน (OFF)"}</span>
-          </label>
           <button
             type="button"
             onClick={handleReset}

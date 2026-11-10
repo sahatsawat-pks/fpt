@@ -508,6 +508,7 @@ export default function MainPage() {
 
   // Tab State: 'standings' | 'poll'
   const [activeTableTab, setActiveTableTab] = useState("standings");
+  const [showPollTable, setShowPollTable] = useState(true);
 
   // Search, Filter & Spotlight Interactive States
   const [searchQuery, setSearchQuery] = useState("");
@@ -556,6 +557,13 @@ export default function MainPage() {
         setPollList(pollData.data);
       }
       if (settingsData.success) {
+        if (settingsData.showPollTable !== undefined) {
+          const isPollVisible = Boolean(settingsData.showPollTable);
+          setShowPollTable(isPollVisible);
+          if (!isPollVisible) {
+            setActiveTableTab("standings");
+          }
+        }
         if (settingsData.totalContestants) {
           setTotalContestants(settingsData.totalContestants);
         }
@@ -1481,14 +1489,14 @@ export default function MainPage() {
             WebkitTextFillColor: "transparent",
             margin: "0 0 8px 0"
           }}>
-            {activeTableTab === "standings"
+            {activeTableTab === "standings" || !showPollTable
               ? effectivePhase === "finals"
                 ? "ตารางคะแนน รอบชิงชนะเลิศ (The Finals 2026)"
                 : "ตารางคะแนนการแข่งขัน แฟนพันธุ์แท้ 2026"
               : "ตารางอันดับโพลล์ (Fan Poll Ranking)"}
           </h2>
           <p style={{ fontSize: "15px", color: "rgba(255, 255, 255, 0.65)", margin: 0 }}>
-            {activeTableTab === "standings"
+            {activeTableTab === "standings" || !showPollTable
               ? effectivePhase === "finals"
                 ? "คะแนนรอบชิงชนะเลิศของ 5 ผู้เข้าแข่งขันสุดท้าย เพื่อชิงตำแหน่งสุดยอดแฟนพันธุ์แท้แห่งปี 2026"
                 : "คะแนนอัปเดตแบบเรียลไทม์จากห้องควบคุมแข่งขัน ตัดตัวผู้เข้าแข่งขัน 5 คนสุดท้าย"
@@ -1497,61 +1505,63 @@ export default function MainPage() {
         </div>
 
         {/* Dual Tab Switcher Buttons */}
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "14px",
-          marginBottom: (isArchived || currentPhase === "finals") ? "16px" : "32px",
-          flexWrap: "wrap"
-        }}>
-          <button
-            type="button"
-            onClick={() => setActiveTableTab("standings")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "12px 28px",
-              borderRadius: "14px",
-              background: activeTableTab === "standings"
-                ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)"
-                : "rgba(16, 32, 60, 0.65)",
-              color: activeTableTab === "standings" ? "#030812" : "#80d0ff",
-              border: activeTableTab === "standings" ? "1px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.25)",
-              fontSize: "16px",
-              fontWeight: "800",
-              cursor: "pointer",
-              boxShadow: activeTableTab === "standings" ? "0 0 25px rgba(0, 229, 255, 0.5)" : "none",
-              transition: "all 0.2s ease"
-            }}
-          >
-            🏆 ตารางคะแนนการแข่งขัน
-          </button>
+        {showPollTable && (
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "14px",
+            marginBottom: (isArchived || currentPhase === "finals") ? "16px" : "32px",
+            flexWrap: "wrap"
+          }}>
+            <button
+              type="button"
+              onClick={() => setActiveTableTab("standings")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "12px 28px",
+                borderRadius: "14px",
+                background: activeTableTab === "standings"
+                  ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)"
+                  : "rgba(16, 32, 60, 0.65)",
+                color: activeTableTab === "standings" ? "#030812" : "#80d0ff",
+                border: activeTableTab === "standings" ? "1px solid #00e5ff" : "1px solid rgba(0, 229, 255, 0.25)",
+                fontSize: "16px",
+                fontWeight: "800",
+                cursor: "pointer",
+                boxShadow: activeTableTab === "standings" ? "0 0 25px rgba(0, 229, 255, 0.5)" : "none",
+                transition: "all 0.2s ease"
+              }}
+            >
+              🏆 ตารางคะแนนการแข่งขัน
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTableTab("poll")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "12px 28px",
-              borderRadius: "14px",
-              background: activeTableTab === "poll"
-                ? "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)"
-                : "rgba(16, 32, 60, 0.65)",
-              color: activeTableTab === "poll" ? "#030812" : "#ffd700",
-              border: activeTableTab === "poll" ? "1px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.25)",
-              fontSize: "16px",
-              fontWeight: "800",
-              cursor: "pointer",
-              boxShadow: activeTableTab === "poll" ? "0 0 25px rgba(255, 215, 0, 0.5)" : "none",
-              transition: "all 0.2s ease"
-            }}
-          >
-            📊 ตารางอันดับโพลล์ (Poll)
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => setActiveTableTab("poll")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "12px 28px",
+                borderRadius: "14px",
+                background: activeTableTab === "poll"
+                  ? "linear-gradient(90deg, #ffd700 0%, #d4a017 100%)"
+                  : "rgba(16, 32, 60, 0.65)",
+                color: activeTableTab === "poll" ? "#030812" : "#ffd700",
+                border: activeTableTab === "poll" ? "1px solid #ffd700" : "1px solid rgba(255, 215, 0, 0.25)",
+                fontSize: "16px",
+                fontWeight: "800",
+                cursor: "pointer",
+                boxShadow: activeTableTab === "poll" ? "0 0 25px rgba(255, 215, 0, 0.5)" : "none",
+                transition: "all 0.2s ease"
+              }}
+            >
+              📊 ตารางอันดับโพลล์ (Poll)
+            </button>
+          </div>
+        )}
 
         {/* Phase Switcher Buttons (Finals vs Qualifying) */}
         {(isArchived || currentPhase === "finals") && activeTableTab === "standings" && (
@@ -1711,26 +1721,28 @@ export default function MainPage() {
                 <p style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.7)", maxWidth: "520px", margin: "0 auto 28px", lineHeight: "1.6" }}>
                   ตารางคะแนนจะเริ่มแสดงผลแบบเรียลไทม์ทันทีที่มีการบันทึกคะแนนจากห้องควบคุมการแข่งขัน
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setActiveTableTab("poll")}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "12px 24px",
-                    borderRadius: "24px",
-                    background: "rgba(0, 229, 255, 0.15)",
-                    border: "1px solid #00e5ff",
-                    color: "#00e5ff",
-                    fontWeight: "700",
-                    fontSize: "15px",
-                    cursor: "pointer",
-                    boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)"
-                  }}
-                >
-                  📊 ดูตารางอันดับโพลล์ (Poll) คลิกที่นี่
-                </button>
+                {showPollTable && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTableTab("poll")}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "12px 24px",
+                      borderRadius: "24px",
+                      background: "rgba(0, 229, 255, 0.15)",
+                      border: "1px solid #00e5ff",
+                      color: "#00e5ff",
+                      fontWeight: "700",
+                      fontSize: "15px",
+                      cursor: "pointer",
+                      boxShadow: "0 0 15px rgba(0, 229, 255, 0.3)"
+                    }}
+                  >
+                    📊 ดูตารางอันดับโพลล์ (Poll) คลิกที่นี่
+                  </button>
+                )}
               </div>
             ) : (
               <div>
@@ -3518,7 +3530,7 @@ export default function MainPage() {
         {/* ========================================================
             TAB 2: POLL RANKING TABLE (ตารางอันดับโพลล์)
            ======================================================== */}
-        {activeTableTab === "poll" && (
+        {showPollTable && activeTableTab === "poll" && (
           <div key="poll-tab-view" className="table-slide-down">
             
             {/* Poll Search Bar */}

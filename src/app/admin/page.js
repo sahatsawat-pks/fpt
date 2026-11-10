@@ -52,6 +52,7 @@ export default function AdminPage() {
   const [historyPassword, setHistoryPassword] = useState("");
   const [protectRestrict, setProtectRestrict] = useState(false);
   const [restrictPassword, setRestrictPassword] = useState("");
+  const [showPollTable, setShowPollTable] = useState(true);
   const [settingsNotice, setSettingsNotice] = useState("");
 
   // Archive & Tournament Phase States
@@ -470,6 +471,9 @@ export default function AdminPage() {
         setArchivedAt(data.archivedAt || null);
         setCurrentPhase(data.currentPhase || "qualifying");
         setQualifyingLocked(Boolean(data.qualifyingLocked));
+        if (data.showPollTable !== undefined) {
+          setShowPollTable(Boolean(data.showPollTable));
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -692,6 +696,7 @@ export default function AdminPage() {
           historyPassword,
           protectRestrict,
           restrictPassword,
+          showPollTable,
         }),
       });
       const data = await res.json();
@@ -703,6 +708,31 @@ export default function AdminPage() {
       }
     } catch (err) {
       setSettingsNotice("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    }
+  };
+
+  // Toggle Poll Table Visibility on Homepage (/)
+  const handleTogglePollTable = async (newVal) => {
+    setShowPollTable(newVal);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_poll_table", showPollTable: newVal }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const msg = newVal ? "🟢 เปิดแสดงตารางโพลล์ในหน้าแรกแล้ว" : "🔴 ปิดซ่อนตารางโพลล์ในหน้าแรกแล้ว";
+        setPollNotice(msg);
+        setSettingsNotice(msg);
+        setTimeout(() => {
+          setPollNotice("");
+          setSettingsNotice("");
+        }, 3500);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการบันทึก");
     }
   };
 
@@ -4096,7 +4126,32 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                  <label
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "9px 14px",
+                      borderRadius: "8px",
+                      background: showPollTable ? "rgba(255, 215, 0, 0.18)" : "rgba(255, 255, 255, 0.05)",
+                      color: showPollTable ? "#ffd700" : "rgba(255,255,255,0.6)",
+                      fontSize: "13px",
+                      border: showPollTable ? "1.5px solid rgba(255, 215, 0, 0.5)" : "1px solid rgba(255, 255, 255, 0.2)",
+                      fontWeight: "800",
+                      cursor: "pointer",
+                      userSelect: "none",
+                    }}
+                    title="ติ๊กเพื่อเปิดหรือปิดแสดงตารางโพลล์ในหน้าแรก (/)"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={showPollTable}
+                      onChange={(e) => handleTogglePollTable(e.target.checked)}
+                      style={{ accentColor: "#ffd700", width: "16px", height: "16px", cursor: "pointer" }}
+                    />
+                    <span>📊 ตารางโพลล์หน้าแรก: {showPollTable ? "เปิดแสดง (ON)" : "ปิดซ่อน (OFF)"}</span>
+                  </label>
                   <button
                     type="button"
                     onClick={handleAddPollItem}
@@ -4695,6 +4750,34 @@ export default function AdminPage() {
                     />
                   </div>
                 )}
+              </div>
+
+              {/* Homepage Display Settings */}
+              <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", margin: "24px 0" }}></div>
+
+              <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#ffd700", marginBottom: "14px" }}>
+                📊 การแสดงผลบนหน้าแรก (/)
+              </h3>
+
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: showPollTable ? "1.5px solid rgba(255, 215, 0, 0.4)" : "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "22px"
+              }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: showPollTable ? "#ffd700" : "rgba(255,255,255,0.7)" }}>
+                  <input
+                    type="checkbox"
+                    checked={showPollTable}
+                    onChange={(e) => handleTogglePollTable(e.target.checked)}
+                    style={{ width: "18px", height: "18px", accentColor: "#ffd700", cursor: "pointer" }}
+                  />
+                  <span>📊 เปิดแสดงตารางอันดับโพลล์ (Poll) ในหน้าแรก (/)</span>
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
+                  หากปิดใช้งาน หน้าแรกจะซ่อนแท็บสลับและตารางอันดับโพลล์ทั้งหมด เหลือแสดงเฉพาะตารางคะแนนแข่งขันเท่านั้น
+                </p>
               </div>
 
               {settingsNotice && (
