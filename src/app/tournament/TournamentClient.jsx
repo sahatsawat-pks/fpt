@@ -30,10 +30,10 @@ export function getYouTubeId(url) {
   return match && match[1] ? match[1] : null;
 }
 
-export default function TournamentClient({ initialData }) {
+export default function TournamentClient({ initialData, initialPollData = [] }) {
   const [data, setData] = useState(initialData || defaultTournamentData);
   const [loading, setLoading] = useState(!initialData);
-  const [activeTab, setActiveTab] = useState("standings"); // 'standings' | 'matches' | 'replays' | 'topics' | 'checklist'
+  const [activeTab, setActiveTab] = useState("standings"); // 'standings' | 'matches' | 'replays' | 'topics' | 'checklist' | 'poll'
   const [selectedGroup, setSelectedGroup] = useState("all"); // 'all' | 'A' | 'B'
   const [selectedMatchday, setSelectedMatchday] = useState("md1");
   const [matchSearch, setMatchSearch] = useState("");
@@ -41,6 +41,18 @@ export default function TournamentClient({ initialData }) {
   const [topicSortBy, setTopicSortBy] = useState("sum"); // 'sum' | '3sec' | 'qa' | 'jigsaw' | 'attribute'
   const [selectedContestant, setSelectedContestant] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Poll States & Toggle
+  const [pollList, setPollList] = useState(initialPollData || []);
+  const [showPollTable, setShowPollTable] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("fpt_tournament_show_poll");
+        if (saved !== null) return saved === "1";
+      } catch (e) {}
+    }
+    return Boolean(initialData?.showPollTable ?? true);
+  });
 
   // YouTube Replay States
   const [activeVideoModal, setActiveVideoModal] = useState(null);
@@ -51,6 +63,26 @@ export default function TournamentClient({ initialData }) {
   // Live Match States
   const [selectedLiveIndex, setSelectedLiveIndex] = useState(0);
   const [showLiveBanner, setShowLiveBanner] = useState(true);
+
+  // Auto-fetch latest poll list if available
+  useEffect(() => {
+    fetch("/api/poll")
+      .then((res) => res.json())
+      .then((resData) => {
+        if (resData.success && Array.isArray(resData.data)) {
+          setPollList(resData.data);
+        }
+      })
+      .catch((err) => console.warn("Failed to fetch poll in tournament:", err));
+  }, []);
+
+  useEffect(() => {
+    if (initialData?.showPollTable !== undefined) {
+      if (typeof window !== "undefined" && localStorage.getItem("fpt_tournament_show_poll") === null) {
+        setShowPollTable(Boolean(initialData.showPollTable));
+      }
+    }
+  }, [initialData]);
 
   // Fetch latest data from API if initialData was not provided
   useEffect(() => {
@@ -1660,6 +1692,84 @@ export default function TournamentClient({ initialData }) {
           3. MAIN CONTENT CONTAINER
          ======================================================== */}
       <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "36px clamp(24px, 4vw, 56px) 80px clamp(24px, 4vw, 56px)" }}>
+        {/* Checkbox Toggle Bar for Poll Table (ปุ่มติ๊กเปิด/ปิดตารางโพลล์) */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <label
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "8px 22px",
+              borderRadius: "30px",
+              background: showPollTable
+                ? "linear-gradient(135deg, rgba(255, 215, 0, 0.18) 0%, rgba(212, 160, 23, 0.28) 100%)"
+                : "rgba(10, 25, 47, 0.6)",
+              border: showPollTable ? "1.5px solid #ffd700" : "1.5px solid rgba(255, 255, 255, 0.2)",
+              boxShadow: showPollTable ? "0 0 18px rgba(255, 215, 0, 0.35)" : "none",
+              cursor: "pointer",
+              userSelect: "none",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={showPollTable}
+              onChange={(e) => {
+                const nextVal = e.target.checked;
+                setShowPollTable(nextVal);
+                if (typeof window !== "undefined") {
+                  try {
+                    localStorage.setItem("fpt_tournament_show_poll", nextVal ? "1" : "0");
+                  } catch (err) {}
+                }
+                if (nextVal) {
+                  setActiveTab("poll");
+                } else if (activeTab === "poll") {
+                  setActiveTab("standings");
+                }
+              }}
+              style={{
+                width: "18px",
+                height: "18px",
+                accentColor: "#ffd700",
+                cursor: "pointer",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "14px",
+                fontWeight: "900",
+                color: showPollTable ? "#ffd700" : "rgba(255, 255, 255, 0.75)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <span>📊 ตารางอันดับโพลล์ (Fan Poll Ranking)</span>
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontWeight: "900",
+                  padding: "2px 8px",
+                  borderRadius: "10px",
+                  background: showPollTable ? "rgba(0, 0, 0, 0.45)" : "rgba(255, 255, 255, 0.1)",
+                  color: showPollTable ? "#fef08a" : "rgba(255, 255, 255, 0.5)",
+                  border: showPollTable ? "1px solid rgba(255, 215, 0, 0.5)" : "1px solid rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                {showPollTable ? "เปิดใช้งาน (ON)" : "ปิดซ่อน (OFF)"}
+              </span>
+            </span>
+          </label>
+        </div>
+
         {/* Navigation Tabs (Style matches other pages) */}
         <div
           style={{
@@ -1676,6 +1786,7 @@ export default function TournamentClient({ initialData }) {
             { id: "replays", label: `📺 รับชมย้อนหลัง (${replays.length})` },
             { id: "topics", label: "🏅 สถิติคะแนนรายหัวข้อ (Top Records)" },
             { id: "checklist", label: "📋 ผังหัวข้อที่ลงทะเบียน (Topics Checklist)" },
+            ...(showPollTable ? [{ id: "poll", label: `📈 ตารางอันดับโพลล์ (Fan Poll)` }] : []),
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1726,40 +1837,78 @@ export default function TournamentClient({ initialData }) {
                 </div>
               </div>
 
-              {/* Group Toggle Pills */}
-              <div
-                style={{
-                  display: "flex",
-                  background: "rgba(10, 25, 47, 0.8)",
-                  padding: "4px",
-                  borderRadius: "24px",
-                  border: "1.5px solid rgba(0, 229, 255, 0.3)",
-                }}
-              >
-                {[
-                  { id: "all", label: "ทั้ง 2 กลุ่ม" },
-                  { id: "A", label: "กลุ่ม A" },
-                  { id: "B", label: "กลุ่ม B" },
-                ].map((g) => (
-                  <button
-                    key={g.id}
-                    onClick={() => setSelectedGroup(g.id)}
-                    style={{
-                      padding: "8px 20px",
-                      borderRadius: "20px",
-                      fontSize: "13px",
-                      fontWeight: "800",
-                      border: "none",
-                      cursor: "pointer",
-                      background: selectedGroup === g.id ? "#00e5ff" : "transparent",
-                      color: selectedGroup === g.id ? "#030814" : "#e0f2fe",
-                      boxShadow: selectedGroup === g.id ? "0 0 15px rgba(0, 229, 255, 0.5)" : "none",
-                      transition: "all 0.15s ease",
+              {/* Group Toggle Pills + Poll Checkbox Toggle */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    background: "rgba(10, 25, 47, 0.8)",
+                    padding: "4px",
+                    borderRadius: "24px",
+                    border: "1.5px solid rgba(0, 229, 255, 0.3)",
+                  }}
+                >
+                  {[
+                    { id: "all", label: "ทั้ง 2 กลุ่ม" },
+                    { id: "A", label: "กลุ่ม A" },
+                    { id: "B", label: "กลุ่ม B" },
+                  ].map((g) => (
+                    <button
+                      key={g.id}
+                      onClick={() => setSelectedGroup(g.id)}
+                      style={{
+                        padding: "8px 20px",
+                        borderRadius: "20px",
+                        fontSize: "13px",
+                        fontWeight: "800",
+                        border: "none",
+                        cursor: "pointer",
+                        background: selectedGroup === g.id ? "#00e5ff" : "transparent",
+                        color: selectedGroup === g.id ? "#030814" : "#e0f2fe",
+                        boxShadow: selectedGroup === g.id ? "0 0 15px rgba(0, 229, 255, 0.5)" : "none",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Standings Group Header Quick Checkbox */}
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "6px 14px",
+                    borderRadius: "20px",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    fontWeight: "800",
+                    color: showPollTable ? "#ffd700" : "rgba(255,255,255,0.6)",
+                    background: showPollTable ? "rgba(255, 215, 0, 0.15)" : "rgba(10, 25, 47, 0.8)",
+                    border: showPollTable ? "1px solid rgba(255, 215, 0, 0.4)" : "1px dashed rgba(255,255,255,0.2)",
+                    userSelect: "none",
+                  }}
+                  title="ติ๊กเพื่อเปิดหรือปิดตารางโพลล์"
+                >
+                  <input
+                    type="checkbox"
+                    checked={showPollTable}
+                    onChange={(e) => {
+                      const nextVal = e.target.checked;
+                      setShowPollTable(nextVal);
+                      if (typeof window !== "undefined") {
+                        try {
+                          localStorage.setItem("fpt_tournament_show_poll", nextVal ? "1" : "0");
+                        } catch (err) {}
+                      }
+                      if (nextVal) setActiveTab("poll");
                     }}
-                  >
-                    {g.label}
-                  </button>
-                ))}
+                    style={{ accentColor: "#ffd700", cursor: "pointer" }}
+                  />
+                  <span>โพลล์ ({showPollTable ? "ON" : "OFF"})</span>
+                </label>
               </div>
             </div>
 
@@ -2693,6 +2842,29 @@ export default function TournamentClient({ initialData }) {
             </div>
           </div>
         )}
+
+        {/* ========================================================
+            TAB 5: POLL RANKINGS
+           ======================================================== */}
+        {activeTab === "poll" && showPollTable && (
+          <div className="tournament-tab-content">
+            <FanpantaePollTable
+              pollList={pollList}
+              contestants={contestants}
+              onSelectContestant={handleSelectContestant}
+              showPollTable={showPollTable}
+              onTogglePollTable={(val) => {
+                setShowPollTable(val);
+                if (typeof window !== "undefined") {
+                  try {
+                    localStorage.setItem("fpt_tournament_show_poll", val ? "1" : "0");
+                  } catch (err) {}
+                }
+                if (!val) setActiveTab("standings");
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* ========================================================
@@ -3244,6 +3416,510 @@ export default function TournamentClient({ initialData }) {
           ระบบจำลองการแข่งขันและคำนวณคะแนนอัตโนมัติ สำหรับทีมงานและผู้ชม
         </p>
       </footer>
+    </div>
+  );
+}
+
+// ========================================================
+// ========================================================
+// SUB-COMPONENT: FANPANTAE POLL TABLE (Broadcast Graphic Style)
+// ========================================================
+function FanpantaePollTable({ pollList = [], contestants = [], onSelectContestant, showPollTable, onTogglePollTable }) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredPoll = useMemo(() => {
+    if (!searchQuery.trim()) return pollList;
+    const q = searchQuery.toLowerCase().trim();
+    return pollList.filter((item) => {
+      const name = (item.name || "").toLowerCase();
+      const nickname = (item.nickname || "").toLowerCase();
+      const topic = (item.topic || "").toLowerCase();
+      return name.includes(q) || nickname.includes(q) || topic.includes(q);
+    });
+  }, [pollList, searchQuery]);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        maxWidth: "980px",
+        width: "100%",
+        margin: "0 auto",
+        background: "radial-gradient(ellipse at 50% 30%, #0a2d6c 0%, #04143a 55%, #010817 100%)",
+        borderRadius: "24px",
+        border: "1.5px solid rgba(255, 215, 0, 0.45)",
+        boxShadow: "0 18px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+        overflow: "hidden",
+        padding: "24px clamp(14px, 2.8vw, 30px)",
+      }}
+    >
+      {/* Background SVG Radar Rings */}
+      <svg
+        style={{
+          position: "absolute",
+          top: "45%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "740px",
+          height: "740px",
+          pointerEvents: "none",
+          opacity: 0.14,
+          zIndex: 1,
+          animation: "radarSpinSlow 75s linear infinite",
+        }}
+        viewBox="0 0 600 600"
+      >
+        <circle cx="300" cy="300" r="130" fill="none" stroke="#ffd700" strokeWidth="1.5" strokeDasharray="6 6" />
+        <circle cx="300" cy="300" r="210" fill="none" stroke="#ffd700" strokeWidth="1.5" />
+        <circle cx="300" cy="300" r="275" fill="none" stroke="#ffd700" strokeWidth="2" strokeDasharray="16 12" />
+      </svg>
+
+      <div style={{ position: "relative", zIndex: 2, width: "100%", boxSizing: "border-box" }}>
+        {/* Header Action Bar */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "12px",
+            marginBottom: "16px",
+          }}
+        >
+          <div>
+            <h2 style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700", margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.8)", display: "flex", alignItems: "center", gap: "8px" }}>
+              <span>📈</span> ตารางอันดับโพลล์ (Fan Poll Rankings)
+            </h2>
+            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
+              ผลการสำรวจความคิดเห็นและความนิยมแฟนพันธุ์แท้แห่งปี • คลิกที่รายชื่อเพื่อดูสถิติผู้เข้าแข่งขันในทัวร์นาเมนต์
+            </div>
+          </div>
+
+          {/* Quick Checkbox Toggle Button inside table header */}
+          <label
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 14px",
+              borderRadius: "18px",
+              background: "rgba(255, 215, 0, 0.15)",
+              border: "1px solid rgba(255, 215, 0, 0.4)",
+              cursor: "pointer",
+              fontSize: "13px",
+              fontWeight: "800",
+              color: "#ffd700",
+              userSelect: "none",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={showPollTable}
+              onChange={(e) => onTogglePollTable && onTogglePollTable(e.target.checked)}
+              style={{ accentColor: "#ffd700", cursor: "pointer" }}
+            />
+            <span>เปิดแสดงตารางโพลล์</span>
+          </label>
+        </div>
+
+        {/* Search Bar */}
+        <div
+          style={{
+            background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+            border: "1px solid rgba(255, 215, 0, 0.3)",
+            borderRadius: "14px",
+            padding: "12px 16px",
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <span style={{ fontSize: "16px" }}>🔍</span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="ค้นหาชื่อจริง, ชื่อเล่น หรือหัวข้อในผลโพลล์..."
+            style={{
+              width: "100%",
+              background: "rgba(0, 15, 30, 0.8)",
+              border: "1px solid rgba(255, 215, 0, 0.3)",
+              borderRadius: "8px",
+              padding: "8px 14px",
+              color: "#fff",
+              fontSize: "14px",
+              outline: "none",
+            }}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: "14px" }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Column Headers (Slanted Pills matching TV graphic) */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            marginBottom: "10px",
+          }}
+        >
+          {/* Rank Header */}
+          <div
+            style={{
+              width: "88px",
+              height: "36px",
+              borderRadius: "8px",
+              transform: "skewX(-16deg)",
+              background: "linear-gradient(180deg, #332608 0%, #140e02 100%)",
+              border: "2px solid #ffd700",
+              boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
+              อันดับโพลล์
+            </span>
+          </div>
+
+          {/* Name Header */}
+          <div
+            style={{
+              flex: 1,
+              height: "36px",
+              borderRadius: "8px",
+              transform: "skewX(-16deg)",
+              background: "linear-gradient(180deg, #162438 0%, #0a1220 100%)",
+              border: "2px solid rgba(255, 255, 255, 0.4)",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 18px",
+              minWidth: 0,
+            }}
+          >
+            <span
+              style={{
+                transform: "skewX(16deg)",
+                fontStyle: "italic",
+                fontWeight: "900",
+                fontSize: "13px",
+                color: "#ffffff",
+                letterSpacing: "1px",
+              }}
+            >
+              ผู้เข้าแข่งขัน (ชื่อเล่น - ชื่อจริง)
+            </span>
+          </div>
+
+          {/* Topic Header */}
+          <div
+            style={{
+              width: "clamp(180px, 25vw, 260px)",
+              height: "36px",
+              borderRadius: "8px",
+              transform: "skewX(-16deg)",
+              background: "linear-gradient(180deg, #0a2538 0%, #03101a 100%)",
+              border: "2px solid #00e5ff",
+              boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#67e8f9" }}>
+              หัวข้อแฟนพันธุ์แท้
+            </span>
+          </div>
+
+          {/* % Header */}
+          <div
+            style={{
+              width: "110px",
+              height: "36px",
+              borderRadius: "8px",
+              transform: "skewX(-16deg)",
+              background: "linear-gradient(180deg, #332608 0%, #140e02 100%)",
+              border: "2px solid #ffd700",
+              boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
+              คิดเป็น %
+            </span>
+          </div>
+        </div>
+
+        {/* Data Rows */}
+        {filteredPoll.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(255,255,255,0.5)" }}>
+            ไม่พบข้อมูลโพลล์ที่ตรงกับการค้นหา
+          </div>
+        ) : (
+          filteredPoll.map((item) => {
+            const matched = contestants.find((c) => {
+              const cName = (c.name || "").trim().toLowerCase();
+              const cNick = (c.nickname || "").trim().toLowerCase();
+              const iName = (item.name || "").trim().toLowerCase();
+              const iNick = (item.nickname || "").trim().toLowerCase();
+              return (iName && cName && (cName === iName || cName.includes(iName) || iName.includes(cName))) ||
+                     (iNick && cNick && cNick === iNick);
+            });
+            const photo = matched?.photo || null;
+            const group = matched?.group || null;
+            const isTop5 = item.pollRank <= 5;
+
+            return (
+              <div
+                key={item.pollRank}
+                onClick={() => {
+                  if (matched) onSelectContestant(matched);
+                }}
+                title={matched ? "คลิกเพื่อดูสถิติเจาะลึกในทัวร์นาเมนต์" : ""}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "8px",
+                  cursor: matched ? "pointer" : "default",
+                  transition: "transform 0.15s ease, filter 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (matched) {
+                    e.currentTarget.style.transform = "scale(1.008) translateX(2px)";
+                    e.currentTarget.style.filter = "brightness(1.15)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (matched) {
+                    e.currentTarget.style.transform = "scale(1) translateX(0)";
+                    e.currentTarget.style.filter = "brightness(1)";
+                  }
+                }}
+              >
+                {/* 1. Slanted Rank Box */}
+                <div
+                  style={{
+                    width: "88px",
+                    height: "48px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: isTop5
+                      ? "linear-gradient(180deg, #ffd700 0%, #e6a100 100%)"
+                      : "linear-gradient(180deg, #132238 0%, #060e18 100%)",
+                    border: isTop5 ? "2.5px solid #fff566" : "2.5px solid rgba(255, 255, 255, 0.3)",
+                    boxShadow: isTop5 ? "0 0 14px rgba(255, 215, 0, 0.6)" : "0 0 6px rgba(0,0,0,0.5)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      transform: "skewX(16deg)",
+                      fontStyle: "italic",
+                      fontWeight: "900",
+                      fontSize: "24px",
+                      color: isTop5 ? "#000000" : "#ffffff",
+                      textShadow: isTop5 ? "none" : "0 2px 6px rgba(0,0,0,0.8)",
+                    }}
+                  >
+                    #{item.pollRank}
+                  </span>
+                </div>
+
+                {/* 2. Slanted Name Capsule */}
+                <div
+                  style={{
+                    flex: 1,
+                    height: "48px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: isTop5
+                      ? "linear-gradient(90deg, rgba(30, 48, 80, 0.95) 0%, rgba(12, 22, 40, 0.95) 100%)"
+                      : "linear-gradient(90deg, rgba(16, 28, 48, 0.9) 0%, rgba(8, 14, 28, 0.9) 100%)",
+                    border: isTop5 ? "2px solid #ffd700" : "1.5px solid rgba(255, 255, 255, 0.25)",
+                    boxShadow: isTop5 ? "0 0 12px rgba(255, 215, 0, 0.35)" : "none",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 14px",
+                    minWidth: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      transform: "skewX(16deg)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      width: "100%",
+                      minWidth: 0,
+                    }}
+                  >
+                    {/* Photo Avatar */}
+                    {photo ? (
+                      <img
+                        src={getOptimizedAvatarUrl(photo, 80)}
+                        alt={item.name}
+                        style={{
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                          border: isTop5 ? "2px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.5)",
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "50%",
+                          background: "rgba(255, 255, 255, 0.1)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "14px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        👤
+                      </div>
+                    )}
+
+                    {/* Name + Nickname */}
+                    <div style={{ minWidth: 0, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <span style={{ fontSize: "16px", fontWeight: "900", color: isTop5 ? "#ffd700" : "#ffffff", marginRight: "6px" }}>
+                        {item.nickname || item.name}
+                      </span>
+                      {item.nickname && item.name && (
+                        <span style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.65)" }}>
+                          ({item.name})
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Group Badge if in tournament */}
+                    {group && (
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: "800",
+                          padding: "2px 8px",
+                          borderRadius: "6px",
+                          background: group === "A" ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 215, 0, 0.2)",
+                          color: group === "A" ? "#00e5ff" : "#ffd700",
+                          border: group === "A" ? "1px solid rgba(0, 229, 255, 0.4)" : "1px solid rgba(255, 215, 0, 0.4)",
+                          flexShrink: 0,
+                        }}
+                      >
+                        กลุ่ม {group}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Slanted Topic Capsule */}
+                <div
+                  style={{
+                    width: "clamp(180px, 25vw, 260px)",
+                    height: "48px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: "linear-gradient(90deg, rgba(8, 24, 44, 0.9) 0%, rgba(4, 12, 24, 0.9) 100%)",
+                    border: "1.5px solid rgba(0, 229, 255, 0.35)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 12px",
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      transform: "skewX(16deg)",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                      color: "#e0f2fe",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      textAlign: "center",
+                    }}
+                  >
+                    📌 {item.topic || "-"}
+                  </span>
+                </div>
+
+                {/* 4. Slanted Percentage Capsule */}
+                <div
+                  style={{
+                    width: "110px",
+                    height: "48px",
+                    borderRadius: "8px",
+                    transform: "skewX(-16deg)",
+                    background: isTop5
+                      ? "linear-gradient(180deg, rgba(50, 36, 6, 0.95) 0%, rgba(20, 14, 2, 0.95) 100%)"
+                      : "linear-gradient(180deg, rgba(16, 28, 48, 0.9) 0%, rgba(6, 12, 24, 0.9) 100%)",
+                    border: isTop5 ? "2px solid #ffd700" : "1.5px solid rgba(255, 255, 255, 0.25)",
+                    boxShadow: isTop5 ? "0 0 10px rgba(255, 215, 0, 0.3)" : "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      transform: "skewX(16deg)",
+                      fontSize: "15px",
+                      fontWeight: "900",
+                      color: isTop5 ? "#ffd700" : "#80d0ff",
+                      fontFamily: "var(--font-num)",
+                    }}
+                  >
+                    {item.percent || "-"}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
+
+        {/* Footnote */}
+        <div
+          style={{
+            marginTop: "20px",
+            padding: "12px 18px",
+            borderRadius: "10px",
+            background: "rgba(255, 255, 255, 0.04)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            fontSize: "12px",
+            color: "rgba(255, 255, 255, 0.6)",
+            textAlign: "center",
+          }}
+        >
+          💡 การคิดคะแนนโพลล์ : อิงจากคะแนนรอบ Audition (10%) + คะแนนรอบทดลอง (40%) + คะแนนโหวตมหาชน (50%)
+        </div>
+      </div>
     </div>
   );
 }
