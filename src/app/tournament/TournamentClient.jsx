@@ -30,6 +30,86 @@ export function getYouTubeId(url) {
   return match && match[1] ? match[1] : null;
 }
 
+function TopicSetCard({ setObj, setLabel }) {
+  const isPlayed = Boolean(setObj?.played);
+  return (
+    <div
+      style={{
+        flex: 1,
+        padding: "8px 10px",
+        borderRadius: "10px",
+        background: isPlayed
+          ? "linear-gradient(145deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 36, 22, 0.4) 100%)"
+          : "rgba(255, 255, 255, 0.03)",
+        border: isPlayed ? "1px solid rgba(16, 185, 129, 0.45)" : "1px solid rgba(255, 255, 255, 0.08)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        minHeight: "72px",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: isPlayed ? "6px" : "0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ fontSize: "11.5px", fontWeight: "800", color: isPlayed ? "#86efac" : "rgba(255,255,255,0.5)" }}>
+            {setLabel}
+          </span>
+          {isPlayed && setObj.matchId && (
+            <span
+              style={{
+                fontSize: "9px",
+                padding: "1px 5px",
+                borderRadius: "4px",
+                background: "rgba(0, 229, 255, 0.15)",
+                color: "#67e8f9",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                fontWeight: "800",
+              }}
+            >
+              {setObj.matchId}
+            </span>
+          )}
+        </div>
+        <strong style={{ fontSize: "12px", fontWeight: "900", color: isPlayed ? "#ffd700" : "rgba(255,255,255,0.3)" }}>
+          {isPlayed ? `${setObj.sum} คะแนน` : "ยังไม่แข่ง"}
+        </strong>
+      </div>
+
+      {isPlayed ? (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "4px" }}>
+          <div title="3 วินาที (เต็ม 25)" style={{ textAlign: "center", padding: "3px 0", borderRadius: "5px", background: "rgba(16, 185, 129, 0.18)", border: "1px solid rgba(16, 185, 129, 0.4)" }}>
+            <div style={{ color: "#86efac", fontSize: "9px", fontWeight: "800", lineHeight: "1" }}>3วิ</div>
+            <div style={{ color: "#ffffff", fontWeight: "900", fontSize: "12px", marginTop: "2px", lineHeight: "1.1" }}>
+              {setObj["3sec"] !== null && setObj["3sec"] !== undefined ? setObj["3sec"] : "–"}
+            </div>
+          </div>
+          <div title="ถาม-ตอบ (เต็ม 25)" style={{ textAlign: "center", padding: "3px 0", borderRadius: "5px", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.25)" }}>
+            <div style={{ color: "rgba(255,255,255,0.75)", fontSize: "9px", fontWeight: "800", lineHeight: "1" }}>ถาม</div>
+            <div style={{ color: "#ffffff", fontWeight: "900", fontSize: "12px", marginTop: "2px", lineHeight: "1.1" }}>
+              {setObj.qa !== null && setObj.qa !== undefined ? setObj.qa : "–"}
+            </div>
+          </div>
+          <div title="จิ๊กซอว์ (เต็ม 25)" style={{ textAlign: "center", padding: "3px 0", borderRadius: "5px", background: "rgba(239, 68, 68, 0.18)", border: "1px solid rgba(239, 68, 68, 0.4)" }}>
+            <div style={{ color: "#fca5a5", fontSize: "9px", fontWeight: "800", lineHeight: "1" }}>จิ๊ก</div>
+            <div style={{ color: "#ffffff", fontWeight: "900", fontSize: "12px", marginTop: "2px", lineHeight: "1.1" }}>
+              {setObj.jigsaw !== null && setObj.jigsaw !== undefined ? setObj.jigsaw : "–"}
+            </div>
+          </div>
+          <div title="คุณสมบัติ (เต็ม 25)" style={{ textAlign: "center", padding: "3px 0", borderRadius: "5px", background: "rgba(0, 229, 255, 0.18)", border: "1px solid rgba(0, 229, 255, 0.4)" }}>
+            <div style={{ color: "#67e8f9", fontSize: "9px", fontWeight: "800", lineHeight: "1" }}>คุณ</div>
+            <div style={{ color: "#ffffff", fontWeight: "900", fontSize: "12px", marginTop: "2px", lineHeight: "1.1" }}>
+              {setObj.attribute !== null && setObj.attribute !== undefined ? setObj.attribute : "–"}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div style={{ fontSize: "10.5px", color: "rgba(255,255,255,0.3)", fontStyle: "italic", textAlign: "center", padding: "4px 0" }}>
+          รอลงสนาม
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function TournamentClient({ initialData }) {
   const [data, setData] = useState(initialData || defaultTournamentData);
   const [loading, setLoading] = useState(!initialData);
@@ -2589,29 +2669,52 @@ export default function TournamentClient({ initialData }) {
                   ผังหัวข้อที่ลงทะเบียน (Topics Checklist)
                 </h2>
                 <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
-                  ผู้เข้าแข่งขันแต่ละท่านมี 4 หัวข้อหลัก พร้อม 2 ชุดคำถามต่อหัวข้อ
+                  ผู้เข้าแข่งขันแต่ละท่านมี 4 หัวข้อหลัก พร้อม 2 ชุดคำถามต่อหัวข้อ • แสดงคะแนนดิบรายหมวด (3 วินาที • ถาม-ตอบ • จิ๊กซอว์ • คุณสมบัติ)
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: "6px" }}>
-                {["all", "A", "B"].map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => setSelectedGroup(g)}
-                    style={{
-                      padding: "6px 16px",
-                      borderRadius: "16px",
-                      fontSize: "12px",
-                      fontWeight: "800",
-                      border: selectedGroup === g ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
-                      background: selectedGroup === g ? "#00e5ff" : "rgba(255,255,255,0.06)",
-                      color: selectedGroup === g ? "#030814" : "#ffffff",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {g === "all" ? "ทุกกลุ่ม" : `กลุ่ม ${g}`}
-                  </button>
-                ))}
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    alignItems: "center",
+                    background: "rgba(6, 16, 36, 0.8)",
+                    padding: "6px 14px",
+                    borderRadius: "14px",
+                    border: "1px solid rgba(0, 229, 255, 0.25)",
+                    fontSize: "11px",
+                  }}
+                >
+                  <span style={{ color: "#86efac", fontWeight: "800" }}>● 3วิ (3 วินาที)</span>
+                  <span style={{ color: "rgba(255,255,255,0.25)" }}>•</span>
+                  <span style={{ color: "#f3f4f6", fontWeight: "800" }}>● ถาม (ถาม-ตอบ)</span>
+                  <span style={{ color: "rgba(255,255,255,0.25)" }}>•</span>
+                  <span style={{ color: "#fca5a5", fontWeight: "800" }}>● จิ๊ก (จิ๊กซอว์)</span>
+                  <span style={{ color: "rgba(255,255,255,0.25)" }}>•</span>
+                  <span style={{ color: "#67e8f9", fontWeight: "800" }}>● คุณ (คุณสมบัติ)</span>
+                </div>
+
+                <div style={{ display: "flex", gap: "6px" }}>
+                  {["all", "A", "B"].map((g) => (
+                    <button
+                      key={g}
+                      onClick={() => setSelectedGroup(g)}
+                      style={{
+                        padding: "6px 16px",
+                        borderRadius: "16px",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        border: selectedGroup === g ? "1.5px solid #00e5ff" : "1px solid rgba(255,255,255,0.15)",
+                        background: selectedGroup === g ? "#00e5ff" : "rgba(255,255,255,0.06)",
+                        color: selectedGroup === g ? "#030814" : "#ffffff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {g === "all" ? "ทุกกลุ่ม" : `กลุ่ม ${g}`}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -2667,23 +2770,13 @@ export default function TournamentClient({ initialData }) {
                             border: "1px solid rgba(255,255,255,0.08)",
                           }}
                         >
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
                             <span style={{ fontSize: "13px", fontWeight: "800", color: "#38bdf8" }}>{t.topic}</span>
                             <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>หัวข้อที่ {tIdx + 1}</span>
                           </div>
                           <div style={{ display: "flex", gap: "8px" }}>
-                            <div style={{ flex: 1, padding: "5px 8px", borderRadius: "8px", background: t.set1?.played ? "rgba(16, 185, 129, 0.18)" : "rgba(255,255,255,0.04)", border: t.set1?.played ? "1px solid #10b981" : "1px solid rgba(255,255,255,0.1)", fontSize: "11px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ color: t.set1?.played ? "#86efac" : "rgba(255,255,255,0.5)" }}>ชุด 1</span>
-                              <strong style={{ color: t.set1?.played ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
-                                {t.set1?.played ? `${t.set1.sum} คะแนน` : "ยังไม่แข่ง"}
-                              </strong>
-                            </div>
-                            <div style={{ flex: 1, padding: "5px 8px", borderRadius: "8px", background: t.set2?.played ? "rgba(16, 185, 129, 0.18)" : "rgba(255,255,255,0.04)", border: t.set2?.played ? "1px solid #10b981" : "1px solid rgba(255,255,255,0.1)", fontSize: "11px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ color: t.set2?.played ? "#86efac" : "rgba(255,255,255,0.5)" }}>ชุด 2</span>
-                              <strong style={{ color: t.set2?.played ? "#ffffff" : "rgba(255,255,255,0.3)" }}>
-                                {t.set2?.played ? `${t.set2.sum} คะแนน` : "ยังไม่แข่ง"}
-                              </strong>
-                            </div>
+                            <TopicSetCard setObj={t.set1} setLabel="ชุด 1" />
+                            <TopicSetCard setObj={t.set2} setLabel="ชุด 2" />
                           </div>
                         </div>
                       ))}
@@ -3001,13 +3094,13 @@ export default function TournamentClient({ initialData }) {
                 <div style={{ fontSize: "15px", fontWeight: "900", color: "#ffd700", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <span>📚</span> หัวข้อประจำตัวและสถิติในแต่ละชุด
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "10px" }}>
                   {selectedContestant.topics.map((t, idx) => (
                     <div key={idx} style={{ background: "rgba(6, 16, 36, 0.8)", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <div style={{ fontSize: "13px", fontWeight: "800", color: "#38bdf8", marginBottom: "6px" }}>{t.topic}</div>
-                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", display: "flex", justifyContent: "space-between" }}>
-                        <span>ชุด 1: {t.set1?.played ? <strong style={{ color: "#86efac" }}>{t.set1.sum} คะแนน</strong> : "ยังไม่แข่ง"}</span>
-                        <span>ชุด 2: {t.set2?.played ? <strong style={{ color: "#86efac" }}>{t.set2.sum} คะแนน</strong> : "ยังไม่แข่ง"}</span>
+                      <div style={{ fontSize: "13px", fontWeight: "800", color: "#38bdf8", marginBottom: "8px" }}>{t.topic}</div>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <TopicSetCard setObj={t.set1} setLabel="ชุด 1" />
+                        <TopicSetCard setObj={t.set2} setLabel="ชุด 2" />
                       </div>
                     </div>
                   ))}
