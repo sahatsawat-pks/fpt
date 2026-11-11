@@ -90,6 +90,62 @@ function getOptimizedImageUrl(src, targetSize = 120) {
   return s;
 }
 
+// ─── Thai Date-Time Parser for Scheduled Warm-up Matches ─────────────────────
+
+const THAI_MONTH_MAP = {
+  "ม.ค": 1, "มกรา": 1,
+  "ก.พ": 2, "กุมภา": 2,
+  "มี.ค": 3, "มีนา": 3,
+  "เม.ย": 4, "เมษา": 4,
+  "พ.ค": 5, "พฤษภา": 5,
+  "มิ.ย": 6, "มิถุนา": 6,
+  "ก.ค": 7, "กรกฎา": 7,
+  "ส.ค": 8, "สิงหา": 8,
+  "ก.ย": 9, "กันยา": 9,
+  "ต.ค": 10, "ตุลา": 10,
+  "พ.ย": 11, "พฤศจิกา": 11,
+  "ธ.ค": 12, "ธันวา": 12,
+};
+
+function parseThaiSchedule(str) {
+  if (!str) return 999999999999;
+  const s = String(str).trim();
+  if (!s) return 999999999999;
+
+  // 1. Month (default Nov if none found)
+  let month = 11;
+  for (const [key, val] of Object.entries(THAI_MONTH_MAP)) {
+    if (s.includes(key)) {
+      month = val;
+      break;
+    }
+  }
+
+  // 2. Day of Month
+  let day = 99;
+  const dayMonthMatch = s.match(/(\d{1,2})\s*(?:ม\.ค|ก\.พ|มี\.ค|เม\.ย|พ\.ค|มิ\.ย|ก\.ค|ส\.ค|ก\.ย|ต\.ค|พ\.ย|ธ\.ค|มกรา|กุมภา|มีนา|เมษา|พฤษภา|มิถุนา|กรกฎา|สิงหา|กันยา|ตุลา|พฤศจิกา|ธันวา)/i);
+  if (dayMonthMatch) {
+    day = parseInt(dayMonthMatch[1], 10);
+  } else {
+    const fallbackDay = s.match(/(\d{1,2})/);
+    if (fallbackDay) day = parseInt(fallbackDay[1], 10);
+  }
+
+  // 3. Time (e.g. 22.00, 19:00, or XX.XX)
+  let hour = 99;
+  let min = 99;
+  const timeMatch = s.match(/(\d{1,2})[:.](\d{2})/);
+  if (timeMatch) {
+    hour = parseInt(timeMatch[1], 10);
+    min = parseInt(timeMatch[2], 10);
+  } else if (/XX/i.test(s)) {
+    hour = 23;
+    min = 59;
+  }
+
+  return month * 1000000 + day * 10000 + hour * 100 + min;
+}
+
 // ─── Dense Ranking Calculation matching page.js ──────────────────────────────
 
 function calculateDenseRanks(items) {
@@ -425,7 +481,7 @@ export default function TrialFOTYPage() {
       };
     });
 
-    // 2. Contestants who haven't played yet, but HAVE a scheduled date-time
+    // 2. Contestants who haven't played yet, but HAVE a scheduled date-time (sorted chronologically)
     const scheduledAwaiting = pollList
       .filter((item) => !hasWarmupScoreRecorded(item) && Boolean(item.warmupSchedule && item.warmupSchedule.trim()))
       .map((item) => ({
@@ -433,7 +489,13 @@ export default function TrialFOTYPage() {
         warmupRank: null,
         finalWarmupScore: null,
         isScheduledAwaiting: true,
-      }));
+      }))
+      .sort((a, b) => {
+        const valA = parseThaiSchedule(a.warmupSchedule);
+        const valB = parseThaiSchedule(b.warmupSchedule);
+        if (valA !== valB) return valA - valB;
+        return (a.nickname || a.name || "").localeCompare(b.nickname || b.name || "", "th");
+      });
 
     // Combine played first, then scheduled awaiting
     return [...rankedPlayed, ...scheduledAwaiting];
