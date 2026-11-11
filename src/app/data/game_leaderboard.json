@@ -318,5 +318,53 @@
     "image": "",
     "createdAt": "2026-11-08T17:08:45.948Z",
     "updatedAt": "2026-11-08T17:54:22.609Z"
+  },
+  {
+    "id": "1794237324330",
+    "name": "ณัฐดนัย วงศ์ปัญญา",
+    "nickname": "แฟรงค์",
+    "topic": "จินตหรา พูนลาภ",
+    "scores": {
+      "3sec": 17,
+      "qa": 0,
+      "jigsaw": 0,
+      "attribute": 15
+    },
+    "totalScore": 32,
+    "image": "",
+    "createdAt": "2026-11-09T15:15:24.662Z",
+    "updatedAt": "2026-11-09T16:48:15.811Z"
+  },
+  {
+    "id": "1794244485852",
+    "name": "พศวัต พุ่มเงิน",
+    "nickname": "ปาร์ค",
+    "topic": "Uma Musume: Pretty Derby",
+    "scores": {
+      "3sec": 12,
+      "qa": 20,
+      "jigsaw": 15,
+      "attribute": 0
+    },
+    "totalScore": 47,
+    "image": "",
+    "createdAt": "2026-11-09T17:14:45.983Z",
+    "updatedAt": "2026-11-09T19:03:06.249Z"
+  },
+  {
+    "id": "1794322938757",
+    "name": "สหัสวรรษ นิจพันธ์",
+    "nickname": "พีท",
+    "topic": "คอมพิวเตอร์",
+    "scores": {
+      "3sec": 14,
+      "qa": 25,
+      "jigsaw": 15,
+      "attribute": 0
+    },
+    "totalScore": 54,
+    "image": "",
+    "createdAt": "2026-11-10T15:02:21.389Z",
+    "updatedAt": "2026-11-10T15:02:31.337Z"
   }
 ]

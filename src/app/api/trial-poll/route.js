@@ -164,6 +164,7 @@ export async function GET() {
       name: item.name || matched?.name || "",
       nickname: item.nickname || matched?.nickname || "",
       topic: item.topic || matched?.topic || "-",
+      warmupSchedule: item.warmupSchedule || matched?.warmupSchedule || "",
       gameScores: matchedGame?.scores || null,
       gameTotalScore: matchedGame?.totalScore !== undefined ? matchedGame.totalScore : Number(item.whatIfScore || 0),
     };
@@ -330,12 +331,38 @@ export async function POST(request) {
                 }
               : { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
           image: item.image || matched?.image || "",
+          warmupSchedule: String(item.warmupSchedule || matched?.warmupSchedule || "").trim(),
         };
       });
 
       // Sort by pollRank ascending
       sanitized.sort((a, b) => a.pollRank - b.pollRank);
       await saveKVData("fpt_trial_poll", sanitized, writeLocalPoll);
+
+      // Also sync warmupSchedule to fpt_trial contestants
+      try {
+        let tData = await getKVData("fpt_trial", readTrialData);
+        if (Array.isArray(tData)) {
+          let tChanged = false;
+          tData = tData.map((c) => {
+            const m = sanitized.find(
+              (p) =>
+                (p.id && c.id && String(p.id) === String(c.id)) ||
+                (p.name && c.name && p.name.trim() === c.name.trim()) ||
+                (p.nickname && c.nickname && p.nickname.trim() === c.nickname.trim())
+            );
+            if (m && m.warmupSchedule !== undefined && m.warmupSchedule !== c.warmupSchedule) {
+              tChanged = true;
+              return { ...c, warmupSchedule: m.warmupSchedule };
+            }
+            return c;
+          });
+          if (tChanged) {
+            await saveKVData("fpt_trial", tData, writeTrialData);
+          }
+        }
+      } catch (e) {}
+
       return NextResponse.json({
         success: true,
         data: sanitized,

@@ -92,6 +92,7 @@ export async function POST(req) {
           topic: body.topic !== undefined ? body.topic : data[idx].topic,
           image: body.image !== undefined ? body.image : (body.photo !== undefined ? body.photo : data[idx].image),
           order: body.order !== undefined ? (body.order === "" || body.order === null ? null : Number(body.order)) : data[idx].order,
+          warmupSchedule: body.warmupSchedule !== undefined ? String(body.warmupSchedule || "").trim() : (data[idx].warmupSchedule || ""),
           updatedAt: new Date().toISOString(),
         };
         await saveKVData("fpt_trial", data, writeData);
@@ -112,6 +113,7 @@ export async function POST(req) {
               if (data[idx].name !== undefined) pollData[pIdx].name = data[idx].name;
               if (data[idx].nickname !== undefined) pollData[pIdx].nickname = data[idx].nickname;
               if (data[idx].topic !== undefined) pollData[pIdx].topic = data[idx].topic;
+              if (data[idx].warmupSchedule !== undefined) pollData[pIdx].warmupSchedule = data[idx].warmupSchedule;
               changed = true;
             }
             if (changed) {

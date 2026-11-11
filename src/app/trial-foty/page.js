@@ -399,13 +399,11 @@ export default function TrialFOTYPage() {
     return Boolean(hasCat || hasTotal || hasWhatIf);
   };
 
-  // Compute Warm-up Standings & Ranking (Only contestants whose scores have been filled!)
+  // Compute Warm-up Standings & Ranking (Contestants who played, plus contestants who have scheduled match times!)
   const warmupRanking = useMemo(() => {
+    // 1. Contestants who have scores recorded
     const played = pollList.filter((item) => hasWarmupScoreRecorded(item));
-    if (played.length === 0) return [];
-
-    const list = [...played];
-    list.sort((a, b) => {
+    const sortedPlayed = [...played].sort((a, b) => {
       const scoreA = Number(a.gameTotalScore !== undefined ? a.gameTotalScore : a.whatIfScore) || 0;
       const scoreB = Number(b.gameTotalScore !== undefined ? b.gameTotalScore : b.whatIfScore) || 0;
       return scoreB - scoreA;
@@ -413,7 +411,7 @@ export default function TrialFOTYPage() {
 
     let curRank = 0;
     let prevScore = null;
-    return list.map((item) => {
+    const rankedPlayed = sortedPlayed.map((item) => {
       const score = Number(item.gameTotalScore !== undefined ? item.gameTotalScore : item.whatIfScore) || 0;
       if (score !== prevScore) {
         curRank++;
@@ -423,14 +421,28 @@ export default function TrialFOTYPage() {
         ...item,
         warmupRank: curRank,
         finalWarmupScore: score,
+        isScheduledAwaiting: false,
       };
     });
+
+    // 2. Contestants who haven't played yet, but HAVE a scheduled date-time
+    const scheduledAwaiting = pollList
+      .filter((item) => !hasWarmupScoreRecorded(item) && Boolean(item.warmupSchedule && item.warmupSchedule.trim()))
+      .map((item) => ({
+        ...item,
+        warmupRank: null,
+        finalWarmupScore: null,
+        isScheduledAwaiting: true,
+      }));
+
+    // Combine played first, then scheduled awaiting
+    return [...rankedPlayed, ...scheduledAwaiting];
   }, [pollList]);
 
-  // Unplayed Warm-up Contestants (Contestants whose scores haven't been entered yet)
+  // Unplayed Warm-up Contestants (Contestants who neither played nor have been scheduled yet)
   const unplayedWarmupContestants = useMemo(() => {
     return pollList
-      .filter((item) => !hasWarmupScoreRecorded(item))
+      .filter((item) => !hasWarmupScoreRecorded(item) && !Boolean(item.warmupSchedule && item.warmupSchedule.trim()))
       .sort((a, b) => (a.nickname || a.name || "").localeCompare(b.nickname || b.name || "", "th"));
   }, [pollList]);
 
@@ -444,7 +456,8 @@ export default function TrialFOTYPage() {
       (p) =>
         p.name?.toLowerCase().includes(q) ||
         p.nickname?.toLowerCase().includes(q) ||
-        p.topic?.toLowerCase().includes(q)
+        p.topic?.toLowerCase().includes(q) ||
+        p.warmupSchedule?.toLowerCase().includes(q)
     );
   }, [warmupRanking, warmupSearchQuery]);
 
@@ -2512,8 +2525,9 @@ export default function TrialFOTYPage() {
                             (c.nickname && item.nickname && c.nickname.trim() === item.nickname.trim())
                         );
                         const photo = item.image || matchedContestant?.image || null;
-                        const isTop5 = item.warmupRank <= 5;
-                        const isRank1 = item.warmupRank === 1;
+                        const isScheduled = Boolean(item.isScheduledAwaiting);
+                        const isTop5 = !isScheduled && item.warmupRank !== null && item.warmupRank <= 5;
+                        const isRank1 = !isScheduled && item.warmupRank === 1;
 
                         const scores = item.gameScores || {};
                         const score3sec = scores["3sec"] !== undefined && scores["3sec"] !== null ? scores["3sec"] : null;
@@ -2524,8 +2538,15 @@ export default function TrialFOTYPage() {
                         const prevItem = index > 0 ? filteredWarmup[index - 1] : null;
                         const showCutoffLine =
                           prevItem &&
-                          (Number(prevItem.warmupRank) || 0) <= 5 &&
-                          (Number(item.warmupRank) || 0) > 5;
+                          prevItem.warmupRank !== null &&
+                          item.warmupRank !== null &&
+                          Number(prevItem.warmupRank) <= 5 &&
+                          Number(item.warmupRank) > 5;
+
+                        const showUpcomingScheduleDivider =
+                          prevItem &&
+                          !prevItem.isScheduledAwaiting &&
+                          item.isScheduledAwaiting;
 
                         return (
                           <Fragment key={item.id || item.name}>
@@ -2586,6 +2607,64 @@ export default function TrialFOTYPage() {
                                 />
                               </div>
                             )}
+
+                            {/* Divider Beam before Scheduled Upcoming Matches */}
+                            {showUpcomingScheduleDivider && (
+                              <div
+                                style={{
+                                  margin: "18px 0 12px 0",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "12px",
+                                  position: "relative",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    flex: 1,
+                                    height: "2px",
+                                    background: "linear-gradient(90deg, rgba(255, 136, 0, 0) 0%, #ff8800 100%)",
+                                    boxShadow: "0 0 10px rgba(255, 136, 0, 0.8)",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    transform: "skewX(-16deg)",
+                                    background: "linear-gradient(135deg, #2b1406 0%, #0d0601 100%)",
+                                    border: "1.5px solid #ff8800",
+                                    boxShadow: "0 0 16px rgba(255, 136, 0, 0.45)",
+                                    padding: "4px 16px",
+                                    borderRadius: "8px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      transform: "skewX(16deg)",
+                                      fontSize: "12px",
+                                      fontWeight: "900",
+                                      fontStyle: "italic",
+                                      letterSpacing: "0.8px",
+                                      color: "#ffa940",
+                                      textShadow: "0 0 10px rgba(255, 136, 0, 0.7)",
+                                    }}
+                                  >
+                                    🗓️ ตารางนัดแข่งขันรอบอุ่นเครื่อง (UPCOMING MATCHES)
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    flex: 1,
+                                    height: "2px",
+                                    background: "linear-gradient(90deg, #ff8800 0%, rgba(255, 136, 0, 0) 100%)",
+                                    boxShadow: "0 0 10px rgba(255, 136, 0, 0.8)",
+                                  }}
+                                />
+                              </div>
+                            )}
                             <div
                               className="table-row-entrance"
                               onClick={() => setSelectedSpotlight(matchedContestant || { ...item, scores: {}, totalScore: 0 })}
@@ -2619,12 +2698,16 @@ export default function TrialFOTYPage() {
                                     ? "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)"
                                     : isTop5
                                       ? "linear-gradient(180deg, #fa8c16 0%, #ad4e00 100%)"
-                                      : "linear-gradient(180deg, #2b1406 0%, #120802 100%)",
+                                      : isScheduled
+                                        ? "linear-gradient(180deg, #1f1207 0%, #0d0703 100%)"
+                                        : "linear-gradient(180deg, #2b1406 0%, #120802 100%)",
                                   border: isRank1
                                     ? "2.5px solid #ffa940"
                                     : isTop5
                                       ? "2px solid #ff8800"
-                                      : "1.5px solid rgba(255, 136, 0, 0.35)",
+                                      : isScheduled
+                                        ? "1.5px dashed rgba(255, 136, 0, 0.5)"
+                                        : "1.5px solid rgba(255, 136, 0, 0.35)",
                                   boxShadow: isRank1
                                     ? "0 0 18px rgba(255, 136, 0, 0.75)"
                                     : isTop5
@@ -2641,11 +2724,11 @@ export default function TrialFOTYPage() {
                                     transform: "skewX(16deg)",
                                     fontStyle: "italic",
                                     fontWeight: "900",
-                                    fontSize: "18px",
-                                    color: isTop5 ? "#ffffff" : "#ffa940",
+                                    fontSize: isScheduled ? "16px" : "18px",
+                                    color: isTop5 ? "#ffffff" : isScheduled ? "#ff9c38" : "#ffa940",
                                   }}
                                 >
-                                  #{item.warmupRank}
+                                  {isScheduled ? "⏳" : `#${item.warmupRank}`}
                                 </span>
                               </div>
 
@@ -2737,108 +2820,172 @@ export default function TrialFOTYPage() {
                                       </span>
                                     </div>
                                   )}
+                                  {isScheduled && (
+                                    <div style={{ marginLeft: "auto", flexShrink: 0 }}>
+                                      <span
+                                        style={{
+                                          display: "inline-block",
+                                          padding: "3px 9px",
+                                          borderRadius: "8px",
+                                          fontSize: "11px",
+                                          fontWeight: "800",
+                                          background: "rgba(255, 136, 0, 0.15)",
+                                          border: "1px dashed rgba(255, 136, 0, 0.6)",
+                                          color: "#ffc069",
+                                        }}
+                                      >
+                                        🗓️ นัดแข่ง
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
 
-                              {/* 3. Slanted 3 วินาที Pill (Green) */}
-                              {(() => {
-                                const sc = score3sec;
-                                const st = getScorePillStyle(sc, "3sec");
-                                return (
+                              {isScheduled ? (
+                                /* Single Wide Capsule (320px) replacing 4 categories */
+                                <div
+                                  style={{
+                                    width: "320px",
+                                    height: "48px",
+                                    borderRadius: "8px",
+                                    transform: "skewX(-16deg)",
+                                    background: "linear-gradient(135deg, rgba(255, 136, 0, 0.14) 0%, rgba(30, 15, 5, 0.88) 100%)",
+                                    border: "1.5px solid rgba(255, 136, 0, 0.55)",
+                                    boxShadow: "0 0 12px rgba(255, 136, 0, 0.2) inset",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    padding: "0 14px",
+                                    flexShrink: 0,
+                                  }}
+                                >
                                   <div
                                     style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...st.container,
+                                      transform: "skewX(16deg)",
                                       display: "flex",
                                       alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0,
+                                      gap: "8px",
+                                      color: "#ffd591",
+                                      fontSize: "13px",
+                                      fontWeight: "800",
+                                      letterSpacing: "0.3px",
+                                      whiteSpace: "nowrap",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
                                     }}
                                   >
-                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                    <span style={{ fontSize: "15px" }}>🗓️</span>
+                                    <span style={{ color: "rgba(255, 255, 255, 0.65)", fontWeight: "600", fontSize: "12px" }}>
+                                      วัน-เวลาแข่ง:
+                                    </span>
+                                    <span style={{ color: "#ffa940", fontWeight: "900", fontSize: "13.5px", fontStyle: "italic" }}>
+                                      {item.warmupSchedule}
                                     </span>
                                   </div>
-                                );
-                              })()}
+                                </div>
+                              ) : (
+                                <>
+                                  {/* 3. Slanted 3 วินาที Pill (Green) */}
+                                  {(() => {
+                                    const sc = score3sec;
+                                    const st = getScorePillStyle(sc, "3sec");
+                                    return (
+                                      <div
+                                        style={{
+                                          width: "74px",
+                                          height: "48px",
+                                          borderRadius: "8px",
+                                          transform: "skewX(-16deg)",
+                                          ...st.container,
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
 
-                              {/* 4. Slanted ถาม-ตอบ Pill (Silver) */}
-                              {(() => {
-                                const sc = scoreQa;
-                                const st = getScorePillStyle(sc, "qa");
-                                return (
-                                  <div
-                                    style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...st.container,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0,
-                                    }}
-                                  >
-                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
-                                    </span>
-                                  </div>
-                                );
-                              })()}
+                                  {/* 4. Slanted ถาม-ตอบ Pill (Silver) */}
+                                  {(() => {
+                                    const sc = scoreQa;
+                                    const st = getScorePillStyle(sc, "qa");
+                                    return (
+                                      <div
+                                        style={{
+                                          width: "74px",
+                                          height: "48px",
+                                          borderRadius: "8px",
+                                          transform: "skewX(-16deg)",
+                                          ...st.container,
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
 
-                              {/* 5. Slanted จิ๊กซอว์ Pill (Red) */}
-                              {(() => {
-                                const sc = scoreJigsaw;
-                                const st = getScorePillStyle(sc, "jigsaw");
-                                return (
-                                  <div
-                                    style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...st.container,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0,
-                                    }}
-                                  >
-                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
-                                    </span>
-                                  </div>
-                                );
-                              })()}
+                                  {/* 5. Slanted จิ๊กซอว์ Pill (Red) */}
+                                  {(() => {
+                                    const sc = scoreJigsaw;
+                                    const st = getScorePillStyle(sc, "jigsaw");
+                                    return (
+                                      <div
+                                        style={{
+                                          width: "74px",
+                                          height: "48px",
+                                          borderRadius: "8px",
+                                          transform: "skewX(-16deg)",
+                                          ...st.container,
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
 
-                              {/* 6. Slanted คุณสมบัติ Pill (Cyan) */}
-                              {(() => {
-                                const sc = scoreAttr;
-                                const st = getScorePillStyle(sc, "attribute");
-                                return (
-                                  <div
-                                    style={{
-                                      width: "74px",
-                                      height: "48px",
-                                      borderRadius: "8px",
-                                      transform: "skewX(-16deg)",
-                                      ...st.container,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      flexShrink: 0,
-                                    }}
-                                  >
-                                    <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
-                                      {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
-                                    </span>
-                                  </div>
-                                );
-                              })()}
+                                  {/* 6. Slanted คุณสมบัติ Pill (Cyan) */}
+                                  {(() => {
+                                    const sc = scoreAttr;
+                                    const st = getScorePillStyle(sc, "attribute");
+                                    return (
+                                      <div
+                                        style={{
+                                          width: "74px",
+                                          height: "48px",
+                                          borderRadius: "8px",
+                                          transform: "skewX(-16deg)",
+                                          ...st.container,
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "20px", ...st.text }}>
+                                          {sc !== null && sc !== undefined && sc !== "" ? sc : "–"}
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
+                                </>
+                              )}
 
                               {/* 7. Slanted Total Score Capsule (Orange Glowing Flame) */}
                               <div
@@ -2847,9 +2994,11 @@ export default function TrialFOTYPage() {
                                   height: "48px",
                                   borderRadius: "8px",
                                   transform: "skewX(-16deg)",
-                                  background: "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)",
-                                  border: "3px solid #ffa940",
-                                  boxShadow: "0 0 18px rgba(255, 136, 0, 0.75)",
+                                  background: isScheduled
+                                    ? "linear-gradient(180deg, #1f1207 0%, #0d0703 100%)"
+                                    : "linear-gradient(180deg, #ff8800 0%, #c4380d 100%)",
+                                  border: isScheduled ? "1.5px dashed rgba(255, 136, 0, 0.45)" : "3px solid #ffa940",
+                                  boxShadow: isScheduled ? "none" : "0 0 18px rgba(255, 136, 0, 0.75)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
@@ -2861,12 +3010,12 @@ export default function TrialFOTYPage() {
                                     transform: "skewX(16deg)",
                                     fontStyle: "italic",
                                     fontWeight: "900",
-                                    fontSize: "26px",
-                                    color: "#ffffff",
-                                    textShadow: "0 2px 6px rgba(0, 0, 0, 0.9)",
+                                    fontSize: isScheduled ? "18px" : "26px",
+                                    color: isScheduled ? "rgba(255, 255, 255, 0.4)" : "#ffffff",
+                                    textShadow: isScheduled ? "none" : "0 2px 6px rgba(0, 0, 0, 0.9)",
                                   }}
                                 >
-                                  {item.finalWarmupScore ?? 0}
+                                  {isScheduled ? "–" : (item.finalWarmupScore ?? 0)}
                                 </span>
                               </div>
                             </div>
@@ -3586,6 +3735,33 @@ export default function TrialFOTYPage() {
                   ✕
                 </button>
               </div>
+
+              {/* Scheduled Match Time Banner (if present) */}
+              {selectedSpotlight.warmupSchedule && (
+                <div
+                  style={{
+                    background: "linear-gradient(90deg, rgba(255, 136, 0, 0.18) 0%, rgba(20, 10, 4, 0.8) 100%)",
+                    border: "1.5px dashed #ff8800",
+                    borderRadius: "12px",
+                    padding: "10px 16px",
+                    marginBottom: "18px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    boxShadow: "0 0 14px rgba(255, 136, 0, 0.2)",
+                  }}
+                >
+                  <span style={{ fontSize: "20px" }}>🗓️</span>
+                  <div>
+                    <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.65)", fontWeight: "600" }}>
+                      นัดหมายวัน-เวลาแข่งรอบอุ่นเครื่อง:
+                    </div>
+                    <div style={{ fontSize: "15px", fontWeight: "900", color: "#ffa940", fontStyle: "italic" }}>
+                      {selectedSpotlight.warmupSchedule}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* 4 Category Scores Grid */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>

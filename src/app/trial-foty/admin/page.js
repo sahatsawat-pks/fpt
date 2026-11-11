@@ -206,6 +206,7 @@ export default function TrialAdminPage() {
             return {
               ...item,
               image: item.image || matched?.image || "",
+              warmupSchedule: item.warmupSchedule || matched?.warmupSchedule || "",
             };
           });
           setPollItems(mergedPoll);
@@ -1090,6 +1091,7 @@ export default function TrialAdminPage() {
       topic: "",
       image: "",
       order: String(contestants.length + 1),
+      warmupSchedule: "",
     });
     setShowContestantModal(true);
   };
@@ -1104,6 +1106,7 @@ export default function TrialAdminPage() {
       topic: c.topic || "",
       image: c.image || "",
       order: c.order !== null && c.order !== undefined ? String(c.order) : "",
+      warmupSchedule: c.warmupSchedule || "",
     });
     setShowContestantModal(true);
   };
@@ -1120,6 +1123,7 @@ export default function TrialAdminPage() {
         topic: formData.topic,
         image: formData.image,
         order: formData.order !== "" ? Number(formData.order) : null,
+        warmupSchedule: formData.warmupSchedule || "",
       };
 
       const res = await fetch("/api/trial", {
@@ -3429,6 +3433,9 @@ export default function TrialAdminPage() {
                     <th rowSpan={2} style={{ padding: "10px 10px", textAlign: "left", minWidth: "160px", color: "#80d0ff" }}>ชื่อจริง - นามสกุล</th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "140px", minWidth: "140px", color: "#80d0ff" }}>ชื่อเล่น</th>
                     <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", minWidth: "170px", color: "#80d0ff" }}>หัวข้อแฟนพันธุ์แท้</th>
+                    <th rowSpan={2} style={{ padding: "10px 8px", textAlign: "left", width: "170px", minWidth: "170px", color: "#ffaa40", fontWeight: "900", background: "rgba(255, 136, 0, 0.12)", borderLeft: "1px solid rgba(255, 136, 0, 0.4)" }} title="นัดหมายวัน-เวลาแข่งรอบอุ่นเครื่อง (หากระบุไว้ จะแสดงชื่อในตารางอุ่นเครื่องทันที)">
+                      🗓️ นัดแข่งอุ่นเครื่อง<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#ffedd5" }}>(วัน-เวลาแข่ง)</span>
+                    </th>
                     <th rowSpan={2} style={{ padding: "10px 6px", textAlign: "center", width: "100px", color: "#ff8800", fontWeight: "900", background: "rgba(255, 136, 0, 0.12)", borderLeft: "1px solid rgba(255, 136, 0, 0.4)" }} title="คะแนนรอบอุ่นเครื่อง What If? (เต็ม 100) คิดเป็นสัดส่วน 30% ของคะแนนรวม">
                       What If?<br /><span style={{ fontSize: "11px", fontWeight: "700", color: "#ffedd5" }}>(30% • เต็ม 100)</span>
                     </th>
@@ -3580,6 +3587,27 @@ export default function TrialAdminPage() {
                               border: "1px solid rgba(0, 229, 255, 0.3)",
                               color: "#67e8f9",
                               fontSize: "13px",
+                            }}
+                          />
+                        </td>
+
+                        {/* Warmup Schedule Input */}
+                        <td style={{ padding: "8px 8px", minWidth: "170px", background: "rgba(255, 136, 0, 0.04)", borderLeft: "1px solid rgba(255, 136, 0, 0.3)" }}>
+                          <input
+                            type="text"
+                            value={item.warmupSchedule || ""}
+                            onChange={(e) => handlePollFieldChange(index, "warmupSchedule", e.target.value)}
+                            placeholder="เช่น พุธ 12 พ.ย. 20:00 น."
+                            title="ระบุวัน-เวลาแข่งรอบอุ่นเครื่อง (หากระบุไว้ จะขึ้นแสดงชื่อในตารางรอบอุ่นเครื่องทันที)"
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: "6px",
+                              background: "#080402",
+                              border: item.warmupSchedule ? "1.5px solid #ff8800" : "1px solid rgba(255, 136, 0, 0.35)",
+                              color: item.warmupSchedule ? "#ffa940" : "#ffffff",
+                              fontSize: "13px",
+                              fontWeight: item.warmupSchedule ? "700" : "normal",
                             }}
                           />
                         </td>
@@ -3900,7 +3928,7 @@ export default function TrialAdminPage() {
 
                   {pollItems.length === 0 && (
                     <tr>
-                      <td colSpan={16} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.5)" }}>
+                      <td colSpan={17} style={{ textAlign: "center", padding: "40px", color: "rgba(255,255,255,0.5)" }}>
                         ยังไม่มีข้อมูลในตารางอันดับโพลล์ กดปุ่ม "➕ เพิ่มคนในโพลล์" หรือ "🔄 รีเซ็ตค่าเริ่มต้น" เพื่อเริ่มต้น
                       </td>
                     </tr>
@@ -5950,6 +5978,30 @@ export default function TrialAdminPage() {
                     boxSizing: "border-box",
                   }}
                 />
+              </div>
+
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#ffa940", marginBottom: "4px" }}>
+                  🗓️ นัดหมายวัน-เวลาแข่งรอบอุ่นเครื่อง (Warm-up Schedule)
+                </label>
+                <input
+                  type="text"
+                  value={formData.warmupSchedule || ""}
+                  onChange={(e) => setFormData({ ...formData, warmupSchedule: e.target.value })}
+                  placeholder="เช่น พุธ 12 พ.ย. 20:00 น."
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    background: "#080402",
+                    border: formData.warmupSchedule ? "1.5px solid #ff8800" : "1px solid rgba(255,136,0,0.3)",
+                    color: formData.warmupSchedule ? "#ffa940" : "#fff",
+                    boxSizing: "border-box",
+                  }}
+                />
+                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "3px", display: "block" }}>
+                  หากระบุไว้ ชื่อจะแสดงในตารางรอบอุ่นเครื่องที่หน้าเว็บหลักทันที พร้อมแถบเวลานัดแข่ง
+                </span>
               </div>
 
               {/* Photo Binding Section */}

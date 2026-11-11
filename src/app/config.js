@@ -9,222 +9,221 @@
  */
 
 const GAME_CONFIG = {
-    "threeSecMode": "3sets",
     "threeSecondsHeaders": [
-        "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-        "อัลบั้ม/ลำดับชุดต่อไปนี้มีชื่อว่าอะไร",
-        "นี่คือคุณสมบัติของบุคคลที่เกี่ยวข้องกับจินตหรา พูนลาภ ที่มีชื่อว่าอะไร"
+        "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+        "นี่คือไอเทมที่มีชื่อว่าอะไร",
+        "ชื่อเพลงที่คุณกำลังจะได้ยินต่อไปนี้ ร้องโดยสาวม้าที่มีชื่อว่าอะไร"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/01.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/01.png",
+            "audio": null,
             "video": null,
-            "answer": "เต่างอย"
+            "answer": "Special Week"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/02.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/02.png",
+            "audio": null,
             "video": null,
-            "answer": "รักสลายดอกฝ้ายบาน"
+            "answer": "Gold Ship"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/03.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/03.png",
+            "audio": null,
             "video": null,
-            "answer": "ฮักบ่าวอีสานใต้"
+            "answer": "Tokai Teio"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/04.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/04.png",
+            "audio": null,
             "video": null,
-            "answer": "น้ำตาสาววาริน"
+            "answer": "Agnes Tachyon"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/05.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/05.png",
+            "audio": null,
             "video": null,
-            "answer": "หมอลำแร็ปเปอร์"
+            "answer": "Vodka"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/06.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/06.png",
+            "audio": null,
             "video": null,
-            "answer": "ผัวขับรถเมียบดแป้ง"
+            "answer": "Twin Turbo"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/07.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/07.png",
+            "audio": null,
             "video": null,
-            "answer": "คอยรักจากหนุ่มถลุงแร่"
+            "answer": "Tamamo Cross"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/08.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/08.png",
+            "audio": null,
             "video": null,
-            "answer": "คอยรักจากเยอรมัน"
+            "answer": "Yamanin Zephyr"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/09.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/09.png",
+            "audio": null,
             "video": null,
-            "answer": "อาลัยเวิลด์เทรด"
+            "answer": "Daring Tact"
         },
         {
-            "question": "นี่คือเสียงจากเพลงที่มีชื่อว่าอะไร",
-            "image": null,
-            "audio": "public/audio/10.mp3",
+            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "image": "public/img/10.png",
+            "audio": null,
             "video": null,
-            "answer": "แตงโมจินตหรา"
+            "answer": "Haru Urara"
         },
         {
-            "question": "หมอลำสะออน ชุดที่3",
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/11.png",
+            "audio": null,
+            "video": null,
+            "answer": "Alarm Clock"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/12.png",
+            "audio": null,
+            "video": null,
+            "answer": "Rainfall Doll"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/13.png",
+            "audio": null,
+            "video": null,
+            "answer": "Carrot Jelly"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/14.png",
+            "audio": null,
+            "video": null,
+            "answer": "Carats"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/15.png",
+            "audio": null,
+            "video": null,
+            "answer": "Sprint Racing Shoes"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/16.png",
+            "audio": null,
+            "video": null,
+            "answer": "Dream Glimmer"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/17.png",
+            "audio": null,
+            "video": null,
+            "answer": "Book of Hints"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/18.png",
+            "audio": null,
+            "video": null,
+            "answer": "Toughness 30"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/19.png",
+            "audio": null,
+            "video": null,
+            "answer": "Gallery Key"
+        },
+        {
+            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
+            "image": "public/img/20.png",
+            "audio": null,
+            "video": null,
+            "answer": "Club Points"
+        },
+        {
+            "question": "Silent Star",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "น้ำตาหล่นบนเถียงนา"
+            "answer": "Silence Suzuka"
         },
         {
-            "question": "จินตหราครบเครื่อง ชุดที่1",
+            "question": "BLAZE",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "ธนาคารน้ำตา"
+            "answer": "Narita Brian"
         },
         {
-            "question": "ลูกทุ่งสะออน ชุดที่4",
+            "question": "Sasayaka na Inori",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "สาวน้ำพองสะอื้น"
+            "answer": "Rice Shower"
         },
         {
-            "question": "ชุดที่9",
+            "question": "Ai Mai, Kurai",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "สาวอีสานพลัดถิ่น"
+            "answer": "Still In Love"
         },
         {
-            "question": "จินตหราครบเครื่อง ชุดที่7",
+            "question": "BRIGHTEST HEART",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "เคยรักกันบ้างไหม"
-        },
-        {
-            "question": "หมอลำสะออน ชุดที่12",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ฮัลโหลโทรผิด"
-        },
-        {
-            "question": "ร็อคหมอลำสะออน ชุดที่10",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "พญานาคฝากรัก"
-        },
-        {
-            "question": "ชุดที่22",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "รอพี่ที่ บ.ข.ส."
-        },
-        {
-            "question": "จินมาแล้วจ้า ชุดที่1",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ซังบ่าวเจ้าชู้"
-        },
-        {
-            "question": "ชุดที่1",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ถูกหลอกออกโรงเรียน"
-        },
-        {
-            "question": "นักร้องระดับซุปเปอร์สตาร์ที่จินตหราเคยไปFeat.ในเพลง มาทำไม และ แฟนจ๋า",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "เบิร์ด ธงไชย แมคอินไตย์"
-        },
-        {
-            "question": "นักแสดงชื่อดังที่เป็นผู้กำกับ MV และพระเอก MV เพลง เมียหลวงทวงสิทธิ์",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ศรราม เทพพิทักษ์"
-        },
-        {
-            "question": "ผู้กำกับภาพยนตร์เรื่องแรกและเรื่องเดียวของจินตหรา พูนลาภ",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "พชร์ อานนท์"
-        },
-        {
-            "question": "ผู้ที่โดนแป้งร่วมกับจินตหราในระเบิดเถิดเทิงตอน วาระสุดท้าย",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "ยายชา เถิดเทิง"
-        },
-        {
-            "question": "ศิลปินที่ร่วมFeat ในเพลง จินตหราแอ๊บแบ๊ว",
-            "image": null,
-            "audio": null,
-            "video": null,
-            "answer": "อี๊ด โปงลางสะออน"
+            "answer": "Oguri Cap"
         }
     ],
     "qa": {
-        "question": "ในรายการ เลขมหาสมบัติ (เทปที่6) ที่จินตหรา พูนลาภ ได้ไปออกเมื่อปี 2546 คำตอบทั้ง3คำตอบในช่วง เลขลับดารา มีผลรวมกันทั้งหมดเท่าไหร่",
-        "answer": "45",
+        "question": "สาวม้าต่างแดนตัวแรกในเกม Uma Musume Pretty Derby มีชื่อว่าอะไร ในเกมเป็นม้าสัญชาติอะไร และตัวจริงเป็นม้าสัญชาติอะไร",
+        "answer": "Montjeu / ฝรั่งเศส / ไอร์แลนด์",
         "choices": [
-            "23",
-            "34",
-            "45",
-            "56",
-            "67"
+            "Montjeu / ฝรั่งเศส / ฝรั่งเศส",
+            "Montjeu / ฝรั่งเศส / ไอร์แลนด์",
+            "Montjeu / ไอร์แลนด์ / ไอร์แลนด์",
+            "Broye / ฝรั่งเศส / ฝรั่งเศส",
+            "Broye / ฝรั่งเศส / เยอรมนี"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
-            4,
             1,
-            2
+            4,
+            3
         ]
     },
     "jigsaw": {
-        "mode": "square",
+        "mode": "portrait",
         "image": "public/img/jigsaw.png",
-        "answer": "สันติสุข พรหมศิริ",
-        "question": "หลังจิ๊กซอว์นี้ จินตหรา พูนลาภ อยู่กับใคร"
+        "answer": "Oguri Cap",
+        "question": "หลังจิ๊กซอว์นี้ นี่คือสาวม้าที่มีชื่อว่าอะไร"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของเพลงที่มีชื่อว่าอะไร",
+        "question": "นี่คือคุณสมบัติของสาวม้าที่มีชื่อว่าอะไร",
         "clues": [
-            "ไม่ใช่เพลงลำดับแรกของอัลบั้ม",
-            "คนแต่งทั้งคำร้องและทำนองเป็นศิลปินแห่งชาติ",
-            "ไม่ใช่เพลงหมอลำ",
-            "เคยถูกร้องในรายการชิงช้าสวรรค์",
-            "ชื่อเพลงเป็นชื่ออัลบั้มที่ออกในยุค GMM Grammy ก่อนมาสเตอร์เทป"
+            "ม้าต้นแบบเสียชีวิตแล้ว",
+            "ในเกม Umamusume: Pretty Derby อยู่ทีม Sirius",
+            "เป็นม้าประเภท Pace Chaser",
+            "ส่วนสูงน้อยกว่า 150 ซม.",
+            "ม้าต้นแบบเป็นเพศผู้"
         ],
-        "answer": "แรงงานข้าวเหนียว"
+        "answer": "Rice Shower"
     },
     "battle": {
         "player1": {
