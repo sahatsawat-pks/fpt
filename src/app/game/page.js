@@ -5281,7 +5281,7 @@ function ThreeSecTimerBar({ timeLeft, isRoundCorrect }) {
 // ==========================================
 // 📺 FANPANTAE SCORE TO GET PILL (คะแนนที่จะได้)
 // ==========================================
-function ScoreToGetPill({ points, id }) {
+function ScoreToGetPill({ points, id, isLocked }) {
   return (
     <div
       style={{
@@ -5290,14 +5290,18 @@ function ScoreToGetPill({ points, id }) {
         alignItems: "center",
         padding: "4px 18px",
         borderRadius: "8px",
-        border: "1.5px solid rgba(255, 215, 0, 0.6)",
-        background: "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
-        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+        border: isLocked ? "1.5px solid #ffd700" : "1.5px solid rgba(255, 215, 0, 0.6)",
+        background: isLocked
+          ? "linear-gradient(135deg, rgba(30, 45, 160, 0.9) 0%, rgba(20, 30, 90, 0.95) 100%)"
+          : "linear-gradient(135deg, rgba(26, 35, 126, 0.75) 0%, rgba(13, 20, 64, 0.95) 100%)",
+        boxShadow: isLocked ? "0 0 14px rgba(255, 215, 0, 0.5)" : "0 2px 10px rgba(0, 0, 0, 0.5)",
+        transition: "all 0.3s ease",
       }}
     >
-      <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ fontSize: "13px", fontWeight: "700", color: "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
-          คะแนนที่จะได้
+      <div style={{ transform: "skewX(16deg)", display: "flex", alignItems: "center", gap: "8px" }}>
+        {isLocked && <span style={{ fontSize: "12px" }}>🔒</span>}
+        <span style={{ fontSize: "13px", fontWeight: "700", color: isLocked ? "#ffd700" : "#e0f2fe", fontFamily: "var(--font-kanit), 'Kanit', sans-serif" }}>
+          {isLocked ? "ล็อกคะแนนที่จะได้" : "คะแนนที่จะได้"}
         </span>
         <span
           id={id}
@@ -5308,6 +5312,7 @@ function ScoreToGetPill({ points, id }) {
             fontSize: "24px",
             color: "#ffd700",
             lineHeight: 1,
+            textShadow: isLocked ? "0 0 10px rgba(255, 215, 0, 0.8)" : "none",
           }}
         >
           {points}
@@ -6637,7 +6642,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
     sfxRef.current = playAudio(SOUND_PATHS.shuffleQA);
 
     setRevealedCount(nextCount);
-    if (!answered && revealedCount === 0) {
+    if (!answered && suspenseStep === 0 && revealedCount === 0) {
       setCurrentPoints(20);
     }
   };
@@ -6674,7 +6679,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
     sfxRef.current = playAudio(SOUND_PATHS.shuffle);
 
     setEliminatedIndices((prev) => [...prev, targetIdx]);
-    if (!answered) {
+    if (!answered && suspenseStep === 0) {
       setCurrentPoints((prev) => Math.max(0, prev - 5));
     }
   };
@@ -6767,7 +6772,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
       <BroadcastQuestionBar
         question={cfg.question || "เลือกคำตอบที่ถูกต้อง"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={<ScoreToGetPill points={currentPoints} id="qaPointsDisplay" />}
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="qaPointsDisplay" isLocked={answered || suspenseStep > 0} />}
       />
 
       <div className="qa-choices-grid" id="qaChoicesGrid">
@@ -6828,7 +6833,7 @@ function QAGame({ qaConfig, battleLockMode, judgeMode, lockedState, accumulatedS
           </button>
         ) : !judgeMode && remaining > 2 ? (
           <button className="btn-game btn-reveal" onClick={handleEliminate}>
-            ตัดตัวเลือก {answered ? "" : "(-5)"}
+            ตัดตัวเลือก {answered || suspenseStep > 0 ? "" : "(-5)"}
           </button>
         ) : null}
 
@@ -6939,7 +6944,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
 
     setOpenedPieces((prev) => [...prev, index]);
 
-    if (!answered) {
+    if (!answered && suspenseStep === 0) {
       if (firstOpen) {
         setFirstOpen(false);
         // First open is free
@@ -7035,7 +7040,7 @@ function JigsawGame({ jigsawMode, jigsawImage, jigsawAnswer, jigsawQuestion, bat
       <BroadcastQuestionBar
         question={jigsawQuestion && jigsawQuestion.trim() !== "" ? jigsawQuestion : "นี่คือภาพของอะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={<ScoreToGetPill points={currentPoints} id="jigsawPointsDisplay" />}
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="jigsawPointsDisplay" isLocked={answered || suspenseStep > 0} />}
       />
 
       {/* Jigsaw Board Centered (เหมือนถาม-ตอบ) */}
@@ -7238,7 +7243,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
     const nextStep = currentStep + 1;
 
     // Deduct points only when starting to reveal (from step 0 to step 1)
-    if (currentStep === 0 && !answered) {
+    if (currentStep === 0 && !answered && suspenseStep === 0) {
       const normalAlreadyOpenedCount = [0, 1, 2, 3, 4].filter((i) => clueSteps[i] > 0).length;
       const isFirstNormal = normalAlreadyOpenedCount === 0;
       if (!isFirstNormal) {
@@ -7269,7 +7274,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
     const currentStep = clueSteps[idx] || 0;
     if (currentStep >= 3) return;
 
-    if (currentStep === 0 && !answered) {
+    if (currentStep === 0 && !answered && suspenseStep === 0) {
       const normalAlreadyOpenedCount = [0, 1, 2, 3, 4].filter((i) => clueSteps[i] > 0).length;
       const isFirstNormal = normalAlreadyOpenedCount === 0;
       if (!isFirstNormal) {
@@ -7389,7 +7394,7 @@ function AttributeGame({ attributeConfig, battleLockMode, judgeMode, lockedState
       <BroadcastQuestionBar
         question={cfg.question || "จากคุณสมบัติต่อไปนี้คือใคร หรืออะไร?"}
         accumulatedScore={accumulatedScore ?? 0}
-        topRightSlot={<ScoreToGetPill points={currentPoints} id="attrPointsDisplay" />}
+        topRightSlot={<ScoreToGetPill points={currentPoints} id="attrPointsDisplay" isLocked={answered || suspenseStep > 0} />}
       />
 
       <div className="attr-clues-list" id="attrCluesList">
