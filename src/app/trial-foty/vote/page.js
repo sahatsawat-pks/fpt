@@ -849,6 +849,13 @@ export default function TrialFotyBallotVotePage() {
   const [toastMessage, setToastMessage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [hasVotedSuccess, setHasVotedSuccess] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState({
+    open: false,
+    type: "success", // 'success' | 'error'
+    title: "",
+    message: "",
+    details: null,
+  });
 
   // Each rank can hold an array of up to 5 IDs!
   const [ballotRanks, setBallotRanks] = useState({
@@ -1005,13 +1012,34 @@ export default function TrialFotyBallotVotePage() {
             JSON.stringify({ ranks: ballotRanks, champion: championId, date: new Date().toISOString() })
           );
         } catch (e) {}
-        showToast("🎉 ส่งคะแนนโหวตของคุณเรียบร้อยแล้ว ขอบคุณที่ร่วมโหวตครับ!");
+        setFeedbackModal({
+          open: true,
+          type: "success",
+          title: "🎉 ส่งคะแนนโหวตสำเร็จเรียบร้อย!",
+          message: "ผลการลงคะแนนของคุณถูกบันทึกเข้าสู่ระบบอย่างปลอดภัยเรียบร้อยแล้ว ขอบคุณที่ร่วมส่งแรงใจให้กับผู้เข้าแข่งขันครับ!",
+          details: {
+            champion: championCandidate,
+            selectedCount: totalSelectedInRanks + 1,
+          },
+        });
       } else {
-        alert(data.error || "เกิดข้อผิดพลาดในการส่งคะแนนโหวต");
+        setFeedbackModal({
+          open: true,
+          type: "error",
+          title: "❌ ส่งคะแนนไม่สำเร็จ",
+          message: data.error || "เกิดข้อผิดพลาดในการส่งคะแนนโหวต กรุณาลองใหม่อีกครั้งครับ",
+          details: null,
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+      setFeedbackModal({
+        open: true,
+        type: "error",
+        title: "⚠️ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์",
+        message: "เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่อีกครั้งครับ",
+        details: null,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -1215,6 +1243,231 @@ export default function TrialFotyBallotVotePage() {
           </div>
         </div>
       )}
+
+      {/* Animated Result Feedback Modal (Success & Error) */}
+      {feedbackModal.open && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            background: "rgba(0, 0, 0, 0.85)",
+            backdropFilter: "blur(12px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            animation: "feedbackFadeIn 0.25s ease-out forwards",
+          }}
+        >
+          <div
+            style={{
+              background:
+                feedbackModal.type === "success"
+                  ? "linear-gradient(145deg, #0d2238 0%, #061224 100%)"
+                  : "linear-gradient(145deg, #2a111a 0%, #15060b 100%)",
+              border:
+                feedbackModal.type === "success"
+                  ? "2px solid #10b981"
+                  : "2px solid #ef4444",
+              borderRadius: "24px",
+              padding: "32px 28px",
+              maxWidth: "520px",
+              width: "100%",
+              textAlign: "center",
+              boxShadow:
+                feedbackModal.type === "success"
+                  ? "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(16, 185, 129, 0.4)"
+                  : "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(239, 68, 68, 0.4)",
+              animation: "feedbackPopIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+            }}
+          >
+            {/* Animated Icon Ring */}
+            <div
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                margin: "0 auto 20px auto",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background:
+                  feedbackModal.type === "success"
+                    ? "linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.4) 100%)"
+                    : "linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.4) 100%)",
+                border:
+                  feedbackModal.type === "success"
+                    ? "2px solid #10b981"
+                    : "2px solid #ef4444",
+                boxShadow:
+                  feedbackModal.type === "success"
+                    ? "0 0 25px rgba(16, 185, 129, 0.6)"
+                    : "0 0 25px rgba(239, 68, 68, 0.6)",
+                animation:
+                  feedbackModal.type === "success"
+                    ? "feedbackPulseGreen 2s infinite"
+                    : "feedbackPulseRed 2s infinite",
+              }}
+            >
+              <span style={{ fontSize: "38px" }}>
+                {feedbackModal.type === "success" ? "🎉" : "⚠️"}
+              </span>
+            </div>
+
+            <h3
+              style={{
+                fontSize: "22px",
+                fontWeight: "900",
+                color: feedbackModal.type === "success" ? "#34d399" : "#f87171",
+                margin: "0 0 10px 0",
+              }}
+            >
+              {feedbackModal.title}
+            </h3>
+
+            <p
+              style={{
+                fontSize: "14px",
+                color: "rgba(255, 255, 255, 0.85)",
+                lineHeight: "1.6",
+                margin: "0 0 20px 0",
+              }}
+            >
+              {feedbackModal.message}
+            </p>
+
+            {/* Success Details Box */}
+            {feedbackModal.type === "success" && feedbackModal.details?.champion && (
+              <div
+                style={{
+                  background: "rgba(0, 0, 0, 0.45)",
+                  border: "1px solid rgba(255, 215, 0, 0.35)",
+                  borderRadius: "14px",
+                  padding: "14px",
+                  marginBottom: "24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", textAlign: "left" }}>
+                  <div
+                    style={{
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      border: "2px solid #ffd700",
+                      background: "#081224",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {feedbackModal.details.champion.image ? (
+                      <img
+                        src={getOptimizedImageUrl(feedbackModal.details.champion.image, 80)}
+                        alt={feedbackModal.details.champion.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <span>👤</span>
+                    )}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "800" }}>
+                      👑 ทายแชมป์แฟนพันธุ์แท้แห่งปี
+                    </div>
+                    <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff" }}>
+                      {feedbackModal.details.champion.nickname || feedbackModal.details.champion.name}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#67e8f9" }}>
+                      {feedbackModal.details.champion.topic}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>รวมที่ลงคะแนน</div>
+                  <div style={{ fontSize: "16px", fontWeight: "900", color: "#34d399" }}>
+                    {feedbackModal.details.selectedCount} รายชื่อ
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button
+                type="button"
+                onClick={() => setFeedbackModal({ open: false, type: "success", title: "", message: "", details: null })}
+                style={{
+                  flex: 1,
+                  padding: "12px 20px",
+                  borderRadius: "10px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  color: "#ffffff",
+                  fontSize: "14px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                }}
+              >
+                ปิดหน้าต่าง
+              </button>
+              {feedbackModal.type === "success" && (
+                <Link
+                  href="/trial-foty"
+                  style={{
+                    flex: 1.4,
+                    padding: "12px 20px",
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    border: "none",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    fontWeight: "800",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                    boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)",
+                  }}
+                >
+                  <span>📊</span> ดูตารางคะแนน
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inject Keyframe Animations */}
+      <style>{`
+        @keyframes feedbackFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes feedbackPopIn {
+          0% { opacity: 0; transform: scale(0.82) translateY(20px); }
+          50% { opacity: 1; transform: scale(1.03) translateY(-3px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes feedbackPulseGreen {
+          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+          70% { transform: scale(1.05); box-shadow: 0 0 0 16px rgba(16, 185, 129, 0); }
+          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes feedbackPulseRed {
+          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+          70% { transform: scale(1.05); box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+      `}</style>
 
       {/* Top Header & Navigation (Mobile Responsive) */}
       <TrialNavbar active="vote" votingOpen={votingOpen} />
