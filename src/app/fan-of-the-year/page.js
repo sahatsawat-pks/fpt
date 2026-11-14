@@ -831,7 +831,7 @@ export default function MainPage() {
     );
   }
 
-  if (protectHome && !isAuthenticated) {
+  if (protectFoty && !isAuthenticated) {
     return (
       <div style={{
         minHeight: "100vh",

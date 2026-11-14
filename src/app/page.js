@@ -31,13 +31,9 @@ export function getYouTubeId(url) {
   return match && match[1] ? match[1] : null;
 }
 
-// 4 Champions from history data (2021, 2022, 2023, 2024)
-const FOUR_CHAMPIONS = (historyData.champions || []).filter(
-  (c) => c.year && Number(c.year) >= 2021 && Number(c.year) <= 2024
-);
-
 export default function MainPage() {
   const [leaderboard, setLeaderboard] = useState([]);
+  const [historyState, setHistoryState] = useState(historyData);
   const [weeklyMatches, setWeeklyMatches] = useState([]);
   const [showFotyInNav, setShowFotyInNav] = useState(true);
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
@@ -51,15 +47,20 @@ export default function MainPage() {
   // Load data & settings
   const fetchData = async () => {
     try {
-      const [scoresRes, settingsRes] = await Promise.all([
+      const [scoresRes, settingsRes, historyRes] = await Promise.all([
         fetch("/api/scores"),
         fetch("/api/settings"),
+        fetch("/api/history"),
       ]);
       const scoresData = await scoresRes.json();
       const settingsData = await settingsRes.json();
+      const historyResData = await historyRes.json();
 
       if (scoresData.success && Array.isArray(scoresData.data)) {
         setLeaderboard(scoresData.data);
+      }
+      if (historyResData.success && historyResData.data) {
+        setHistoryState(historyResData.data);
       }
       if (settingsData.success) {
         setShowFotyInNav(settingsData.showFotyInNav !== false);
@@ -101,6 +102,24 @@ export default function MainPage() {
   const warmupContestants = useMemo(() => {
     return (leaderboard || []).filter((c) => Boolean(c.warmupSchedule || c.warmupMatch));
   }, [leaderboard]);
+
+  const enabledYears = useMemo(() => {
+    return (
+      historyState?.enabledYears || {
+        "2021": true,
+        "2022": true,
+        "2023": true,
+        "2024": true,
+      }
+    );
+  }, [historyState]);
+
+  // Active Champions from history data filtered by enabledYears
+  const activeChampions = useMemo(() => {
+    return (historyState?.champions || historyData.champions || [])
+      .filter((c) => c.year && Number(c.year) >= 2021 && Number(c.year) <= 2024)
+      .filter((c) => enabledYears[String(c.year)] !== false);
+  }, [historyState, enabledYears]);
 
   return (
     <div
@@ -674,7 +693,7 @@ export default function MainPage() {
               🗓️ โปรแกรมออกอากาศประจำสัปดาห์
             </a>
 
-            {showChampionsOnHome && (
+            {showChampionsOnHome && activeChampions.length > 0 && (
               <a
                 href="#champions"
                 style={{
@@ -1118,9 +1137,9 @@ export default function MainPage() {
       )}
 
       {/* ========================================================
-          5. SECTION: ทำเนียบแชมป์ (4 คน) - HALL OF FAME
+          5. SECTION: ทำเนียบแชมป์ - HALL OF FAME
          ======================================================== */}
-      {showChampionsOnHome && (
+      {showChampionsOnHome && activeChampions.length > 0 && (
         <section
           id="champions"
           style={{
@@ -1156,14 +1175,16 @@ export default function MainPage() {
                 margin: "0 0 10px 0",
               }}
             >
-              ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (4 คน)
+              {activeChampions.length === 4
+                ? "ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (4 คน)"
+                : `ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (${activeChampions.length} ท่าน)`}
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "600px", margin: "0 auto" }}>
-              4 สหายผู้คว้าชัยชนะสูงสุดในประวัติศาสตร์แฟนพันธุ์แท้แห่งปีฉบับ Fanmade
+              ผู้คว้าชัยชนะสูงสุดในประวัติศาสตร์แฟนพันธุ์แท้แห่งปีฉบับ Fanmade
             </p>
           </div>
 
-          {/* 4 Champions Grid */}
+          {/* Champions Grid */}
           <div
             style={{
               display: "grid",
@@ -1172,7 +1193,7 @@ export default function MainPage() {
               marginBottom: "36px",
             }}
           >
-            {FOUR_CHAMPIONS.map((champ) => {
+            {activeChampions.map((champ) => {
               const optimizedPhoto = getOptimizedImageUrl(champ.image, 320);
               return (
                 <div
