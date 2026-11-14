@@ -62,10 +62,10 @@ export default function MainPage() {
   const fetchData = async () => {
     try {
       const [scoresRes, settingsRes, historyRes, pollRes] = await Promise.all([
-        fetch("/api/scores"),
-        fetch("/api/settings"),
-        fetch("/api/history"),
-        fetch("/api/poll"),
+        fetch("/api/scores", { cache: "no-store" }),
+        fetch("/api/settings", { cache: "no-store" }),
+        fetch("/api/history", { cache: "no-store" }),
+        fetch("/api/poll", { cache: "no-store" }),
       ]);
       const scoresData = await scoresRes.json();
       const settingsData = await settingsRes.json();

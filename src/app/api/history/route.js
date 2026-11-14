@@ -3,6 +3,9 @@ import fs from "fs";
 import path from "path";
 import { getKVData, saveKVData } from "@/lib/kv";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const HISTORY_FILE = path.join(process.cwd(), "src/app/data/history.json");
 
 function readLocalHistory() {
