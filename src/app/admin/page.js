@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import defaultTournamentData from "../data/tournament.json";
+import historyData from "../data/history.json";
 
 function AdminPhotoPreview({ src, name, size = 36 }) {
   const [err, setErr] = useState(false);
@@ -66,6 +67,27 @@ export default function AdminPage() {
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
   const [showChampionsOnHome, setShowChampionsOnHome] = useState(true);
   const [tournamentUpdateUpToMatch, setTournamentUpdateUpToMatch] = useState("all");
+  const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
+  const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
+
+  // 2026 Audition Episodes from history.json (14 episodes)
+  const fotyAuditionEpisodes = useMemo(() => {
+    const auditionList = historyData?.seasons?.["2026"]?.audition || [];
+    const map = new Map();
+    auditionList.forEach((c) => {
+      const epNum = Number(c.episode) || 1;
+      if (!map.has(epNum)) {
+        map.set(epNum, {
+          episode: epNum,
+          episodeName: `ตอนที่ ${epNum}`,
+          defaultDate: c.date || "",
+          contestants: [],
+        });
+      }
+      map.get(epNum).contestants.push(c);
+    });
+    return Array.from(map.values()).sort((a, b) => a.episode - b.episode);
+  }, []);
 
   // All tournament matches list for dropdown selection
   const allTournamentMatches = useMemo(() => {
@@ -524,6 +546,12 @@ export default function AdminPage() {
         if (data.tournamentUpdateUpToMatch !== undefined) {
           setTournamentUpdateUpToMatch(data.tournamentUpdateUpToMatch);
         }
+        if (data.fotyAirUpToEpisode !== undefined) {
+          setFotyAirUpToEpisode(data.fotyAirUpToEpisode);
+        }
+        if (data.fotyBroadcastCustoms) {
+          setFotyBroadcastCustoms(data.fotyBroadcastCustoms);
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -758,6 +786,8 @@ export default function AdminPage() {
           tournamentWeeklyMatches,
           showChampionsOnHome,
           tournamentUpdateUpToMatch,
+          fotyAirUpToEpisode,
+          fotyBroadcastCustoms,
         }),
       });
       const data = await res.json();
@@ -839,19 +869,38 @@ export default function AdminPage() {
   const handleSaveWeeklyMatches = async (type) => {
     setWeeklyNotice("กำลังบันทึก...");
     try {
-      const action = type === "foty" ? "save_weekly_matches" : "save_tournament_weekly_matches";
-      const payload = type === "foty" ? { weeklyMatches } : { tournamentWeeklyMatches };
-      const res = await fetch("/api/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, ...payload }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setWeeklyNotice("✅ บันทึกตารางแข่งขันประจำสัปดาห์สำเร็จ!");
-        setTimeout(() => setWeeklyNotice(""), 3500);
+      if (type === "foty") {
+        const res = await fetch("/api/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "save_foty_broadcast",
+            fotyAirUpToEpisode,
+            fotyBroadcastCustoms,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setWeeklyNotice("✅ บันทึกตารางออกอากาศแฟนพันธุ์แท้ 2026 สำเร็จ!");
+          setTimeout(() => setWeeklyNotice(""), 3500);
+        } else {
+          setWeeklyNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+        }
       } else {
-        setWeeklyNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+        const action = "save_tournament_weekly_matches";
+        const payload = { tournamentWeeklyMatches };
+        const res = await fetch("/api/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, ...payload }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setWeeklyNotice("✅ บันทึกตารางแข่งขันประจำสัปดาห์ทัวร์นาเมนต์สำเร็จ!");
+          setTimeout(() => setWeeklyNotice(""), 3500);
+        } else {
+          setWeeklyNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+        }
       }
     } catch (e) {
       setWeeklyNotice("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -4684,7 +4733,7 @@ export default function AdminPage() {
                   style={{
                     padding: "8px 18px",
                     borderRadius: "8px",
-                    background: weeklySubTab === "foty" ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)" : "transparent",
+                    background: weeklySubTab === "foty" ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)" : "transparent",
                     color: weeklySubTab === "foty" ? "#030812" : "#e0f2fe",
                     fontWeight: "800",
                     fontSize: "14px",
@@ -4693,7 +4742,7 @@ export default function AdminPage() {
                     transition: "all 0.2s",
                   }}
                 >
-                  🏠 หน้าแรก (Fan of the Year) ({weeklyMatches.length})
+                  🏠 หน้าแรก (แฟนพันธุ์แท้ 2026) (14 ตอน)
                 </button>
                 <button
                   type="button"
@@ -4722,15 +4771,268 @@ export default function AdminPage() {
             )}
 
             {/* List and Form */}
-            {(() => {
-              const currentList = weeklySubTab === "foty" ? weeklyMatches : tournamentWeeklyMatches;
-              const type = weeklySubTab;
+            {weeklySubTab === "foty" ? (
+              <div>
+                {/* FOTY Cutoff Control */}
+                <div
+                  style={{
+                    background: "rgba(255, 215, 0, 0.08)",
+                    border: "1.5px solid rgba(255, 215, 0, 0.4)",
+                    borderRadius: "14px",
+                    padding: "20px",
+                    marginBottom: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "16px",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span>📺</span> ตอนนี้แข่งขัน / ออกอากาศถึงตอนที่เท่าไหร่:
+                    </div>
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>
+                      ข้อมูลรอบ Audition ปี 2026 ทั้ง 14 ตอนถูกดึงมาจากระบบประวัติศาสตร์อัตโนมัติ โดยตอนที่ยังไม่ออกอากาศจะถูกซ่อนไว้ในหน้า <code>/history</code> สาธารณะ และหน้าแรกจะโชว์เฉพาะตอนที่แข่งแล้วและตอนถัดไป
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                    <select
+                      value={fotyAirUpToEpisode}
+                      onChange={(e) => setFotyAirUpToEpisode(e.target.value)}
+                      style={{
+                        padding: "10px 16px",
+                        borderRadius: "8px",
+                        background: "#050b14",
+                        border: "1.5px solid #ffd700",
+                        color: "#ffd700",
+                        fontSize: "15px",
+                        fontWeight: "800",
+                        minWidth: "250px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="0">ยังไม่ออกอากาศ (ซ่อนทั้งหมด)</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((ep) => (
+                        <option key={ep} value={ep}>
+                          ออกอากาศถึงตอนที่ {ep} (คู่ที่ {ep})
+                        </option>
+                      ))}
+                      <option value="all">🌐 แสดงผลครบทุกตอน (14 ตอน)</option>
+                    </select>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSaveWeeklyMatches("foty")}
+                      style={{
+                        padding: "10px 20px",
+                        borderRadius: "8px",
+                        background: "linear-gradient(135deg, #ffd700 0%, #ff9900 100%)",
+                        border: "none",
+                        color: "#030814",
+                        fontSize: "14px",
+                        fontWeight: "900",
+                        cursor: "pointer",
+                        boxShadow: "0 0 15px rgba(255, 215, 0, 0.4)",
+                      }}
+                    >
+                      💾 บันทึกตารางออกอากาศ 2026
+                    </button>
+                  </div>
+                </div>
+
+                {/* List of 14 episodes */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "28px" }}>
+                  {fotyAuditionEpisodes.map((ep) => {
+                    const custom = fotyBroadcastCustoms?.[ep.episode] || {};
+                    const c1 = ep.contestants[0] || null;
+                    const c2 = ep.contestants[1] || null;
+                    const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
+                    const isCompleted = ep.episode <= maxEp;
+                    const isNext = ep.episode === maxEp + 1;
+
+                    return (
+                      <div
+                        key={ep.episode}
+                        style={{
+                          background: "linear-gradient(145deg, rgba(10, 20, 36, 0.9) 0%, rgba(5, 12, 24, 0.95) 100%)",
+                          border: isCompleted
+                            ? "1.5px solid rgba(82, 196, 26, 0.5)"
+                            : isNext
+                            ? "1.5px solid rgba(250, 173, 20, 0.6)"
+                            : "1px solid rgba(255, 255, 255, 0.12)",
+                          borderRadius: "14px",
+                          padding: "18px 20px",
+                        }}
+                      >
+                        {/* Episode Header */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <span style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
+                              📺 ตอนที่ {ep.episode}
+                            </span>
+                            {isCompleted && (
+                              <span style={{ background: "rgba(82, 196, 26, 0.2)", border: "1px solid #52c41a", color: "#73d13d", fontSize: "11px", fontWeight: "800", padding: "2px 8px", borderRadius: "4px" }}>
+                                ✓ ออกอากาศแล้ว
+                              </span>
+                            )}
+                            {isNext && (
+                              <span style={{ background: "rgba(250, 173, 20, 0.2)", border: "1px solid #faad14", color: "#ffd700", fontSize: "11px", fontWeight: "800", padding: "2px 8px", borderRadius: "4px" }}>
+                                ⏳ ตอนถัดไป
+                              </span>
+                            )}
+                            {!isCompleted && !isNext && (
+                              <span style={{ background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.5)", fontSize: "11px", fontWeight: "700", padding: "2px 8px", borderRadius: "4px" }}>
+                                🔒 ยังไม่ออกอากาศ
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
+                            วันที่เริ่มต้นในประวัติศาสตร์: {ep.defaultDate || "-"}
+                          </span>
+                        </div>
+
+                        {/* Contestants summary from history */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "14px", marginBottom: "16px" }}>
+                          {c1 && (
+                            <div style={{ background: "rgba(0,0,0,0.35)", borderRadius: "10px", padding: "10px 14px", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", gap: "12px" }}>
+                              <div style={{ width: "40px", height: "40px", borderRadius: "50%", overflow: "hidden", background: "#0a172e", border: "1.5px solid #ffd700", flexShrink: 0 }}>
+                                <AdminPhotoPreview src={c1.image} name={c1.name} size={40} />
+                              </div>
+                              <div style={{ minWidth: 0, flex: 1 }}>
+                                <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {c1.nickname ? `${c1.nickname} (${c1.name})` : c1.name}
+                                </div>
+                                <div style={{ fontSize: "12px", color: "#00e5ff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {c1.topic}
+                                </div>
+                                {c1.totalScore !== undefined && c1.totalScore !== null && (
+                                  <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "800", marginTop: "2px" }}>
+                                    คะแนน: {c1.totalScore} {c1.quota && "• 🏆 เข้ารอบ"}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          {c2 && (
+                            <div style={{ background: "rgba(0,0,0,0.35)", borderRadius: "10px", padding: "10px 14px", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", gap: "12px" }}>
+                              <div style={{ width: "40px", height: "40px", borderRadius: "50%", overflow: "hidden", background: "#0a172e", border: "1.5px solid #ffd700", flexShrink: 0 }}>
+                                <AdminPhotoPreview src={c2.image} name={c2.name} size={40} />
+                              </div>
+                              <div style={{ minWidth: 0, flex: 1 }}>
+                                <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {c2.nickname ? `${c2.nickname} (${c2.name})` : c2.name}
+                                </div>
+                                <div style={{ fontSize: "12px", color: "#00e5ff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {c2.topic}
+                                </div>
+                                {c2.totalScore !== undefined && c2.totalScore !== null && (
+                                  <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "800", marginTop: "2px" }}>
+                                    คะแนน: {c2.totalScore} {c2.quota && "• 🏆 เข้ารอบ"}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Inputs: airDate and replayUrl */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px" }}>
+                          <div>
+                            <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#e0f2fe", marginBottom: "6px" }}>
+                              🗓️ วันที่ / เวลาออกอากาศ:
+                            </label>
+                            <input
+                              type="text"
+                              value={custom.airDate ?? ep.defaultDate ?? ""}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setFotyBroadcastCustoms((prev) => ({
+                                  ...prev,
+                                  [ep.episode]: {
+                                    ...(prev[ep.episode] || {}),
+                                    airDate: val,
+                                  },
+                                }));
+                              }}
+                              placeholder="เช่น 14 พ.ย. 2026 - 20:00 น."
+                              style={{
+                                width: "100%",
+                                padding: "9px 12px",
+                                borderRadius: "8px",
+                                background: "#040914",
+                                border: "1px solid rgba(0, 229, 255, 0.4)",
+                                color: "#ffffff",
+                                fontSize: "13px",
+                              }}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#e0f2fe", marginBottom: "6px" }}>
+                              📺 ลิงก์รับชมย้อนหลัง (YouTube):
+                            </label>
+                            <input
+                              type="text"
+                              value={custom.replayUrl ?? ""}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setFotyBroadcastCustoms((prev) => ({
+                                  ...prev,
+                                  [ep.episode]: {
+                                    ...(prev[ep.episode] || {}),
+                                    replayUrl: val,
+                                  },
+                                }));
+                              }}
+                              placeholder="https://www.youtube.com/watch?v=..."
+                              style={{
+                                width: "100%",
+                                padding: "9px 12px",
+                                borderRadius: "8px",
+                                background: "#040914",
+                                border: "1px solid rgba(255, 215, 0, 0.4)",
+                                color: "#ffd700",
+                                fontSize: "13px",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Save Button */}
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+                  <button
+                    type="button"
+                    onClick={() => handleSaveWeeklyMatches("foty")}
+                    style={{
+                      padding: "12px 28px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(135deg, #ffd700 0%, #ff9900 100%)",
+                      color: "#030814",
+                      fontWeight: "900",
+                      fontSize: "15px",
+                      border: "none",
+                      cursor: "pointer",
+                      boxShadow: "0 0 16px rgba(255, 215, 0, 0.4)",
+                    }}
+                  >
+                    💾 บันทึกตารางออกอากาศแฟนพันธุ์แท้ 2026 ทั้งหมด
+                  </button>
+                </div>
+              </div>
+            ) : (() => {
+              const currentList = tournamentWeeklyMatches;
+              const type = "tournament";
 
               return (
                 <div>
                   {/* Tournament Cutoff Control (shown when tournament sub-tab is active) */}
-                  {weeklySubTab === "tournament" && (
-                    <div
+                  <div
                       style={{
                         background: "rgba(0, 229, 255, 0.08)",
                         border: "1.5px solid rgba(0, 229, 255, 0.4)",
@@ -4776,7 +5078,6 @@ export default function AdminPage() {
                         ))}
                       </select>
                     </div>
-                  )}
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
                     <div style={{ fontSize: "15px", fontWeight: "700", color: "#ffd700" }}>

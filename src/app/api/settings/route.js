@@ -37,6 +37,8 @@ const DEFAULT_SETTINGS = {
   showChampionsOnHome: true,
   tournamentUpdateUpToMatch: "all",
   fotyUpdateUpToMatch: "all",
+  fotyAirUpToEpisode: 1,
+  fotyBroadcastCustoms: {},
 };
 
 function readSettings() {
@@ -107,6 +109,8 @@ export async function GET(request) {
       showChampionsOnHome: settings.showChampionsOnHome !== false,
       tournamentUpdateUpToMatch: settings.tournamentUpdateUpToMatch !== undefined ? settings.tournamentUpdateUpToMatch : "all",
       fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
+      fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
+      fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
     });
   }
 
@@ -136,6 +140,8 @@ export async function GET(request) {
     showChampionsOnHome: settings.showChampionsOnHome !== false,
     tournamentUpdateUpToMatch: settings.tournamentUpdateUpToMatch !== undefined ? settings.tournamentUpdateUpToMatch : "all",
     fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
+    fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
+    fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
   });
 }
 
@@ -323,6 +329,12 @@ export async function POST(request) {
       if (body.fotyUpdateUpToMatch !== undefined) {
         newSettings.fotyUpdateUpToMatch = body.fotyUpdateUpToMatch;
       }
+      if (body.fotyAirUpToEpisode !== undefined) {
+        newSettings.fotyAirUpToEpisode = body.fotyAirUpToEpisode;
+      }
+      if (body.fotyBroadcastCustoms !== undefined) {
+        newSettings.fotyBroadcastCustoms = body.fotyBroadcastCustoms;
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -370,6 +382,22 @@ export async function POST(request) {
         success: true,
         message: "บันทึกตารางแข่งขันประจำสัปดาห์หน้าแรกเรียบร้อยแล้ว",
         weeklyMatches: newSettings.weeklyMatches,
+      });
+    }
+
+    // Save FOTY 2026 broadcast schedule action (Homepage 2026 episodes)
+    if (body.action === "save_foty_broadcast") {
+      const newSettings = {
+        ...current,
+        fotyAirUpToEpisode: body.fotyAirUpToEpisode !== undefined ? body.fotyAirUpToEpisode : current.fotyAirUpToEpisode,
+        fotyBroadcastCustoms: body.fotyBroadcastCustoms !== undefined ? body.fotyBroadcastCustoms : current.fotyBroadcastCustoms,
+      };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        message: "บันทึกตารางออกอากาศแฟนพันธุ์แท้ 2026 เรียบร้อยแล้ว",
+        fotyAirUpToEpisode: newSettings.fotyAirUpToEpisode,
+        fotyBroadcastCustoms: newSettings.fotyBroadcastCustoms,
       });
     }
 

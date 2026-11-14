@@ -35,6 +35,8 @@ export default function MainPage() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [historyState, setHistoryState] = useState(historyData);
   const [weeklyMatches, setWeeklyMatches] = useState([]);
+  const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
+  const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
   const [showFotyInNav, setShowFotyInNav] = useState(true);
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
   const [showChampionsOnHome, setShowChampionsOnHome] = useState(true);
@@ -67,6 +69,12 @@ export default function MainPage() {
         setShowCurrentInNav(settingsData.showCurrentInNav !== false);
         setShowChampionsOnHome(settingsData.showChampionsOnHome !== false);
         setShowWarmupTable(settingsData.showWarmupTable !== false);
+        if (settingsData.fotyAirUpToEpisode !== undefined) {
+          setFotyAirUpToEpisode(settingsData.fotyAirUpToEpisode);
+        }
+        if (settingsData.fotyBroadcastCustoms) {
+          setFotyBroadcastCustoms(settingsData.fotyBroadcastCustoms);
+        }
         if (Array.isArray(settingsData.weeklyMatches)) {
           setWeeklyMatches(settingsData.weeklyMatches);
         }
@@ -93,10 +101,77 @@ export default function MainPage() {
     return cols.map((col) => [...col, ...col, ...col, ...col]);
   }, []);
 
-  // Filter visible weekly matches
+  // 2026 Audition weekly episodes from history data
+  const fotyWeeklyEpisodes = useMemo(() => {
+    const auditionList = historyState?.seasons?.["2026"]?.audition || historyData?.seasons?.["2026"]?.audition || [];
+    const map = new Map();
+    auditionList.forEach((c) => {
+      const epNum = Number(c.episode) || 1;
+      if (!map.has(epNum)) {
+        map.set(epNum, {
+          episode: epNum,
+          episodeName: `ตอนที่ ${epNum}`,
+          defaultDate: c.date || "",
+          contestants: [],
+        });
+      }
+      map.get(epNum).contestants.push(c);
+    });
+
+    const list = Array.from(map.values()).sort((a, b) => a.episode - b.episode);
+    const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
+
+    return list.map((ep) => {
+      const custom = fotyBroadcastCustoms?.[ep.episode] || {};
+      const c1 = ep.contestants[0] || null;
+      const c2 = ep.contestants[1] || null;
+      const isCompleted = ep.episode <= maxEp;
+      const isNext = ep.episode === maxEp + 1;
+      const status = isCompleted ? "completed" : isNext ? "next" : "upcoming";
+      const airDate = custom.airDate || ep.defaultDate || `ตอนที่ ${ep.episode}`;
+      const replayUrl = custom.replayUrl || "";
+
+      return {
+        id: `ep-${ep.episode}`,
+        episode: `ตอนที่ ${ep.episode}`,
+        episodeNum: ep.episode,
+        title: c1 && c2 ? `${c1.nickname} ปะทะ ${c2.nickname}` : c1?.nickname || `ตอนที่ ${ep.episode}`,
+        airDate,
+        replayUrl,
+        status,
+        isCompleted,
+        isNext,
+        player1: c1
+          ? {
+              photo: c1.image,
+              nickname: c1.nickname,
+              name: c1.name,
+              topic: c1.topic,
+              score: isCompleted ? c1.totalScore : null,
+              quota: isCompleted ? c1.quota : false,
+              final: isCompleted ? c1.final : null,
+            }
+          : null,
+        player2: c2
+          ? {
+              photo: c2.image,
+              nickname: c2.nickname,
+              name: c2.name,
+              topic: c2.topic,
+              score: isCompleted ? c2.totalScore : null,
+              quota: isCompleted ? c2.quota : false,
+              final: isCompleted ? c2.final : null,
+            }
+          : null,
+      };
+    });
+  }, [historyState, fotyAirUpToEpisode, fotyBroadcastCustoms]);
+
+  // Episodes shown on Homepage: completed ones + next upcoming episode
   const visibleWeeklyMatches = useMemo(() => {
-    return (weeklyMatches || []).filter((m) => m.isShown !== false);
-  }, [weeklyMatches]);
+    const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
+    return fotyWeeklyEpisodes.filter((ep) => ep.episodeNum <= maxEp + 1);
+  }, [fotyWeeklyEpisodes, fotyAirUpToEpisode]);
 
   // Warmup contestants: contestants that have warmupSchedule
   const warmupContestants = useMemo(() => {
@@ -710,21 +785,6 @@ export default function MainPage() {
                         {m.episode || `คู่ที่ ${idx + 1}`}
                       </span>
 
-                      {m.status === "live" && (
-                        <span
-                          style={{
-                            background: "rgba(255, 77, 79, 0.2)",
-                            border: "1px solid #ff4d4f",
-                            color: "#ff4d4f",
-                            fontSize: "11px",
-                            fontWeight: "800",
-                            padding: "2px 8px",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          🔴 กำลังออกอากาศ
-                        </span>
-                      )}
                       {m.status === "completed" && (
                         <span
                           style={{
@@ -738,6 +798,21 @@ export default function MainPage() {
                           }}
                         >
                           ✓ ออกอากาศแล้ว
+                        </span>
+                      )}
+                      {m.status === "next" && (
+                        <span
+                          style={{
+                            background: "rgba(250, 173, 20, 0.2)",
+                            border: "1px solid #faad14",
+                            color: "#ffd700",
+                            fontSize: "11px",
+                            fontWeight: "800",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          ⏳ ตอนถัดไป
                         </span>
                       )}
                       {(!m.status || m.status === "upcoming") && (
@@ -813,6 +888,18 @@ export default function MainPage() {
                           {p1Topic}
                         </span>
                       )}
+                      {m.player1?.score !== null && m.player1?.score !== undefined && (
+                        <div style={{ marginTop: "4px", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "800", color: "#ffd700" }}>
+                            {m.player1.score} คะแนน
+                          </span>
+                          {m.player1.quota && (
+                            <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "10px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
+                              🏆 เข้ารอบแห่งปี
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {hasP2 && (
@@ -844,6 +931,18 @@ export default function MainPage() {
                             <span style={{ fontSize: "11px", color: "#94a3b8", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                               {p2Topic}
                             </span>
+                          )}
+                          {m.player2?.score !== null && m.player2?.score !== undefined && (
+                            <div style={{ marginTop: "4px", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: "800", color: "#ffd700" }}>
+                                {m.player2.score} คะแนน
+                              </span>
+                              {m.player2.quota && (
+                                <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "10px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
+                                  🏆 เข้ารอบแห่งปี
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
                       </>
