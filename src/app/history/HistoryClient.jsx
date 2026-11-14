@@ -1197,9 +1197,15 @@ export default function HistoryClient({ isSecretFoty = false }) {
                       color: "#ffffff",
                       margin: "0 0 4px"
                     }}>
-                      {champ.nickname && champ.nickname !== "ปริศนา" && champ.nickname !== "ยังไม่ทราบ"
-                        ? `${champ.nickname} (${champ.name})`
-                        : champ.name}
+                      {(() => {
+                        let name = champ.name;
+                        if (!isSecretFoty && isMystery && name && name.includes("รอบชิงชนะเลิศ")) {
+                          name = name.replace("รอบชิงชนะเลิศ", "รอบแห่งปี");
+                        }
+                        return champ.nickname && champ.nickname !== "ปริศนา" && champ.nickname !== "ยังไม่ทราบ"
+                          ? `${champ.nickname} (${name})`
+                          : name;
+                      })()}
                     </h3>
 
                     {/* Topic */}
@@ -1210,7 +1216,9 @@ export default function HistoryClient({ isSecretFoty = false }) {
                       marginBottom: "10px",
                       minHeight: "20px"
                     }}>
-                      แฟนพันธุ์แท้: {champ.topic}
+                      แฟนพันธุ์แท้: {(!isSecretFoty && isMystery)
+                        ? "รอตัดสินในรอบแห่งปี"
+                        : champ.topic}
                     </div>
 
                     {/* Description */}
@@ -1325,11 +1333,17 @@ export default function HistoryClient({ isSecretFoty = false }) {
               const activeChamp = (data?.champions || []).find((c) => String(c.year) === String(activeYear));
               const isMystery = Number(activeYear) === 2026 && (!activeChamp?.image || !activeChamp?.nickname || activeChamp?.nickname === "ยังไม่ทราบ" || activeChamp?.nickname === "ปริศนา" || (activeChamp?.name && (activeChamp?.name.includes("รอลุ้น") || activeChamp?.name.includes("รอการแข่งขัน"))));
               const champTitle = isMystery
-                ? (activeChamp?.name || "รอการแข่งขันในรอบชิงชนะเลิศ")
+                ? (!isSecretFoty
+                    ? "รอการแข่งขันในรอบแห่งปี"
+                    : (activeChamp?.name || "รอการแข่งขันในรอบชิงชนะเลิศ"))
                 : activeChamp?.nickname
                 ? `${activeChamp.name} (${activeChamp.nickname})`
                 : activeChamp?.name || currentSeason?.info?.championName;
-              const champTopic = isMystery ? "รอตัดสินในรอบชิงชนะเลิศ" : (activeChamp?.topic || currentSeason?.info?.championTopic);
+              const champTopic = isMystery
+                ? (!isSecretFoty
+                    ? "รอตัดสินในรอบแห่งปี"
+                    : (activeChamp?.topic || currentSeason?.info?.championTopic || "รอตัดสินในรอบชิงชนะเลิศ"))
+                : (activeChamp?.topic || currentSeason?.info?.championTopic);
 
               return (
                 <div style={{
