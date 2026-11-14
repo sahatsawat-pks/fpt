@@ -857,6 +857,14 @@ export default function TrialFotyBallotVotePage() {
     details: null,
   });
 
+  const handleCloseFeedbackModal = () => {
+    const isSuccess = feedbackModal.type === "success";
+    setFeedbackModal({ open: false, type: "success", title: "", message: "", details: null });
+    if (isSuccess && typeof window !== "undefined") {
+      window.location.href = "/";
+    }
+  };
+
   // Each rank can hold an array of up to 5 IDs!
   const [ballotRanks, setBallotRanks] = useState({
     "1": [],
@@ -1247,6 +1255,7 @@ export default function TrialFotyBallotVotePage() {
       {/* Animated Result Feedback Modal (Success & Error) */}
       {feedbackModal.open && (
         <div
+          onClick={handleCloseFeedbackModal}
           style={{
             position: "fixed",
             inset: 0,
@@ -1261,6 +1270,7 @@ export default function TrialFotyBallotVotePage() {
           }}
         >
           <div
+            onClick={(e) => e.stopPropagation()}
             style={{
               background:
                 feedbackModal.type === "success"
@@ -1403,44 +1413,41 @@ export default function TrialFotyBallotVotePage() {
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button
                 type="button"
-                onClick={() => setFeedbackModal({ open: false, type: "success", title: "", message: "", details: null })}
+                onClick={handleCloseFeedbackModal}
                 style={{
-                  flex: 1,
-                  padding: "12px 20px",
-                  borderRadius: "10px",
-                  background: "rgba(255, 255, 255, 0.1)",
-                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  width: "100%",
+                  padding: "13px 24px",
+                  borderRadius: "12px",
+                  background:
+                    feedbackModal.type === "success"
+                      ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                      : "rgba(255, 255, 255, 0.12)",
+                  border:
+                    feedbackModal.type === "success"
+                      ? "none"
+                      : "1px solid rgba(255, 255, 255, 0.25)",
                   color: "#ffffff",
-                  fontSize: "14px",
-                  fontWeight: "700",
+                  fontSize: "15px",
+                  fontWeight: "800",
                   cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  boxShadow:
+                    feedbackModal.type === "success"
+                      ? "0 0 25px rgba(16, 185, 129, 0.4)"
+                      : "none",
                 }}
               >
-                ปิดหน้าต่าง
+                {feedbackModal.type === "success" ? (
+                  <>
+                    <span>🏠</span> ปิดและกลับสู่หน้าแรก
+                  </>
+                ) : (
+                  "ปิดหน้าต่าง"
+                )}
               </button>
-              {feedbackModal.type === "success" && (
-                <Link
-                  href="/trial-foty"
-                  style={{
-                    flex: 1.4,
-                    padding: "12px 20px",
-                    borderRadius: "10px",
-                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                    border: "none",
-                    color: "#ffffff",
-                    fontSize: "14px",
-                    fontWeight: "800",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px",
-                    boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)",
-                  }}
-                >
-                  <span>📊</span> ดูตารางคะแนน
-                </Link>
-              )}
             </div>
           </div>
         </div>
