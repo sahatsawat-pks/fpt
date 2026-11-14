@@ -35,6 +35,8 @@ const DEFAULT_SETTINGS = {
   weeklyMatches: [],
   tournamentWeeklyMatches: [],
   showChampionsOnHome: true,
+  tournamentUpdateUpToMatch: "all",
+  fotyUpdateUpToMatch: "all",
 };
 
 function readSettings() {
@@ -103,6 +105,8 @@ export async function GET(request) {
       weeklyMatches: Array.isArray(settings.weeklyMatches) ? settings.weeklyMatches : [],
       tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
       showChampionsOnHome: settings.showChampionsOnHome !== false,
+      tournamentUpdateUpToMatch: settings.tournamentUpdateUpToMatch !== undefined ? settings.tournamentUpdateUpToMatch : "all",
+      fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
     });
   }
 
@@ -130,6 +134,8 @@ export async function GET(request) {
     weeklyMatches: Array.isArray(settings.weeklyMatches) ? settings.weeklyMatches : [],
     tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
     showChampionsOnHome: settings.showChampionsOnHome !== false,
+    tournamentUpdateUpToMatch: settings.tournamentUpdateUpToMatch !== undefined ? settings.tournamentUpdateUpToMatch : "all",
+    fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
   });
 }
 
@@ -310,6 +316,12 @@ export async function POST(request) {
       }
       if (body.showChampionsOnHome !== undefined) {
         newSettings.showChampionsOnHome = Boolean(body.showChampionsOnHome);
+      }
+      if (body.tournamentUpdateUpToMatch !== undefined) {
+        newSettings.tournamentUpdateUpToMatch = body.tournamentUpdateUpToMatch;
+      }
+      if (body.fotyUpdateUpToMatch !== undefined) {
+        newSettings.fotyUpdateUpToMatch = body.fotyUpdateUpToMatch;
       }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);

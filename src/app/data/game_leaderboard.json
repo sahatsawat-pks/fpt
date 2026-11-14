@@ -366,5 +366,101 @@
     "image": "",
     "createdAt": "2026-11-10T15:02:21.389Z",
     "updatedAt": "2026-11-10T15:02:31.337Z"
+  },
+  {
+    "id": "1794402230094",
+    "name": "คุณอินทร์ บุญสิน",
+    "nickname": "อินทร์",
+    "topic": "รายการแฟนพันธุ์แท้",
+    "scores": {
+      "3sec": 20,
+      "qa": 20,
+      "jigsaw": 20,
+      "attribute": 15
+    },
+    "totalScore": 75,
+    "image": "",
+    "createdAt": "2026-11-11T13:03:50.192Z",
+    "updatedAt": "2026-11-11T14:09:56.920Z"
+  },
+  {
+    "id": "1794406918889",
+    "name": "ณชนน ยุงคุณ",
+    "nickname": "เจสัน",
+    "topic": "ซีรีส์ F.R.I.E.N.D.S",
+    "scores": {
+      "3sec": 11,
+      "qa": 20,
+      "jigsaw": 5,
+      "attribute": 0
+    },
+    "totalScore": 36,
+    "image": "",
+    "createdAt": "2026-11-11T14:21:58.970Z",
+    "updatedAt": "2026-11-11T15:35:53.491Z"
+  },
+  {
+    "id": "1794574884243",
+    "name": "ศุภกร นิลสุวรรณ",
+    "nickname": "หมี",
+    "topic": "บุคคลสำคัญของโลก",
+    "scores": {
+      "3sec": 21,
+      "qa": 20,
+      "jigsaw": 20,
+      "attribute": 25
+    },
+    "totalScore": 86,
+    "image": "",
+    "createdAt": "2026-11-13T13:01:24.295Z",
+    "updatedAt": "2026-11-13T13:01:38.603Z"
+  },
+  {
+    "id": "1794574908443",
+    "name": "พัชราภรณ์ ขวัญพรมสี",
+    "nickname": "เอิร์น",
+    "topic": "Disney Twisted-Wonderland",
+    "scores": {
+      "3sec": 16,
+      "qa": 0,
+      "jigsaw": 25,
+      "attribute": 25
+    },
+    "totalScore": 66,
+    "image": "",
+    "createdAt": "2026-11-13T13:01:48.494Z",
+    "updatedAt": "2026-11-13T14:03:05.288Z"
+  },
+  {
+    "id": "1794581778362",
+    "name": "กันตชาติ ศรีเพ็ชร",
+    "nickname": "กัปตัน",
+    "topic": "Valorant Esport",
+    "scores": {
+      "3sec": 18,
+      "qa": 0,
+      "jigsaw": 20,
+      "attribute": 0
+    },
+    "totalScore": 38,
+    "image": "",
+    "createdAt": "2026-11-13T14:56:18.431Z",
+    "updatedAt": "2026-11-13T15:43:16.923Z"
+  },
+  {
+    "id": "1794585407726",
+    "name": "วรพัชร์ พงษ์ประเสริฐ",
+    "nickname": "ไอซ์วอ",
+    "topic": "โฆษณาโทรทัศน์ไทย",
+    "scores": {
+      "3sec": 19,
+      "qa": 20,
+      "jigsaw": 0,
+      "attribute": 20
+    },
+    "totalScore": 59,
+    "image": "",
+    "createdAt": "2026-11-13T15:56:47.776Z",
+    "updatedAt": "2026-11-13T16:41:38.606Z"
   }
 ]

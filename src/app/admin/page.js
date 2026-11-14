@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
+import defaultTournamentData from "../data/tournament.json";
 
 function AdminPhotoPreview({ src, name, size = 36 }) {
   const [err, setErr] = useState(false);
@@ -64,6 +65,18 @@ export default function AdminPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
   const [showChampionsOnHome, setShowChampionsOnHome] = useState(true);
+  const [tournamentUpdateUpToMatch, setTournamentUpdateUpToMatch] = useState("all");
+
+  // All tournament matches list for dropdown selection
+  const allTournamentMatches = useMemo(() => {
+    const list = [];
+    (defaultTournamentData?.matchdays || []).forEach((md) => {
+      (md.matches || []).forEach((m) => {
+        list.push({ ...m, matchdayName: md.name });
+      });
+    });
+    return list.sort((a, b) => (Number(a.matchNumber) || 0) - (Number(b.matchNumber) || 0));
+  }, []);
 
   // Weekly Broadcast Matches States
   const [weeklyMatches, setWeeklyMatches] = useState([]);
@@ -508,6 +521,9 @@ export default function AdminPage() {
         if (data.showChampionsOnHome !== undefined) {
           setShowChampionsOnHome(Boolean(data.showChampionsOnHome));
         }
+        if (data.tournamentUpdateUpToMatch !== undefined) {
+          setTournamentUpdateUpToMatch(data.tournamentUpdateUpToMatch);
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -741,6 +757,7 @@ export default function AdminPage() {
           weeklyMatches,
           tournamentWeeklyMatches,
           showChampionsOnHome,
+          tournamentUpdateUpToMatch,
         }),
       });
       const data = await res.json();
@@ -4711,6 +4728,56 @@ export default function AdminPage() {
 
               return (
                 <div>
+                  {/* Tournament Cutoff Control (shown when tournament sub-tab is active) */}
+                  {weeklySubTab === "tournament" && (
+                    <div
+                      style={{
+                        background: "rgba(0, 229, 255, 0.08)",
+                        border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                        borderRadius: "12px",
+                        padding: "16px 20px",
+                        marginBottom: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexWrap: "wrap",
+                        gap: "14px",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: "15px", fontWeight: "800", color: "#ffd700", display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span>📺</span> เลือกว่าจะให้อัปเดตตารางข้อมูลการแข่งทัวร์นาเมนต์ถึงแมตช์ไหน (/tournament)
+                        </div>
+                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
+                          แมตช์หลังจากคู่ที่เลือกจะถูกซ่อนผลและคะแนนบนหน้า <code>/tournament</code> เพื่อป้องกันสปอยล์ (หน้า <code>/current</code> จะยังเห็นข้อมูลทั้งหมด)
+                        </div>
+                      </div>
+
+                      <select
+                        value={tournamentUpdateUpToMatch}
+                        onChange={(e) => setTournamentUpdateUpToMatch(e.target.value)}
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          background: "#050b14",
+                          border: "1.5px solid #00e5ff",
+                          color: "#ffd700",
+                          fontSize: "14px",
+                          fontWeight: "700",
+                          minWidth: "260px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="all">🌐 แสดงผลทั้งหมด (ทุกคู่ / ทุก Matchday)</option>
+                        {allTournamentMatches.map((m) => (
+                          <option key={m.id || m.matchNumber} value={m.matchNumber}>
+                            คู่ที่ {m.matchNumber} ({m.matchdayName || `กลุ่ม ${m.group}`}): {m.player1?.nickname || m.player1?.name} vs {m.player2?.nickname || m.player2?.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
                     <div style={{ fontSize: "15px", fontWeight: "700", color: "#ffd700" }}>
                       รายการแมตช์ออกอากาศทั้งหมด ({currentList.length} แมตช์)
@@ -5277,7 +5344,7 @@ export default function AdminPage() {
                   </div>
                 )}
                 <div style={{ marginLeft: "28px", paddingTop: "8px", borderTop: "1px dashed rgba(255,255,255,0.1)" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "#e0f2fe" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "#e0f2fe", marginBottom: "10px" }}>
                     <input
                       type="checkbox"
                       checked={showCurrentInNav}
@@ -5286,6 +5353,38 @@ export default function AdminPage() {
                     />
                     📌 แสดงลิงก์ /current ในแถบ Header และเมนู Hamburger
                   </label>
+
+                  {/* Cutoff Selector */}
+                  <div style={{ background: "rgba(0, 0, 0, 0.4)", padding: "10px 12px", borderRadius: "8px", border: "1px solid rgba(0, 229, 255, 0.25)" }}>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ffd700", marginBottom: "4px" }}>
+                      📺 เลือกอัปเดตข้อมูลการแข่งทัวร์นาเมนต์ถึงแมตช์ไหน (/tournament):
+                    </label>
+                    <select
+                      value={tournamentUpdateUpToMatch}
+                      onChange={(e) => setTournamentUpdateUpToMatch(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        background: "#050b14",
+                        border: "1px solid #00e5ff",
+                        color: "#ffd700",
+                        fontSize: "13px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="all">🌐 แสดงผลทั้งหมด (ทุกคู่ / ทุก Matchday)</option>
+                      {allTournamentMatches.map((m) => (
+                        <option key={m.id || m.matchNumber} value={m.matchNumber}>
+                          คู่ที่ {m.matchNumber} ({m.matchdayName || `กลุ่ม ${m.group}`}): {m.player1?.nickname || m.player1?.name} vs {m.player2?.nickname || m.player2?.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "4px", display: "block" }}>
+                      แมตช์หลังจากคู่ที่เลือกจะถูกซ่อนผลและคะแนนบนหน้า <code>/tournament</code>
+                    </span>
+                  </div>
                 </div>
               </div>
 

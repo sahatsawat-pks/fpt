@@ -10,220 +10,220 @@
 
 const GAME_CONFIG = {
     "threeSecondsHeaders": [
-        "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
-        "นี่คือไอเทมที่มีชื่อว่าอะไร",
-        "ชื่อเพลงที่คุณกำลังจะได้ยินต่อไปนี้ ร้องโดยสาวม้าที่มีชื่อว่าอะไร"
+        "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
+        "นี่คือสโลแกนของโฆษณาผลิตภัณฑ์ใด?",
+        "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?"
     ],
     "threeSeconds": [
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/01.png",
             "audio": null,
             "video": null,
-            "answer": "Special Week"
+            "answer": "ฮาตาริ"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/02.png",
             "audio": null,
             "video": null,
-            "answer": "Gold Ship"
+            "answer": "ซีมอน"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/03.png",
             "audio": null,
             "video": null,
-            "answer": "Tokai Teio"
+            "answer": "ไทยประกันชีวิต"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/04.png",
             "audio": null,
             "video": null,
-            "answer": "Agnes Tachyon"
+            "answer": "ฟาร์มเฮ้าส์"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/05.png",
             "audio": null,
             "video": null,
-            "answer": "Vodka"
+            "answer": "สมาร์ทฮาร์ท"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/06.png",
             "audio": null,
             "video": null,
-            "answer": "Twin Turbo"
+            "answer": "ซันวา"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/07.png",
             "audio": null,
             "video": null,
-            "answer": "Tamamo Cross"
+            "answer": "Thai Eng Ink"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/08.png",
             "audio": null,
             "video": null,
-            "answer": "Yamanin Zephyr"
+            "answer": "MK Restaurant"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/09.png",
             "audio": null,
             "video": null,
-            "answer": "Daring Tact"
+            "answer": "7-Eleven"
         },
         {
-            "question": "นี่คือภาพสาวม้าที่มีชื่อว่าอะไร",
+            "question": "นี่คือภาพจากโฆษณาผลิตภัณฑ์ใด?",
             "image": "public/img/10.png",
             "audio": null,
             "video": null,
-            "answer": "Haru Urara"
+            "answer": "AIA"
         },
         {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/11.png",
-            "audio": null,
-            "video": null,
-            "answer": "Alarm Clock"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/12.png",
-            "audio": null,
-            "video": null,
-            "answer": "Rainfall Doll"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/13.png",
-            "audio": null,
-            "video": null,
-            "answer": "Carrot Jelly"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/14.png",
-            "audio": null,
-            "video": null,
-            "answer": "Carats"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/15.png",
-            "audio": null,
-            "video": null,
-            "answer": "Sprint Racing Shoes"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/16.png",
-            "audio": null,
-            "video": null,
-            "answer": "Dream Glimmer"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/17.png",
-            "audio": null,
-            "video": null,
-            "answer": "Book of Hints"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/18.png",
-            "audio": null,
-            "video": null,
-            "answer": "Toughness 30"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/19.png",
-            "audio": null,
-            "video": null,
-            "answer": "Gallery Key"
-        },
-        {
-            "question": "นี่คือไอเทมที่มีชื่อว่าอะไร",
-            "image": "public/img/20.png",
-            "audio": null,
-            "video": null,
-            "answer": "Club Points"
-        },
-        {
-            "question": "Silent Star",
+            "question": "ทุกหยดซ่า",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Silence Suzuka"
+            "answer": "โซดาสิงห์"
         },
         {
-            "question": "BLAZE",
+            "question": "เพราะชีวิตขาดหวานไม่ได้",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Narita Brian"
+            "answer": "ปาร์ตี้"
         },
         {
-            "question": "Sasayaka na Inori",
+            "question": "กรอบเกลียว เคี้ยว...",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Rice Shower"
+            "answer": "โปเต้"
         },
         {
-            "question": "Ai Mai, Kurai",
+            "question": "ไร้กลิ่นติดจาน ไร้สารตกค้าง",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Still In Love"
+            "answer": "น้ำยาล้างจานไลปอน เอฟ"
         },
         {
-            "question": "BRIGHTEST HEART",
+            "question": "พระเอก ตัวจริง",
             "image": null,
             "audio": null,
             "video": null,
-            "answer": "Oguri Cap"
+            "answer": "AJ DVD"
+        },
+        {
+            "question": "ใช้ดม ใช้ทาในหลอดเดียวกัน",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "ยาดมโป๊ยเซียน"
+        },
+        {
+            "question": "ตัดก่อนตาย เตือนก่อนวายวอด",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "เซฟ-ที-คัท"
+        },
+        {
+            "question": "ดีไซน์สวยงาม ทนทาน แข็งแกร่ง",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "ประตู ตู้แขวน บานซิงค์ KING"
+        },
+        {
+            "question": "อร่อย",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "มาม่า"
+        },
+        {
+            "question": "เค็มแต่ดี",
+            "image": null,
+            "audio": null,
+            "video": null,
+            "answer": "ยาสีฟันซอลส์"
+        },
+        {
+            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
+            "image": null,
+            "audio": "public/audio/21.mp3",
+            "video": null,
+            "answer": "สมหวัง เงินสั่งได้"
+        },
+        {
+            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
+            "image": null,
+            "audio": "public/audio/22.mp3",
+            "video": null,
+            "answer": "เมืองไทยประกันชีวิต"
+        },
+        {
+            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
+            "image": null,
+            "audio": "public/audio/23.mp3",
+            "video": null,
+            "answer": "ยัวซ่าแบตเตอรี่"
+        },
+        {
+            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
+            "image": null,
+            "audio": "public/audio/24.mp3",
+            "video": null,
+            "answer": "ม่องเล่ย๊ะ"
+        },
+        {
+            "question": "นี่คือเสียงจากโฆษณาผลิตภัณฑ์ใด?",
+            "image": null,
+            "audio": "public/audio/25.mp3",
+            "video": null,
+            "answer": "แอคแทค"
         }
     ],
     "qa": {
-        "question": "สาวม้าต่างแดนตัวแรกในเกม Uma Musume Pretty Derby มีชื่อว่าอะไร ในเกมเป็นม้าสัญชาติอะไร และตัวจริงเป็นม้าสัญชาติอะไร",
-        "answer": "Montjeu / ฝรั่งเศส / ไอร์แลนด์",
+        "question": "จากโฆษณากาแฟแบล็กอัพ ชุด เจ้านายขายหนังสือพิมพ์ นำแสดงโดยชาลี คดีเด็ด รถที่เจ้านายนั่งต้องรอไฟแดงเป็นเวลากี่วินาทีจนกว่าจะขึ้นไฟเขียว?",
+        "answer": "236 วินาที",
         "choices": [
-            "Montjeu / ฝรั่งเศส / ฝรั่งเศส",
-            "Montjeu / ฝรั่งเศส / ไอร์แลนด์",
-            "Montjeu / ไอร์แลนด์ / ไอร์แลนด์",
-            "Broye / ฝรั่งเศส / ฝรั่งเศส",
-            "Broye / ฝรั่งเศส / เยอรมนี"
+            "217 วินาที",
+            "236 วินาที",
+            "255 วินาที",
+            "274 วินาที",
+            "เป็นไฟแดงที่ไม่มีตัวเลขระบุ"
         ],
         "eliminateMode": "order",
         "eliminateOrder": [
+            5,
             1,
-            4,
-            3
+            4
         ]
     },
     "jigsaw": {
-        "mode": "portrait",
+        "mode": "square",
         "image": "public/img/jigsaw.png",
-        "answer": "Oguri Cap",
-        "question": "หลังจิ๊กซอว์นี้ นี่คือสาวม้าที่มีชื่อว่าอะไร"
+        "answer": "โทนาฟ",
+        "question": "หลังจิ๊กซอว์นี้คือโฆษณาผลิตภัณฑ์ใด?"
     },
     "attribute": {
-        "question": "นี่คือคุณสมบัติของสาวม้าที่มีชื่อว่าอะไร",
+        "question": "นี่คือคุณสมบัติของแบรนด์ / ยี่ห้ออะไร?",
         "clues": [
-            "ม้าต้นแบบเสียชีวิตแล้ว",
-            "ในเกม Umamusume: Pretty Derby อยู่ทีม Sirius",
-            "เป็นม้าประเภท Pace Chaser",
-            "ส่วนสูงน้อยกว่า 150 ซม.",
-            "ม้าต้นแบบเป็นเพศผู้"
+            "เคยเป็นสปอนเซอร์ในรายการเกมโชว์",
+            "เป็นเครือข่ายอินเตอร์เน็ตที่ยังมีให้บริการอยู่ในปัจจุบัน",
+            "ชื่อมี 3 ตัวอักษร",
+            "ชื่อแบรนด์ไม่ใช่ภาษาไทย",
+            "เคยมีการเปลี่ยนโลโก้ของแบรนด์ / ยี่ห้อมาแล้ว"
         ],
-        "answer": "Rice Shower"
+        "answer": "AIS"
     },
     "battle": {
         "player1": {
