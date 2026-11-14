@@ -1105,16 +1105,11 @@ export default function MainPage() {
                             {p1Topic}
                           </span>
                         )}
-                        {m.player1?.score !== null && m.player1?.score !== undefined && (
-                          <div style={{ marginTop: "3px", display: "flex", alignItems: "center", gap: "6px" }}>
-                            <span style={{ fontSize: "12px", fontWeight: "900", color: "#ffd700" }}>
-                              {m.player1.score} คะแนน
+                        {m.player1?.quota && (
+                          <div style={{ marginTop: "3px" }}>
+                            <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "8px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
+                              🏆 เข้ารอบ
                             </span>
-                            {m.player1.quota && (
-                              <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "8px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
-                                🏆 เข้ารอบ
-                              </span>
-                            )}
                           </div>
                         )}
                       </div>
@@ -1181,16 +1176,11 @@ export default function MainPage() {
                               {p2Topic}
                             </span>
                           )}
-                          {m.player2?.score !== null && m.player2?.score !== undefined && (
-                            <div style={{ marginTop: "3px", display: "flex", alignItems: "center", gap: "6px" }}>
-                              <span style={{ fontSize: "12px", fontWeight: "900", color: "#ffd700" }}>
-                                {m.player2.score} คะแนน
+                          {m.player2?.quota && (
+                            <div style={{ marginTop: "3px" }}>
+                              <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "8px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
+                                🏆 เข้ารอบ
                               </span>
-                              {m.player2.quota && (
-                                <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "8px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
-                                  🏆 เข้ารอบ
-                                </span>
-                              )}
                             </div>
                           )}
                         </div>
