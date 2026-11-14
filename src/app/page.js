@@ -940,7 +940,7 @@ export default function MainPage() {
               letterSpacing: "1px",
             }}
           >
-            แฟนพันธุ์แท้แห่งปี 2026
+            {showFotyQualifyingOnHome ? "แฟนพันธุ์แท้แห่งปี 2026" : "แฟนพันธุ์แท้ 2026"}
           </h2>
 
           {/* Action Buttons */}
@@ -2817,7 +2817,7 @@ export default function MainPage() {
         }}
       >
         <p style={{ margin: "0 0 8px 0" }}>
-          FANPANTAE 2026 • แฟนพันธุ์แท้แห่งปี 2026 (Fanmade Community Edition)
+          FANPANTAE 2026 • {showFotyQualifyingOnHome ? "แฟนพันธุ์แท้แห่งปี 2026" : "แฟนพันธุ์แท้ 2026"} (Fanmade Community Edition)
         </p>
         <p style={{ margin: 0, fontSize: "12px", color: "rgba(255, 255, 255, 0.35)" }}>
           สงวนลิขสิทธิ์สำหรับการเผยแพร่และจัดทำขึ้นเพื่อความบันเทิงในกลุ่มแฟนพันธุ์แท้

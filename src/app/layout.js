@@ -30,8 +30,8 @@ const lexend = Lexend({
 });
 
 export const metadata = {
-  title: "แฟนพันธุ์แท้แห่งปี 2026 | Fanpantae 2026",
-  description: "การแข่งขันแฟนพันธุ์แท้แห่งปี 2026 - ระบบแข่งขัน ตารางคะแนน และจำลองการจับสลาก",
+  title: "แฟนพันธุ์แท้ 2026 | Fanpantae 2026",
+  description: "การแข่งขันแฟนพันธุ์แท้ 2026 - ระบบแข่งขัน ตารางคะแนน และจำลองการจับสลาก",
   icons: {
     icon: [
       { url: "/favicon.ico" },
