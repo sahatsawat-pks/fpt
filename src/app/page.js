@@ -328,7 +328,7 @@ export default function MainPage() {
                 textDecoration: "none",
               }}
             >
-              Admin เท่านั้น
+              Admin
             </Link>
           </div>
 
