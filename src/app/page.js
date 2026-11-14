@@ -139,7 +139,7 @@ export default function MainPage() {
         id: `ep-${ep.episode}`,
         episode: `ตอนที่ ${ep.episode}`,
         episodeNum: ep.episode,
-        title: c1 && c2 ? `${c1.nickname} ปะทะ ${c2.nickname}` : c1?.nickname || `ตอนที่ ${ep.episode}`,
+        title: c1 && c2 ? `${c1.nickname} & ${c2.nickname}` : c1?.nickname || `ตอนที่ ${ep.episode}`,
         airDate,
         replayUrl,
         status,
@@ -171,11 +171,11 @@ export default function MainPage() {
     });
   }, [historyState, fotyAirUpToEpisode, fotyBroadcastCustoms]);
 
-  // Episodes shown on Homepage: completed ones + next upcoming episode
+  // Episodes shown on Homepage: only completed/aired episodes up to fotyAirUpToEpisode (no upcoming episode)
   const visibleWeeklyMatches = useMemo(() => {
     if (!dataLoaded) return [];
     const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
-    return fotyWeeklyEpisodes.filter((ep) => ep.episodeNum <= maxEp + 1);
+    return fotyWeeklyEpisodes.filter((ep) => ep.episodeNum <= maxEp);
   }, [fotyWeeklyEpisodes, fotyAirUpToEpisode, dataLoaded]);
 
   // Warmup contestants: contestants that have warmupSchedule
@@ -792,7 +792,7 @@ export default function MainPage() {
                           letterSpacing: "0.5px",
                         }}
                       >
-                        {m.episode || `คู่ที่ ${idx + 1}`}
+                        {m.episode || `ตอนที่ ${idx + 1}`}
                       </span>
 
                       {m.status === "completed" && (
@@ -810,40 +810,12 @@ export default function MainPage() {
                           ✓ ออกอากาศแล้ว
                         </span>
                       )}
-                      {m.status === "next" && (
-                        <span
-                          style={{
-                            background: "rgba(250, 173, 20, 0.2)",
-                            border: "1px solid #faad14",
-                            color: "#ffd700",
-                            fontSize: "11px",
-                            fontWeight: "800",
-                            padding: "2px 8px",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          ⏳ ตอนถัดไป
-                        </span>
-                      )}
-                      {(!m.status || m.status === "upcoming") && (
-                        <span
-                          style={{
-                            background: "rgba(250, 173, 20, 0.15)",
-                            border: "1px solid rgba(250, 173, 20, 0.5)",
-                            color: "#faad14",
-                            fontSize: "11px",
-                            fontWeight: "700",
-                            padding: "2px 8px",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          ⏳ เร็วๆ นี้
-                        </span>
-                      )}
                     </div>
 
                     <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#ffffff", margin: "0 0 8px 0" }}>
-                      {m.title || (hasP2 ? `${p1Name} ปะทะ ${p2Name}` : `${p1Name} (${p1Topic || "แฟนพันธุ์แท้"})`)}
+                      {hasP2
+                        ? `${p1Name} & ${p2Name}`
+                        : `${p1Name} (${p1Topic || "แฟนพันธุ์แท้"})`}
                     </h3>
 
                     <div
@@ -869,13 +841,24 @@ export default function MainPage() {
                     )}
                   </div>
 
-                  {/* Center: Contestants */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: "0 1 auto" }}>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "90px" }}>
+                  {/* Center: Contestants (Individual Play - เล่นใครเล่นมัน) */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        background: "rgba(0, 0, 0, 0.35)",
+                        border: "1px solid rgba(0, 229, 255, 0.25)",
+                        borderRadius: "14px",
+                        padding: "10px 14px",
+                        minWidth: "170px",
+                      }}
+                    >
                       <div
                         style={{
-                          width: "56px",
-                          height: "56px",
+                          width: "48px",
+                          height: "48px",
                           borderRadius: "50%",
                           border: "2px solid #00e5ff",
                           overflow: "hidden",
@@ -883,79 +866,91 @@ export default function MainPage() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          marginBottom: "4px",
+                          flexShrink: 0,
                         }}
                       >
                         {p1Photo ? (
                           <img src={p1Photo} alt={p1Name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         ) : (
-                          <span style={{ fontSize: "24px" }}>👤</span>
+                          <span style={{ fontSize: "22px" }}>👤</span>
                         )}
                       </div>
-                      <span style={{ fontSize: "14px", fontWeight: "700", color: "#e0f2fe" }}>{p1Name}</span>
-                      {p1Topic && (
-                        <span style={{ fontSize: "11px", color: "#94a3b8", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {p1Topic}
-                        </span>
-                      )}
-                      {m.player1?.score !== null && m.player1?.score !== undefined && (
-                        <div style={{ marginTop: "4px", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-                          <span style={{ fontSize: "12px", fontWeight: "800", color: "#ffd700" }}>
-                            {m.player1.score} คะแนน
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p1Name}</span>
+                        {p1Topic && (
+                          <span style={{ fontSize: "11px", color: "#94a3b8", maxWidth: "130px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {p1Topic}
                           </span>
-                          {m.player1.quota && (
-                            <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "10px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
-                              🏆 เข้ารอบแห่งปี
+                        )}
+                        {m.player1?.score !== null && m.player1?.score !== undefined && (
+                          <div style={{ marginTop: "3px", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "12px", fontWeight: "900", color: "#ffd700" }}>
+                              {m.player1.score} คะแนน
                             </span>
-                          )}
-                        </div>
-                      )}
+                            {m.player1.quota && (
+                              <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "8px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
+                                🏆 เข้ารอบ
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {hasP2 && (
-                      <>
-                        <div style={{ fontSize: "16px", fontWeight: "900", color: "#ff4d4f" }}>VS</div>
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "90px" }}>
-                          <div
-                            style={{
-                              width: "56px",
-                              height: "56px",
-                              borderRadius: "50%",
-                              border: "2px solid #ff4d4f",
-                              overflow: "hidden",
-                              background: "#081020",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              marginBottom: "4px",
-                            }}
-                          >
-                            {p2Photo ? (
-                              <img src={p2Photo} alt={p2Name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                            ) : (
-                              <span style={{ fontSize: "24px" }}>👤</span>
-                            )}
-                          </div>
-                          <span style={{ fontSize: "14px", fontWeight: "700", color: "#e0f2fe" }}>{p2Name}</span>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          background: "rgba(0, 0, 0, 0.35)",
+                          border: "1px solid rgba(0, 229, 255, 0.25)",
+                          borderRadius: "14px",
+                          padding: "10px 14px",
+                          minWidth: "170px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "48px",
+                            height: "48px",
+                            borderRadius: "50%",
+                            border: "2px solid #00e5ff",
+                            overflow: "hidden",
+                            background: "#081020",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {p2Photo ? (
+                            <img src={p2Photo} alt={p2Name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ) : (
+                            <span style={{ fontSize: "22px" }}>👤</span>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p2Name}</span>
                           {p2Topic && (
-                            <span style={{ fontSize: "11px", color: "#94a3b8", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            <span style={{ fontSize: "11px", color: "#94a3b8", maxWidth: "130px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                               {p2Topic}
                             </span>
                           )}
                           {m.player2?.score !== null && m.player2?.score !== undefined && (
-                            <div style={{ marginTop: "4px", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-                              <span style={{ fontSize: "12px", fontWeight: "800", color: "#ffd700" }}>
+                            <div style={{ marginTop: "3px", display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: "900", color: "#ffd700" }}>
                                 {m.player2.score} คะแนน
                               </span>
                               {m.player2.quota && (
-                                <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "10px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
-                                  🏆 เข้ารอบแห่งปี
+                                <span style={{ fontSize: "10px", fontWeight: "800", color: "#86efac", background: "rgba(82, 196, 26, 0.2)", padding: "1px 6px", borderRadius: "8px", border: "1px solid rgba(82, 196, 26, 0.4)" }}>
+                                  🏆 เข้ารอบ
                                 </span>
                               )}
                             </div>
                           )}
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
 
