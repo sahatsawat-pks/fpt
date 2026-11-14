@@ -175,6 +175,17 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
   const topicRankings = data?.topicRankings || [];
   const checklist = data?.checklist || [];
 
+  // Auto-switch to an existing matchday if currently selected one is not in matchdays
+  useEffect(() => {
+    if (matchdays.length > 0 && !matchdays.some((m) => m.id === selectedMatchday)) {
+      setSelectedMatchday(matchdays[matchdays.length - 1].id);
+    }
+  }, [matchdays, selectedMatchday]);
+
+  const completedMDCount = useMemo(() => {
+    return matchdays.filter((md) => md.matches && md.matches.length > 0 && md.matches.every((m) => m.status === "completed")).length;
+  }, [matchdays]);
+
   // Contestants list with live topics and stats merged from standings
   const contestants = useMemo(() => {
     const rawContestants = data?.contestants || [];
@@ -667,22 +678,6 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
             >
               หน้าแรก
             </Link>
-            {navSettings.showFotyInNav && (
-              <Link
-                href="/fan-of-the-year"
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  color: "#e0f2fe",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                  transition: "background 0.2s",
-                }}
-              >
-                ตารางคะแนนแห่งปี
-              </Link>
-            )}
             <Link
               href="/history"
               style={{
@@ -715,24 +710,6 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
             >
               <span>⚔️</span> ทัวร์นาเมนต์
             </Link>
-            {navSettings.showCurrentInNav && (
-              <Link
-                href="/current"
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  background: "linear-gradient(90deg, rgba(0, 229, 255, 0.35) 0%, rgba(0, 150, 200, 0.25) 100%)",
-                  border: "1.5px solid #00e5ff",
-                  color: "#ffffff",
-                  fontWeight: "800",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                  boxShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
-                }}
-              >
-                ตารางปัจจุบัน
-              </Link>
-            )}
             <Link
               href="/draw"
               style={{
@@ -817,27 +794,6 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
             >
               <span style={{ fontSize: "16px" }}>🏠</span> หน้าแรก
             </Link>
-            {navSettings.showFotyInNav && (
-              <Link
-                href="/fan-of-the-year"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: "11px 16px",
-                  borderRadius: "10px",
-                  background: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.12)",
-                  color: "#e0f2fe",
-                  fontWeight: "700",
-                  fontSize: "15px",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนแห่งปี
-              </Link>
-            )}
             <Link
               href="/history"
               onClick={() => setMobileMenuOpen(false)}
@@ -876,27 +832,6 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
             >
               <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
             </Link>
-            {navSettings.showCurrentInNav && (
-              <Link
-                href="/current"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: "11px 16px",
-                  borderRadius: "10px",
-                  background: "rgba(0, 229, 255, 0.25)",
-                  border: "1px solid #00e5ff",
-                  color: "#ffffff",
-                  fontWeight: "800",
-                  fontSize: "15px",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ fontSize: "16px" }}>📊</span> ตารางทัวร์นาเมนต์ปัจจุบัน
-              </Link>
-            )}
             <Link
               href="/draw"
               onClick={() => setMobileMenuOpen(false)}
@@ -1682,8 +1617,12 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
                 }}
               >
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontWeight: "600" }}>รอบการแข่งขัน</div>
-                <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>6 Matchdays</div>
-                <div style={{ fontSize: "10px", color: "#86efac", fontWeight: "700" }}>แข่งแล้ว 3 แมตช์เดย์</div>
+                <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", fontFamily: "var(--font-num)" }}>
+                  {matchdays.length} Matchdays
+                </div>
+                <div style={{ fontSize: "10px", color: "#86efac", fontWeight: "700" }}>
+                  {completedMDCount > 0 ? `แข่งแล้ว ${completedMDCount} แมตช์เดย์` : "รอเริ่มการแข่งขัน"}
+                </div>
               </div>
 
               <div
@@ -1810,25 +1749,13 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
               border: "1px solid rgba(0, 229, 255, 0.4)",
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: "10px",
+              justifyContent: "center",
               fontSize: "13px",
             }}
           >
             <span style={{ color: "#ffd700", fontWeight: "700" }}>
               📺 ข้อมูลการแข่งขันอัปเดตถึงคู่ที่: <b style={{ color: "#00e5ff" }}>#{cutoffMatch}</b>
             </span>
-            <Link
-              href="/current"
-              style={{
-                color: "#80d0ff",
-                fontWeight: "700",
-                textDecoration: "underline",
-              }}
-            >
-              เข้าดูตารางสดเต็มรูปแบบ (/current) →
-            </Link>
           </div>
         )}
 

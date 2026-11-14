@@ -186,23 +186,6 @@ export default function MainPage() {
               หน้าแรก
             </Link>
 
-            {showFotyInNav && (
-              <Link
-                href="/fan-of-the-year"
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  color: "#e0f2fe",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                  transition: "background 0.2s",
-                }}
-              >
-                ตารางคะแนนแห่งปี
-              </Link>
-            )}
-
             <Link
               href="/history"
               style={{
@@ -238,22 +221,6 @@ export default function MainPage() {
             >
               <span>⚔️</span> ทัวร์นาเมนต์
             </Link>
-
-            {showCurrentInNav && (
-              <Link
-                href="/current"
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  color: "#e0f2fe",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                }}
-              >
-                ตารางปัจจุบัน
-              </Link>
-            )}
 
             <Link
               href="/draw"
@@ -341,28 +308,6 @@ export default function MainPage() {
               <span style={{ fontSize: "16px" }}>🏠</span> หน้าแรก
             </Link>
 
-            {showFotyInNav && (
-              <Link
-                href="/fan-of-the-year"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: "11px 16px",
-                  borderRadius: "10px",
-                  background: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.12)",
-                  color: "#e0f2fe",
-                  fontWeight: "700",
-                  fontSize: "15px",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนแห่งปี
-              </Link>
-            )}
-
             <Link
               href="/history"
               onClick={() => setMobileMenuOpen(false)}
@@ -402,28 +347,6 @@ export default function MainPage() {
             >
               <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
             </Link>
-
-            {showCurrentInNav && (
-              <Link
-                href="/current"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: "11px 16px",
-                  borderRadius: "10px",
-                  background: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.12)",
-                  color: "#e0f2fe",
-                  fontWeight: "700",
-                  fontSize: "15px",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ fontSize: "16px" }}>📊</span> ตารางทัวร์นาเมนต์ปัจจุบัน
-              </Link>
-            )}
 
             <Link
               href="/draw"
@@ -650,29 +573,6 @@ export default function MainPage() {
 
           {/* Action Buttons */}
           <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
-            {showFotyInNav && (
-              <Link
-                href="/fan-of-the-year"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 28px",
-                  borderRadius: "30px",
-                  background: "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
-                  color: "#030812",
-                  fontSize: "16px",
-                  fontWeight: "800",
-                  textDecoration: "none",
-                  boxShadow: "0 0 25px rgba(0, 229, 255, 0.6)",
-                  transition: "transform 0.2s ease",
-                  cursor: "pointer",
-                }}
-              >
-                📊 ตารางคะแนนแข่งขันแห่งปี
-              </Link>
-            )}
-
             <a
               href="#weekly-schedule"
               style={{

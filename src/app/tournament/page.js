@@ -34,32 +34,21 @@ export default async function TournamentPage() {
     const maxMatchNum = Number(cutoff);
     try {
       const cloned = JSON.parse(JSON.stringify(data));
+      const filteredMatchdays = [];
       (cloned.matchdays || []).forEach((md) => {
-        (md.matches || []).forEach((m) => {
+        const validMatches = (md.matches || []).filter((m) => {
           const num = Number(m.matchNumber) || 999;
-          if (num > maxMatchNum) {
-            m.status = "upcoming";
-            delete m.winner;
-            if (m.player1) {
-              m.player1.scores = { "3sec": null, qa: null, jigsaw: null, attribute: null };
-              m.player1.sum = 0;
-              m.player1.categoryPoints = 0;
-              m.player1.leaguePoint = 0;
-            }
-            if (m.player2) {
-              m.player2.scores = { "3sec": null, qa: null, jigsaw: null, attribute: null };
-              m.player2.sum = 0;
-              m.player2.categoryPoints = 0;
-              m.player2.leaguePoint = 0;
-            }
-            delete m.categoryPointsBeforeBonus;
-            delete m.rawSumBonusWinner;
-          }
+          return num <= maxMatchNum;
         });
+        if (validMatches.length > 0) {
+          md.matches = validMatches;
+          filteredMatchdays.push(md);
+        }
       });
+      cloned.matchdays = filteredMatchdays;
       displayData = syncTournamentData(cloned);
     } catch (err) {
-      console.error("Error masking tournament matches for cutoff:", err);
+      console.error("Error filtering tournament matches for cutoff:", err);
       displayData = data;
     }
   }

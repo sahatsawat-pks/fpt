@@ -4749,7 +4749,7 @@ export default function AdminPage() {
                           <span>📺</span> เลือกว่าจะให้อัปเดตตารางข้อมูลการแข่งทัวร์นาเมนต์ถึงแมตช์ไหน (/tournament)
                         </div>
                         <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginTop: "4px" }}>
-                          แมตช์หลังจากคู่ที่เลือกจะถูกซ่อนผลและคะแนนบนหน้า <code>/tournament</code> เพื่อป้องกันสปอยล์ (หน้า <code>/current</code> จะยังเห็นข้อมูลทั้งหมด)
+                          แมตช์เดย์และคู่แข่งขันหลังจากคู่ที่เลือกจะไม่ถูกแสดงบนหน้า <code>/tournament</code> เพื่อป้องกันสปอยล์ (หน้า <code>/tournament/current</code> จะยังเห็นข้อมูลสดทั้งหมด)
                         </div>
                       </div>
 
@@ -5291,20 +5291,12 @@ export default function AdminPage() {
                     />
                   </div>
                 )}
-                <div style={{ marginLeft: "28px", paddingTop: "8px", borderTop: "1px dashed rgba(255,255,255,0.1)" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "#e0f2fe" }}>
-                    <input
-                      type="checkbox"
-                      checked={showFotyInNav}
-                      onChange={(e) => setShowFotyInNav(e.target.checked)}
-                      style={{ width: "16px", height: "16px", accentColor: "#00e5ff", cursor: "pointer" }}
-                    />
-                    📌 แสดงลิงก์ /fan-of-the-year ในแถบ Header และเมนู Hamburger
-                  </label>
+                <div style={{ marginLeft: "28px", paddingTop: "8px", borderTop: "1px dashed rgba(255,255,255,0.1)", fontSize: "12px", color: "rgba(0, 229, 255, 0.8)" }}>
+                  🔒 หน้าลับ: เข้าถึงผ่าน URL <code>/fan-of-the-year</code> โดยตรง (ไม่มีปุ่มหรือ Hyperlink บนหน้าเว็บ เพื่อป้องกันสปอยล์)
                 </div>
               </div>
 
-              {/* Tournament Current (/current) Protection & Nav */}
+              {/* Tournament Current (/tournament/current) Protection */}
               <div style={{
                 background: "rgba(0, 15, 30, 0.6)",
                 border: "1px solid rgba(0, 229, 255, 0.3)",
@@ -5319,10 +5311,10 @@ export default function AdminPage() {
                     onChange={(e) => setProtectCurrent(e.target.checked)}
                     style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
                   />
-                  ⚔️ เปิดระบบรหัสผ่านสำหรับหน้าตารางปัจจุบันทัวร์นาเมนต์ (/current)
+                  ⚔️ เปิดระบบรหัสผ่านสำหรับหน้าตารางปัจจุบันทัวร์นาเมนต์ (/tournament/current)
                 </label>
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 10px 28px" }}>
-                  เมื่อเปิดใช้งาน ผู้เข้าชมหน้า /current จะต้องกรอกรหัสผ่านก่อนเข้าดูตารางคะแนนและผลการแข่งทัวร์นาเมนต์ปัจจุบัน (กันสปอย)
+                  เมื่อเปิดใช้งาน ผู้เข้าชมหน้า /tournament/current จะต้องกรอกรหัสผ่านก่อนเข้าดูตารางคะแนนและผลการแข่งทัวร์นาเมนต์สดทั้งหมด (กันสปอยล์)
                 </p>
                 {protectCurrent && (
                   <div style={{ marginLeft: "28px", marginBottom: "12px" }}>
@@ -5330,7 +5322,7 @@ export default function AdminPage() {
                       type="text"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="กำหนดรหัสผ่านสำหรับหน้าตารางปัจจุบันทัวร์นาเมนต์ (/current)..."
+                      placeholder="กำหนดรหัสผ่านสำหรับหน้าตารางปัจจุบันทัวร์นาเมนต์ (/tournament/current)..."
                       style={{
                         width: "100%",
                         padding: "10px 12px",
@@ -5343,21 +5335,14 @@ export default function AdminPage() {
                     />
                   </div>
                 )}
-                <div style={{ marginLeft: "28px", paddingTop: "8px", borderTop: "1px dashed rgba(255,255,255,0.1)" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "#e0f2fe", marginBottom: "10px" }}>
-                    <input
-                      type="checkbox"
-                      checked={showCurrentInNav}
-                      onChange={(e) => setShowCurrentInNav(e.target.checked)}
-                      style={{ width: "16px", height: "16px", accentColor: "#00e5ff", cursor: "pointer" }}
-                    />
-                    📌 แสดงลิงก์ /current ในแถบ Header และเมนู Hamburger
-                  </label>
+                <div style={{ marginLeft: "28px", paddingTop: "8px", borderTop: "1px dashed rgba(255,255,255,0.1)", fontSize: "12px", color: "rgba(0, 229, 255, 0.8)", marginBottom: "10px" }}>
+                  🔒 หน้าลับ: เข้าถึงผ่าน URL <code>/tournament/current</code> โดยตรง (ไม่มีปุ่มหรือ Hyperlink บนหน้าเว็บ เพื่อป้องกันสปอยล์)
+                </div>
 
-                  {/* Cutoff Selector */}
-                  <div style={{ background: "rgba(0, 0, 0, 0.4)", padding: "10px 12px", borderRadius: "8px", border: "1px solid rgba(0, 229, 255, 0.25)" }}>
-                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ffd700", marginBottom: "4px" }}>
-                      📺 เลือกอัปเดตข้อมูลการแข่งทัวร์นาเมนต์ถึงแมตช์ไหน (/tournament):
+                {/* Cutoff Selector */}
+                <div style={{ background: "rgba(0, 0, 0, 0.4)", padding: "10px 12px", borderRadius: "8px", border: "1px solid rgba(0, 229, 255, 0.25)" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ffd700", marginBottom: "4px" }}>
+                    📺 เลือกอัปเดตข้อมูลการแข่งทัวร์นาเมนต์ถึงแมตช์ไหน (/tournament):
                     </label>
                     <select
                       value={tournamentUpdateUpToMatch}
@@ -5386,7 +5371,6 @@ export default function AdminPage() {
                     </span>
                   </div>
                 </div>
-              </div>
 
               {/* Ball Draw (/draw) Password Protection */}
               <div style={{

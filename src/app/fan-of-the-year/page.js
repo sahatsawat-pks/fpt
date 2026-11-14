@@ -1042,21 +1042,6 @@ export default function MainPage() {
             >
               <span>⚔️</span> ทัวร์นาเมนต์
             </Link>
-            {showCurrentInNav && (
-              <Link
-                href="/current"
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  color: "#e0f2fe",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                }}
-              >
-                ตารางปัจจุบัน
-              </Link>
-            )}
             <Link
               href="/draw"
               style={{
@@ -1198,27 +1183,6 @@ export default function MainPage() {
             >
               <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
             </Link>
-            {showCurrentInNav && (
-              <Link
-                href="/current"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: "11px 16px",
-                  borderRadius: "10px",
-                  background: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.12)",
-                  color: "#e0f2fe",
-                  fontWeight: "700",
-                  fontSize: "15px",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px"
-                }}
-              >
-                <span style={{ fontSize: "16px" }}>📊</span> ตารางทัวร์นาเมนต์ปัจจุบัน
-              </Link>
-            )}
             <Link
               href="/draw"
               onClick={() => setMobileMenuOpen(false)}
