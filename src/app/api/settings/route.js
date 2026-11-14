@@ -34,6 +34,7 @@ const DEFAULT_SETTINGS = {
   showCurrentInNav: true,
   weeklyMatches: [],
   tournamentWeeklyMatches: [],
+  showChampionsOnHome: true,
 };
 
 function readSettings() {
@@ -101,6 +102,7 @@ export async function GET(request) {
       showCurrentInNav: settings.showCurrentInNav !== false,
       weeklyMatches: Array.isArray(settings.weeklyMatches) ? settings.weeklyMatches : [],
       tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
+      showChampionsOnHome: settings.showChampionsOnHome !== false,
     });
   }
 
@@ -127,6 +129,7 @@ export async function GET(request) {
     showCurrentInNav: settings.showCurrentInNav !== false,
     weeklyMatches: Array.isArray(settings.weeklyMatches) ? settings.weeklyMatches : [],
     tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
+    showChampionsOnHome: settings.showChampionsOnHome !== false,
   });
 }
 
@@ -305,6 +308,9 @@ export async function POST(request) {
       if (body.tournamentWeeklyMatches !== undefined && Array.isArray(body.tournamentWeeklyMatches)) {
         newSettings.tournamentWeeklyMatches = body.tournamentWeeklyMatches;
       }
+      if (body.showChampionsOnHome !== undefined) {
+        newSettings.showChampionsOnHome = Boolean(body.showChampionsOnHome);
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -339,6 +345,7 @@ export async function POST(request) {
           showCurrentInNav: newSettings.showCurrentInNav !== false,
           weeklyMatches: newSettings.weeklyMatches || [],
           tournamentWeeklyMatches: newSettings.tournamentWeeklyMatches || [],
+          showChampionsOnHome: newSettings.showChampionsOnHome !== false,
         },
       });
     }

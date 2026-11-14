@@ -39,6 +39,7 @@ export default function MainPage() {
   const [weeklyMatches, setWeeklyMatches] = useState([]);
   const [showFotyInNav, setShowFotyInNav] = useState(true);
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
+  const [showChampionsOnHome, setShowChampionsOnHome] = useState(true);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeVideoModal, setActiveVideoModal] = useState(null);
@@ -52,6 +53,7 @@ export default function MainPage() {
         if (data && data.success) {
           setShowFotyInNav(data.showFotyInNav !== false);
           setShowCurrentInNav(data.showCurrentInNav !== false);
+          setShowChampionsOnHome(data.showChampionsOnHome !== false);
           if (Array.isArray(data.weeklyMatches)) {
             setWeeklyMatches(data.weeklyMatches);
           }
@@ -548,24 +550,26 @@ export default function MainPage() {
               <span>🗓️</span> โปรแกรมออกอากาศประจำสัปดาห์
             </a>
 
-            <a
-              href="#champions"
-              style={{
-                padding: "14px 26px",
-                borderRadius: "12px",
-                background: "rgba(255, 215, 0, 0.1)",
-                border: "1.5px solid rgba(255, 215, 0, 0.4)",
-                color: "#ffd700",
-                fontWeight: "700",
-                fontSize: "15px",
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <span>🏆</span> ทำเนียบแชมป์ (4 คน)
-            </a>
+            {showChampionsOnHome && (
+              <a
+                href="#champions"
+                style={{
+                  padding: "14px 26px",
+                  borderRadius: "12px",
+                  background: "rgba(255, 215, 0, 0.1)",
+                  border: "1.5px solid rgba(255, 215, 0, 0.4)",
+                  color: "#ffd700",
+                  fontWeight: "700",
+                  fontSize: "15px",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <span>🏆</span> ทำเนียบแชมป์ (4 คน)
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -573,209 +577,211 @@ export default function MainPage() {
       {/* ========================================================
           3. SECTION: ทำเนียบแชมป์ (4 คน) - HALL OF FAME
          ======================================================== */}
-      <section
-        id="champions"
-        style={{
-          maxWidth: "1320px",
-          margin: "0 auto",
-          padding: "60px 20px 40px 20px",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "5px 16px",
-              borderRadius: "50px",
-              background: "rgba(255, 215, 0, 0.12)",
-              border: "1px solid rgba(255, 215, 0, 0.35)",
-              color: "#ffd700",
-              fontSize: "13px",
-              fontWeight: "800",
-              letterSpacing: "1px",
-              marginBottom: "12px",
-            }}
-          >
-            <span>🏆</span> HALL OF FAME
-          </div>
-          <h2
-            style={{
-              fontSize: "clamp(26px, 4vw, 38px)",
-              fontWeight: "900",
-              color: "#ffffff",
-              margin: "0 0 10px 0",
-            }}
-          >
-            ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (4 คน)
-          </h2>
-          <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "600px", margin: "0 auto" }}>
-            4 สหายผู้คว้าชัยชนะสูงสุดในประวัติศาสตร์แฟนพันธุ์แท้แห่งปีฉบับ Fanmade
-          </p>
-        </div>
-
-        {/* 4 Champions Grid */}
-        <div
+      {showChampionsOnHome && (
+        <section
+          id="champions"
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "24px",
-            marginBottom: "36px",
+            maxWidth: "1320px",
+            margin: "0 auto",
+            padding: "60px 20px 40px 20px",
           }}
         >
-          {FOUR_CHAMPIONS.map((champ) => {
-            const optimizedPhoto = getOptimizedImageUrl(champ.image, 320);
-            return (
-              <div
-                key={champ.year}
-                style={{
-                  background: "linear-gradient(145deg, rgba(16, 28, 54, 0.95) 0%, rgba(6, 14, 28, 0.95) 100%)",
-                  border: "1.5px solid rgba(255, 215, 0, 0.35)",
-                  borderRadius: "20px",
-                  padding: "24px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  position: "relative",
-                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
-                  transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
-                }}
-              >
-                {/* Year Badge */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "16px",
-                    left: "16px",
-                    background: "linear-gradient(135deg, #ffd700 0%, #d48806 100%)",
-                    color: "#050b14",
-                    fontSize: "13px",
-                    fontWeight: "900",
-                    padding: "3px 12px",
-                    borderRadius: "20px",
-                    boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
-                  }}
-                >
-                  {champ.year}
-                </div>
+          <div style={{ textAlign: "center", marginBottom: "40px" }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "5px 16px",
+                borderRadius: "50px",
+                background: "rgba(255, 215, 0, 0.12)",
+                border: "1px solid rgba(255, 215, 0, 0.35)",
+                color: "#ffd700",
+                fontSize: "13px",
+                fontWeight: "800",
+                letterSpacing: "1px",
+                marginBottom: "12px",
+              }}
+            >
+              <span>🏆</span> HALL OF FAME
+            </div>
+            <h2
+              style={{
+                fontSize: "clamp(26px, 4vw, 38px)",
+                fontWeight: "900",
+                color: "#ffffff",
+                margin: "0 0 10px 0",
+              }}
+            >
+              ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (4 คน)
+            </h2>
+            <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "600px", margin: "0 auto" }}>
+              4 สหายผู้คว้าชัยชนะสูงสุดในประวัติศาสตร์แฟนพันธุ์แท้แห่งปีฉบับ Fanmade
+            </p>
+          </div>
 
-                {/* Champion Photo */}
-                <div
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    borderRadius: "50%",
-                    border: "3px solid #ffd700",
-                    boxShadow: "0 0 20px rgba(255, 215, 0, 0.35)",
-                    overflow: "hidden",
-                    margin: "12px 0 16px 0",
-                    background: "#0a1324",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {optimizedPhoto ? (
-                    <img
-                      src={optimizedPhoto}
-                      alt={champ.nickname || champ.name}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: "top center",
-                      }}
-                    />
-                  ) : (
-                    <span style={{ fontSize: "40px" }}>👤</span>
-                  )}
-                </div>
-
-                {/* Nickname & Full Name */}
-                <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", marginBottom: "4px" }}>
-                  {champ.nickname || champ.name}
-                </div>
-                <div style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.75)", marginBottom: "12px" }}>
-                  {champ.name}
-                </div>
-
-                {/* Topic Pill */}
-                <div
-                  style={{
-                    background: "rgba(0, 229, 255, 0.12)",
-                    border: "1px solid rgba(0, 229, 255, 0.35)",
-                    color: "#00e5ff",
-                    padding: "4px 14px",
-                    borderRadius: "20px",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    marginBottom: "14px",
-                    maxWidth: "90%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {champ.topic}
-                </div>
-
-                {/* Badge text */}
-                {champ.badge && (
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      color: "#ffa940",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    {champ.badge}
-                  </div>
-                )}
-
-                {/* Description */}
-                <p
-                  style={{
-                    fontSize: "13px",
-                    color: "rgba(255, 255, 255, 0.65)",
-                    lineHeight: 1.6,
-                    margin: 0,
-                    textAlign: "center",
-                    flexGrow: 1,
-                  }}
-                >
-                  {champ.description}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* View All History Link */}
-        <div style={{ textAlign: "center" }}>
-          <Link
-            href="/history"
+          {/* 4 Champions Grid */}
+          <div
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "12px 28px",
-              borderRadius: "12px",
-              background: "rgba(255, 215, 0, 0.12)",
-              border: "1px solid rgba(255, 215, 0, 0.4)",
-              color: "#ffd700",
-              fontWeight: "700",
-              fontSize: "14px",
-              textDecoration: "none",
-              transition: "all 0.2s ease",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "24px",
+              marginBottom: "36px",
             }}
           >
-            <span>📜</span> ดูประวัติศาสตร์ สถิติ และการแข่งขันทุกปีทั้งหมด →
-          </Link>
-        </div>
-      </section>
+            {FOUR_CHAMPIONS.map((champ) => {
+              const optimizedPhoto = getOptimizedImageUrl(champ.image, 320);
+              return (
+                <div
+                  key={champ.year}
+                  style={{
+                    background: "linear-gradient(145deg, rgba(16, 28, 54, 0.95) 0%, rgba(6, 14, 28, 0.95) 100%)",
+                    border: "1.5px solid rgba(255, 215, 0, 0.35)",
+                    borderRadius: "20px",
+                    padding: "24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    position: "relative",
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
+                    transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+                  }}
+                >
+                  {/* Year Badge */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "16px",
+                      left: "16px",
+                      background: "linear-gradient(135deg, #ffd700 0%, #d48806 100%)",
+                      color: "#050b14",
+                      fontSize: "13px",
+                      fontWeight: "900",
+                      padding: "3px 12px",
+                      borderRadius: "20px",
+                      boxShadow: "0 0 10px rgba(255, 215, 0, 0.4)",
+                    }}
+                  >
+                    {champ.year}
+                  </div>
+
+                  {/* Champion Photo */}
+                  <div
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      borderRadius: "50%",
+                      border: "3px solid #ffd700",
+                      boxShadow: "0 0 20px rgba(255, 215, 0, 0.35)",
+                      overflow: "hidden",
+                      margin: "12px 0 16px 0",
+                      background: "#0a1324",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {optimizedPhoto ? (
+                      <img
+                        src={optimizedPhoto}
+                        alt={champ.nickname || champ.name}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          objectPosition: "top center",
+                        }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: "40px" }}>👤</span>
+                    )}
+                  </div>
+
+                  {/* Nickname & Full Name */}
+                  <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", marginBottom: "4px" }}>
+                    {champ.nickname || champ.name}
+                  </div>
+                  <div style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.75)", marginBottom: "12px" }}>
+                    {champ.name}
+                  </div>
+
+                  {/* Topic Pill */}
+                  <div
+                    style={{
+                      background: "rgba(0, 229, 255, 0.12)",
+                      border: "1px solid rgba(0, 229, 255, 0.35)",
+                      color: "#00e5ff",
+                      padding: "4px 14px",
+                      borderRadius: "20px",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                      marginBottom: "14px",
+                      maxWidth: "90%",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {champ.topic}
+                  </div>
+
+                  {/* Badge text */}
+                  {champ.badge && (
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: "700",
+                        color: "#ffa940",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      {champ.badge}
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      color: "rgba(255, 255, 255, 0.65)",
+                      lineHeight: 1.6,
+                      margin: 0,
+                      textAlign: "center",
+                      flexGrow: 1,
+                    }}
+                  >
+                    {champ.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* View All History Link */}
+          <div style={{ textAlign: "center" }}>
+            <Link
+              href="/history"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "12px 28px",
+                borderRadius: "12px",
+                background: "rgba(255, 215, 0, 0.12)",
+                border: "1px solid rgba(255, 215, 0, 0.4)",
+                color: "#ffd700",
+                fontWeight: "700",
+                fontSize: "14px",
+                textDecoration: "none",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <span>📜</span> ดูประวัติศาสตร์ สถิติ และการแข่งขันทุกปีทั้งหมด →
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* ========================================================
           4. SECTION: ตารางแข่งขันรอบประจำสัปดาห์ (WEEKLY MATCHES)

@@ -63,6 +63,7 @@ export default function AdminPage() {
   const [protectCurrent, setProtectCurrent] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
+  const [showChampionsOnHome, setShowChampionsOnHome] = useState(true);
 
   // Weekly Broadcast Matches States
   const [weeklyMatches, setWeeklyMatches] = useState([]);
@@ -504,6 +505,9 @@ export default function AdminPage() {
         if (Array.isArray(data.tournamentWeeklyMatches)) {
           setTournamentWeeklyMatches(data.tournamentWeeklyMatches);
         }
+        if (data.showChampionsOnHome !== undefined) {
+          setShowChampionsOnHome(Boolean(data.showChampionsOnHome));
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -736,6 +740,7 @@ export default function AdminPage() {
           showCurrentInNav,
           weeklyMatches,
           tournamentWeeklyMatches,
+          showChampionsOnHome,
         }),
       });
       const data = await res.json();
@@ -5164,6 +5169,20 @@ export default function AdminPage() {
                     />
                   </div>
                 )}
+                <div style={{ marginLeft: "28px", marginTop: "12px", paddingTop: "8px", borderTop: "1px dashed rgba(255,255,255,0.1)" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "#ffd700", fontWeight: "700" }}>
+                    <input
+                      type="checkbox"
+                      checked={showChampionsOnHome}
+                      onChange={(e) => setShowChampionsOnHome(e.target.checked)}
+                      style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
+                    />
+                    🏆 แสดงส่วนทำเนียบแชมป์ (4 คน) ในหน้าแรก
+                  </label>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginLeft: "24px", display: "block", marginTop: "2px" }}>
+                    หากติ๊กออก ส่วนทำเนียบแชมป์ 4 คนบนหน้าแรกจะไม่แสดงผล
+                  </span>
+                </div>
               </div>
 
               {/* Fan of the Year (/fan-of-the-year) Protection & Nav */}
