@@ -994,8 +994,10 @@ export default function TrialFotyBallotVotePage() {
       });
 
       const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
-        setPollList(data.data);
+      if (data.success) {
+        if (Array.isArray(data.data)) {
+          setPollList(data.data);
+        }
         setHasVotedSuccess(true);
         try {
           localStorage.setItem(
