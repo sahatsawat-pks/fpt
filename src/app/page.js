@@ -1186,7 +1186,7 @@ export default function MainPage() {
             >
               {activeChampions.length === 4
                 ? "ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (4 คน)"
-                : `ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (${activeChampions.length} ท่าน)`}
+                : `ทำเนียบสุดยอดแฟนพันธุ์แท้แห่งปี (${activeChampions.length} คน)`}
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "600px", margin: "0 auto" }}>
               ผู้คว้าชัยชนะสูงสุดในประวัติศาสตร์แฟนพันธุ์แท้แห่งปีฉบับ Fanmade

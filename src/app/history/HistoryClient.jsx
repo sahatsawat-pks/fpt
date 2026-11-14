@@ -1391,7 +1391,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                   boxShadow: activeTab === "battleRoyale" ? "0 0 12px rgba(255, 77, 79, 0.3)" : "none"
                 }}
               >
-                💥 Battle Royale • {currentSeason.battleRoyale.length} คน
+                💥 Battle Royale • {currentSeason?.battleRoyale?.length || 0} คน
               </button>
             )}
 
@@ -1410,7 +1410,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                   boxShadow: activeTab === "consolation" ? "0 0 12px rgba(56, 189, 248, 0.3)" : "none"
                 }}
               >
-                🔄 รอบแก้ตัว (Consolation Match) • {currentSeason.consolation.length} คน
+                🔄 รอบแก้ตัว (Consolation Match) • {currentSeason?.consolation?.length || 0} คน
               </button>
             )}
 
@@ -1526,7 +1526,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                   )}
                 </div>
                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>
-                  รวมทั้งหมด <span style={{ color: "#86efac", fontWeight: "900" }}>{currentSeason.audition.length}</span> แมตช์ ({auditionEpisodes.length} ตอน)
+                  รวมทั้งหมด <span style={{ color: "#86efac", fontWeight: "900" }}>{currentSeason?.audition?.length || 0}</span> แมตช์ ({auditionEpisodes.length} ตอน)
                 </div>
               </div>
 
@@ -3338,7 +3338,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
               }}>
                 <div>
                   <h3 style={{ fontSize: "18px", fontWeight: "900", color: "#ff7875", margin: "0 0 4px" }}>
-                    ⚔️ {currentSeason.playoffs.roundName} - {currentSeason.playoffs.gameType}
+                    ⚔️ {currentSeason?.playoffs?.roundName || "รอบเพลย์ออฟ"} - {currentSeason?.playoffs?.gameType || ""}
                   </h3>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", margin: 0 }}>
                     ผู้เข้าแข่งขันอันดับคะแนนเท่ากันหรือรอบเพลย์ออฟ แข่งขันเพื่อชิงตั๋วเข้าสู่รอบชิงชนะเลิศ
@@ -3351,7 +3351,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                 padding: "10px 14px 20px 14px"
               }}>
                 <div style={{ minWidth: "760px", padding: "0 14px", boxSizing: "border-box" }}>
-                  {currentSeason.playoffs.players.map((item, idx) => {
+                  {(currentSeason?.playoffs?.players || []).map((item, idx) => {
                     const isQualified = item.result === "เข้ารอบ";
                     return (
                       <div

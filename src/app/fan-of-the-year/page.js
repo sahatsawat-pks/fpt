@@ -1009,7 +1009,7 @@ export default function MainPage() {
               ตารางคะแนนแห่งปี
             </Link>
             <Link
-              href="/history"
+              href="/fan-of-the-year/history"
               style={{
                 padding: "8px 16px",
                 borderRadius: "6px",
@@ -1146,7 +1146,7 @@ export default function MainPage() {
               <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนแห่งปี
             </Link>
             <Link
-              href="/history"
+              href="/fan-of-the-year/history"
               onClick={() => setMobileMenuOpen(false)}
               style={{
                 padding: "11px 16px",
