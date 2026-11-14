@@ -483,6 +483,10 @@ export default function HistoryClient({ isSecretFoty = false }) {
     return groups;
   }, [currentSeason, searchQuery, isPublic2026, fotyAirUpToEpisode]);
 
+  const totalAuditionContestantsShown = useMemo(() => {
+    return auditionEpisodes.reduce((acc, ep) => acc + (ep.contestants?.length || 0), 0);
+  }, [auditionEpisodes]);
+
   const displayedAuditionCount = useMemo(() => {
     if (!currentSeason?.audition) return 0;
     if (isPublic2026) {
@@ -1526,7 +1530,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                   )}
                 </div>
                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>
-                  รวมทั้งหมด <span style={{ color: "#86efac", fontWeight: "900" }}>{currentSeason?.audition?.length || 0}</span> แมตช์ ({auditionEpisodes.length} ตอน)
+                  รวมทั้งหมด <span style={{ color: "#86efac", fontWeight: "900" }}>{totalAuditionContestantsShown}</span> คน ({auditionEpisodes.length} ตอน)
                 </div>
               </div>
 
