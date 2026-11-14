@@ -247,8 +247,21 @@ export default function HistoryClient({ isSecretFoty = false }) {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const settingsRes = await fetch("/api/settings");
+        const [settingsRes, historyRes, pollRes] = await Promise.all([
+          fetch("/api/settings"),
+          fetch("/api/history"),
+          fetch("/api/poll"),
+        ]);
         const settingsData = await settingsRes.json();
+        const historyDataRes = await historyRes.json();
+        const pollDataRes = await pollRes.json();
+
+        if (historyDataRes.success && historyDataRes.data) {
+          setData(historyDataRes.data);
+        }
+        if (pollDataRes.success && Array.isArray(pollDataRes.data)) {
+          setPollList(pollDataRes.data);
+        }
 
         if (settingsData.showFotyInNav !== undefined) {
           setShowFotyInNav(Boolean(settingsData.showFotyInNav));
@@ -321,27 +334,6 @@ export default function HistoryClient({ isSecretFoty = false }) {
       setIsVerifying(false);
     }
   };
-
-  // Fetch updated history from API
-  useEffect(() => {
-    fetch("/api/history")
-      .then((res) => res.json())
-      .then((resData) => {
-        if (resData.success && resData.data) {
-          setData(resData.data);
-        }
-      })
-      .catch((err) => console.error("Error loading history from API:", err));
-
-    fetch("/api/poll")
-      .then((res) => res.json())
-      .then((pData) => {
-        if (pData.success && Array.isArray(pData.data)) {
-          setPollList(pData.data);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   const enabledYears = data?.enabledYears || {
     "2021": true,
@@ -558,7 +550,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
     );
   }
 
-  if (protectHistory && !isAuthenticated) {
+  if (isProtected && !isAuthenticated) {
     return (
       <div style={{
         minHeight: "100vh",

@@ -32,14 +32,15 @@ export function getYouTubeId(url) {
 }
 
 export default function MainPage() {
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [historyState, setHistoryState] = useState(historyData);
+  const [historyState, setHistoryState] = useState(null);
   const [weeklyMatches, setWeeklyMatches] = useState([]);
   const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
   const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
   const [showFotyInNav, setShowFotyInNav] = useState(true);
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
-  const [showChampionsOnHome, setShowChampionsOnHome] = useState(true);
+  const [showChampionsOnHome, setShowChampionsOnHome] = useState(false);
   const [showWarmupTable, setShowWarmupTable] = useState(true);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,6 +64,8 @@ export default function MainPage() {
       }
       if (historyResData.success && historyResData.data) {
         setHistoryState(historyResData.data);
+      } else {
+        setHistoryState(historyData);
       }
       if (settingsData.success) {
         setShowFotyInNav(settingsData.showFotyInNav !== false);
@@ -82,6 +85,7 @@ export default function MainPage() {
     } catch (err) {
       console.error("Failed to fetch homepage data:", err);
     } finally {
+      setDataLoaded(true);
       setLoading(false);
     }
   };
@@ -169,9 +173,10 @@ export default function MainPage() {
 
   // Episodes shown on Homepage: completed ones + next upcoming episode
   const visibleWeeklyMatches = useMemo(() => {
+    if (!dataLoaded) return [];
     const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
     return fotyWeeklyEpisodes.filter((ep) => ep.episodeNum <= maxEp + 1);
-  }, [fotyWeeklyEpisodes, fotyAirUpToEpisode]);
+  }, [fotyWeeklyEpisodes, fotyAirUpToEpisode, dataLoaded]);
 
   // Warmup contestants: contestants that have warmupSchedule
   const warmupContestants = useMemo(() => {
@@ -191,10 +196,11 @@ export default function MainPage() {
 
   // Active Champions from history data filtered by enabledYears
   const activeChampions = useMemo(() => {
-    return (historyState?.champions || historyData.champions || [])
+    if (!dataLoaded || !historyState) return [];
+    return (historyState?.champions || [])
       .filter((c) => c.year && Number(c.year) >= 2021 && Number(c.year) <= 2024)
       .filter((c) => enabledYears[String(c.year)] !== false);
-  }, [historyState, enabledYears]);
+  }, [historyState, enabledYears, dataLoaded]);
 
   return (
     <div
@@ -668,7 +674,7 @@ export default function MainPage() {
               🗓️ โปรแกรมออกอากาศประจำสัปดาห์
             </a>
 
-            {showChampionsOnHome && activeChampions.length > 0 && (
+            {dataLoaded && showChampionsOnHome && activeChampions.length > 0 && (
               <a
                 href="#champions"
                 style={{
@@ -738,7 +744,11 @@ export default function MainPage() {
           </p>
         </div>
 
-        {visibleWeeklyMatches.length > 0 ? (
+        {!dataLoaded ? (
+          <div style={{ textAlign: "center", padding: "50px 20px", color: "#80d0ff", fontSize: "15px", fontWeight: "700" }}>
+            ⏳ กำลังโหลดโปรแกรมการแข่งขัน...
+          </div>
+        ) : visibleWeeklyMatches.length > 0 ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             {visibleWeeklyMatches.map((m, idx) => {
               const p1Photo = getOptimizedImageUrl(m.player1?.photo || m.contestant1?.photo, 140);
@@ -1138,7 +1148,7 @@ export default function MainPage() {
       {/* ========================================================
           5. SECTION: ทำเนียบแชมป์ - HALL OF FAME
          ======================================================== */}
-      {showChampionsOnHome && activeChampions.length > 0 && (
+      {dataLoaded && showChampionsOnHome && activeChampions.length > 0 && (
         <section
           id="champions"
           style={{
