@@ -3275,10 +3275,12 @@ export default function TrialFOTYPage() {
                 <span style={{ fontSize: "28px" }}>🗳️</span>
                 <div>
                   <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
-                    เปิดรับคะแนนโหวตโพลล์มหาชนแล้ว!
+                    {votingOpen ? "🗳️ เปิดรับคะแนนโหวตโพลล์มหาชนแล้ว!" : "📊 สรุปผลคะแนนโพลล์มหาชนอย่างเป็นทางการ"}
                   </div>
                   <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
-                    ร่วมส่งแรงใจและโหวตให้กับผู้เข้าแข่งขันคนโปรดของคุณใน Trial Fan of the Year 2026
+                    {votingOpen
+                      ? "คะแนนโหวตทั้งหมดจะถูกส่งและเก็บรักษาอย่างปลอดภัยใน Google Spreadsheet โดยผลคะแนนโพลล์รวม (70% โหวต + 30% What If) จะถูกประมวลผลและเปิดเผยหลังปิดรับโหวต!"
+                      : "ร่วมส่งแรงใจและโหวตให้กับผู้เข้าแข่งขันคนโปรดของคุณใน Trial Fan of the Year 2026"}
                   </div>
                   <div style={{ fontSize: "12px", color: "#fef08a", marginTop: "4px", fontWeight: "700" }}>
                     ⚡ สูตรคำนวณคะแนนโพลล์: คะแนนโหวตมหาชน 70% + คะแนนรอบอุ่นเครื่อง (What If?) 30%
@@ -3475,7 +3477,7 @@ export default function TrialFOTYPage() {
                     }}
                   >
                     <span style={{ transform: "skewX(16deg)", fontStyle: "italic", fontWeight: "900", fontSize: "12px", color: "#ffd700" }}>
-                      คิดเป็น %
+                      {votingOpen ? "สถานะคะแนน" : "คิดเป็น %"}
                     </span>
                   </div>
                 </div>
@@ -3684,11 +3686,11 @@ export default function TrialFOTYPage() {
                               transform: "skewX(16deg)",
                               fontStyle: "italic",
                               fontWeight: "900",
-                              fontSize: "17px",
+                              fontSize: votingOpen ? "13px" : "17px",
                               color: isTop5 ? "#000000" : "#ffd700",
                             }}
                           >
-                            {item.percent}
+                            {votingOpen ? "🔒 รอสรุปผล" : item.percent}
                           </span>
                         </div>
                       </div>

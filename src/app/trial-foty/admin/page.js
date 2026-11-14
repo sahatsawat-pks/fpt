@@ -117,6 +117,9 @@ export default function TrialAdminPage() {
   const [showMainPollTable, setShowMainPollTable] = useState(true);
   const [togglingMainPollTable, setTogglingMainPollTable] = useState(false);
   const [syncingGameScores, setSyncingGameScores] = useState(false);
+  const [syncingGoogleSheets, setSyncingGoogleSheets] = useState(false);
+  const [testingSheet, setTestingSheet] = useState(false);
+  const [sheetStatus, setSheetStatus] = useState(null);
 
   // ── Trial Info & Staff Q&A States ─────────────────────────────────────────
   const [infoKeywords, setInfoKeywords] = useState([]);
@@ -840,6 +843,56 @@ export default function TrialAdminPage() {
       showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
     } finally {
       setSyncingGameScores(false);
+    }
+  };
+
+  const handleTestGoogleSheets = async () => {
+    setTestingSheet(true);
+    try {
+      const res = await fetch("/api/trial-poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "test_google_sheets" }),
+      });
+      const data = await res.json();
+      setSheetStatus(data);
+      if (data.success) {
+        showToast(`✅ เชื่อมต่อ Google Sheets สำเร็จ! (${data.title})`, "success");
+      } else {
+        showToast(`❌ เชื่อมต่อไม่สำเร็จ: ${data.error}`, "error");
+      }
+    } catch (e) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setTestingSheet(false);
+    }
+  };
+
+  const handleSyncGoogleSheets = async (closeVoting = false) => {
+    const confirmMsg = closeVoting
+      ? "⚠️ ยืนยันการปิดรับโหวต และดึงคะแนนทั้งหมดจาก Google Sheets มาประมวลผลเป็น % โพลล์ (โหวต 70% + What If 30%) ใช่หรือไม่?"
+      : "ดึงคะแนนโหวตทั้งหมดจาก Google Sheets มาประมวลผลอัปเดตลงตารางใช่หรือไม่?";
+    if (!window.confirm(confirmMsg)) return;
+
+    setSyncingGoogleSheets(true);
+    try {
+      const res = await fetch("/api/trial-poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync_google_sheets", closeVoting }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPollItems(data.data || []);
+        if (closeVoting) setVotingOpen(false);
+        showToast(data.message || `ซิงค์คะแนนจาก Google Sheets สำเร็จ (${data.totalBallots} บัตรโหวต)`, "success");
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาดในการซิงค์คะแนนจาก Google Sheets", "error");
+      }
+    } catch (e) {
+      showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", "error");
+    } finally {
+      setSyncingGoogleSheets(false);
     }
   };
 
@@ -3195,6 +3248,134 @@ export default function TrialAdminPage() {
                       : "🔓 คลิกเพื่อเปิดรับโหวต"}
                   </button>
                 </div>
+              </div>
+
+              {/* Google Sheets Live Ballot Integration Box */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  borderRadius: "14px",
+                  background: "linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)",
+                  border: "1.5px solid rgba(56, 189, 248, 0.4)",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.4)",
+                  marginBottom: "16px",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", marginBottom: "12px" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "18px" }}>📑</span>
+                      <span style={{ fontSize: "16px", fontWeight: "800", color: "#38bdf8" }}>
+                        ระบบเก็บผลโหวตด้วย Google Spreadsheet (Service Account)
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.75)", margin: "4px 0 0", lineHeight: "1.6" }}>
+                      ระหว่างเปิดโหวต: ทุกการส่งโหวตจะถูกบันทึกเข้า Google Sheets โดยตรง <strong>และไม่แสดงคะแนนหรือคำนวณ % บนเว็บ</strong> เพื่อความปลอดภัยและกันสปอยล์<br />
+                      เมื่อปิดโพลล์: ให้กดปุ่ม <strong>"🔴 ปิดโหวต & ซิงค์คะแนนประมวลผลทันที"</strong> เพื่อดึงคะแนนทั้งหมดมาคำนวณ % และจัดอันดับลงฐานข้อมูล
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    <a
+                      href="https://docs.google.com/spreadsheets/d/1lbLRgFnR6OKrxlsWznPiE1rqCmaSJxkLwb-Hq-vAZYA/edit"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: "8px",
+                        background: "rgba(56, 189, 248, 0.15)",
+                        border: "1px solid rgba(56, 189, 248, 0.4)",
+                        color: "#38bdf8",
+                        fontSize: "12px",
+                        fontWeight: "700",
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      🔗 เปิด Google Sheet ↗
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleTestGoogleSheets}
+                      disabled={testingSheet}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: "8px",
+                        background: "rgba(255, 255, 255, 0.08)",
+                        border: "1px solid rgba(255, 255, 255, 0.25)",
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        fontWeight: "700",
+                        cursor: testingSheet ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      {testingSheet ? "⏳ กำลังทดสอบ..." : "🧪 ทดสอบสิทธิ์การเข้าถึง"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSyncGoogleSheets(false)}
+                      disabled={syncingGoogleSheets}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: "8px",
+                        background: "rgba(16, 185, 129, 0.2)",
+                        border: "1px solid #10b981",
+                        color: "#86efac",
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        cursor: syncingGoogleSheets ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      {syncingGoogleSheets ? "⏳ กำลังซิงค์..." : "📥 ดึงคะแนนจาก Sheet (ยังไม่ปิดโหวต)"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSyncGoogleSheets(true)}
+                      disabled={syncingGoogleSheets}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: "8px",
+                        background: "linear-gradient(90deg, #ef4444 0%, #dc2626 100%)",
+                        border: "none",
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        fontWeight: "900",
+                        cursor: syncingGoogleSheets ? "not-allowed" : "pointer",
+                        boxShadow: "0 0 12px rgba(239, 68, 68, 0.4)",
+                      }}
+                    >
+                      {syncingGoogleSheets ? "⏳ กำลังปิดโพลล์และประมวลผล..." : "🔴 ปิดโหวต & ซิงค์คะแนนประมวลผลทันที"}
+                    </button>
+                  </div>
+                </div>
+
+                {sheetStatus && (
+                  <div
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: "8px",
+                      background: sheetStatus.success ? "rgba(34, 197, 94, 0.15)" : "rgba(239, 68, 68, 0.15)",
+                      border: sheetStatus.success ? "1px solid #22c55e" : "1px solid #ef4444",
+                      color: sheetStatus.success ? "#86efac" : "#fca5a5",
+                      fontSize: "12px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    {sheetStatus.success ? (
+                      <div>
+                        ✅ <strong>เชื่อมต่อ Google Sheet สำเร็จ:</strong> "{sheetStatus.title}" (แท็บ: {sheetStatus.sheets?.join(", ")})
+                      </div>
+                    ) : (
+                      <div>
+                        ❌ <strong>เชื่อมต่อไม่สำเร็จ:</strong> {sheetStatus.error}<br />
+                        <span style={{ color: "#ffd700", marginTop: "4px", display: "inline-block" }}>
+                          💡 อย่าลืมกด <strong>แชร์ (Share)</strong> ใน Google Sheet ให้กับอีเมล: <code>ballot-service@fanpantae-fanmade.iam.gserviceaccount.com</code> สิทธิ์ <strong>Editor</strong>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Poll Table on Trial Front Page Toggle Control Box */}
