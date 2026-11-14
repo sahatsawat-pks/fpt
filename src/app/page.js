@@ -961,6 +961,7 @@ export default function MainPage() {
               const p2Name =
                 m.player2?.nickname || m.contestant2?.nickname || m.player2?.name || m.contestant2?.name;
               const p2Topic = m.player2?.topic || m.contestant2?.topic;
+              const isEpCompleted = m.isCompleted !== undefined ? m.isCompleted : m.status === "completed";
 
               return (
                 <div
@@ -1045,8 +1046,8 @@ export default function MainPage() {
                   {/* Center: Contestants (Individual Play - เล่นใครเล่นมัน) */}
                   <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
                     <div
-                      onClick={() => isCompleted && m.player1 && setSelectedAuditionSpotlight(m.player1)}
-                      title={isCompleted ? "คลิกเพื่อดูคะแนนละเอียด" : ""}
+                      onClick={() => isEpCompleted && m.player1 && setSelectedAuditionSpotlight(m.player1)}
+                      title={isEpCompleted ? "คลิกเพื่อดูคะแนนละเอียด" : ""}
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -1056,17 +1057,17 @@ export default function MainPage() {
                         borderRadius: "14px",
                         padding: "10px 14px",
                         minWidth: "170px",
-                        cursor: isCompleted ? "pointer" : "default",
+                        cursor: isEpCompleted ? "pointer" : "default",
                         transition: "all 0.2s ease",
                       }}
                       onMouseEnter={(e) => {
-                        if (isCompleted) {
+                        if (isEpCompleted) {
                           e.currentTarget.style.borderColor = "#00e5ff";
                           e.currentTarget.style.background = "rgba(0, 229, 255, 0.12)";
                         }
                       }}
                       onMouseLeave={(e) => {
-                        if (isCompleted) {
+                        if (isEpCompleted) {
                           e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.25)";
                           e.currentTarget.style.background = "rgba(0, 0, 0, 0.35)";
                         }
@@ -1095,7 +1096,7 @@ export default function MainPage() {
                       <div style={{ display: "flex", flexDirection: "column" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                           <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p1Name}</span>
-                          {isCompleted && (
+                          {isEpCompleted && (
                             <span style={{ fontSize: "10px", color: "#00e5ff", fontWeight: "700" }}>🔍</span>
                           )}
                         </div>
@@ -1121,8 +1122,8 @@ export default function MainPage() {
 
                     {hasP2 && (
                       <div
-                        onClick={() => isCompleted && m.player2 && setSelectedAuditionSpotlight(m.player2)}
-                        title={isCompleted ? "คลิกเพื่อดูคะแนนละเอียด" : ""}
+                        onClick={() => isEpCompleted && m.player2 && setSelectedAuditionSpotlight(m.player2)}
+                        title={isEpCompleted ? "คลิกเพื่อดูคะแนนละเอียด" : ""}
                         style={{
                           display: "flex",
                           alignItems: "center",
@@ -1132,17 +1133,17 @@ export default function MainPage() {
                           borderRadius: "14px",
                           padding: "10px 14px",
                           minWidth: "170px",
-                          cursor: isCompleted ? "pointer" : "default",
+                          cursor: isEpCompleted ? "pointer" : "default",
                           transition: "all 0.2s ease",
                         }}
                         onMouseEnter={(e) => {
-                          if (isCompleted) {
+                          if (isEpCompleted) {
                             e.currentTarget.style.borderColor = "#00e5ff";
                             e.currentTarget.style.background = "rgba(0, 229, 255, 0.12)";
                           }
                         }}
                         onMouseLeave={(e) => {
-                          if (isCompleted) {
+                          if (isEpCompleted) {
                             e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.25)";
                             e.currentTarget.style.background = "rgba(0, 0, 0, 0.35)";
                           }
@@ -1171,7 +1172,7 @@ export default function MainPage() {
                         <div style={{ display: "flex", flexDirection: "column" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                             <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p2Name}</span>
-                            {isCompleted && (
+                            {isEpCompleted && (
                               <span style={{ fontSize: "10px", color: "#00e5ff", fontWeight: "700" }}>🔍</span>
                             )}
                           </div>
