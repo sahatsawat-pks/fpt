@@ -16,8 +16,10 @@ export default async function TournamentPage() {
   }
   if (!data) data = defaultTournamentData;
 
-  // Read settings for tournamentUpdateUpToMatch
+  // Read settings for tournamentUpdateUpToMatch, awardOverride, penaltyOverride
   let cutoff = "all";
+  let awardOverride = "auto";
+  let penaltyOverride = "auto";
   try {
     const rawSettings = await getKVData("fpt_settings", () => {
       const p = path.join(process.cwd(), "src/app/data/settings.json");
@@ -26,6 +28,12 @@ export default async function TournamentPage() {
     });
     if (rawSettings && rawSettings.tournamentUpdateUpToMatch !== undefined) {
       cutoff = rawSettings.tournamentUpdateUpToMatch;
+    }
+    if (rawSettings && rawSettings.tournamentAwardOverride) {
+      awardOverride = rawSettings.tournamentAwardOverride;
+    }
+    if (rawSettings && rawSettings.tournamentPenaltyOverride) {
+      penaltyOverride = rawSettings.tournamentPenaltyOverride;
     }
   } catch (e) {}
 
@@ -53,5 +61,13 @@ export default async function TournamentPage() {
     }
   }
 
-  return <TournamentClient initialData={displayData} isPublicView={true} cutoffMatch={cutoff} />;
+  return (
+    <TournamentClient
+      initialData={displayData}
+      isPublicView={true}
+      cutoffMatch={cutoff}
+      awardOverride={awardOverride}
+      penaltyOverride={penaltyOverride}
+    />
+  );
 }

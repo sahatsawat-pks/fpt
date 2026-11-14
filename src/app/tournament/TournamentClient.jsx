@@ -110,8 +110,16 @@ function TopicSetCard({ setObj, setLabel }) {
   );
 }
 
-export default function TournamentClient({ initialData, isPublicView = false, cutoffMatch = "all" }) {
+export default function TournamentClient({
+  initialData,
+  isPublicView = false,
+  cutoffMatch = "all",
+  awardOverride = "auto",
+  penaltyOverride = "auto",
+}) {
   const [data, setData] = useState(initialData || defaultTournamentData);
+  const [activeAwardOverride, setActiveAwardOverride] = useState(awardOverride);
+  const [activePenaltyOverride, setActivePenaltyOverride] = useState(penaltyOverride);
   const [loading, setLoading] = useState(!initialData);
   const [activeTab, setActiveTab] = useState("standings"); // 'standings' | 'matches' | 'replays' | 'topics' | 'checklist'
   const [selectedGroup, setSelectedGroup] = useState("all"); // 'all' | 'A' | 'B'
@@ -145,6 +153,12 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
             showFotyInNav: json.showFotyInNav !== false,
             showCurrentInNav: json.showCurrentInNav !== false,
           });
+          if (json.tournamentAwardOverride) {
+            setActiveAwardOverride(json.tournamentAwardOverride);
+          }
+          if (json.tournamentPenaltyOverride) {
+            setActivePenaltyOverride(json.tournamentPenaltyOverride);
+          }
         }
       } catch (e) {}
     }
@@ -320,8 +334,55 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
 
   // Current latest holders of Tournament Award & Penalty
   const currentAwardInfo = useMemo(() => {
+    const CANDIDATES = {
+      "ปาร์ค": {
+        name: "รางวัลปาร์ค",
+        holderNickname: "ปาร์ค",
+        holderName: "พศวัต พุ่มเงิน",
+        photo: "https://lh3.googleusercontent.com/pw/AP1GczMwFPheesY-nKVcVpRYTHvCFm_Kvsf2djmqLhSfgE6btw62df02FN84YxvJnUHojPbRuOTYYcL-JEol0ZwrqvhwyENZWRk8KHGxLoZ4byFEbxKy7tYrZhY_9PSnMIxvau4O3_iyy_noIIO24OkcYhQJ=w1125-h1125-s-no-gm",
+      },
+      "กร": {
+        name: "รางวัลกร",
+        holderNickname: "กร",
+        holderName: "วรงกร แจ่มปัญญา",
+        photo: "https://lh3.googleusercontent.com/pw/AP1GczMVzB8MxkQ8MAro-Hmj_NhysPlBNlwWbnTH7mNSdh-5SBk2mWqE2sesfq7CTpfV2dbQqat-n7cGc4TNz1w5lp23qHiBKgmRmqJyv8Qv4Fqnqzxl_t2-TnsmRcIczq6AU8OJEXPptub_p5dqniZPpyYb=w1098-h1106-s-no-gm",
+      },
+      "ริท": {
+        name: "หักค่าริท",
+        holderNickname: "ริท",
+        holderName: "ฤทธิชัย ภูสิญามณี",
+        photo: "https://lh3.googleusercontent.com/pw/AP1GczPoobelYtJFgLBfwoO4JX5KwnjFgzPl1yDpAcnnTnYawU4qUdoQhegCiT8M_XxF3kUQXYujweANW183NPbe5PR9hK83WFmZgokhpiDlIHBXncUgIYwp6lEKutOIwbIqiEhtY2hc_OMRD4TyMnbIy1XM=w1114-h1110-s-no-gm",
+      },
+      "ปัน": {
+        name: "หักค่าปัน",
+        holderNickname: "ปัน",
+        holderName: "ปฏิปัน อัศวภูไชย",
+        photo: "https://lh3.googleusercontent.com/pw/AP1GczMYJs2gfkpivIlfFh_ogguJ850aCteu5kKVtkB2sKh-XFht5S6AzcTd42JOYXTFCi_-mpl16FpUV2fHvuZlY5J9ENOize1yH06NsdYgjLekboQ--KeSMVnuviGwjLkB5anel5ToX5KKP5d_g6NtvB9I=w1092-h1092-s-no-gm",
+      },
+      "แมน": {
+        name: "หักค่าแมน",
+        holderNickname: "แมน",
+        holderName: "ปกรณ์ สถิตอยู่คู่ไทย",
+        photo: "https://lh3.googleusercontent.com/pw/AP1GczOXYyrdC4bzQRJaQFzxalJq97SQA-0YTbyISMmDp6VWhbxdBJxsyUlMWY5qAOsiZB7i9TkWqqOeDGtTgejDnqoA-3nqYvVlF2qjnByanyH1xNAW7LUapIv-VVwZonTn5feSno6G19Ng-nd6XoF6JpDa=w1100-h1099-s-no-gm",
+      },
+      "ออมสิน": {
+        name: "หักค่าออมสิน",
+        holderNickname: "ออมสิน",
+        holderName: "เจษฎาพร ศรีมาตย์",
+        photo: "https://lh3.googleusercontent.com/pw/AP1GczPm7XK3GBPrPoj5mitFuPhsIM-Ro5DWjk2l4zC8YydVisJjER1unaYVitNce0BUZa18n7hmXdnWbwa0DO5CkrWEHvBKBctORALIzEnkkPkRjlQlWlT12sVUEv2s2MySTZFoabz9xfc8nj2U9e-vmHL6=w1101-h1099-s-no-gm",
+      },
+    };
+
     let latestAward = null;
     let latestPenalty = null;
+
+    if (activeAwardOverride && activeAwardOverride !== "auto" && CANDIDATES[activeAwardOverride]) {
+      latestAward = CANDIDATES[activeAwardOverride];
+    }
+    if (activePenaltyOverride && activePenaltyOverride !== "auto" && CANDIDATES[activePenaltyOverride]) {
+      latestPenalty = CANDIDATES[activePenaltyOverride];
+    }
+
     const mds = data?.matchdays || [];
     for (let i = mds.length - 1; i >= 0; i--) {
       const matches = mds[i].matches || [];
@@ -341,7 +402,7 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
           const cp2 = m.categoryPointsBeforeBonus?.player2 ?? (p2?.categoryPoints - (rawSumWinner === "player2" ? 1 : 0));
           if (m.awards?.player2 || (count25_2 >= 2 && cp2 === 4) || count25_2 >= 3) {
             latestAward = {
-              name: m.awards?.player2?.name || (p2.nickname ? `รางวัล${p2.nickname}` : "รางวัลกร"),
+              name: m.awards?.player2?.name || (p2.nickname ? `รางวัล${p2.nickname}` : "รางวัลปาร์ค"),
               holderName: p2.name || "วรงกร แจ่มปัญญา",
               holderNickname: p2.nickname || "กร",
               photo: p2.photo,
@@ -350,7 +411,7 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
             };
           } else if (m.awards?.player1 || (count25_1 >= 2 && cp1 === 4) || count25_1 >= 3) {
             latestAward = {
-              name: m.awards?.player1?.name || (p1.nickname ? `รางวัล${p1.nickname}` : "รางวัลกร"),
+              name: m.awards?.player1?.name || (p1.nickname ? `รางวัล${p1.nickname}` : "รางวัลปาร์ค"),
               holderName: p1.name || "วรงกร แจ่มปัญญา",
               holderNickname: p1.nickname || "กร",
               photo: p1.photo,
@@ -389,10 +450,10 @@ export default function TournamentClient({ initialData, isPublicView = false, cu
       }
     }
     return {
-      award: latestAward || { name: "รางวัลกร", holderNickname: "กร", holderName: "วรงกร แจ่มปัญญา", photo: "" },
-      penalty: latestPenalty || { name: "หักค่าปัน", holderNickname: "ปัน", holderName: "ปฏิปัน อัศวภูไชย", photo: "" },
+      award: latestAward || CANDIDATES["ปาร์ค"],
+      penalty: latestPenalty || CANDIDATES["ปัน"],
     };
-  }, [data]);
+  }, [data, activeAwardOverride, activePenaltyOverride]);
 
   // Filtered matches for current matchday
   const filteredMatches = useMemo(() => {

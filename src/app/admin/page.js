@@ -67,6 +67,8 @@ export default function AdminPage() {
   const [showCurrentInNav, setShowCurrentInNav] = useState(true);
   const [showChampionsOnHome, setShowChampionsOnHome] = useState(true);
   const [tournamentUpdateUpToMatch, setTournamentUpdateUpToMatch] = useState("all");
+  const [tournamentAwardOverride, setTournamentAwardOverride] = useState("auto");
+  const [tournamentPenaltyOverride, setTournamentPenaltyOverride] = useState("auto");
   const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
   const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
 
@@ -546,6 +548,12 @@ export default function AdminPage() {
         if (data.tournamentUpdateUpToMatch !== undefined) {
           setTournamentUpdateUpToMatch(data.tournamentUpdateUpToMatch);
         }
+        if (data.tournamentAwardOverride) {
+          setTournamentAwardOverride(data.tournamentAwardOverride);
+        }
+        if (data.tournamentPenaltyOverride) {
+          setTournamentPenaltyOverride(data.tournamentPenaltyOverride);
+        }
         if (data.fotyAirUpToEpisode !== undefined) {
           setFotyAirUpToEpisode(data.fotyAirUpToEpisode);
         }
@@ -786,6 +794,8 @@ export default function AdminPage() {
           tournamentWeeklyMatches,
           showChampionsOnHome,
           tournamentUpdateUpToMatch,
+          tournamentAwardOverride,
+          tournamentPenaltyOverride,
           fotyAirUpToEpisode,
           fotyBroadcastCustoms,
         }),
@@ -5077,6 +5087,71 @@ export default function AdminPage() {
                           </option>
                         ))}
                       </select>
+
+                      {/* รางวัลพิเศษและบทลงโทษประจำลีก */}
+                      <div
+                        style={{
+                          width: "100%",
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                          gap: "14px",
+                          marginTop: "12px",
+                          paddingTop: "14px",
+                          borderTop: "1px dashed rgba(0, 229, 255, 0.25)",
+                        }}
+                      >
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#38bdf8", marginBottom: "4px" }}>
+                            🎁 รางวัลพิเศษประจำลีก (+1 LP) บนหน้า /tournament:
+                          </label>
+                          <select
+                            value={tournamentAwardOverride}
+                            onChange={(e) => setTournamentAwardOverride(e.target.value)}
+                            style={{
+                              width: "100%",
+                              padding: "8px 12px",
+                              borderRadius: "8px",
+                              background: "#081020",
+                              border: "1px solid #38bdf8",
+                              color: "#ffffff",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <option value="auto">🤖 คำนวณอัตโนมัติตามคู่ล่าสุดที่เปิดแสดง</option>
+                            <option value="ปาร์ค">🎁 รางวัลปาร์ค (พศวัต พุ่มเงิน) - ตั้งต้นลีก (ก่อนคู่ที่ 38)</option>
+                            <option value="กร">🎁 รางวัลกร (วรงกร แจ่มปัญญา) - คู่ที่ 38 เป็นต้นไป</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#ff7875", marginBottom: "4px" }}>
+                            ⚠️ บทลงโทษประจำลีก (-1 LP) บนหน้า /tournament:
+                          </label>
+                          <select
+                            value={tournamentPenaltyOverride}
+                            onChange={(e) => setTournamentPenaltyOverride(e.target.value)}
+                            style={{
+                              width: "100%",
+                              padding: "8px 12px",
+                              borderRadius: "8px",
+                              background: "#081020",
+                              border: "1px solid #ff4d4f",
+                              color: "#ffffff",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <option value="auto">🤖 คำนวณอัตโนมัติตามคู่ล่าสุดที่เปิดแสดง</option>
+                            <option value="ริท">⚠️ หักค่าริท (ฤทธิชัย ภูสิญามณี) - คู่ที่ 21-31</option>
+                            <option value="ปัน">⚠️ หักค่าปัน (ปฏิปัน อัศวภูไชย) - คู่ที่ 32 เป็นต้นไป</option>
+                            <option value="แมน">⚠️ หักค่าแมน (ปกรณ์ สถิตอยู่คู่ไทย) - คู่ที่ 13-20</option>
+                            <option value="ออมสิน">⚠️ หักค่าออมสิน (เจษฎาพร ศรีมาตย์) - คู่ที่ 2-12</option>
+                          </select>
+                        </div>
+                      </div>
                     </div>
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
@@ -5670,6 +5745,60 @@ export default function AdminPage() {
                     <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "4px", display: "block" }}>
                       แมตช์หลังจากคู่ที่เลือกจะถูกซ่อนผลและคะแนนบนหน้า <code>/tournament</code>
                     </span>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "10px", paddingTop: "10px", borderTop: "1px dashed rgba(255,255,255,0.1)" }}>
+                      <div>
+                        <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#38bdf8", marginBottom: "3px" }}>
+                          🎁 รางวัลพิเศษ (+1 LP):
+                        </label>
+                        <select
+                          value={tournamentAwardOverride}
+                          onChange={(e) => setTournamentAwardOverride(e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "6px",
+                            background: "#081020",
+                            border: "1px solid #38bdf8",
+                            color: "#ffffff",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <option value="auto">🤖 อัตโนมัติ (ตามคู่ที่เลือก)</option>
+                          <option value="ปาร์ค">🎁 รางวัลปาร์ค (ก่อนคู่ที่ 38)</option>
+                          <option value="กร">🎁 รางวัลกร (คู่ที่ 38+)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#ff7875", marginBottom: "3px" }}>
+                          ⚠️ บทลงโทษ (-1 LP):
+                        </label>
+                        <select
+                          value={tournamentPenaltyOverride}
+                          onChange={(e) => setTournamentPenaltyOverride(e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "6px",
+                            background: "#081020",
+                            border: "1px solid #ff4d4f",
+                            color: "#ffffff",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <option value="auto">🤖 อัตโนมัติ (ตามคู่ที่เลือก)</option>
+                          <option value="ริท">⚠️ หักค่าริท (คู่ 21-31)</option>
+                          <option value="ปัน">⚠️ หักค่าปัน (คู่ 32+)</option>
+                          <option value="แมน">⚠️ หักค่าแมน (คู่ 13-20)</option>
+                          <option value="ออมสิน">⚠️ หักค่าออมสิน (คู่ 2-12)</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

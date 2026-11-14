@@ -36,6 +36,8 @@ const DEFAULT_SETTINGS = {
   tournamentWeeklyMatches: [],
   showChampionsOnHome: true,
   tournamentUpdateUpToMatch: "all",
+  tournamentAwardOverride: "auto",
+  tournamentPenaltyOverride: "auto",
   fotyUpdateUpToMatch: "all",
   fotyAirUpToEpisode: 1,
   fotyBroadcastCustoms: {},
@@ -108,6 +110,8 @@ export async function GET(request) {
       tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
       showChampionsOnHome: settings.showChampionsOnHome !== false,
       tournamentUpdateUpToMatch: settings.tournamentUpdateUpToMatch !== undefined ? settings.tournamentUpdateUpToMatch : "all",
+      tournamentAwardOverride: settings.tournamentAwardOverride || "auto",
+      tournamentPenaltyOverride: settings.tournamentPenaltyOverride || "auto",
       fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
       fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
       fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
@@ -139,6 +143,8 @@ export async function GET(request) {
     tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
     showChampionsOnHome: settings.showChampionsOnHome !== false,
     tournamentUpdateUpToMatch: settings.tournamentUpdateUpToMatch !== undefined ? settings.tournamentUpdateUpToMatch : "all",
+    tournamentAwardOverride: settings.tournamentAwardOverride || "auto",
+    tournamentPenaltyOverride: settings.tournamentPenaltyOverride || "auto",
     fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
     fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
     fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
@@ -325,6 +331,12 @@ export async function POST(request) {
       }
       if (body.tournamentUpdateUpToMatch !== undefined) {
         newSettings.tournamentUpdateUpToMatch = body.tournamentUpdateUpToMatch;
+      }
+      if (body.tournamentAwardOverride !== undefined) {
+        newSettings.tournamentAwardOverride = body.tournamentAwardOverride;
+      }
+      if (body.tournamentPenaltyOverride !== undefined) {
+        newSettings.tournamentPenaltyOverride = body.tournamentPenaltyOverride;
       }
       if (body.fotyUpdateUpToMatch !== undefined) {
         newSettings.fotyUpdateUpToMatch = body.fotyUpdateUpToMatch;
