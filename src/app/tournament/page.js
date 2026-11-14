@@ -1,5 +1,5 @@
 import { getTournamentData } from "@/lib/tournament";
-import TournamentClient from "./TournamentClient";
+import TournamentLandingClient from "./TournamentLandingClient";
 import defaultTournamentData from "@/app/data/tournament.json";
 
 export const dynamic = "force-dynamic";
@@ -12,5 +12,5 @@ export default async function TournamentPage() {
     console.error("Error fetching tournament data on server:", err);
   }
 
-  return <TournamentClient initialData={data || defaultTournamentData} />;
+  return <TournamentLandingClient initialTournamentData={data || defaultTournamentData} />;
 }

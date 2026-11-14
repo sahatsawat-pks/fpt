@@ -237,6 +237,8 @@ export default function HistoryPage() {
   const [historyPasswordInput, setHistoryPasswordInput] = useState("");
   const [historyAuthError, setHistoryAuthError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showFotyInNav, setShowFotyInNav] = useState(true);
+  const [showCurrentInNav, setShowCurrentInNav] = useState(true);
 
   // Check protection & auth on mount
   useEffect(() => {
@@ -246,6 +248,12 @@ export default function HistoryPage() {
         const settingsData = await settingsRes.json();
         const isProtected = Boolean(settingsData.protectHistory);
         setProtectHistory(isProtected);
+        if (settingsData.showFotyInNav !== undefined) {
+          setShowFotyInNav(Boolean(settingsData.showFotyInNav));
+        }
+        if (settingsData.showCurrentInNav !== undefined) {
+          setShowCurrentInNav(Boolean(settingsData.showCurrentInNav));
+        }
 
         if (!isProtected) {
           setIsAuthenticated(true);
@@ -727,6 +735,22 @@ export default function HistoryPage() {
             >
               หน้าแรก
             </Link>
+            {showFotyInNav && (
+              <Link
+                href="/fan-of-the-year"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  color: "#e0f2fe",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                  transition: "all 0.2s"
+                }}
+              >
+                ตารางคะแนนแห่งปี
+              </Link>
+            )}
             <Link
               href="/history"
               style={{
@@ -761,6 +785,21 @@ export default function HistoryPage() {
             >
               <span>⚔️</span> ทัวร์นาเมนต์
             </Link>
+            {showCurrentInNav && (
+              <Link
+                href="/current"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  color: "#e0f2fe",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                }}
+              >
+                ตารางปัจจุบัน
+              </Link>
+            )}
             <Link
               href="/draw"
               style={{
@@ -845,6 +884,27 @@ export default function HistoryPage() {
             >
               <span style={{ fontSize: "16px" }}>🏠</span> หน้าแรก
             </Link>
+            {showFotyInNav && (
+              <Link
+                href="/fan-of-the-year"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: "11px 16px",
+                  borderRadius: "10px",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "#e0f2fe",
+                  fontWeight: "700",
+                  fontSize: "15px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px"
+                }}
+              >
+                <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนแห่งปี
+              </Link>
+            )}
             <Link
               href="/history"
               onClick={() => setMobileMenuOpen(false)}
@@ -883,6 +943,27 @@ export default function HistoryPage() {
             >
               <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
             </Link>
+            {showCurrentInNav && (
+              <Link
+                href="/current"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: "11px 16px",
+                  borderRadius: "10px",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "#e0f2fe",
+                  fontWeight: "700",
+                  fontSize: "15px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px"
+                }}
+              >
+                <span style={{ fontSize: "16px" }}>📊</span> ตารางทัวร์นาเมนต์ปัจจุบัน
+              </Link>
+            )}
             <Link
               href="/draw"
               onClick={() => setMobileMenuOpen(false)}

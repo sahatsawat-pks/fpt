@@ -26,6 +26,14 @@ const DEFAULT_SETTINGS = {
   showWarmupTable: true,
   showPollTable: true,
   showTrialPollTable: true,
+  protectFoty: false,
+  fotyPassword: "",
+  showFotyInNav: true,
+  protectCurrent: false,
+  currentPassword: "",
+  showCurrentInNav: true,
+  weeklyMatches: [],
+  tournamentWeeklyMatches: [],
 };
 
 function readSettings() {
@@ -85,6 +93,14 @@ export async function GET(request) {
       showWarmupTable: settings.showWarmupTable !== false,
       showPollTable: settings.showPollTable !== false,
       showTrialPollTable: settings.showTrialPollTable !== false,
+      protectFoty: Boolean(settings.protectFoty),
+      fotyPassword: settings.fotyPassword || "",
+      showFotyInNav: settings.showFotyInNav !== false,
+      protectCurrent: Boolean(settings.protectCurrent),
+      currentPassword: settings.currentPassword || "",
+      showCurrentInNav: settings.showCurrentInNav !== false,
+      weeklyMatches: Array.isArray(settings.weeklyMatches) ? settings.weeklyMatches : [],
+      tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
     });
   }
 
@@ -105,6 +121,12 @@ export async function GET(request) {
     showWarmupTable: settings.showWarmupTable !== false,
     showPollTable: settings.showPollTable !== false,
     showTrialPollTable: settings.showTrialPollTable !== false,
+    protectFoty: Boolean(settings.protectFoty),
+    showFotyInNav: settings.showFotyInNav !== false,
+    protectCurrent: Boolean(settings.protectCurrent),
+    showCurrentInNav: settings.showCurrentInNav !== false,
+    weeklyMatches: Array.isArray(settings.weeklyMatches) ? settings.weeklyMatches : [],
+    tournamentWeeklyMatches: Array.isArray(settings.tournamentWeeklyMatches) ? settings.tournamentWeeklyMatches : [],
   });
 }
 
@@ -168,6 +190,24 @@ export async function POST(request) {
         return NextResponse.json({ success: true, valid: true });
       }
       const match = String(body.password || "").trim() === String(current.restrictPassword || "").trim();
+      return NextResponse.json({ success: true, valid: match });
+    }
+
+    // Verify foty (/fan-of-the-year) password action
+    if (body.action === "verify_foty") {
+      if (!current.protectFoty) {
+        return NextResponse.json({ success: true, valid: true });
+      }
+      const match = String(body.password || "").trim() === String(current.fotyPassword || "").trim();
+      return NextResponse.json({ success: true, valid: match });
+    }
+
+    // Verify current tournament (/current) password action
+    if (body.action === "verify_current") {
+      if (!current.protectCurrent) {
+        return NextResponse.json({ success: true, valid: true });
+      }
+      const match = String(body.password || "").trim() === String(current.currentPassword || "").trim();
       return NextResponse.json({ success: true, valid: match });
     }
 
@@ -241,6 +281,30 @@ export async function POST(request) {
       if (body.showTrialPollTable !== undefined) {
         newSettings.showTrialPollTable = Boolean(body.showTrialPollTable);
       }
+      if (body.protectFoty !== undefined) {
+        newSettings.protectFoty = Boolean(body.protectFoty);
+      }
+      if (body.fotyPassword !== undefined) {
+        newSettings.fotyPassword = String(body.fotyPassword || "").trim();
+      }
+      if (body.showFotyInNav !== undefined) {
+        newSettings.showFotyInNav = Boolean(body.showFotyInNav);
+      }
+      if (body.protectCurrent !== undefined) {
+        newSettings.protectCurrent = Boolean(body.protectCurrent);
+      }
+      if (body.currentPassword !== undefined) {
+        newSettings.currentPassword = String(body.currentPassword || "").trim();
+      }
+      if (body.showCurrentInNav !== undefined) {
+        newSettings.showCurrentInNav = Boolean(body.showCurrentInNav);
+      }
+      if (body.weeklyMatches !== undefined && Array.isArray(body.weeklyMatches)) {
+        newSettings.weeklyMatches = body.weeklyMatches;
+      }
+      if (body.tournamentWeeklyMatches !== undefined && Array.isArray(body.tournamentWeeklyMatches)) {
+        newSettings.tournamentWeeklyMatches = body.tournamentWeeklyMatches;
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -267,7 +331,37 @@ export async function POST(request) {
           showWarmupTable: newSettings.showWarmupTable !== false,
           showPollTable: newSettings.showPollTable !== false,
           showTrialPollTable: newSettings.showTrialPollTable !== false,
+          protectFoty: newSettings.protectFoty,
+          fotyPassword: newSettings.fotyPassword,
+          showFotyInNav: newSettings.showFotyInNav !== false,
+          protectCurrent: newSettings.protectCurrent,
+          currentPassword: newSettings.currentPassword,
+          showCurrentInNav: newSettings.showCurrentInNav !== false,
+          weeklyMatches: newSettings.weeklyMatches || [],
+          tournamentWeeklyMatches: newSettings.tournamentWeeklyMatches || [],
         },
+      });
+    }
+
+    // Save weekly matches for homepage action
+    if (body.action === "save_weekly_matches" && Array.isArray(body.weeklyMatches)) {
+      const newSettings = { ...current, weeklyMatches: body.weeklyMatches };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        message: "บันทึกตารางแข่งขันประจำสัปดาห์หน้าแรกเรียบร้อยแล้ว",
+        weeklyMatches: newSettings.weeklyMatches,
+      });
+    }
+
+    // Save tournament weekly matches action
+    if (body.action === "save_tournament_weekly_matches" && Array.isArray(body.tournamentWeeklyMatches)) {
+      const newSettings = { ...current, tournamentWeeklyMatches: body.tournamentWeeklyMatches };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        message: "บันทึกตารางแข่งขันประจำสัปดาห์ทัวร์นาเมนต์เรียบร้อยแล้ว",
+        tournamentWeeklyMatches: newSettings.tournamentWeeklyMatches,
       });
     }
 

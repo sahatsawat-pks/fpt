@@ -132,6 +132,25 @@ export default function TournamentClient({ initialData }) {
   const [selectedLiveIndex, setSelectedLiveIndex] = useState(0);
   const [showLiveBanner, setShowLiveBanner] = useState(true);
 
+  // Settings for Nav
+  const [navSettings, setNavSettings] = useState({ showFotyInNav: true, showCurrentInNav: true });
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/settings");
+        const json = await res.json();
+        if (json && json.success) {
+          setNavSettings({
+            showFotyInNav: json.showFotyInNav !== false,
+            showCurrentInNav: json.showCurrentInNav !== false,
+          });
+        }
+      } catch (e) {}
+    }
+    fetchSettings();
+  }, []);
+
   // Fetch latest data from API if initialData was not provided
   useEffect(() => {
     if (initialData) return;
@@ -648,20 +667,22 @@ export default function TournamentClient({ initialData }) {
             >
               หน้าแรก
             </Link>
-            <Link
-              href="/#leaderboard"
-              style={{
-                padding: "8px 16px",
-                borderRadius: "6px",
-                color: "#e0f2fe",
-                fontWeight: "600",
-                fontSize: "14px",
-                textDecoration: "none",
-                transition: "background 0.2s",
-              }}
-            >
-              ตารางคะแนน
-            </Link>
+            {navSettings.showFotyInNav && (
+              <Link
+                href="/fan-of-the-year"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  color: "#e0f2fe",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                  transition: "background 0.2s",
+                }}
+              >
+                ตารางคะแนนแห่งปี
+              </Link>
+            )}
             <Link
               href="/history"
               style={{
@@ -683,20 +704,35 @@ export default function TournamentClient({ initialData }) {
               style={{
                 padding: "8px 16px",
                 borderRadius: "6px",
-                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.35) 0%, rgba(0, 150, 200, 0.25) 100%)",
-                border: "1.5px solid #00e5ff",
-                color: "#ffffff",
-                fontWeight: "800",
+                color: "#00e5ff",
+                fontWeight: "700",
                 fontSize: "14px",
                 textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
                 gap: "5px",
-                boxShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
               }}
             >
               <span>⚔️</span> ทัวร์นาเมนต์
             </Link>
+            {navSettings.showCurrentInNav && (
+              <Link
+                href="/current"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  background: "linear-gradient(90deg, rgba(0, 229, 255, 0.35) 0%, rgba(0, 150, 200, 0.25) 100%)",
+                  border: "1.5px solid #00e5ff",
+                  color: "#ffffff",
+                  fontWeight: "800",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                  boxShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
+                }}
+              >
+                ตารางปัจจุบัน
+              </Link>
+            )}
             <Link
               href="/draw"
               style={{
@@ -781,25 +817,27 @@ export default function TournamentClient({ initialData }) {
             >
               <span style={{ fontSize: "16px" }}>🏠</span> หน้าแรก
             </Link>
-            <Link
-              href="/#leaderboard"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: "11px 16px",
-                borderRadius: "10px",
-                background: "rgba(255, 255, 255, 0.05)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
-                color: "#e0f2fe",
-                fontWeight: "700",
-                fontSize: "15px",
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนหลัก
-            </Link>
+            {navSettings.showFotyInNav && (
+              <Link
+                href="/fan-of-the-year"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: "11px 16px",
+                  borderRadius: "10px",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "#e0f2fe",
+                  fontWeight: "700",
+                  fontSize: "15px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <span style={{ fontSize: "16px" }}>📊</span> ตารางคะแนนแห่งปี
+              </Link>
+            )}
             <Link
               href="/history"
               onClick={() => setMobileMenuOpen(false)}
@@ -825,8 +863,8 @@ export default function TournamentClient({ initialData }) {
               style={{
                 padding: "11px 16px",
                 borderRadius: "10px",
-                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.25) 0%, rgba(59, 130, 246, 0.15) 100%)",
-                border: "1.5px solid #00e5ff",
+                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.4)",
                 color: "#00e5ff",
                 fontWeight: "800",
                 fontSize: "15px",
@@ -834,11 +872,31 @@ export default function TournamentClient({ initialData }) {
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-                boxShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
               }}
             >
               <span style={{ fontSize: "16px" }}>⚔️</span> ทัวร์นาเมนต์ (Tournament)
             </Link>
+            {navSettings.showCurrentInNav && (
+              <Link
+                href="/current"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: "11px 16px",
+                  borderRadius: "10px",
+                  background: "rgba(0, 229, 255, 0.25)",
+                  border: "1px solid #00e5ff",
+                  color: "#ffffff",
+                  fontWeight: "800",
+                  fontSize: "15px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <span style={{ fontSize: "16px" }}>📊</span> ตารางทัวร์นาเมนต์ปัจจุบัน
+              </Link>
+            )}
             <Link
               href="/draw"
               onClick={() => setMobileMenuOpen(false)}
