@@ -1798,28 +1798,6 @@ export default function TournamentClient({
           3. MAIN CONTENT CONTAINER
          ======================================================== */}
       <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "36px clamp(24px, 4vw, 56px) 80px clamp(24px, 4vw, 56px)" }}>
-        {/* Cutoff Match Alert for Public View */}
-        {isPublicView && cutoffMatch !== "all" && (
-          <div
-            style={{
-              maxWidth: "800px",
-              margin: "0 auto 24px auto",
-              padding: "10px 20px",
-              borderRadius: "12px",
-              background: "rgba(0, 229, 255, 0.12)",
-              border: "1px solid rgba(0, 229, 255, 0.4)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "13px",
-            }}
-          >
-            <span style={{ color: "#ffd700", fontWeight: "700" }}>
-              📺 ข้อมูลการแข่งขันอัปเดตถึงคู่ที่: <b style={{ color: "#00e5ff" }}>#{cutoffMatch}</b>
-            </span>
-          </div>
-        )}
-
         {/* Navigation Tabs (Style matches other pages) */}
         <div
           style={{
