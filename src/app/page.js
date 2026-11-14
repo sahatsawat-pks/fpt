@@ -692,7 +692,7 @@ export default function MainPage() {
                   boxShadow: "0 0 15px rgba(255, 215, 0, 0.3)",
                 }}
               >
-                🏆 ทำเนียบแชมป์ (4 คน)
+                🏆 ทำเนียบแชมป์
               </a>
             )}
           </div>
