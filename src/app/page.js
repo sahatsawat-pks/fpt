@@ -45,19 +45,32 @@ export default function MainPage() {
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedSpotlight, setSelectedSpotlight] = useState(null);
+  const [selectedAuditionSpotlight, setSelectedAuditionSpotlight] = useState(null);
   const [activeVideoModal, setActiveVideoModal] = useState(null);
+
+  // FOTY Qualifying & Poll on Home States
+  const [showFotyQualifyingOnHome, setShowFotyQualifyingOnHome] = useState(false);
+  const [showPollTable, setShowPollTable] = useState(true);
+  const [fotyRevealUpToOrder, setFotyRevealUpToOrder] = useState("all");
+  const [fotyRevealCategory, setFotyRevealCategory] = useState("attribute");
+  const [fotyReveal3SecPartial, setFotyReveal3SecPartial] = useState(0);
+  const [pollList, setPollList] = useState([]);
+  const [activeFotyHomeTab, setActiveFotyHomeTab] = useState("standings");
+  const [fotySearchQuery, setFotySearchQuery] = useState("");
 
   // Load data & settings
   const fetchData = async () => {
     try {
-      const [scoresRes, settingsRes, historyRes] = await Promise.all([
+      const [scoresRes, settingsRes, historyRes, pollRes] = await Promise.all([
         fetch("/api/scores"),
         fetch("/api/settings"),
         fetch("/api/history"),
+        fetch("/api/poll"),
       ]);
       const scoresData = await scoresRes.json();
       const settingsData = await settingsRes.json();
       const historyResData = await historyRes.json();
+      const pollData = await pollRes.json();
 
       if (scoresData.success && Array.isArray(scoresData.data)) {
         setLeaderboard(scoresData.data);
@@ -67,11 +80,25 @@ export default function MainPage() {
       } else {
         setHistoryState(historyData);
       }
+      if (pollData.success && Array.isArray(pollData.data)) {
+        setPollList(pollData.data);
+      }
       if (settingsData.success) {
         setShowFotyInNav(settingsData.showFotyInNav !== false);
         setShowCurrentInNav(settingsData.showCurrentInNav !== false);
         setShowChampionsOnHome(settingsData.showChampionsOnHome !== false);
         setShowWarmupTable(settingsData.showWarmupTable !== false);
+        setShowFotyQualifyingOnHome(Boolean(settingsData.showFotyQualifyingOnHome));
+        setShowPollTable(settingsData.showPollTable !== false);
+        if (settingsData.fotyRevealUpToOrder !== undefined) {
+          setFotyRevealUpToOrder(settingsData.fotyRevealUpToOrder);
+        }
+        if (settingsData.fotyRevealCategory !== undefined) {
+          setFotyRevealCategory(settingsData.fotyRevealCategory);
+        }
+        if (settingsData.fotyReveal3SecPartial !== undefined) {
+          setFotyReveal3SecPartial(settingsData.fotyReveal3SecPartial);
+        }
         if (settingsData.fotyAirUpToEpisode !== undefined) {
           setFotyAirUpToEpisode(settingsData.fotyAirUpToEpisode);
         }
@@ -147,6 +174,7 @@ export default function MainPage() {
         isNext,
         player1: c1
           ? {
+              ...c1,
               photo: c1.image,
               nickname: c1.nickname,
               name: c1.name,
@@ -158,6 +186,7 @@ export default function MainPage() {
           : null,
         player2: c2
           ? {
+              ...c2,
               photo: c2.image,
               nickname: c2.nickname,
               name: c2.name,
@@ -177,6 +206,178 @@ export default function MainPage() {
     const maxEp = fotyAirUpToEpisode === "all" ? 999 : (Number(fotyAirUpToEpisode) || 0);
     return fotyWeeklyEpisodes.filter((ep) => ep.episodeNum <= maxEp);
   }, [fotyWeeklyEpisodes, fotyAirUpToEpisode, dataLoaded]);
+
+  // Avatar map for lookup by name/nickname
+  const avatarMap = useMemo(() => {
+    const map = new Map();
+    (leaderboard || []).forEach((c) => {
+      if (c.name) map.set(c.name, c.image);
+      if (c.nickname) map.set(c.nickname, c.image);
+    });
+    return map;
+  }, [leaderboard]);
+
+  // FOTY Qualifying Standings with Live Reveal logic
+  const revealedQualifyingList = useMemo(() => {
+    if (!Array.isArray(leaderboard) || leaderboard.length === 0) return [];
+    const maxOrder = fotyRevealUpToOrder === "all" ? 999 : (Number(fotyRevealUpToOrder) || 0);
+
+    const list = leaderboard.map((c) => {
+      const cOrder = Number(c.order) || 999;
+      const originalScores = c.scores || {};
+
+      let revealedScores = {
+        "3sec": "-",
+        "qa": "-",
+        "jigsaw": "-",
+        "attribute": "-",
+      };
+      let revealedTotal = null;
+      let revealStatus = "pending"; // 'completed' | 'in_progress' | 'pending'
+      let statusLabel = "⏳ รอแข่งขัน";
+
+      if (cOrder < maxOrder) {
+        // Prior contestants: completely revealed
+        revealedScores = {
+          "3sec": originalScores["3sec"] ?? 0,
+          "qa": originalScores["qa"] ?? 0,
+          "jigsaw": originalScores["jigsaw"] ?? 0,
+          "attribute": originalScores["attribute"] ?? 0,
+        };
+        revealedTotal = (Number(revealedScores["3sec"]) || 0) +
+                        (Number(revealedScores["qa"]) || 0) +
+                        (Number(revealedScores["jigsaw"]) || 0) +
+                        (Number(revealedScores["attribute"]) || 0);
+        revealStatus = "completed";
+        statusLabel = "✓ แข่งขันจบแล้ว";
+      } else if (cOrder === maxOrder) {
+        // Active latest contestant being revealed
+        if (fotyRevealCategory === "attribute") {
+          revealedScores = {
+            "3sec": originalScores["3sec"] ?? 0,
+            "qa": originalScores["qa"] ?? 0,
+            "jigsaw": originalScores["jigsaw"] ?? 0,
+            "attribute": originalScores["attribute"] ?? 0,
+          };
+          revealedTotal = (Number(revealedScores["3sec"]) || 0) +
+                          (Number(revealedScores["qa"]) || 0) +
+                          (Number(revealedScores["jigsaw"]) || 0) +
+                          (Number(revealedScores["attribute"]) || 0);
+          revealStatus = "completed";
+          statusLabel = "✓ แข่งขันจบแล้ว";
+        } else if (fotyRevealCategory === "jigsaw") {
+          revealedScores = {
+            "3sec": originalScores["3sec"] ?? 0,
+            "qa": originalScores["qa"] ?? 0,
+            "jigsaw": originalScores["jigsaw"] ?? 0,
+            "attribute": "-",
+          };
+          revealedTotal = (Number(revealedScores["3sec"]) || 0) +
+                          (Number(revealedScores["qa"]) || 0) +
+                          (Number(revealedScores["jigsaw"]) || 0);
+          revealStatus = "in_progress";
+          statusLabel = "🔴 กำลังแข่งขัน (ถึงจิ๊กซอว์)";
+        } else if (fotyRevealCategory === "qa") {
+          revealedScores = {
+            "3sec": originalScores["3sec"] ?? 0,
+            "qa": originalScores["qa"] ?? 0,
+            "jigsaw": "-",
+            "attribute": "-",
+          };
+          revealedTotal = (Number(revealedScores["3sec"]) || 0) +
+                          (Number(revealedScores["qa"]) || 0);
+          revealStatus = "in_progress";
+          statusLabel = "🔴 กำลังแข่งขัน (ถึงถาม-ตอบ)";
+        } else if (fotyRevealCategory === "3sec") {
+          revealedScores = {
+            "3sec": originalScores["3sec"] ?? 0,
+            "qa": "-",
+            "jigsaw": "-",
+            "attribute": "-",
+          };
+          revealedTotal = Number(originalScores["3sec"]) || 0;
+          revealStatus = "in_progress";
+          statusLabel = "🔴 กำลังแข่งขัน (จบ 3 วินาที)";
+        } else if (fotyRevealCategory === "3sec_in_progress") {
+          const partial = Number(fotyReveal3SecPartial) || 0;
+          revealedScores = {
+            "3sec": `${partial}*`,
+            "qa": "-",
+            "jigsaw": "-",
+            "attribute": "-",
+          };
+          revealedTotal = partial;
+          revealStatus = "in_progress";
+          statusLabel = `🔴 กำลังเล่น 3 วินาที (${partial} คะแนน)`;
+        } else {
+          // 'none'
+          revealStatus = "pending";
+          statusLabel = "⏳ รอแข่งขัน";
+          revealedTotal = null;
+        }
+      } else {
+        // Future contestants: hidden
+        revealStatus = "pending";
+        statusLabel = "⏳ รอแข่งขัน";
+        revealedTotal = null;
+      }
+
+      return {
+        ...c,
+        revealedScores,
+        revealedTotal,
+        revealStatus,
+        statusLabel,
+      };
+    });
+
+    const played = list.filter((c) => c.revealStatus !== "pending" && c.revealedTotal !== null);
+    const unplayed = list.filter((c) => c.revealStatus === "pending" || c.revealedTotal === null);
+
+    played.sort((a, b) => {
+      if (b.revealedTotal !== a.revealedTotal) {
+        return b.revealedTotal - a.revealedTotal;
+      }
+      return (Number(a.order) || 0) - (Number(b.order) || 0);
+    });
+
+    let currentRank = 1;
+    played.forEach((c, idx) => {
+      if (idx > 0 && c.revealedTotal < played[idx - 1].revealedTotal) {
+        currentRank = idx + 1;
+      }
+      c.denseRank = currentRank;
+    });
+
+    unplayed.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+    unplayed.forEach((c) => {
+      c.denseRank = "-";
+    });
+
+    return [...played, ...unplayed];
+  }, [leaderboard, fotyRevealUpToOrder, fotyRevealCategory, fotyReveal3SecPartial]);
+
+  // Filtered Qualifying List for search
+  const filteredQualifyingList = useMemo(() => {
+    if (!fotySearchQuery.trim()) return revealedQualifyingList;
+    const q = fotySearchQuery.toLowerCase().trim();
+    return revealedQualifyingList.filter((c) =>
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.nickname && c.nickname.toLowerCase().includes(q)) ||
+      (c.topic && c.topic.toLowerCase().includes(q))
+    );
+  }, [revealedQualifyingList, fotySearchQuery]);
+
+  // Filtered Poll List for search
+  const filteredPollList = useMemo(() => {
+    if (!fotySearchQuery.trim()) return pollList;
+    const q = fotySearchQuery.toLowerCase().trim();
+    return (pollList || []).filter((p) =>
+      (p.name && p.name.toLowerCase().includes(q)) ||
+      (p.nickname && p.nickname.toLowerCase().includes(q)) ||
+      (p.topic && p.topic.toLowerCase().includes(q))
+    );
+  }, [pollList, fotySearchQuery]);
 
   // Warmup contestants: contestants that have warmupSchedule
   const warmupContestants = useMemo(() => {
@@ -844,6 +1045,8 @@ export default function MainPage() {
                   {/* Center: Contestants (Individual Play - เล่นใครเล่นมัน) */}
                   <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
                     <div
+                      onClick={() => isCompleted && m.player1 && setSelectedAuditionSpotlight(m.player1)}
+                      title={isCompleted ? "คลิกเพื่อดูคะแนนละเอียด" : ""}
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -853,6 +1056,20 @@ export default function MainPage() {
                         borderRadius: "14px",
                         padding: "10px 14px",
                         minWidth: "170px",
+                        cursor: isCompleted ? "pointer" : "default",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (isCompleted) {
+                          e.currentTarget.style.borderColor = "#00e5ff";
+                          e.currentTarget.style.background = "rgba(0, 229, 255, 0.12)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (isCompleted) {
+                          e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.25)";
+                          e.currentTarget.style.background = "rgba(0, 0, 0, 0.35)";
+                        }
                       }}
                     >
                       <div
@@ -876,7 +1093,12 @@ export default function MainPage() {
                         )}
                       </div>
                       <div style={{ display: "flex", flexDirection: "column" }}>
-                        <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p1Name}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p1Name}</span>
+                          {isCompleted && (
+                            <span style={{ fontSize: "10px", color: "#00e5ff", fontWeight: "700" }}>🔍</span>
+                          )}
+                        </div>
                         {p1Topic && (
                           <span style={{ fontSize: "11px", color: "#94a3b8", maxWidth: "130px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {p1Topic}
@@ -899,6 +1121,8 @@ export default function MainPage() {
 
                     {hasP2 && (
                       <div
+                        onClick={() => isCompleted && m.player2 && setSelectedAuditionSpotlight(m.player2)}
+                        title={isCompleted ? "คลิกเพื่อดูคะแนนละเอียด" : ""}
                         style={{
                           display: "flex",
                           alignItems: "center",
@@ -908,6 +1132,20 @@ export default function MainPage() {
                           borderRadius: "14px",
                           padding: "10px 14px",
                           minWidth: "170px",
+                          cursor: isCompleted ? "pointer" : "default",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (isCompleted) {
+                            e.currentTarget.style.borderColor = "#00e5ff";
+                            e.currentTarget.style.background = "rgba(0, 229, 255, 0.12)";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (isCompleted) {
+                            e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.25)";
+                            e.currentTarget.style.background = "rgba(0, 0, 0, 0.35)";
+                          }
                         }}
                       >
                         <div
@@ -931,7 +1169,12 @@ export default function MainPage() {
                           )}
                         </div>
                         <div style={{ display: "flex", flexDirection: "column" }}>
-                          <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p2Name}</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "14px", fontWeight: "800", color: "#e0f2fe" }}>{p2Name}</span>
+                            {isCompleted && (
+                              <span style={{ fontSize: "10px", color: "#00e5ff", fontWeight: "700" }}>🔍</span>
+                            )}
+                          </div>
                           {p2Topic && (
                             <span style={{ fontSize: "11px", color: "#94a3b8", maxWidth: "130px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                               {p2Topic}
@@ -1027,6 +1270,524 @@ export default function MainPage() {
           </div>
         )}
       </section>
+
+      {/* ========================================================
+          3.5 SECTION: แฟนพันธุ์แท้แห่งปี 2026 (FAN OF THE YEAR 2026)
+              - ตารางคะแนนรอบคัดเลือก & อันดับผลโพลล์
+         ======================================================== */}
+      {dataLoaded && (showFotyQualifyingOnHome || showPollTable) && (
+        <section
+          id="foty-qualifying"
+          style={{
+            maxWidth: "1320px",
+            margin: "0 auto 60px auto",
+            padding: "0 20px",
+          }}
+        >
+          {/* Section Header */}
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "6px 18px",
+                borderRadius: "50px",
+                background: "linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, rgba(255, 215, 0, 0.15) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.4)",
+                color: "#00e5ff",
+                fontSize: "13px",
+                fontWeight: "800",
+                letterSpacing: "1px",
+                marginBottom: "12px",
+              }}
+            >
+              <span>⚔️</span> FAN OF THE YEAR 2026
+            </div>
+            <h2
+              style={{
+                fontSize: "clamp(26px, 4vw, 38px)",
+                fontWeight: "900",
+                color: "#ffffff",
+                margin: "0 0 10px 0",
+              }}
+            >
+              {activeFotyHomeTab === "standings" && showFotyQualifyingOnHome
+                ? "ตารางคะแนนการแข่งขัน แฟนพันธุ์แท้แห่งปี 2026"
+                : "ตารางอันดับโพลล์ความนิยม (Fan Poll Ranking)"}
+            </h2>
+            <p style={{ color: "#94a3b8", fontSize: "15px", maxWidth: "650px", margin: "0 auto" }}>
+              {activeFotyHomeTab === "standings" && showFotyQualifyingOnHome
+                ? "รอบคัดเลือก (Qualifying Phase) ค้นหา 5 ยอดฝีมือที่มีคะแนนสูงสุด เพื่อผ่านเข้าสู่รอบชิงชนะเลิศ (The Finals)"
+                : "อันดับผลสำรวจความนิยมและความคาดหวังของผู้เข้าแข่งขัน แฟนพันธุ์แท้แห่งปี 2026 จากแฟนรายการ"}
+            </p>
+          </div>
+
+          {/* Tab Switcher (if both are enabled) */}
+          {showFotyQualifyingOnHome && showPollTable && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                marginBottom: "28px",
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveFotyHomeTab("standings")}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "12px",
+                  background:
+                    activeFotyHomeTab === "standings"
+                      ? "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)"
+                      : "rgba(16, 32, 60, 0.65)",
+                  color: activeFotyHomeTab === "standings" ? "#030812" : "#80d0ff",
+                  border:
+                    activeFotyHomeTab === "standings"
+                      ? "1.5px solid #00e5ff"
+                      : "1px solid rgba(0, 229, 255, 0.25)",
+                  fontSize: "15px",
+                  fontWeight: "800",
+                  cursor: "pointer",
+                  boxShadow:
+                    activeFotyHomeTab === "standings"
+                      ? "0 0 20px rgba(0, 229, 255, 0.45)"
+                      : "none",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                📊 ตารางคะแนนรอบคัดเลือก (Qualifying)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveFotyHomeTab("poll")}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "12px",
+                  background:
+                    activeFotyHomeTab === "poll"
+                      ? "linear-gradient(90deg, #ffd700 0%, #d48806 100%)"
+                      : "rgba(30, 24, 10, 0.65)",
+                  color: activeFotyHomeTab === "poll" ? "#030812" : "#ffd700",
+                  border:
+                    activeFotyHomeTab === "poll"
+                      ? "1.5px solid #ffd700"
+                      : "1px solid rgba(255, 215, 0, 0.25)",
+                  fontSize: "15px",
+                  fontWeight: "800",
+                  cursor: "pointer",
+                  boxShadow:
+                    activeFotyHomeTab === "poll"
+                      ? "0 0 20px rgba(255, 215, 0, 0.45)"
+                      : "none",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                🗳️ ตารางอันดับโพลล์ (Fan Poll)
+              </button>
+            </div>
+          )}
+
+          {/* Search Bar */}
+          <div
+            style={{
+              background: "linear-gradient(145deg, rgba(16, 32, 60, 0.75) 0%, rgba(8, 16, 32, 0.9) 100%)",
+              border: "1px solid rgba(0, 229, 255, 0.25)",
+              borderRadius: "14px",
+              padding: "12px 18px",
+              marginBottom: "20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <span style={{ fontSize: "16px" }}>🔍</span>
+            <input
+              type="text"
+              value={fotySearchQuery}
+              onChange={(e) => setFotySearchQuery(e.target.value)}
+              placeholder="ค้นหาชื่อจริง, ชื่อเล่น หรือหัวข้อแฟนพันธุ์แท้..."
+              style={{
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                color: "#fff",
+                fontSize: "14px",
+                outline: "none",
+              }}
+            />
+            {fotySearchQuery && (
+              <button
+                type="button"
+                onClick={() => setFotySearchQuery("")}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "rgba(255,255,255,0.5)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* VIEW 1: QUALIFYING STANDINGS TABLE */}
+          {(activeFotyHomeTab === "standings" || !showPollTable) && showFotyQualifyingOnHome && (
+            <div
+              style={{
+                background: "linear-gradient(180deg, rgba(10, 20, 36, 0.95) 0%, rgba(5, 12, 24, 0.98) 100%)",
+                border: "1.5px solid rgba(0, 229, 255, 0.35)",
+                borderRadius: "20px",
+                padding: "20px",
+                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.6)",
+                overflowX: "auto",
+              }}
+            >
+              <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 8px", minWidth: "820px" }}>
+                <thead>
+                  <tr style={{ color: "rgba(255,255,255,0.7)", fontSize: "12px", textTransform: "uppercase" }}>
+                    <th style={{ padding: "10px", textAlign: "center", width: "55px" }}>อันดับ</th>
+                    <th style={{ padding: "10px", textAlign: "center", width: "50px" }}>ลำดับ</th>
+                    <th style={{ padding: "10px", textAlign: "left" }}>ผู้เข้าแข่งขัน & หัวข้อ</th>
+                    <th style={{ padding: "10px", textAlign: "center", width: "80px", color: "#86efac" }}>3 วินาที</th>
+                    <th style={{ padding: "10px", textAlign: "center", width: "80px", color: "#f3f4f6" }}>ถาม-ตอบ</th>
+                    <th style={{ padding: "10px", textAlign: "center", width: "80px", color: "#fca5a5" }}>จิ๊กซอว์</th>
+                    <th style={{ padding: "10px", textAlign: "center", width: "80px", color: "#67e8f9" }}>คุณสมบัติ</th>
+                    <th style={{ padding: "10px", textAlign: "center", width: "95px", color: "#ffd700" }}>รวมคะแนน</th>
+                    <th style={{ padding: "10px", textAlign: "center", width: "145px" }}>สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredQualifyingList.map((c) => {
+                    const isTop5 = typeof c.denseRank === "number" && c.denseRank <= 5;
+                    const isLive = c.revealStatus === "in_progress";
+                    const isCompleted = c.revealStatus === "completed";
+
+                    return (
+                      <tr
+                        key={c.id || c.order}
+                        onClick={() => setSelectedAuditionSpotlight(c)}
+                        title="คลิกเพื่อดูรายละเอียดคะแนน"
+                        style={{
+                          background: isLive
+                            ? "linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)"
+                            : isTop5
+                            ? "linear-gradient(90deg, rgba(255, 215, 0, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%)"
+                            : "rgba(255, 255, 255, 0.03)",
+                          borderRadius: "10px",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                          border: isLive
+                            ? "1px solid #ef4444"
+                            : isTop5
+                            ? "1px solid rgba(255, 215, 0, 0.35)"
+                            : "1px solid rgba(255, 255, 255, 0.06)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = isTop5
+                            ? "rgba(255, 215, 0, 0.2)"
+                            : "rgba(0, 229, 255, 0.12)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = isLive
+                            ? "linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)"
+                            : isTop5
+                            ? "linear-gradient(90deg, rgba(255, 215, 0, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%)"
+                            : "rgba(255, 255, 255, 0.03)";
+                        }}
+                      >
+                        {/* Rank */}
+                        <td style={{ padding: "12px 10px", textAlign: "center" }}>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              width: "30px",
+                              height: "30px",
+                              lineHeight: "30px",
+                              borderRadius: "50%",
+                              background: isTop5
+                                ? "linear-gradient(135deg, #ffd700 0%, #b8860b 100%)"
+                                : "rgba(255,255,255,0.08)",
+                              color: isTop5 ? "#030812" : "#fff",
+                              fontWeight: "900",
+                              fontSize: "13px",
+                            }}
+                          >
+                            {c.denseRank}
+                          </span>
+                        </td>
+
+                        {/* Order */}
+                        <td style={{ padding: "12px 10px", textAlign: "center", color: "rgba(255,255,255,0.6)", fontSize: "12px", fontWeight: "700" }}>
+                          #{c.order}
+                        </td>
+
+                        {/* Contestant info */}
+                        <td style={{ padding: "12px 10px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <div
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                overflow: "hidden",
+                                border: isTop5 ? "1.5px solid #ffd700" : "1.5px solid #00e5ff",
+                                background: "#081020",
+                                flexShrink: 0,
+                              }}
+                            >
+                              {c.image ? (
+                                <img
+                                  src={getOptimizedImageUrl(c.image, 100)}
+                                  alt={c.name}
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                              ) : (
+                                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  👤
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: "14px", fontWeight: "800", color: "#fff" }}>
+                                {c.nickname && <span style={{ color: "#00e5ff" }}>({c.nickname})</span>}{" "}
+                                {c.name}
+                              </div>
+                              <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                                {c.topic}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* 3sec */}
+                        <td style={{ padding: "12px 10px", textAlign: "center", fontWeight: "800", color: "#86efac", fontSize: "14px" }}>
+                          {c.revealedScores?.["3sec"]}
+                        </td>
+
+                        {/* qa */}
+                        <td style={{ padding: "12px 10px", textAlign: "center", fontWeight: "800", color: "#f3f4f6", fontSize: "14px" }}>
+                          {c.revealedScores?.["qa"]}
+                        </td>
+
+                        {/* jigsaw */}
+                        <td style={{ padding: "12px 10px", textAlign: "center", fontWeight: "800", color: "#fca5a5", fontSize: "14px" }}>
+                          {c.revealedScores?.["jigsaw"]}
+                        </td>
+
+                        {/* attribute */}
+                        <td style={{ padding: "12px 10px", textAlign: "center", fontWeight: "800", color: "#67e8f9", fontSize: "14px" }}>
+                          {c.revealedScores?.["attribute"]}
+                        </td>
+
+                        {/* Total Score */}
+                        <td style={{ padding: "12px 10px", textAlign: "center", fontWeight: "900", color: "#ffd700", fontSize: "16px" }}>
+                          {c.revealedTotal !== null && c.revealedTotal !== undefined ? `${c.revealedTotal}` : "-"}
+                        </td>
+
+                        {/* Status */}
+                        <td style={{ padding: "12px 10px", textAlign: "center" }}>
+                          {isLive ? (
+                            <span
+                              style={{
+                                padding: "4px 8px",
+                                borderRadius: "6px",
+                                background: "rgba(239, 68, 68, 0.25)",
+                                border: "1px solid #ef4444",
+                                color: "#fca5a5",
+                                fontSize: "11px",
+                                fontWeight: "800",
+                                display: "inline-block",
+                              }}
+                            >
+                              {c.statusLabel}
+                            </span>
+                          ) : isTop5 && isCompleted ? (
+                            <span
+                              style={{
+                                padding: "4px 8px",
+                                borderRadius: "6px",
+                                background: "rgba(255, 215, 0, 0.2)",
+                                border: "1px solid #ffd700",
+                                color: "#ffd700",
+                                fontSize: "11px",
+                                fontWeight: "800",
+                                display: "inline-block",
+                              }}
+                            >
+                              🏆 ผ่านเข้ารอบ 5 คน
+                            </span>
+                          ) : (
+                            <span
+                              style={{
+                                padding: "4px 8px",
+                                borderRadius: "6px",
+                                background: isCompleted ? "rgba(82, 196, 26, 0.15)" : "rgba(255,255,255,0.06)",
+                                border: isCompleted ? "1px solid rgba(82, 196, 26, 0.4)" : "1px solid rgba(255,255,255,0.12)",
+                                color: isCompleted ? "#86efac" : "rgba(255,255,255,0.5)",
+                                fontSize: "11px",
+                                fontWeight: "700",
+                                display: "inline-block",
+                              }}
+                            >
+                              {c.statusLabel}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* VIEW 2: POLL TABLE */}
+          {(activeFotyHomeTab === "poll" || !showFotyQualifyingOnHome) && showPollTable && (
+            <div
+              style={{
+                background: "linear-gradient(180deg, rgba(16, 24, 40, 0.95) 0%, rgba(8, 14, 24, 0.98) 100%)",
+                border: "1.5px solid rgba(255, 215, 0, 0.35)",
+                borderRadius: "20px",
+                padding: "20px",
+                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.6)",
+                overflowX: "auto",
+              }}
+            >
+              <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 8px", minWidth: "650px" }}>
+                <thead>
+                  <tr style={{ color: "rgba(255,255,255,0.7)", fontSize: "12px", textTransform: "uppercase" }}>
+                    <th style={{ padding: "10px", textAlign: "center", width: "65px" }}>อันดับโพล</th>
+                    <th style={{ padding: "10px", textAlign: "left" }}>ผู้เข้าแข่งขัน & หัวข้อ</th>
+                    <th style={{ padding: "10px", textAlign: "right", width: "120px", color: "#ffd700" }}>สัดส่วนคะแนน</th>
+                    <th style={{ padding: "10px", textAlign: "left", width: "160px" }}>แผนภูมิ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPollList.map((p, idx) => {
+                    const avatar = avatarMap.get(p.name) || avatarMap.get(p.nickname) || "";
+                    const rank = Number(p.pollRank || idx + 1);
+                    const isTop3 = rank <= 3;
+                    const percentNum = parseFloat(p.percent) || 0;
+
+                    return (
+                      <tr
+                        key={idx}
+                        style={{
+                          background: isTop3
+                            ? "linear-gradient(90deg, rgba(255, 215, 0, 0.12) 0%, rgba(15, 23, 42, 0.75) 100%)"
+                            : "rgba(255, 255, 255, 0.03)",
+                          borderRadius: "10px",
+                          border: isTop3 ? "1px solid rgba(255, 215, 0, 0.35)" : "1px solid rgba(255, 255, 255, 0.06)",
+                        }}
+                      >
+                        {/* Poll Rank */}
+                        <td style={{ padding: "12px 10px", textAlign: "center" }}>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              lineHeight: "32px",
+                              borderRadius: "50%",
+                              background:
+                                rank === 1
+                                  ? "linear-gradient(135deg, #ffd700 0%, #b8860b 100%)"
+                                  : rank === 2
+                                  ? "linear-gradient(135deg, #e0e0e0 0%, #9e9e9e 100%)"
+                                  : rank === 3
+                                  ? "linear-gradient(135deg, #cd7f32 0%, #8c4a16 100%)"
+                                  : "rgba(255,255,255,0.08)",
+                              color: isTop3 ? "#030812" : "#fff",
+                              fontWeight: "900",
+                              fontSize: "13px",
+                            }}
+                          >
+                            #{rank}
+                          </span>
+                        </td>
+
+                        {/* Contestant */}
+                        <td style={{ padding: "12px 10px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <div
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                overflow: "hidden",
+                                border: isTop3 ? "1.5px solid #ffd700" : "1.5px solid rgba(0, 229, 255, 0.5)",
+                                background: "#081020",
+                                flexShrink: 0,
+                              }}
+                            >
+                              {avatar ? (
+                                <img
+                                  src={getOptimizedImageUrl(avatar, 100)}
+                                  alt={p.name}
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                              ) : (
+                                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  👤
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: "14px", fontWeight: "800", color: "#fff" }}>
+                                {p.nickname && <span style={{ color: "#ffd700" }}>({p.nickname})</span>}{" "}
+                                {p.name}
+                              </div>
+                              <div style={{ fontSize: "12px", color: "#94a3b8" }}>
+                                {p.topic}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Percentage */}
+                        <td style={{ padding: "12px 10px", textAlign: "right", fontWeight: "900", color: "#ffd700", fontSize: "15px" }}>
+                          {p.percent}
+                        </td>
+
+                        {/* Progress Bar */}
+                        <td style={{ padding: "12px 10px" }}>
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "10px",
+                              borderRadius: "10px",
+                              background: "rgba(255,255,255,0.08)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: `${Math.min(percentNum * 8, 100)}%`,
+                                height: "100%",
+                                borderRadius: "10px",
+                                background: isTop3
+                                  ? "linear-gradient(90deg, #ffd700 0%, #ff9900 100%)"
+                                  : "linear-gradient(90deg, #00e5ff 0%, #0077b6 100%)",
+                              }}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ========================================================
           4. SECTION: ผู้เข้าแข่งขันรอบอุ่นเครื่อง (CONTESTANTS AWAITING COMPETITION)
@@ -1435,6 +2196,463 @@ export default function MainPage() {
           </div>
         </div>
       )}
+
+      {/* ========================================================
+          6.5 AUDITION & QUALIFYING DETAILED SCORECARD MODAL
+         ======================================================== */}
+      {selectedAuditionSpotlight && (() => {
+        const c = selectedAuditionSpotlight;
+        const isAudition = Boolean(c.stage1);
+        const s1 = c.stage1 || {};
+        const s2 = c.stage2 || {};
+        const s1Total = s1.total !== undefined ? Number(s1.total) : 0;
+        const s1Pass = s1Total >= 5;
+        const s1Bonus = s1Total === 15;
+        const combinedScore = (c.totalScore !== undefined && c.totalScore !== null)
+          ? Number(c.totalScore)
+          : (c.score !== undefined && c.score !== null)
+          ? Number(c.score)
+          : (c.revealedTotal !== null && c.revealedTotal !== undefined)
+          ? Number(c.revealedTotal)
+          : 0;
+
+        return (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0, 0, 0, 0.85)",
+              backdropFilter: "blur(8px)",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "16px",
+            }}
+            onClick={() => setSelectedAuditionSpotlight(null)}
+          >
+            <div
+              style={{
+                maxWidth: "600px",
+                width: "100%",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                background: "linear-gradient(180deg, #0d1929 0%, #060c16 100%)",
+                border: "1.5px solid rgba(0, 229, 255, 0.4)",
+                borderRadius: "20px",
+                padding: "24px",
+                position: "relative",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedAuditionSpotlight(null)}
+                style={{
+                  position: "absolute",
+                  top: "16px",
+                  right: "16px",
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  color: "#fff",
+                  fontSize: "18px",
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+
+              {/* Header Info */}
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <div
+                  style={{
+                    width: "88px",
+                    height: "88px",
+                    borderRadius: "50%",
+                    margin: "0 auto 12px",
+                    overflow: "hidden",
+                    border: "3px solid #00e5ff",
+                    boxShadow: "0 0 20px rgba(0, 229, 255, 0.5)",
+                    background: "#081020",
+                  }}
+                >
+                  {c.image || c.photo ? (
+                    <img
+                      src={getOptimizedImageUrl(c.image || c.photo, 180)}
+                      alt={c.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "36px" }}>
+                      👤
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  style={{
+                    display: "inline-block",
+                    padding: "4px 14px",
+                    borderRadius: "12px",
+                    background: "rgba(0, 229, 255, 0.15)",
+                    border: "1px solid rgba(0, 229, 255, 0.4)",
+                    color: "#00e5ff",
+                    fontSize: "12px",
+                    fontWeight: "800",
+                    marginBottom: "8px",
+                  }}
+                >
+                  {c.episode
+                    ? `📺 รอบประจำสัปดาห์ (Audition) • EP.${c.episode} • แฟนพันธุ์แท้ 2026`
+                    : c.order
+                    ? `อันดับแข่งขัน #${c.order} • รอบคัดเลือกแห่งปี 2026`
+                    : "แฟนพันธุ์แท้ 2026"}
+                </div>
+
+                <h2 style={{ fontSize: "22px", fontWeight: "900", color: "#fff", margin: "0 0 4px" }}>
+                  {c.nickname ? `(${c.nickname}) ` : ""}
+                  {c.name}
+                  {c.quota && (
+                    <span style={{ fontSize: "12px", color: "#ffd700", marginLeft: "6px" }}>[โควตา]</span>
+                  )}
+                </h2>
+
+                <p style={{ fontSize: "14px", color: "#80d0ff", margin: "0 0 4px" }}>
+                  หัวข้อ: <strong style={{ color: "#fff" }}>{c.topic}</strong>
+                </p>
+                {c.date && (
+                  <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
+                    📅 วันที่แข่งขัน: {c.date}
+                  </p>
+                )}
+              </div>
+
+              {/* AUDITION SCORE BREAKDOWN */}
+              {isAudition && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                  {/* Stage 1: 3 seconds */}
+                  <div
+                    style={{
+                      background: "rgba(0, 0, 0, 0.4)",
+                      borderRadius: "14px",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      padding: "12px 14px",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff" }}>
+                        ⚡ ด่านที่ 1 : แฟนพันธุ์แท้กับความเร็ว 3 วินาที
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: "900",
+                          color: s1Total === 15 ? "#ffd700" : s1Pass ? "#52c41a" : "#ff4d4f",
+                        }}
+                      >
+                        {s1Total} / 15 คะแนน
+                      </span>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", marginBottom: "8px", textAlign: "center" }}>
+                      {[
+                        { label: "ชุดที่ 1", val: s1.set1 },
+                        { label: "ชุดที่ 2", val: s1.set2 },
+                        { label: "ชุดที่ 3", val: s1.set3 },
+                      ].map((s, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            background: "rgba(255,255,255,0.05)",
+                            borderRadius: "8px",
+                            padding: "6px 2px",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                          }}
+                        >
+                          <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)" }}>{s.label} (5 ข้อ)</div>
+                          <div style={{ fontSize: "15px", fontWeight: "900", color: "#fff" }}>
+                            {s.val !== undefined && s.val !== null ? s.val : "-"}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        padding: "6px 10px",
+                        borderRadius: "8px",
+                        background: !s1Pass
+                          ? "rgba(255, 77, 79, 0.15)"
+                          : s1Total >= 11
+                          ? "rgba(82, 196, 26, 0.15)"
+                          : "rgba(250, 173, 20, 0.15)",
+                        border: !s1Pass
+                          ? "1px solid rgba(255, 77, 79, 0.4)"
+                          : s1Total >= 11
+                          ? "1px solid rgba(82, 196, 26, 0.4)"
+                          : "1px solid rgba(250, 173, 20, 0.4)",
+                        color: !s1Pass ? "#ff7875" : s1Total >= 11 ? "#95de64" : "#ffc069",
+                      }}
+                    >
+                      {!s1Pass
+                        ? "❌ ไม่ผ่านการคัดเลือกทันที (คะแนนรวมไม่ถึง 5 คะแนน)"
+                        : s1Total >= 11
+                        ? "✅ ผ่านการคัดเลือก (ได้ 11 คะแนนขึ้นไป — มีสิทธิ์เลือกหมวดเกมในด่านที่ 2)"
+                        : "⚠️ ผ่านการคัดเลือก (ได้ 5-10 คะแนน — ไม่มีสิทธิ์เลือกเกมในด่านที่ 2)"}
+                      {s1Bonus && (
+                        <div style={{ color: "#ffd700", fontWeight: "800", marginTop: "4px" }}>
+                          🎁 ได้รับเงินรางวัลโบนัสพิเศษ 5 บาท (ทำคะแนนเต็ม 15 คะแนน)
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Stage 2: Classic Game */}
+                  <div
+                    style={{
+                      background: "rgba(0, 0, 0, 0.4)",
+                      borderRadius: "14px",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      padding: "12px 14px",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff" }}>
+                        🧩 ด่านที่ 2 : Classic Game (เลือก 2 ใน 3)
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: "900",
+                          color: "#ffd700",
+                        }}
+                      >
+                        คะแนนสะสม ST.1+2: {combinedScore} คะแนน
+                      </span>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", marginBottom: "8px", textAlign: "center" }}>
+                      {[
+                        { label: "Action Game", val: s2.action },
+                        { label: "จิ๊กซอว์", val: s2.jigsaw },
+                        { label: "คุณสมบัติ", val: s2.properties },
+                      ].map((game, idx) => {
+                        const isNotChosen = game.val === "-" || game.val === null || game.val === undefined || game.val === "";
+                        const isPerfect = Number(game.val) === 25;
+                        return (
+                          <div
+                            key={idx}
+                            style={{
+                              background: isPerfect
+                                ? "linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(212, 136, 6, 0.3) 100%)"
+                                : isNotChosen
+                                ? "rgba(255,255,255,0.02)"
+                                : "rgba(255,255,255,0.06)",
+                              borderRadius: "8px",
+                              padding: "6px 2px",
+                              border: isPerfect
+                                ? "1.5px solid #ffd700"
+                                : isNotChosen
+                                ? "1px dashed rgba(255,255,255,0.15)"
+                                : "1px solid rgba(0,229,255,0.3)",
+                            }}
+                          >
+                            <div style={{ fontSize: "10px", color: isPerfect ? "#ffd700" : isNotChosen ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.7)" }}>
+                              {game.label}
+                            </div>
+                            <div style={{ fontSize: "15px", fontWeight: "900", color: isPerfect ? "#ffd700" : isNotChosen ? "rgba(255,255,255,0.3)" : "#fff" }}>
+                              {isNotChosen ? "ไม่ได้เลือก" : `${game.val} คะแนน`}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        padding: "6px 10px",
+                        borderRadius: "8px",
+                        background: combinedScore >= 40
+                          ? "rgba(82, 196, 26, 0.15)"
+                          : combinedScore > 25
+                          ? "rgba(250, 173, 20, 0.15)"
+                          : "rgba(255, 77, 79, 0.15)",
+                        border: combinedScore >= 40
+                          ? "1px solid rgba(82, 196, 26, 0.4)"
+                          : combinedScore > 25
+                          ? "1px solid rgba(250, 173, 20, 0.4)"
+                          : "1px solid rgba(255, 77, 79, 0.4)",
+                        color: combinedScore >= 40
+                          ? "#95de64"
+                          : combinedScore > 25
+                          ? "#ffc069"
+                          : "#ff7875",
+                      }}
+                    >
+                      {combinedScore >= 40
+                        ? `✅ รวมคะแนน Stage 1+2 ได้ ${combinedScore} คะแนน (ถึง 40) — ข้ามไปรอบ Final ทันที`
+                        : combinedScore > 25
+                        ? `⚠️ รวมคะแนน Stage 1+2 ได้ ${combinedScore} คะแนน — เข้าสู่คำถามชี้ชะตา (ด่านที่ 3)`
+                        : `❌ รวมคะแนน Stage 1+2 ได้ ${combinedScore} คะแนน (ไม่เกิน 25) — ตกรอบ`}
+                    </div>
+                  </div>
+
+                  {/* Stage 3: Evaluating questions (if played) */}
+                  {c.evaluating && (
+                    <div
+                      style={{
+                        background: "rgba(0, 0, 0, 0.4)",
+                        borderRadius: "14px",
+                        border: "1px solid rgba(0, 229, 255, 0.25)",
+                        padding: "12px 14px",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "13px", fontWeight: "800", color: "#00e5ff" }}>
+                          🎯 ด่านที่ 3 : คำถามชี้ชะตา (4 ข้อ ถูก 2 ใน 4)
+                        </span>
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px", textAlign: "center" }}>
+                        {[
+                          { label: "ข้อที่ 1", val: c.evaluating.q1 },
+                          { label: "ข้อที่ 2", val: c.evaluating.q2 },
+                          { label: "ข้อที่ 3", val: c.evaluating.q3 },
+                          { label: "ข้อที่ 4", val: c.evaluating.q4 },
+                        ].map((q, idx) => {
+                          const isCorrect = q.val === "ถูก";
+                          const isWrong = q.val === "ผิด";
+                          return (
+                            <div
+                              key={idx}
+                              style={{
+                                background: isCorrect ? "rgba(82, 196, 26, 0.2)" : isWrong ? "rgba(255, 77, 79, 0.2)" : "rgba(255,255,255,0.05)",
+                                border: isCorrect ? "1px solid #52c41a" : isWrong ? "1px solid #ff4d4f" : "1px solid rgba(255,255,255,0.1)",
+                                borderRadius: "8px",
+                                padding: "6px 2px",
+                              }}
+                            >
+                              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)" }}>{q.label}</div>
+                              <div style={{ fontSize: "13px", fontWeight: "800", color: isCorrect ? "#86efac" : isWrong ? "#fca5a5" : "#94a3b8" }}>
+                                {isCorrect ? "✓ ถูก" : isWrong ? "✕ ผิด" : q.val || "-"}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Stage 4 / Final Result */}
+                  {c.final && (
+                    <div
+                      style={{
+                        background: c.final === "ถูก"
+                          ? "linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(212,136,6,0.25) 100%)"
+                          : c.final === "ผิด"
+                          ? "rgba(255, 77, 79, 0.12)"
+                          : "rgba(0, 0, 0, 0.4)",
+                        borderRadius: "14px",
+                        border: c.final === "ถูก"
+                          ? "2px solid #ffd700"
+                          : c.final === "ผิด"
+                          ? "1.5px solid #ff4d4f"
+                          : "1px solid rgba(255,255,255,0.15)",
+                        padding: "14px 16px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <div style={{ fontSize: "13px", fontWeight: "800", color: c.final === "ถูก" ? "#ffd700" : "#fff", marginBottom: "4px" }}>
+                        👑 STAGE 3 : FINAL (คำถามสุดยอดแฟนพันธุ์แท้)
+                      </div>
+                      {c.final === "ถูก" ? (
+                        <div>
+                          <div style={{ fontSize: "17px", fontWeight: "900", color: "#ffd700" }}>
+                            🏆 ตอบถูก — เป็นสุดยอดแฟนพันธุ์แท้!
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#e0f2fe", marginTop: "4px" }}>
+                            คว้าตำแหน่งสุดยอดแฟนพันธุ์แท้ในหัวข้อนี้สำเร็จ
+                          </div>
+                        </div>
+                      ) : c.final === "ผิด" ? (
+                        <div style={{ fontSize: "15px", fontWeight: "800", color: "#ff7875" }}>
+                          🥈 ตอบผิด (ไม่ได้รับตำแหน่งสุดยอดแฟนพันธุ์แท้)
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                          {c.final}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* QUALIFYING 4-CATEGORY BREAKDOWN (IF FROM QUALIFYING TABLE) */}
+              {!isAudition && (c.scores || c.revealedScores) && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                  <div
+                    style={{
+                      background: "rgba(0, 0, 0, 0.4)",
+                      borderRadius: "14px",
+                      border: "1px solid rgba(0, 229, 255, 0.25)",
+                      padding: "16px",
+                    }}
+                  >
+                    <div style={{ fontSize: "14px", fontWeight: "800", color: "#00e5ff", marginBottom: "12px" }}>
+                      ⚔️ ผลคะแนนรอบคัดเลือก 4 หมวด (เต็มหมวดละ 25 คะแนน)
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", marginBottom: "14px" }}>
+                      <div style={{ background: "rgba(255,255,255,0.05)", padding: "10px", borderRadius: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <div style={{ fontSize: "11px", color: "#86efac", fontWeight: "700" }}>⚡ 3 วินาที</div>
+                        <div style={{ fontSize: "20px", fontWeight: "900", color: "#86efac" }}>
+                          {c.revealedScores?.["3sec"] ?? c.scores?.["3sec"] ?? "-"}
+                        </div>
+                      </div>
+                      <div style={{ background: "rgba(255,255,255,0.05)", padding: "10px", borderRadius: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <div style={{ fontSize: "11px", color: "#f3f4f6", fontWeight: "700" }}>❓ ถาม-ตอบ</div>
+                        <div style={{ fontSize: "20px", fontWeight: "900", color: "#f3f4f6" }}>
+                          {c.revealedScores?.["qa"] ?? c.scores?.["qa"] ?? "-"}
+                        </div>
+                      </div>
+                      <div style={{ background: "rgba(255,255,255,0.05)", padding: "10px", borderRadius: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <div style={{ fontSize: "11px", color: "#fca5a5", fontWeight: "700" }}>🧩 จิ๊กซอว์</div>
+                        <div style={{ fontSize: "20px", fontWeight: "900", color: "#fca5a5" }}>
+                          {c.revealedScores?.["jigsaw"] ?? c.scores?.["jigsaw"] ?? "-"}
+                        </div>
+                      </div>
+                      <div style={{ background: "rgba(255,255,255,0.05)", padding: "10px", borderRadius: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <div style={{ fontSize: "11px", color: "#67e8f9", fontWeight: "700" }}>💡 คุณสมบัติ</div>
+                        <div style={{ fontSize: "20px", fontWeight: "900", color: "#67e8f9" }}>
+                          {c.revealedScores?.["attribute"] ?? c.scores?.["attribute"] ?? "-"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: "center", padding: "12px", borderRadius: "10px", background: "rgba(255, 215, 0, 0.12)", border: "1.5px solid rgba(255, 215, 0, 0.4)" }}>
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>คะแนนรวมรอบคัดเลือก</div>
+                      <div style={{ fontSize: "26px", fontWeight: "900", color: "#ffd700" }}>
+                        {c.revealedTotal !== null && c.revealedTotal !== undefined
+                          ? `${c.revealedTotal} คะแนน`
+                          : c.totalScore !== undefined
+                          ? `${c.totalScore} คะแนน`
+                          : "-"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ========================================================
           7. YOUTUBE VIDEO MODAL

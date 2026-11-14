@@ -41,6 +41,10 @@ const DEFAULT_SETTINGS = {
   fotyUpdateUpToMatch: "all",
   fotyAirUpToEpisode: 1,
   fotyBroadcastCustoms: {},
+  showFotyQualifyingOnHome: false,
+  fotyRevealUpToOrder: "all",
+  fotyRevealCategory: "attribute",
+  fotyReveal3SecPartial: 0,
 };
 
 function readSettings() {
@@ -115,6 +119,10 @@ export async function GET(request) {
       fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
       fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
       fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
+      showFotyQualifyingOnHome: Boolean(settings.showFotyQualifyingOnHome),
+      fotyRevealUpToOrder: settings.fotyRevealUpToOrder !== undefined ? settings.fotyRevealUpToOrder : "all",
+      fotyRevealCategory: settings.fotyRevealCategory || "attribute",
+      fotyReveal3SecPartial: settings.fotyReveal3SecPartial !== undefined ? Number(settings.fotyReveal3SecPartial) : 0,
     });
   }
 
@@ -148,6 +156,10 @@ export async function GET(request) {
     fotyUpdateUpToMatch: settings.fotyUpdateUpToMatch !== undefined ? settings.fotyUpdateUpToMatch : "all",
     fotyAirUpToEpisode: settings.fotyAirUpToEpisode !== undefined ? settings.fotyAirUpToEpisode : 1,
     fotyBroadcastCustoms: settings.fotyBroadcastCustoms || {},
+    showFotyQualifyingOnHome: Boolean(settings.showFotyQualifyingOnHome),
+    fotyRevealUpToOrder: settings.fotyRevealUpToOrder !== undefined ? settings.fotyRevealUpToOrder : "all",
+    fotyRevealCategory: settings.fotyRevealCategory || "attribute",
+    fotyReveal3SecPartial: settings.fotyReveal3SecPartial !== undefined ? Number(settings.fotyReveal3SecPartial) : 0,
   });
 }
 
@@ -347,6 +359,18 @@ export async function POST(request) {
       if (body.fotyBroadcastCustoms !== undefined) {
         newSettings.fotyBroadcastCustoms = body.fotyBroadcastCustoms;
       }
+      if (body.showFotyQualifyingOnHome !== undefined) {
+        newSettings.showFotyQualifyingOnHome = Boolean(body.showFotyQualifyingOnHome);
+      }
+      if (body.fotyRevealUpToOrder !== undefined) {
+        newSettings.fotyRevealUpToOrder = body.fotyRevealUpToOrder;
+      }
+      if (body.fotyRevealCategory !== undefined) {
+        newSettings.fotyRevealCategory = body.fotyRevealCategory;
+      }
+      if (body.fotyReveal3SecPartial !== undefined) {
+        newSettings.fotyReveal3SecPartial = Number(body.fotyReveal3SecPartial);
+      }
 
       await saveKVData("fpt_settings", newSettings, writeSettings);
       return NextResponse.json({
@@ -410,6 +434,28 @@ export async function POST(request) {
         message: "บันทึกตารางออกอากาศแฟนพันธุ์แท้ 2026 เรียบร้อยแล้ว",
         fotyAirUpToEpisode: newSettings.fotyAirUpToEpisode,
         fotyBroadcastCustoms: newSettings.fotyBroadcastCustoms,
+      });
+    }
+
+    // Save FOTY Qualifying & Poll on Home Reveal Settings
+    if (body.action === "save_foty_qualifying_reveal") {
+      const newSettings = {
+        ...current,
+        showFotyQualifyingOnHome: body.showFotyQualifyingOnHome !== undefined ? Boolean(body.showFotyQualifyingOnHome) : current.showFotyQualifyingOnHome,
+        showPollTable: body.showPollTable !== undefined ? Boolean(body.showPollTable) : current.showPollTable,
+        fotyRevealUpToOrder: body.fotyRevealUpToOrder !== undefined ? body.fotyRevealUpToOrder : current.fotyRevealUpToOrder,
+        fotyRevealCategory: body.fotyRevealCategory !== undefined ? body.fotyRevealCategory : current.fotyRevealCategory,
+        fotyReveal3SecPartial: body.fotyReveal3SecPartial !== undefined ? Number(body.fotyReveal3SecPartial) : current.fotyReveal3SecPartial,
+      };
+      await saveKVData("fpt_settings", newSettings, writeSettings);
+      return NextResponse.json({
+        success: true,
+        message: "บันทึกการเปิดเผยคะแนนแฟนพันธุ์แท้แห่งปีบนหน้าแรกเรียบร้อยแล้ว",
+        showFotyQualifyingOnHome: newSettings.showFotyQualifyingOnHome,
+        showPollTable: newSettings.showPollTable,
+        fotyRevealUpToOrder: newSettings.fotyRevealUpToOrder,
+        fotyRevealCategory: newSettings.fotyRevealCategory,
+        fotyReveal3SecPartial: newSettings.fotyReveal3SecPartial,
       });
     }
 

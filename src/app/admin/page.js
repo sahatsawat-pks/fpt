@@ -71,6 +71,10 @@ export default function AdminPage() {
   const [tournamentPenaltyOverride, setTournamentPenaltyOverride] = useState("auto");
   const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
   const [fotyBroadcastCustoms, setFotyBroadcastCustoms] = useState({});
+  const [showFotyQualifyingOnHome, setShowFotyQualifyingOnHome] = useState(false);
+  const [fotyRevealUpToOrder, setFotyRevealUpToOrder] = useState("all");
+  const [fotyRevealCategory, setFotyRevealCategory] = useState("attribute");
+  const [fotyReveal3SecPartial, setFotyReveal3SecPartial] = useState(0);
 
   // 2026 Audition Episodes from history.json (14 episodes)
   const fotyAuditionEpisodes = useMemo(() => {
@@ -560,6 +564,18 @@ export default function AdminPage() {
         if (data.fotyBroadcastCustoms) {
           setFotyBroadcastCustoms(data.fotyBroadcastCustoms);
         }
+        if (data.showFotyQualifyingOnHome !== undefined) {
+          setShowFotyQualifyingOnHome(Boolean(data.showFotyQualifyingOnHome));
+        }
+        if (data.fotyRevealUpToOrder !== undefined) {
+          setFotyRevealUpToOrder(data.fotyRevealUpToOrder);
+        }
+        if (data.fotyRevealCategory !== undefined) {
+          setFotyRevealCategory(data.fotyRevealCategory);
+        }
+        if (data.fotyReveal3SecPartial !== undefined) {
+          setFotyReveal3SecPartial(data.fotyReveal3SecPartial);
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -798,6 +814,10 @@ export default function AdminPage() {
           tournamentPenaltyOverride,
           fotyAirUpToEpisode,
           fotyBroadcastCustoms,
+          showFotyQualifyingOnHome,
+          fotyRevealUpToOrder,
+          fotyRevealCategory,
+          fotyReveal3SecPartial,
         }),
       });
       const data = await res.json();
@@ -939,6 +959,37 @@ export default function AdminPage() {
     } catch (err) {
       console.error(err);
       alert("เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
+  // Save FOTY Qualifying & Poll on Home Reveal Settings
+  const handleSaveFotyRevealSettings = async (overrides = {}) => {
+    const payload = {
+      action: "save_foty_qualifying_reveal",
+      showFotyQualifyingOnHome: overrides.showFotyQualifyingOnHome !== undefined ? overrides.showFotyQualifyingOnHome : showFotyQualifyingOnHome,
+      showPollTable: overrides.showPollTable !== undefined ? overrides.showPollTable : showPollTable,
+      fotyRevealUpToOrder: overrides.fotyRevealUpToOrder !== undefined ? overrides.fotyRevealUpToOrder : fotyRevealUpToOrder,
+      fotyRevealCategory: overrides.fotyRevealCategory !== undefined ? overrides.fotyRevealCategory : fotyRevealCategory,
+      fotyReveal3SecPartial: overrides.fotyReveal3SecPartial !== undefined ? overrides.fotyReveal3SecPartial : fotyReveal3SecPartial,
+    };
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setWeeklyNotice("✅ บันทึกการเปิดเผยคะแนนแฟนพันธุ์แท้แห่งปีบนหน้าแรกสำเร็จ!");
+        setSettingsNotice("✅ บันทึกการเปิดเผยคะแนนแฟนพันธุ์แท้แห่งปีบนหน้าแรกสำเร็จ!");
+        setTimeout(() => {
+          setWeeklyNotice("");
+          setSettingsNotice("");
+        }, 3500);
+      }
+    } catch (e) {
+      console.error(e);
+      setWeeklyNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
     }
   };
 
@@ -4852,6 +4903,181 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* FOTY Qualifying & Poll on Homepage Reveal Controls */}
+                <div
+                  style={{
+                    background: "linear-gradient(145deg, rgba(16, 28, 54, 0.95) 0%, rgba(8, 16, 32, 0.95) 100%)",
+                    border: showFotyQualifyingOnHome ? "1.5px solid #00e5ff" : "1.5px solid rgba(0, 229, 255, 0.3)",
+                    borderRadius: "14px",
+                    padding: "20px",
+                    marginBottom: "24px",
+                    boxShadow: showFotyQualifyingOnHome ? "0 0 25px rgba(0, 229, 255, 0.2)" : "none",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "14px", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                    <div>
+                      <div style={{ fontSize: "17px", fontWeight: "900", color: "#00e5ff", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>⚔️</span> การแข่งขันแฟนพันธุ์แท้แห่งปี 2026 (รอบคัดเลือก & ผลโพลล์) บนหน้าแรก
+                      </div>
+                      <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>
+                        เปิด/ปิด และควบคุมการเปิดเผยคะแนนสดทีละหมวด/คน ในช่วงที่เข้าสู่การแข่งขันแฟนพันธุ์แท้แห่งปี
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSaveFotyRevealSettings()}
+                      style={{
+                        padding: "8px 18px",
+                        borderRadius: "8px",
+                        background: "linear-gradient(135deg, #00e5ff 0%, #0077b6 100%)",
+                        border: "none",
+                        color: "#030814",
+                        fontSize: "13px",
+                        fontWeight: "900",
+                        cursor: "pointer",
+                        boxShadow: "0 0 12px rgba(0, 229, 255, 0.35)",
+                      }}
+                    >
+                      💾 บันทึกการเปิดเผยคะแนนแห่งปี
+                    </button>
+                  </div>
+
+                  {/* Toggles */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px", marginBottom: "18px" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: "rgba(0,0,0,0.3)", padding: "12px 14px", borderRadius: "10px", border: showFotyQualifyingOnHome ? "1px solid #00e5ff" : "1px solid rgba(255,255,255,0.1)" }}>
+                      <input
+                        type="checkbox"
+                        checked={showFotyQualifyingOnHome}
+                        onChange={(e) => setShowFotyQualifyingOnHome(e.target.checked)}
+                        style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
+                      />
+                      <div>
+                        <div style={{ fontSize: "14px", fontWeight: "800", color: showFotyQualifyingOnHome ? "#00e5ff" : "#fff" }}>
+                          📊 เปิดแสดงตารางคะแนนแห่งปี (Qualifying) บนหน้าแรก
+                        </div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                          แสดงตารางคะแนนรอบคัดเลือก 22 คน พร้อมระบบเรียงลำดับสด
+                        </div>
+                      </div>
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: "rgba(0,0,0,0.3)", padding: "12px 14px", borderRadius: "10px", border: showPollTable ? "1px solid #ffd700" : "1px solid rgba(255,255,255,0.1)" }}>
+                      <input
+                        type="checkbox"
+                        checked={showPollTable}
+                        onChange={(e) => setShowPollTable(e.target.checked)}
+                        style={{ width: "18px", height: "18px", accentColor: "#ffd700", cursor: "pointer" }}
+                      />
+                      <div>
+                        <div style={{ fontSize: "14px", fontWeight: "800", color: showPollTable ? "#ffd700" : "#fff" }}>
+                          🗳️ เปิดแสดงตารางอันดับโพลล์ (Fan Poll) บนหน้าแรก
+                        </div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                          แสดงแท็บหรือตารางอันดับผลสำรวจความนิยมของผู้เข้าแข่งขัน
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* 3 Step Controls */}
+                  <div style={{ background: "rgba(0,0,0,0.4)", borderRadius: "12px", padding: "16px", border: "1px solid rgba(0, 229, 255, 0.2)" }}>
+                    <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffd700", marginBottom: "14px" }}>
+                      ⚙️ กำหนดระดับการเปิดเผยคะแนนสด (Live Reveal Controls):
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
+                      {/* Step 1: Up to which contestant */}
+                      <div>
+                        <label style={{ display: "block", fontSize: "13px", fontWeight: "800", color: "#00e5ff", marginBottom: "6px" }}>
+                          1. ให้ขึ้นคะแนนถึงคนไหน (ลำดับแข่งขัน):
+                        </label>
+                        <select
+                          value={fotyRevealUpToOrder}
+                          onChange={(e) => setFotyRevealUpToOrder(e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "10px 14px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1.5px solid #00e5ff",
+                            color: "#00e5ff",
+                            fontSize: "13.5px",
+                            fontWeight: "700",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <option value="all">🌐 แสดงคะแนนครบทุกคน (22 คน)</option>
+                          {contestants
+                            .slice()
+                            .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+                            .map((c) => (
+                              <option key={c.id || c.order} value={c.order}>
+                                ลำดับที่ #{c.order} - {c.nickname ? `(${c.nickname}) ` : ""}{c.name} • {c.topic}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+
+                      {/* Step 2: Up to which category */}
+                      <div>
+                        <label style={{ display: "block", fontSize: "13px", fontWeight: "800", color: "#ffd700", marginBottom: "6px" }}>
+                          2. ขึ้นถึงหมวดไหน (สำหรับคนล่าสุดที่กำลังเล่น):
+                        </label>
+                        <select
+                          value={fotyRevealCategory}
+                          onChange={(e) => setFotyRevealCategory(e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "10px 14px",
+                            borderRadius: "8px",
+                            background: "#050b14",
+                            border: "1.5px solid #ffd700",
+                            color: "#ffd700",
+                            fontSize: "13.5px",
+                            fontWeight: "700",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <option value="attribute">🏁 ครบทุกหมวด (จบการแข่งขันแล้ว)</option>
+                          <option value="jigsaw">🧩 ถึงหมวดจิ๊กซอว์ (3 วินาที + ถาม-ตอบ + จิ๊กซอว์)</option>
+                          <option value="qa">❓ ถึงหมวดถาม-ตอบ (3 วินาที + ถาม-ตอบ)</option>
+                          <option value="3sec">⚡ ถึงหมวด 3 วินาที (จบหมวด 3 วินาที)</option>
+                          <option value="3sec_in_progress">🔴 กำลังเล่นหมวด 3 วินาที (ใส่คะแนนค้างไว้)</option>
+                          <option value="none">⏳ ยังไม่เริ่มแข่งขัน (รอแข่งขัน)</option>
+                        </select>
+                      </div>
+
+                      {/* Step 3: In-progress 3 sec partial score */}
+                      {fotyRevealCategory === "3sec_in_progress" && (
+                        <div>
+                          <label style={{ display: "block", fontSize: "13px", fontWeight: "800", color: "#ff4d4f", marginBottom: "6px" }}>
+                            3. คะแนน 3 วินาทีที่เล่นค้างไว้ (0-25 คะแนน):
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="25"
+                            value={fotyReveal3SecPartial}
+                            onChange={(e) => setFotyReveal3SecPartial(e.target.value)}
+                            placeholder="ใส่คะแนนที่ทำได้ เช่น 5, 8, 12..."
+                            style={{
+                              width: "100%",
+                              padding: "10px 14px",
+                              borderRadius: "8px",
+                              background: "#050b14",
+                              border: "1.5px solid #ff4d4f",
+                              color: "#ff7875",
+                              fontSize: "14px",
+                              fontWeight: "800",
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 {/* List of 14 episodes */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "28px" }}>
                   {fotyAuditionEpisodes.map((ep) => {
@@ -5929,8 +6155,34 @@ export default function AdminPage() {
               <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", margin: "24px 0" }}></div>
 
               <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#ffd700", marginBottom: "14px" }}>
-                📊 การแสดงผลตารางโพลล์บนหน้าต่าง ๆ
+                ⚔️ การแสดงผลตารางแฟนพันธุ์แท้แห่งปี 2026 และโพลล์บนหน้าแรก (/)
               </h3>
+
+              {/* FOTY Qualifying Table on Home Toggle */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: showFotyQualifyingOnHome ? "1.5px solid rgba(0, 229, 255, 0.5)" : "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "16px"
+              }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: showFotyQualifyingOnHome ? "#00e5ff" : "rgba(255,255,255,0.7)" }}>
+                  <input
+                    type="checkbox"
+                    checked={showFotyQualifyingOnHome}
+                    onChange={(e) => {
+                      const val = e.target.checked;
+                      setShowFotyQualifyingOnHome(val);
+                      handleSaveFotyRevealSettings({ showFotyQualifyingOnHome: val });
+                    }}
+                    style={{ width: "18px", height: "18px", accentColor: "#00e5ff", cursor: "pointer" }}
+                  />
+                  <span>📊 เปิดแสดงตารางคะแนนแฟนพันธุ์แท้แห่งปี (รอบคัดเลือก / Qualifying) บนหน้าแรก</span>
+                </label>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
+                  เมื่อเปิดใช้งาน หน้าแรกจะแสดงตารางคะแนนรอบคัดเลือก 22 คน เพื่อชิง 5 อันดับแรกสู่รอบชิงชนะเลิศ
+                </p>
+              </div>
 
               {/* Main Homepage Poll */}
               <div style={{
@@ -5947,10 +6199,10 @@ export default function AdminPage() {
                     onChange={(e) => handleTogglePollTable(e.target.checked)}
                     style={{ width: "18px", height: "18px", accentColor: "#ffd700", cursor: "pointer" }}
                   />
-                  <span>🏠 เปิดแสดงตารางอันดับโพลล์ (Poll) ในหน้าแรกหลัก (/)</span>
+                  <span>🗳️ เปิดแสดงตารางอันดับโพลล์ (Fan Poll) ในหน้าแรกหลัก (/)</span>
                 </label>
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
-                  หากปิดใช้งาน หน้าแรกจะซ่อนแท็บสลับและตารางอันดับโพลล์ทั้งหมด เหลือแสดงเฉพาะตารางคะแนนแข่งขันเท่านั้น
+                  หากปิดใช้งาน หน้าแรกจะซ่อนตารางอันดับโพลล์ทั้งหมด
                 </p>
               </div>
 
