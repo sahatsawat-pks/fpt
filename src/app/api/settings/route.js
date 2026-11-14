@@ -29,6 +29,10 @@ const DEFAULT_SETTINGS = {
   showWarmupTable: true,
   showPollTable: true,
   showTrialPollTable: true,
+  favFanVotingOpen: false,
+  showFavFanInNav: false,
+  pollVotingOpen: false,
+  showPollInNav: false,
   protectFoty: false,
   fotyPassword: "",
   showFotyInNav: true,
@@ -107,6 +111,10 @@ export async function GET(request) {
       showWarmupTable: settings.showWarmupTable !== false,
       showPollTable: settings.showPollTable !== false,
       showTrialPollTable: settings.showTrialPollTable !== false,
+      favFanVotingOpen: Boolean(settings.favFanVotingOpen),
+      showFavFanInNav: Boolean(settings.showFavFanInNav),
+      pollVotingOpen: Boolean(settings.pollVotingOpen),
+      showPollInNav: Boolean(settings.showPollInNav),
       protectFoty: Boolean(settings.protectFoty),
       fotyPassword: settings.fotyPassword || "",
       showFotyInNav: settings.showFotyInNav !== false,
@@ -146,6 +154,10 @@ export async function GET(request) {
     showWarmupTable: settings.showWarmupTable !== false,
     showPollTable: settings.showPollTable !== false,
     showTrialPollTable: settings.showTrialPollTable !== false,
+    favFanVotingOpen: Boolean(settings.favFanVotingOpen),
+    showFavFanInNav: Boolean(settings.showFavFanInNav),
+    pollVotingOpen: Boolean(settings.pollVotingOpen),
+    showPollInNav: Boolean(settings.showPollInNav),
     protectFoty: Boolean(settings.protectFoty),
     showFotyInNav: settings.showFotyInNav !== false,
     protectCurrent: Boolean(settings.protectCurrent),
@@ -343,6 +355,18 @@ export async function POST(request) {
       }
       if (body.showChampionsOnHome !== undefined) {
         newSettings.showChampionsOnHome = Boolean(body.showChampionsOnHome);
+      }
+      if (body.favFanVotingOpen !== undefined) {
+        newSettings.favFanVotingOpen = Boolean(body.favFanVotingOpen);
+      }
+      if (body.showFavFanInNav !== undefined) {
+        newSettings.showFavFanInNav = Boolean(body.showFavFanInNav);
+      }
+      if (body.pollVotingOpen !== undefined) {
+        newSettings.pollVotingOpen = Boolean(body.pollVotingOpen);
+      }
+      if (body.showPollInNav !== undefined) {
+        newSettings.showPollInNav = Boolean(body.showPollInNav);
       }
       if (body.tournamentUpdateUpToMatch !== undefined) {
         newSettings.tournamentUpdateUpToMatch = body.tournamentUpdateUpToMatch;

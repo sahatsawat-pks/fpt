@@ -76,6 +76,16 @@ export default function AdminPage() {
   const [fotyRevealCategory, setFotyRevealCategory] = useState("attribute");
   const [fotyReveal3SecPartial, setFotyReveal3SecPartial] = useState(0);
 
+  // Fav Fan (/fav-fan) & Poll (/poll) Voting and Nav States
+  const [favFanVotingOpen, setFavFanVotingOpen] = useState(false);
+  const [showFavFanInNav, setShowFavFanInNav] = useState(false);
+  const [pollVotingOpen, setPollVotingOpen] = useState(false);
+  const [showPollInNav, setShowPollInNav] = useState(false);
+  const [favFanVotes, setFavFanVotes] = useState([]);
+  const [favFanStats, setFavFanStats] = useState({ total: 0, valid: 0 });
+  const [loadingFavFan, setLoadingFavFan] = useState(false);
+  const [favFanNotice, setFavFanNotice] = useState("");
+
   // 2026 Audition Episodes from history.json (14 episodes)
   const fotyAuditionEpisodes = useMemo(() => {
     const auditionList = historyData?.seasons?.["2026"]?.audition || [];
@@ -260,6 +270,7 @@ export default function AdminPage() {
       loadContestants();
       loadPoll();
       loadAdminHistory();
+      loadFavFanVotes();
     }
   }, [isAuthenticated]);
 
@@ -576,6 +587,18 @@ export default function AdminPage() {
         if (data.fotyReveal3SecPartial !== undefined) {
           setFotyReveal3SecPartial(data.fotyReveal3SecPartial);
         }
+        if (data.favFanVotingOpen !== undefined) {
+          setFavFanVotingOpen(Boolean(data.favFanVotingOpen));
+        }
+        if (data.showFavFanInNav !== undefined) {
+          setShowFavFanInNav(Boolean(data.showFavFanInNav));
+        }
+        if (data.pollVotingOpen !== undefined) {
+          setPollVotingOpen(Boolean(data.pollVotingOpen));
+        }
+        if (data.showPollInNav !== undefined) {
+          setShowPollInNav(Boolean(data.showPollInNav));
+        }
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -608,10 +631,148 @@ export default function AdminPage() {
       if (data.success && Array.isArray(data.data)) {
         setPollItems(data.data);
       }
+      if (data.votingOpen !== undefined) setPollVotingOpen(Boolean(data.votingOpen));
+      if (data.showInNav !== undefined) setShowPollInNav(Boolean(data.showInNav));
     } catch (err) {
       console.error("Failed to load poll:", err);
     } finally {
       setLoadingPoll(false);
+    }
+  };
+
+  const loadFavFanVotes = async () => {
+    setLoadingFavFan(true);
+    try {
+      const res = await fetch("/api/fav-fan");
+      const data = await res.json();
+      if (data.success) {
+        setFavFanVotes(Array.isArray(data.votes) ? data.votes : []);
+        setFavFanStats({
+          total: data.totalVotes || 0,
+          valid: data.validVotesCount || 0,
+        });
+        if (data.votingOpen !== undefined) setFavFanVotingOpen(Boolean(data.votingOpen));
+        if (data.showInNav !== undefined) setShowFavFanInNav(Boolean(data.showInNav));
+      }
+    } catch (err) {
+      console.error("Failed to load fav-fan votes:", err);
+    } finally {
+      setLoadingFavFan(false);
+    }
+  };
+
+  const handleToggleFavFanVoting = async (val) => {
+    setFavFanVotingOpen(val);
+    try {
+      await fetch("/api/fav-fan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_voting", votingOpen: val }),
+      });
+      setFavFanNotice(`✅ ${val ? "เปิดรับโหวต Tellme เรียบร้อยแล้ว" : "ปิดรับโหวต Tellme เรียบร้อยแล้ว"}`);
+      setTimeout(() => setFavFanNotice(""), 3000);
+    } catch (err) {
+      setFavFanNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
+  const handleToggleFavFanNav = async (val) => {
+    setShowFavFanInNav(val);
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", showFavFanInNav: val }),
+      });
+      setFavFanNotice(`✅ ${val ? "แสดง /fav-fan บน Navbar แล้ว" : "ซ่อน /fav-fan จาก Navbar แล้ว"}`);
+      setTimeout(() => setFavFanNotice(""), 3000);
+    } catch (err) {
+      setFavFanNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
+  const handleResetFavFanVotes = async () => {
+    if (!window.confirm("⚠️ ยืนยันการล้างผลโหวต Tellme ทั้งหมดใช่หรือไม่? ข้อมูลคะแนนโหวตทั้งหมดจะถูกรีเซ็ตเป็นศูนย์")) return;
+    try {
+      const res = await fetch("/api/fav-fan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reset_votes" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFavFanNotice("✅ ล้างข้อมูลคะแนนโหวต Tellme เรียบร้อยแล้ว");
+        await loadFavFanVotes();
+        setTimeout(() => setFavFanNotice(""), 3500);
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการรีเซ็ตผลโหวต");
+    }
+  };
+
+  const handleDeleteFavFanVote = async (id) => {
+    if (!window.confirm("ต้องการลบการส่งโหวตนี้ใช่หรือไม่?")) return;
+    try {
+      const res = await fetch("/api/fav-fan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_vote", id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await loadFavFanVotes();
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการลบโหวต");
+    }
+  };
+
+  const handleTogglePollVoting = async (val) => {
+    setPollVotingOpen(val);
+    try {
+      await fetch("/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_voting", votingOpen: val }),
+      });
+      setPollNotice(`✅ ${val ? "เปิดรับโหวตโพลล์แห่งปีเรียบร้อยแล้ว" : "ปิดรับโหวตโพลล์แห่งปีเรียบร้อยแล้ว"}`);
+      setTimeout(() => setPollNotice(""), 3000);
+    } catch (err) {
+      setPollNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
+  const handleTogglePollNav = async (val) => {
+    setShowPollInNav(val);
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", showPollInNav: val }),
+      });
+      setPollNotice(`✅ ${val ? "แสดง /poll บน Navbar แล้ว" : "ซ่อน /poll จาก Navbar แล้ว"}`);
+      setTimeout(() => setPollNotice(""), 3000);
+    } catch (err) {
+      setPollNotice("❌ เกิดข้อผิดพลาดในการบันทึก");
+    }
+  };
+
+  const handleResetPollVotes = async () => {
+    if (!window.confirm("⚠️ ยืนยันการรีเซ็ตผลโพลล์แห่งปีทั้งหมดเป็นค่าเริ่มต้น (0 โหวต / กระจายเท่ากัน)?")) return;
+    try {
+      const res = await fetch("/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reset" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPollNotice("✅ รีเซ็ตผลโหวตโพลล์เรียบร้อยแล้ว");
+        await loadPoll();
+        setTimeout(() => setPollNotice(""), 3500);
+      }
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการรีเซ็ตผลโพลล์");
     }
   };
 
@@ -809,6 +970,10 @@ export default function AdminPage() {
           weeklyMatches,
           tournamentWeeklyMatches,
           showChampionsOnHome,
+          favFanVotingOpen,
+          showFavFanInNav,
+          pollVotingOpen,
+          showPollInNav,
           tournamentUpdateUpToMatch,
           tournamentAwardOverride,
           tournamentPenaltyOverride,
@@ -4761,6 +4926,280 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+
+            {/* Quick Settings & Actions for /poll and /fav-fan */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "20px", marginTop: "24px" }}>
+              {/* Poll (/poll) Card */}
+              <div style={{
+                background: "linear-gradient(145deg, rgba(16, 32, 60, 0.85) 0%, rgba(10, 20, 40, 0.95) 100%)",
+                border: "1.5px solid rgba(255, 215, 0, 0.35)",
+                borderRadius: "16px",
+                padding: "20px",
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ffd700", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>🗳️</span> โพลล์แห่งปี FAN OF THE YEAR (/poll)
+                  </h3>
+                  <a
+                    href="/poll"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      background: "rgba(255, 215, 0, 0.15)",
+                      border: "1px solid rgba(255, 215, 0, 0.4)",
+                      color: "#ffd700",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      textDecoration: "none",
+                    }}
+                  >
+                    เปิดหน้า /poll ↗
+                  </a>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: pollVotingOpen ? "#ffd700" : "rgba(255,255,255,0.6)" }}>
+                    <input
+                      type="checkbox"
+                      checked={pollVotingOpen}
+                      onChange={(e) => handleTogglePollVoting(e.target.checked)}
+                      style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
+                    />
+                    <span>เปิดรับการโหวตโพลล์แห่งปี: {pollVotingOpen ? "🟢 เปิดอยู่" : "🔴 ปิดโหวต"}</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: showPollInNav ? "#ffd700" : "rgba(255,255,255,0.6)" }}>
+                    <input
+                      type="checkbox"
+                      checked={showPollInNav}
+                      onChange={(e) => handleTogglePollNav(e.target.checked)}
+                      style={{ width: "16px", height: "16px", accentColor: "#ffd700", cursor: "pointer" }}
+                    />
+                    <span>แสดงเมนู /poll บนแถบนำทาง (Navbar): {showPollInNav ? "👁️ แสดง" : "🙈 ซ่อน"}</span>
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleResetPollVotes}
+                  style={{
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    background: "rgba(255, 77, 79, 0.15)",
+                    border: "1px solid rgba(255, 77, 79, 0.4)",
+                    color: "#ff7875",
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                  }}
+                >
+                  🔄 รีเซ็ตผลโพลล์แห่งปีทั้งหมด
+                </button>
+              </div>
+
+              {/* Fav Fan (/fav-fan) Tellme Card */}
+              <div style={{
+                background: "linear-gradient(145deg, rgba(20, 20, 45, 0.85) 0%, rgba(12, 10, 30, 0.95) 100%)",
+                border: "1.5px solid rgba(255, 117, 143, 0.35)",
+                borderRadius: "16px",
+                padding: "20px",
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ff758f", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>💄</span> โหวต Tellme Popular Vote (/fav-fan)
+                  </h3>
+                  <a
+                    href="/fav-fan"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      background: "rgba(255, 117, 143, 0.15)",
+                      border: "1px solid rgba(255, 117, 143, 0.4)",
+                      color: "#ff758f",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      textDecoration: "none",
+                    }}
+                  >
+                    เปิดหน้า /fav-fan ↗
+                  </a>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: favFanVotingOpen ? "#ff758f" : "rgba(255,255,255,0.6)" }}>
+                    <input
+                      type="checkbox"
+                      checked={favFanVotingOpen}
+                      onChange={(e) => handleToggleFavFanVoting(e.target.checked)}
+                      style={{ width: "16px", height: "16px", accentColor: "#ff758f", cursor: "pointer" }}
+                    />
+                    <span>เปิดรับการโหวต Tellme: {favFanVotingOpen ? "🟢 เปิดอยู่" : "🔴 ปิดโหวต"}</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: showFavFanInNav ? "#ff758f" : "rgba(255,255,255,0.6)" }}>
+                    <input
+                      type="checkbox"
+                      checked={showFavFanInNav}
+                      onChange={(e) => handleToggleFavFanNav(e.target.checked)}
+                      style={{ width: "16px", height: "16px", accentColor: "#ff758f", cursor: "pointer" }}
+                    />
+                    <span>แสดงเมนู /fav-fan บนแถบนำทาง (Navbar): {showFavFanInNav ? "👁️ แสดง" : "🙈 ซ่อน"}</span>
+                  </label>
+                </div>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                  <button
+                    type="button"
+                    onClick={loadFavFanVotes}
+                    disabled={loadingFavFan}
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: "8px",
+                      background: "rgba(0, 229, 255, 0.15)",
+                      border: "1px solid rgba(0, 229, 255, 0.4)",
+                      color: "#00e5ff",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🔄 รีเฟรชรายชื่อโหวต ({favFanStats.total} คน)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResetFavFanVotes}
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: "8px",
+                      background: "rgba(255, 77, 79, 0.15)",
+                      border: "1px solid rgba(255, 77, 79, 0.4)",
+                      color: "#ff7875",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🗑️ ล้างคะแนนโหวตทั้งหมด
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {favFanNotice && (
+              <div style={{
+                marginTop: "16px",
+                padding: "10px 16px",
+                borderRadius: "8px",
+                background: favFanNotice.startsWith("✅") ? "rgba(34, 197, 94, 0.15)" : "rgba(255, 77, 79, 0.15)",
+                color: favFanNotice.startsWith("✅") ? "#86efac" : "#ff7875",
+                fontWeight: "700",
+                fontSize: "14px",
+              }}>
+                {favFanNotice}
+              </div>
+            )}
+
+            {/* Tellme Votes Viewer Table */}
+            <div style={{
+              marginTop: "24px",
+              background: "linear-gradient(145deg, rgba(16, 24, 45, 0.85) 0%, rgba(10, 16, 32, 0.95) 100%)",
+              border: "1px solid rgba(255, 117, 143, 0.25)",
+              borderRadius: "16px",
+              padding: "20px",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "16px" }}>
+                <div>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#ff758f", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>💄</span> รายชื่อผู้ร่วมสนุกโหวตเครื่องสำอาง Tellme ({favFanVotes.length} รายการ)
+                  </h3>
+                  <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
+                    ผู้มีสิทธิ์ลุ้นรับรางวัลต้องเขียนสโลแกนถูกต้อง: <strong style={{ color: "#ffd700" }}>"เครื่องสำอางเทลมี ภูมิใจใช้เทลมี"</strong>
+                  </p>
+                </div>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <div style={{ padding: "6px 12px", borderRadius: "8px", background: "rgba(34, 197, 94, 0.15)", border: "1px solid rgba(34, 197, 94, 0.4)", color: "#86efac", fontSize: "12px", fontWeight: "700" }}>
+                    ✅ สโลแกนถูกต้อง: {favFanStats.valid} คน
+                  </div>
+                  <div style={{ padding: "6px 12px", borderRadius: "8px", background: "rgba(255, 77, 79, 0.15)", border: "1px solid rgba(255, 77, 79, 0.4)", color: "#ff7875", fontSize: "12px", fontWeight: "700" }}>
+                    ❌ ไม่ถูกต้อง: {favFanStats.total - favFanStats.valid} คน
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "750px", fontSize: "13px" }}>
+                  <thead>
+                    <tr style={{ background: "rgba(255, 117, 143, 0.1)", borderBottom: "1px solid rgba(255, 117, 143, 0.3)" }}>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "50px", color: "#ffd700" }}>ลำดับ</th>
+                      <th style={{ padding: "10px 12px", textAlign: "left", color: "#ff758f" }}>ชื่อ - นามสกุล</th>
+                      <th style={{ padding: "10px 12px", textAlign: "left", width: "120px", color: "#80d0ff" }}>จังหวัด</th>
+                      <th style={{ padding: "10px 12px", textAlign: "left", color: "#ffd700" }}>โหวตให้</th>
+                      <th style={{ padding: "10px 12px", textAlign: "left", color: "#ffffff" }}>สโลแกนที่กรอก</th>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "120px", color: "#86efac" }}>สถานะสิทธิ์</th>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "140px", color: "rgba(255,255,255,0.6)" }}>เวลาโหวต</th>
+                      <th style={{ padding: "10px 12px", textAlign: "center", width: "60px", color: "#ff7875" }}>ลบ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {favFanVotes.map((v, idx) => (
+                      <tr
+                        key={v.id || idx}
+                        style={{
+                          borderBottom: "1px solid rgba(255,255,255,0.06)",
+                          background: idx % 2 === 0 ? "rgba(0,0,0,0.15)" : "transparent",
+                        }}
+                      >
+                        <td style={{ padding: "8px 10px", textAlign: "center", color: "rgba(255,255,255,0.6)" }}>{idx + 1}</td>
+                        <td style={{ padding: "8px 10px", fontWeight: "700", color: "#ffffff" }}>{v.voterName || "-"}</td>
+                        <td style={{ padding: "8px 10px", color: "#80d0ff" }}>{v.province || "-"}</td>
+                        <td style={{ padding: "8px 10px", color: "#ffd700", fontWeight: "700" }}>
+                          {v.contestantName ? `${v.contestantName} (${v.topic})` : `ID: ${v.contestantId}`}
+                        </td>
+                        <td style={{ padding: "8px 10px", color: "rgba(255,255,255,0.85)", fontStyle: "italic", fontSize: "12px" }}>
+                          "{v.slogan || ""}"
+                        </td>
+                        <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                          {v.isValidSlogan !== false ? (
+                            <span style={{ padding: "3px 8px", borderRadius: "6px", background: "rgba(34, 197, 94, 0.2)", border: "1px solid #22c55e", color: "#86efac", fontSize: "11px", fontWeight: "800" }}>
+                              ✅ มีสิทธิ์
+                            </span>
+                          ) : (
+                            <span style={{ padding: "3px 8px", borderRadius: "6px", background: "rgba(255, 77, 79, 0.2)", border: "1px solid #ef4444", color: "#ff7875", fontSize: "11px", fontWeight: "800" }}>
+                              ❌ ผิดสโลแกน
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: "8px 10px", textAlign: "center", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                          {v.createdAt ? new Date(v.createdAt).toLocaleString("th-TH") : "-"}
+                        </td>
+                        <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteFavFanVote(v.id)}
+                            style={{
+                              padding: "4px 8px",
+                              borderRadius: "4px",
+                              background: "rgba(255, 77, 79, 0.2)",
+                              border: "1px solid rgba(255, 77, 79, 0.5)",
+                              color: "#ff7875",
+                              fontSize: "11px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {favFanVotes.length === 0 && (
+                      <tr>
+                        <td colSpan={8} style={{ textAlign: "center", padding: "30px", color: "rgba(255,255,255,0.4)" }}>
+                          ยังไม่มีผู้ส่งผลโหวต Tellme ในขณะนี้
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 
@@ -6225,6 +6664,85 @@ export default function AdminPage() {
                 </label>
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "6px 0 0 28px" }}>
                   หากปิดใช้งาน หน้า <code>/trial-foty</code> จะซ่อนแท็บสลับและตารางอันดับโพลล์มหาชน
+                </p>
+              </div>
+
+              {/* Tellme Popular Vote & FOTY Poll Section */}
+              <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", margin: "24px 0" }}></div>
+
+              <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#ff758f", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>💄</span> ระบบโหวต Tellme (/fav-fan) และโพลล์แห่งปี (/poll)
+              </h3>
+
+              {/* Fav Fan (Tellme) Settings */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: "1px solid rgba(255, 117, 143, 0.35)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "16px"
+              }}>
+                <div style={{ fontSize: "14px", fontWeight: "800", color: "#ff758f", marginBottom: "10px" }}>
+                  💄 โหวตสุดยอดแฟนพันธุ์แท้ที่คุณชื่นชอบกับ Tellme (/fav-fan)
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "6px" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "600", color: "#ffffff" }}>
+                    <input
+                      type="checkbox"
+                      checked={showFavFanInNav}
+                      onChange={(e) => setShowFavFanInNav(e.target.checked)}
+                      style={{ width: "18px", height: "18px", accentColor: "#ff758f", cursor: "pointer" }}
+                    />
+                    <span>แสดงเมนู /fav-fan (โหวต Tellme) บนแถบนำทาง (Navbar)</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "600", color: "#ff758f" }}>
+                    <input
+                      type="checkbox"
+                      checked={favFanVotingOpen}
+                      onChange={(e) => setFavFanVotingOpen(e.target.checked)}
+                      style={{ width: "18px", height: "18px", accentColor: "#ff758f", cursor: "pointer" }}
+                    />
+                    <span>เปิดรับการโหวต Tellme (/fav-fan)</span>
+                  </label>
+                </div>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "8px 0 0 34px" }}>
+                  หากปิดโหวต ผู้ชมจะเห็นหน้าสรุปผลโหวตและข้อความปิดรับโหวตชั่วคราว
+                </p>
+              </div>
+
+              {/* FOTY Poll Settings */}
+              <div style={{
+                background: "rgba(0, 15, 30, 0.6)",
+                border: "1px solid rgba(255, 215, 0, 0.35)",
+                borderRadius: "10px",
+                padding: "16px",
+                marginBottom: "22px"
+              }}>
+                <div style={{ fontSize: "14px", fontWeight: "800", color: "#ffd700", marginBottom: "10px" }}>
+                  🗳️ โพลล์แห่งปี FAN OF THE YEAR 2026 (/poll)
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginLeft: "6px" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "600", color: "#ffffff" }}>
+                    <input
+                      type="checkbox"
+                      checked={showPollInNav}
+                      onChange={(e) => setShowPollInNav(e.target.checked)}
+                      style={{ width: "18px", height: "18px", accentColor: "#ffd700", cursor: "pointer" }}
+                    />
+                    <span>แสดงเมนู /poll (โพลล์แห่งปี) บนแถบนำทาง (Navbar)</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "600", color: "#ffd700" }}>
+                    <input
+                      type="checkbox"
+                      checked={pollVotingOpen}
+                      onChange={(e) => setPollVotingOpen(e.target.checked)}
+                      style={{ width: "18px", height: "18px", accentColor: "#ffd700", cursor: "pointer" }}
+                    />
+                    <span>เปิดรับการโหวตโพลล์แห่งปี (/poll)</span>
+                  </label>
+                </div>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "8px 0 0 34px" }}>
+                  หากปิดโหวต ผู้ชมจะเห็นผลอันดับโพลล์รวมและไม่สามารถส่งบัตรลงคะแนนใหม่ได้
                 </p>
               </div>
 

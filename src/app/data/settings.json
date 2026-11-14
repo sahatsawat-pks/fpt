@@ -10,5 +10,9 @@
   "historyPassword": "fanoftheyear2026",
   "protectRestrict": false,
   "restrictPassword": "fanoftheyear2026",
-  "trialAdminPassword": "trial_admin_2026"
+  "trialAdminPassword": "trial_admin_2026",
+  "favFanVotingOpen": false,
+  "showFavFanInNav": false,
+  "pollVotingOpen": false,
+  "showPollInNav": false
 }

@@ -232,6 +232,8 @@ export default function HistoryClient({ isSecretFoty = false }) {
 
   // Settings
   const [fotyAirUpToEpisode, setFotyAirUpToEpisode] = useState(1);
+  const [showFavFanInNav, setShowFavFanInNav] = useState(false);
+  const [showPollInNav, setShowPollInNav] = useState(false);
 
   // Auth state for history page protection
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -268,6 +270,12 @@ export default function HistoryClient({ isSecretFoty = false }) {
         }
         if (settingsData.showCurrentInNav !== undefined) {
           setShowCurrentInNav(Boolean(settingsData.showCurrentInNav));
+        }
+        if (settingsData.showFavFanInNav !== undefined) {
+          setShowFavFanInNav(Boolean(settingsData.showFavFanInNav));
+        }
+        if (settingsData.showPollInNav !== undefined) {
+          setShowPollInNav(Boolean(settingsData.showPollInNav));
         }
         if (settingsData.fotyAirUpToEpisode !== undefined) {
           setFotyAirUpToEpisode(settingsData.fotyAirUpToEpisode);
@@ -819,6 +827,46 @@ export default function HistoryClient({ isSecretFoty = false }) {
             >
               จำลองจับลูกบอล
             </Link>
+            {showFavFanInNav && (
+              <Link
+                href="/fav-fan"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  color: "#ff758f",
+                  fontWeight: "700",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "rgba(255, 75, 143, 0.15)",
+                  border: "1px solid rgba(255, 75, 143, 0.4)",
+                }}
+              >
+                <span>💄</span> โหวต Tellme
+              </Link>
+            )}
+            {showPollInNav && (
+              <Link
+                href="/poll"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  color: "#ffd700",
+                  fontWeight: "700",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "rgba(255, 215, 0, 0.15)",
+                  border: "1px solid rgba(255, 215, 0, 0.4)",
+                }}
+              >
+                <span>🗳️</span> โพลล์แห่งปี
+              </Link>
+            )}
             <Link
               href="/admin"
               style={{
@@ -947,6 +995,48 @@ export default function HistoryClient({ isSecretFoty = false }) {
             >
               <span style={{ fontSize: "16px" }}>🎱</span> จำลองจับลูกบอล
             </Link>
+            {showFavFanInNav && (
+              <Link
+                href="/fav-fan"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: "11px 16px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(90deg, rgba(255, 75, 143, 0.2) 0%, rgba(255, 50, 100, 0.1) 100%)",
+                  border: "1px solid rgba(255, 75, 143, 0.4)",
+                  color: "#ff758f",
+                  fontWeight: "800",
+                  fontSize: "15px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <span style={{ fontSize: "16px" }}>💄</span> โหวต Tellme (/fav-fan)
+              </Link>
+            )}
+            {showPollInNav && (
+              <Link
+                href="/poll"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: "11px 16px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 170, 0, 0.1) 100%)",
+                  border: "1px solid rgba(255, 215, 0, 0.4)",
+                  color: "#ffd700",
+                  fontWeight: "800",
+                  fontSize: "15px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <span style={{ fontSize: "16px" }}>🗳️</span> โพลล์แห่งปี (/poll)
+              </Link>
+            )}
             <Link
               href="/admin"
               onClick={() => setMobileMenuOpen(false)}
