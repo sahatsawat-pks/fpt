@@ -1745,7 +1745,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                                           โควตา
                                         </span>
                                       )}
-                                      {c.note && (
+                                      {c.note && (isSecretFoty || !c.note.includes("สละสิทธิ์")) && (
                                         <span style={{
                                           marginLeft: "8px",
                                           padding: "1px 7px",
@@ -4015,7 +4015,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                   {selectedSpotlight.quota && (
                     <span style={{ fontSize: "12px", color: "#ffd700", marginLeft: "6px" }}>[โควตา]</span>
                   )}
-                  {selectedSpotlight.note && (
+                  {selectedSpotlight.note && (isSecretFoty || !selectedSpotlight.note.includes("สละสิทธิ์")) && (
                     <span style={{
                       fontSize: "11px",
                       color: "#fca5a5",
@@ -4526,7 +4526,7 @@ export default function HistoryClient({ isSecretFoty = false }) {
                         <div style={{ fontSize: "16px", fontWeight: "900", color: "#ffd700" }}>
                           🏆 ตอบถูก — เป็นสุดยอดแฟนพันธุ์แท้!
                         </div>
-                        {selectedSpotlight.note ? (
+                        {selectedSpotlight.note && (isSecretFoty || !selectedSpotlight.note.includes("สละสิทธิ์")) ? (
                           <div style={{ fontSize: "12px", color: "#fca5a5", marginTop: "6px", fontWeight: "700" }}>
                             ⚠️ {selectedSpotlight.note}
                           </div>
