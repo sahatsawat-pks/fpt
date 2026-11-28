@@ -1194,7 +1194,7 @@ export default function TrialFotyBallotVotePage() {
         minHeight: "100vh",
         background: "linear-gradient(180deg, #020712 0%, #061122 50%, #030814 100%)",
         color: "#f8fafc",
-        fontFamily: "'Sukhumvit Set', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontFamily: "var(--font-th, var(--font-prompt), 'Prompt', 'Kanit', sans-serif)",
         paddingBottom: "80px",
       }}
     >
